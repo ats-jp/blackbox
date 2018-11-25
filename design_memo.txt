@@ -1,0 +1,797 @@
+スキーマ設計方針
+	まずは最大限正規化、あとで非効率なところの正規化を崩していく
+	PKは テーブル名_id で統一、他テーブルで参照する際も同じ名称で項目を作成し、必ずFKを付ける
+		PKはUUID?sequence（big serial）?→効率の面でsequenceとする
+	全項目NOT NULL（を目指す）
+	各テーブルに、ユーザーが認識する一意のコードを付ける（必要なテーブルだけ）。名称はid
+		→idは外部アプリケーションで持つことにするので不要
+	名称の項目名もnameで統一
+	アプリケーションで必要な項目は、各アプリケーション専用の別テーブルとし、クエリビルドに介入してJOINすることで各アプリケーションが取得できるようにする
+	利用者から指定されるgroup_idは、上位グループの場合、その下位グループも含めなければならない。実現方式は要検討
+	外部のアプリケーション拡張テーブルとの結合について
+		例えばitemを例にとると、アプリケーションの拡張テーブルとしてext_itemがあり、アプリケーションはitemとext_itemを同一視させなければならない。
+		だがitemに項目の追加はさせないので、ext_item側にitem_idをFKで持ち、さらにその項目にunique keyを付けなければならない。
+	extensionの使い方
+		extension項目は、外部のアプリケーション拡張テーブルの情報を転記し保存しておくためのもの
+	jsonbを活用する。ただし、あくまでも当時の状態を記録するためで、JSONのレイアウトに依存した検索などをするべきではない
+	マスタはtriggerでlogスキーマに更新前の値を保存→extension連鎖があるから不要?要検討
+		logスキーマバックアップの要件をパッケージの機能に含める
+	ロールについて
+		細やかなロール管理は、アプリケーション側で行う前提
+		ここではあくまで最低限のロール管理のみ行うものとする
+		SystemAdministrator
+			client CRUD
+			group CRUD
+			user CRUD
+			transfer C (snapshot, stockの数量更新含む)
+		ClientAdministrator
+			client RU
+			group CRUD
+			user CRUD
+				Systemロールは設定できない
+			item, owner, location, status CRUD
+			branch CRUD
+			transfer C (snapshot, stockの数量更新含む)
+		GroupAdministrator
+			group RU
+			user CRUD
+				SystemAdministrator, ClientAdministratorロールは設定できない
+				自分が直属するgroupのみ（group_idを直接参照しているuser、つまり子group孫groupに属しているuserは不可ということ）
+			item, owner, location, status CRUD
+				自分が直属するgroupのみ（group_idを直接参照しているuser、つまり子group孫groupに属しているuserは不可ということ）
+			branch CRUD
+			transfer C (snapshot, stockの数量更新含む)
+		User
+			item, owner, location, status R
+			branch CRUD
+			transfer C (snapshot, stockの数量更新含む)
+	実スキーマ
+		sawdust
+		sawdust_log
+
+検討事項
+	client_id全テーブルにつける?
+	上位group_idを検索条件として指定された場合のの展開方法
+	ownerをgroupでownerを吸収
+		顧客等の外部組織もgroupで表現することで、locationの所属先をgroupで表現できる
+	移動数量はマイナスあり?なし?
+	idとかnameとかすべて外持ちにする?→id外持ち、nameは見やすさのために持つことにする
+	state名前変えたほうがいいかも→stockにする
+
+名称案
+	balanceofstates
+	balanceinstatus
+	balansus
+	balance-in-stores clerk
+		-> biscle
+		-> bisc
+		-> bisclerk
+		-> clerk
+	translog
+	balis
+	sawdust
+	okoze
+	pivot
+
+client
+	データの仕切り
+	システム利用者最大単位
+	logとる
+	項目
+		client_id
+			PK
+			big serial
+		id
+			text
+			systemでunique
+		name
+			text
+		revision
+		extension
+			アプリケーションによる追加情報
+		created_at
+			このデータの登録時刻
+		create_user_id
+		updated_at
+			このデータの更新時刻
+		update_user_id
+
+group
+	userのまとまり
+	権限コントロールのためのテーブル
+	全てのオブジェクトは何らかのgroupに属するように
+	logとる
+	項目
+		group_id
+			PK
+			big serial
+		client_id
+		parent_id ※廃止、外のアプリケーションで行う
+			groupへのFK
+			自グループの上位グループを表す
+		id
+			text
+			org内でunique
+		name
+			text
+		revision
+		extension
+			アプリケーションによる追加情報
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+user
+	本システムの操作者
+	logとる
+	項目
+		user_id
+			PK
+			big serial
+		group_id
+		id
+			org内でunique
+		name
+		role
+		revision
+		extension
+			アプリケーションによる追加情報
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+item
+	もの
+	もののマスタ
+	insert, updateは常時可能, deleteはstockにリンクされるまではOK
+	idはclientで一意
+	logとる
+	項目
+		item_id
+		group_id
+		id
+		name
+		extension
+			アプリケーションによる追加情報
+		revision
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+owner
+	itemの所有者
+	顧客、仕入先（個人の場合もある）
+	logとる
+	項目
+		owner_id
+		group_id
+		id
+		name
+		extension
+			アプリケーションによる追加情報
+		revision
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+location
+	ものの置き場
+	insert, updateは常時可能, deleteはstockにリンクされるまではOK
+	idはclientで一意
+	logとる
+	項目
+		location_id
+		group_id
+		owner_id
+			この置き場の所有者を表す
+		id
+		name
+		extension
+			アプリケーションによる追加情報
+		revision
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+status
+	ものの状態
+	insert, updateは常時可能, deleteはstockにリンクされるまではOK
+	idはclientで一意
+	logとる
+	項目
+		status_id
+		client_id
+		id
+		name
+		extension
+			アプリケーションによる追加情報
+		revision
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+stock
+	物、その所有者、所在地、状況を表す特定の状態
+	item, group(ownerとして), location, statusを紐づけ
+	group_id, item_id, owner_id, location_id, status_idで一意になるようにユニークキーをはる
+	更新可能だが、現時点での数量の保持がメインなのでlogとる必要なし
+	項目
+		stock_id
+			PK
+			big serial
+		group_id
+		user_id
+		item_id
+		owner_id
+		location_id
+		status_id
+		quantity
+			現在時点での数量
+		revision
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+===========ここまでマスタ===========
+
+transfer
+	移動伝票
+	bundleを束ねるもの
+	insertのみ
+	項目
+		transfer_id
+			PK
+			big serial
+		group_id
+			FK
+		transferred_at
+			移動時刻
+		created_at
+			このデータの登録時刻
+		created_by
+			FK
+			登録者
+		extension
+			group, userのextensionをまとめたもの
+			権限系の情報を記録するため、赤伝時も最新のものを持ってくる
+bundle
+	nodeを束ねるもの
+	insertのみ
+	項目
+		bundle_id
+			PK
+			big serial
+		transfer_id
+			FK
+node
+	stockの移動数量を持つ
+	insertのみ
+	項目
+		node_id
+			PK
+			big serial
+		bundle_id
+			FK
+		stock_id
+			FK
+		in_out
+			in:'I', out:'O'
+		shift
+			移動量
+			numeric（小数点あり）
+			minusありにする?要検討
+		extension
+			stockが参照する全テーブルのextensionをまとめたもの
+			item, owner, location, statusのextension
+			マスタ系の情報を記録するため、赤伝時は、最新のものではなく赤伝の元となる伝票のextensionをもってくる
+
+snapshot
+	nodeのタイムスタンプ時点での数量を持つ
+	update可能
+	更新可能だがlogとらない
+	項目
+		node_id
+			PK
+			FK
+		quantity
+			この時点での数量
+		revision
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+===========ここまでtransfer===========
+
+branch
+	以下のbranch系テーブルのまとめ
+	insert, delete
+	logとる
+	項目
+		branch_id
+		group_id
+		created_by
+		created_at
+			このデータの登録時刻
+
+stock_branch
+	stockの一時保存ブランチ
+	insert, update, delete可能
+	revisionは楽観的排他ロックで使う
+	logとる
+	stockが存在しない場合、quantity 0でstockを作成、リンクする
+	項目
+		stock_id
+			PK
+			FK
+		quantity
+			現在時点での数量
+		revision
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+transfer_branch
+	transferの一時保存ブランチ
+	insert, update, delete可能
+	revisionは楽観的排他ロックで使う
+	logとる
+	項目
+		branch_id
+		transfer_branch_id
+			PK
+			big serial
+		group_id
+			FK
+		transferred_at
+			移動時刻
+		created_at
+			このデータの登録時刻
+		extension
+			group, userのextensionをまとめたもの
+			権限系の情報を記録するため、赤伝時も最新のものを持ってくる
+		revision
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+bundle_branch
+	bundleの一時保存ブランチ
+	insert, update, delete可能
+	revisionは楽観的排他ロックで使う
+	logとる
+	項目
+		bundle_branch_id
+		transfer_branch_id
+		revision
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+node_branch
+	nodeの一時保存ブランチ
+	insert, update, delete可能
+	revisionは楽観的排他ロックで使う
+	logとる
+	項目
+		stock_id
+			FK
+			stock_branch_idではない
+		in_out
+			in:'I', out:'O'
+		shift
+			移動量
+			numeric（小数点あり）
+			minusありにする?要検討
+		revision
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+snapshot_branch
+	snapshotの一時保存ブランチ
+	insert, update, delete可能
+	revisionは楽観的排他ロックで使う
+	logとる
+	項目
+		node_branch_id
+			PK
+			FK
+		quantity
+			この時点での数量
+		revision
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+--===========================
+-- security
+--===========================
+
+CREATE SCHEMA sawdust;
+
+CREATE TABLE sawdust.client (
+	client_id bigserial PRIMARY KEY,
+	name text NOT NULL,
+	revision bigint NOT NULL,
+	extension jsonb NOT NULL,
+	created_at timestamptz NOT NULL DEFAULT now(),
+	created_by bigint NOT NULL, --あとでREFERENCES userに
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	updated_by bigint NOT NULL, --あとでREFERENCES userに
+	UNIQUE (client_id, revision) --revisionはrow毎に一意
+);
+
+--システム用
+INSERT INTO sawdust.client (
+	name,
+	revision,
+	extension,
+	created_by,
+	updated_by
+) VALUES (
+	'Sawdust',
+	0,
+	'{}',
+	0,
+	0
+);
+
+----------
+
+CREATE TABLE sawdust.group (
+	group_id bigserial PRIMARY KEY,
+	client_id bigint REFERENCES sawdust.client NOT NULL,
+	name text NOT NULL,
+	revision bigint NOT NULL,
+	extension jsonb NOT NULL,
+	created_at timestamptz NOT NULL DEFAULT now(),
+	created_by bigint NOT NULL, --あとでREFERENCES userに
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	updated_by bigint NOT NULL, --あとでREFERENCES userに
+	UNIQUE (client_id, id), --idはclient毎に一意
+	UNIQUE (group_id, revision) --revisionはrow毎に一意
+);
+
+--システム用
+INSERT INTO sawdust.group (
+	client_id,
+	name,
+	revision,
+	extension,
+	created_by,
+	updated_by
+) VALUES (
+	0,
+	'superuser-group',
+	'Superuser Group',
+	0,
+	'{}',
+	0,
+	0
+);
+----------
+
+CREATE TABLE sawdust.user (
+	user_id bigserial PRIMARY KEY,
+	group_id bigint REFERENCES sawdust.group NOT NULL,
+	name text NOT NULL,
+	role smallint NOT NULL CHECK role IN (0, 1, 2, 3), --0=SystemAdministrator, 1=ClientAdministrator, 2=GroupAdministrator, 3=User
+	revision bigint NOT NULL,
+	extension jsonb NOT NULL,
+	created_at timestamptz NOT NULL DEFAULT now(),
+	created_by bigint NOT NULL, --あとでREFERENCES userに
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	updated_by bigint NOT NULL, --あとでREFERENCES userに
+	UNIQUE (user_id, revision) --revisionはrow毎に一意
+);
+
+INSERT INTO sawdust.user (
+	group_id,
+	name,
+	role,
+	revision,
+	extension,
+	created_by,
+	updated_by
+) VALUES (
+	0,
+	'Superuser',
+	0,
+	0,
+	'{}',
+	0,
+	0
+);
+
+ALTER TABLE sawdust.client ADD FOREIGN KEY (created_by) REFERENCES sawdust.user;
+ALTER TABLE sawdust.client ADD FOREIGN KEY (updated_by) REFERENCES sawdust.user;
+ALTER TABLE sawdust.group ADD FOREIGN KEY (created_by) REFERENCES sawdust.user;
+ALTER TABLE sawdust.group ADD FOREIGN KEY (updated_by) REFERENCES sawdust.user;
+ALTER TABLE sawdust.user ADD FOREIGN KEY (created_by) REFERENCES sawdust.user;
+ALTER TABLE sawdust.user ADD FOREIGN KEY (updated_by) REFERENCES sawdust.user;
+
+--===========================
+-- master
+--===========================
+
+CREATE TABLE sawdust.item (
+	item_id bigserial PRIMARY KEY,
+	group_id bigint REFERENCES sawdust.group NOT NULL,
+	name text NOT NULL,
+	revision bigint NOT NULL,
+	extension jsonb NOT NULL,
+	created_at timestamptz NOT NULL DEFAULT now(),
+	created_by bigint REFERENCES user NOT NULL,
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	updated_by bigint REFERENCES user NOT NULL,
+	UNIQUE (item_id, revision) --revisionはrow毎に一意
+);
+----------
+
+CREATE TABLE sawdust.owner (
+	owner_id bigserial PRIMARY KEY,
+	group_id bigint REFERENCES sawdust.group NOT NULL,
+	name text NOT NULL,
+	revision bigint NOT NULL,
+	extension jsonb NOT NULL,
+	created_at timestamptz NOT NULL DEFAULT now(),
+	created_by bigint REFERENCES user NOT NULL,
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	updated_by bigint REFERENCES user NOT NULL,
+	UNIQUE (owner_id, revision) --revisionはrow毎に一意
+);
+----------
+
+CREATE TABLE sawdust.location (
+	location_id bigserial PRIMARY KEY,
+	group_id bigint REFERENCES sawdust.group NOT NULL,
+	name text NOT NULL,
+	revision bigint NOT NULL,
+	extension jsonb NOT NULL,
+	created_at timestamptz NOT NULL DEFAULT now(),
+	created_by bigint REFERENCES user NOT NULL,
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	updated_by bigint REFERENCES user NOT NULL,
+	UNIQUE (location_id, revision) --revisionはrow毎に一意
+);
+----------
+
+CREATE TABLE sawdust.status (
+	status_id bigserial PRIMARY KEY,
+	client_id bigint REFERENCES sawdust.client NOT NULL,
+	name text NOT NULL,
+	revision bigint NOT NULL,
+	extension jsonb NOT NULL,
+	created_at timestamptz NOT NULL DEFAULT now(),
+	created_by bigint REFERENCES user NOT NULL,
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	updated_by bigint REFERENCES user NOT NULL,
+	UNIQUE (status_id, revision) --revisionはrow毎に一意
+);
+----------
+
+CREATE TABLE sawdust.stock (
+	stock_id bigserial PRIMARY KEY,
+	group_id bigint REFERENCES sawdust.group NOT NULL,
+	item_id bigint REFERENCES sawdust.item NOT NULL,
+	owner_id bigint REFERENCES sawdust.owner NOT NULL,
+	location_id bigint REFERENCES sawdust.location NOT NULL,
+	status_id bigint REFERENCES sawdust.status NOT NULL,
+	quantity numeric NOT NULL,
+	revision bigint NOT NULL,
+	created_at timestamptz NOT NULL DEFAULT now(),
+	created_by bigint REFERENCES user NOT NULL,
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	updated_by bigint REFERENCES user NOT NULL,
+	UNIQUE (stock_id, revision) --revisionはrow毎に一意
+);
+
+--===========================
+-- transfer
+--===========================
+
+CREATE TABLE sawdust.transfer (
+	transfer_id bigserial PRIMARY KEY,
+	group_id bigint REFERENCES sawdust.group NOT NULL,
+	transferred_at timestamptz NOT NULL DEFAULT,
+	created_at timestamptz NOT NULL DEFAULT,
+	extension jsonb NOT NULL,
+	created_by bigint REFERENCES user NOT NULL
+);
+----------
+
+CREATE TABLE sawdust.bundle (
+	bundle_id bigserial PRIMARY KEY,
+	transfer_id bigint REFERENCES sawdust.transfer NOT NULL
+);
+----------
+
+CREATE TABLE sawdust.node (
+	node_id bigserial PRIMARY KEY,
+	bundle_id REFERENCES sawdust.bundle NOT NULL,
+	stock_id REFERENCES sawdust.stock NOT NULL,
+	in_out text CHECK in_out IN ('I', 'O'),
+	shift numeric NOT NULL,
+	extension jsonb NOT NULL
+);
+----------
+
+CREATE TABLE sawdust.snapshot (
+	snapshot_id bigint PRIMARY KEY REFERENCES sawdust.node,
+	quantity numeric,
+	revision bigint NOT NULL,
+	created_at timestamptz NOT NULL DEFAULT now(), --snapshotを後から追加更新することも考慮し、create系項目を用意する
+	created_by bigint REFERENCES user NOT NULL,
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	updated_by bigint REFERENCES user NOT NULL,
+	UNIQUE (snapshot_id, revision) --revisionはrow毎に一意
+);
+
+--===========================
+-- branch
+--===========================
+
+branch
+	以下のbranch系テーブルのまとめ
+	insert, delete
+	logとる
+	項目
+		branch_id
+		group_id
+		created_by
+		created_at
+			このデータの登録時刻
+
+stock_branch
+	stockの一時保存ブランチ
+	insert, update, delete可能
+	revisionは楽観的排他ロックで使う
+	logとる
+	stockが存在しない場合、quantity 0でstockを作成、リンクする
+	項目
+		stock_id
+			PK
+			FK
+		quantity
+			現在時点での数量
+		revision
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+transfer_branch
+	transferの一時保存ブランチ
+	insert, update, delete可能
+	revisionは楽観的排他ロックで使う
+	logとる
+	項目
+		branch_id
+		transfer_branch_id
+			PK
+			big serial
+		group_id
+			FK
+		transferred_at
+			移動時刻
+		created_at
+			このデータの登録時刻
+		extension
+			group, userのextensionをまとめたもの
+			権限系の情報を記録するため、赤伝時も最新のものを持ってくる
+		revision
+		created_at
+			このデータの登録時刻
+		created_by
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+bundle_branch
+	bundleの一時保存ブランチ
+	insert, update, delete可能
+	revisionは楽観的排他ロックで使う
+	logとる
+	項目
+		bundle_branch_id
+		transfer_branch_id
+		revision
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+node_branch
+	nodeの一時保存ブランチ
+	insert, update, delete可能
+	revisionは楽観的排他ロックで使う
+	logとる
+	項目
+		stock_id
+			FK
+			stock_branch_idではない
+		in_out
+			in:'I', out:'O'
+		shift
+			移動量
+			numeric（小数点あり）
+			minusありにする?要検討
+		revision
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+snapshot_branch
+	snapshotの一時保存ブランチ
+	insert, update, delete可能
+	revisionは楽観的排他ロックで使う
+	logとる
+	項目
+		node_branch_id
+			PK
+			FK
+		quantity
+			この時点での数量
+		revision
+		updated_at
+			このデータの更新時刻
+		updated_by
+
+2018/11/20
+
+処理について
+検索処理
+	クエリビルドプロセスに介入できるようにし、一検索で目的の情報がすべて取得できるようにする
+登録処理
+	extensionを渡してもらう、処理結果にextensionを含めるようにし、介入（拡張）不要にする
+となるとSawdustのカバー範囲はREST API機能を含めたものになる?
+Sawdust = 在庫管理 + REST API基盤?
+
+snapshotsは常に更新することにする
+更新可能チェック（先に登録されたnodeの在庫がマイナスにならないかのチェック）は常に行わなければならないため、
+処理コストとしては更新してもしなくてもあまり変わらないのではないか
+であれば、設計をシンプルにするためにもsnapshotsは常に更新するほうが良い
+
+今後の作業方針
+・11/22に外部アプリケーションの各テーブルを設計するための打ち合わせ
+・REST APIの設計
+
+2018/11/21
+
+内部API案
+transfersが全て反映されたかどうかを確認するAPI
+	日次バッチなどが、その日の在庫移動が反映完了したことを確認して動かすために使用する
+	時刻をパラメータとし、その時刻までのsnapshotがすべてcurrentに反映されていればtrue
+	RESTとは別に、Java内で使用するwaitさせるメソッドも用意する
+		バッチスレッドが、current反映が完了してから処理開始できるように
+ANALYZEを掛けるAPI
+	外部のjobでスケジュールした通りにANALYZEを実行
+	一番負荷の少ない時間を外部に任せるために

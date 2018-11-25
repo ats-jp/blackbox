@@ -1,0 +1,1046 @@
+REST API
+参考: https://qiita.com/mserizawa/items/b833e407d89abd21ee72
+
+共通
+	パラメータ
+		検索条件
+			{column}.{column}で参照先のカラムを指定可能
+			検索条件のタイプ
+				equals
+					完全一致
+				like
+					中間一致
+				contains
+					指定したgroup_idに従属するものすべて
+				boolean
+					true, false
+				range
+					検索条件について
+						{column}={from}~{to} で
+							from <= column <= to
+						という検索を行う
+						~の隣に何も指定しないと、無制限として扱われる
+						検索パターン一覧
+						{column}={value} -> column = value
+						{column}=~{value} -> value <= column
+						{column}={value}~ -> value >= column
+						{column}={from}~{to} -> from <= column <= to
+				timestamp
+					形式はyyyyMMddHHmmssで、タイムゾーンはアプリケーション毎の定義を採用
+					時刻
+						時刻検索条件について
+							{timestamp_column}={from-timestamp}~{to-timestamp} で
+								from-timestamp <= timestamp_column <= to-timestamp
+							という検索を行う
+							~の隣に何も指定しないと、無期限として扱われる
+							検索パターン一覧
+							{timestamp_column}={timestamp} -> timestamp_column = timestamp
+							{timestamp_column}=~{timestamp} -> timestamp_column <= timestamp
+							{timestamp_column}={timestamp}~ -> timestamp_column >= timestamp
+							{timestamp_column}={from-timestamp}~{to-timestamp} -> from-timestamp <= timestamp_column <= to-timestamp
+				ex
+					外部アプリケーション用
+		sort
+			ソート項目名を指定する
+			{column}.{column}で参照先のカラムを指定可能
+			,で複数指定可能
+			先頭-ありで降順、なしで昇順
+			ex.{column}形式で、外部アプリケーションの項目を指定可能
+		embed
+			,で複数指定可能
+			指定された項目は、responseのembedに追加される
+			項目名.項目名...とすることで参照ツリーをさかのぼってembedに追加可能
+				例) created_by.group_idとした場合
+					"embed" : {
+						"created_by" : {
+							"type" : "user",
+							...
+							"embed" : {
+								"group_id" : {
+									...
+								}
+							}
+						}
+					}
+			ex.{column}形式使用可能
+		page
+			{ページ数},{ページ行数}
+			指定されない場合、0,{Blackbox設定:デフォルト最大行数}となる
+	JSON内の値の表記 (JSONの仕様: string, number, object, array, true, false, null)
+		"文字列"
+			固定文字列
+		number
+			数
+		number?
+			数またはnull
+		string
+			"文字列"
+		boolean
+			true, false
+		timestamp
+			ISO 8601拡張形式
+			例) 2018-01-31T23:00:00+09:00
+		{extension}
+			外部アプリケーション追加情報JSON
+		{object}
+			object名のJSON
+		[object]
+			objectの配列
+		{embed}
+			embed形式参照のこと
+	複数件オブジェクトがある場合のresponse形式
+		endpointが /objects となっている場合、単体指定時のオブジェクトが、配列として複数件返ってくる
+		形式
+			{
+				[
+					{object},
+					...
+				]
+			}
+	role文字列について
+		SYSTEM_ADMIN
+		ORG_ADMIN
+		GROUP_ADMIN
+		USER
+		NONE
+
+----------
+
+object: org
+endpoint: blackbox/v1/orgs
+method:
+	GET /orgs/:id
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+		response
+			{
+				"type" : "org",
+				"id" : number,
+				"name" : string,
+				"revision" : number,
+				"extension" : {extension},
+				"active" : boolean,
+				"created_at" " timestamp,
+				"create_by" : number,
+				"updated_at" : timestamp,
+				"updated_by" : number,
+				"embed" : {embed}
+			}
+	GET /orgs
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+		parameters
+			検索条件
+				name (like)
+				active (boolean)
+				created_at (equals)
+				created_by (timestamp)
+				updated_at (equals)
+				updated_by (timestamp)
+				ex.{column} (ex)
+			追加情報
+				embed
+		response
+			org配列
+	POST /orgs
+		権限
+			SYSTEM_ADMIN
+		parameters
+			embed
+		post body
+			{
+				"name" : string, //必須
+				"extension" : {extension} //任意
+			}
+		response
+			/orgs/:id
+	PUT /orgs/:id
+	PATCH /orgs/:id
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+		parameters
+			embed
+		post body
+			{
+				"revision" : number, //必須
+				"name" : string, //任意
+				"extension" : {extension}, //任意
+				"active" : boolean //任意
+			}
+		response
+			/orgs/:id
+	PUT /orgs/:id/on
+		set active true
+		権限
+			SYSTEM_ADMIN
+		response
+			/orgs/:id
+	PUT /orgs/:id/off
+		set active false
+		権限
+			SYSTEM_ADMIN
+		response
+			/orgs/:id
+	DELETE /orgs/:id
+		権限
+			SYSTEM_ADMIN
+		parameters
+			embed
+		response
+			/orgs/:id
+
+---------
+
+object: group
+endpoint: blackbox/v1/groups
+method:
+	GET /groups/:id
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他group情報の参照は可能
+		response
+			{
+				"type" : "group",
+				"id" : number,
+				"org_id" : number,
+				"name" : string,
+				"parent_id" : number?,
+				"revision" : number,
+				"extension" : {extension},
+				"active" : boolean,
+				"created_at" " timestamp,
+				"create_by" : number,
+				"updated_at" : timestamp,
+				"updated_by" : number,
+				"embed" : {embed}
+			}
+	GET /groups
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他group情報の参照は可能
+		parameters
+			検索条件
+				org_id (equals)
+				name (like)
+				active (boolean)
+				created_at (equals)
+				created_by (timestamp)
+				updated_at (equals)
+				updated_by (timestamp)
+				ex.{column} (ex)
+			追加情報
+				embed
+		response
+			group配列
+	POST /groups
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+		parameters
+			embed
+		post body
+			{
+				"org_id" : number, //任意(指定なしの場合、作業userに従属)
+				"name" : string, //必須
+				"extension" : {extension} //任意
+			}
+		response
+			/groups/:id
+	PUT /groups/:id
+	PATCH /groups/:id
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		parameters
+			embed
+		post body
+			{
+				"revision" : number, //必須
+				"name" : string, //任意
+				"extension" : {extension}, //任意
+				"active" : boolean //任意
+			}
+		response
+			/groups/:id
+	PUT /groups/:id/on
+		set active true
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+		response
+			/groups/:id
+	PUT /groups/:id/off
+		set active false
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+		response
+			/groups/:id
+	DELETE /groups/:id
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+		parameters
+			embed
+		response
+			/groups/:id
+			
+---------
+
+object: user
+endpoint: blackbox/v1/users
+method:
+	GET /users/:id
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他user情報の参照は可能
+		response
+			{
+				"type" : "user",
+				"id" : number,
+				"group_id" : number,
+				"name" : string,
+				"role" : string, //role文字列参照
+				"revision" : number,
+				"extension" : {extension},
+				"active" : boolean,
+				"created_at" " timestamp,
+				"create_by" : number,
+				"updated_at" : timestamp,
+				"updated_by" : number,
+				"embed" : {embed}
+			}
+	GET /users
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他user情報の参照は可能
+		parameters
+			検索条件
+				group_id (contains)
+				name (like)
+				role (equals)
+				active (boolean)
+				created_at (equals)
+				created_by (timestamp)
+				updated_at (equals)
+				updated_by (timestamp)
+				ex.{column} (ex)
+			追加情報
+				embed
+		response
+			user配列
+	POST /users
+		権限
+			SYSTEM_ADMIN
+				全roleまで設定可能
+			ORG_ADMIN
+				ORG_ADMINまで設定可能
+					→ORG_ADMINはORG_ADMINを追加できる
+			GROUP_ADMIN
+				GROUP_ADMINまで設定可能
+					→GROUP_ADMINはGROUP_ADMINを追加できる
+		parameters
+			embed
+		post body
+			{
+				"group_id" : number, //任意(指定なしの場合、作業userに従属)
+				"name" : string, //必須
+				"role" : string, //必須(role文字列参照)
+				"extension" : {extension} //任意
+			}
+		response
+			/users/:id
+	PUT /users/:id
+	PATCH /users/:id
+		権限
+			SYSTEM_ADMIN
+				全roleまで設定可能
+			ORG_ADMIN
+				ORG_ADMINまで設定可能
+					→ORG_ADMINはORG_ADMINまでroleを上昇できる
+			GROUP_ADMIN
+					→GROUP_ADMINはGROUP_ADMINまでroleを上昇できる
+		parameters
+			embed
+		post body
+			{
+				"revision" : number, //必須
+				"group_id" : number, //任意
+				"name" : string, //任意
+				"role" : string //任意(role文字列参照)
+				"extension" : {extension}, //任意
+				"active" : boolean //任意
+			}
+		response
+			/users/:id
+	PUT /users/:id/on
+		set active true
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/users/:id
+	PUT /users/:id/off
+		set active false
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/users/:id
+	DELETE /users/:id
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		parameters
+			embed
+		response
+			/users/:id
+
+---------
+
+object: item
+endpoint: blackbox/v1/items
+method:
+	GET /items/:id
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他item情報の参照は可能
+		response
+			{
+				"type" : "item",
+				"id" : number,
+				"group_id" : number,
+				"name" : string,
+				"revision" : number,
+				"extension" : {extension},
+				"active" : boolean,
+				"created_at" " timestamp,
+				"create_by" : number,
+				"updated_at" : timestamp,
+				"updated_by" : number,
+				"embed" : {embed}
+			}
+	GET /items
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他item情報の参照は可能
+		parameters
+			検索条件
+				group_id (contains)
+				name (like)
+				active (boolean)
+				created_at (equals)
+				created_by (timestamp)
+				updated_at (equals)
+				updated_by (timestamp)
+				ex.{column} (ex)
+			追加情報
+				embed
+		response
+			item配列
+	POST /items
+		権限
+			SYSTEM_ADMIN
+				全group設定可能
+			ORG_ADMIN
+				org配下全group設定可能
+			GROUP_ADMIN
+				自groupのみ設定可能
+		parameters
+			embed
+		post body
+			{
+				"group_id" : number, //任意(指定なしの場合、作業userに従属)
+				"name" : string, //必須
+				"extension" : {extension} //任意
+			}
+		response
+			/items/:id
+	PUT /items/:id
+	PATCH /items/:id
+		権限
+			SYSTEM_ADMIN
+				全group設定可能
+			ORG_ADMIN
+				org配下全group設定可能
+			GROUP_ADMIN
+				自groupのみ設定可能
+		parameters
+			embed
+		post body
+			{
+				"revision" : number, //必須
+				"group_id" : number, //任意
+				"name" : string, //任意
+				"extension" : {extension}, //任意
+				"active" : boolean //任意
+			}
+		response
+			/items/:id
+	PUT /items/:id/on
+		set active true
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/items/:id
+	PUT /items/:id/off
+		set active false
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/items/:id
+	DELETE /items/:id
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		parameters
+			embed
+		response
+			/items/:id
+
+---------
+
+object: owner
+endpoint: blackbox/v1/owners
+method:
+	GET /owners/:id
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他owner情報の参照は可能
+		response
+			{
+				"type" : "owner",
+				"id" : number,
+				"group_id" : number,
+				"name" : string,
+				"revision" : number,
+				"extension" : {extension},
+				"active" : boolean,
+				"created_at" " timestamp,
+				"create_by" : number,
+				"updated_at" : timestamp,
+				"updated_by" : number,
+				"embed" : {embed}
+			}
+	GET /owners
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他owner情報の参照は可能
+		parameters
+			検索条件
+				group_id (contains)
+				name (like)
+				active (boolean)
+				created_at (equals)
+				created_by (timestamp)
+				updated_at (equals)
+				updated_by (timestamp)
+				ex.{column} (ex)
+			追加情報
+				embed
+		response
+			owner配列
+	POST /owners
+		権限
+			SYSTEM_ADMIN
+				全group設定可能
+			ORG_ADMIN
+				org配下全group設定可能
+			GROUP_ADMIN
+				自groupのみ設定可能
+		parameters
+			embed
+		post body
+			{
+				"group_id" : number, //任意(指定なしの場合、作業userに従属)
+				"name" : string, //必須
+				"extension" : {extension} //任意
+			}
+		response
+			/owners/:id
+	PUT /owners/:id
+	PATCH /owners/:id
+		権限
+			SYSTEM_ADMIN
+				全group設定可能
+			ORG_ADMIN
+				org配下全group設定可能
+			GROUP_ADMIN
+				自groupのみ設定可能
+		parameters
+			embed
+		post body
+			{
+				"revision" : number, //必須
+				"group_id" : number, //任意
+				"name" : string, //任意
+				"extension" : {extension}, //任意
+				"active" : boolean //任意
+			}
+		response
+			/owners/:id
+	PUT /owners/:id/on
+		set active true
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/owners/:id
+	PUT /owners/:id/off
+		set active false
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/owners/:id
+	DELETE /owners/:id
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		parameters
+			embed
+		response
+			/owners/:id
+
+---------
+
+object: location
+endpoint: blackbox/v1/locations
+method:
+	GET /locations/:id
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他location情報の参照は可能
+		response
+			{
+				"type" : "location",
+				"id" : number,
+				"group_id" : number,
+				"name" : string,
+				"revision" : number,
+				"extension" : {extension},
+				"active" : boolean,
+				"created_at" " timestamp,
+				"create_by" : number,
+				"updated_at" : timestamp,
+				"updated_by" : number,
+				"embed" : {embed}
+			}
+	GET /locations
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他location情報の参照は可能
+		parameters
+			検索条件
+				group_id (contains)
+				name (like)
+				active (boolean)
+				created_at (equals)
+				created_by (timestamp)
+				updated_at (equals)
+				updated_by (timestamp)
+				ex.{column} (ex)
+			追加情報
+				embed
+		response
+			location配列
+	POST /locations
+		権限
+			SYSTEM_ADMIN
+				全group設定可能
+			ORG_ADMIN
+				org配下全group設定可能
+			GROUP_ADMIN
+				自groupのみ設定可能
+		parameters
+			embed
+		post body
+			{
+				"group_id" : number, //任意(指定なしの場合、作業userに従属)
+				"name" : string, //必須
+				"extension" : {extension} //任意
+			}
+		response
+			/locations/:id
+	PUT /locations/:id
+	PATCH /locations/:id
+		権限
+			SYSTEM_ADMIN
+				全group設定可能
+			ORG_ADMIN
+				org配下全group設定可能
+			GROUP_ADMIN
+				自groupのみ設定可能
+		parameters
+			embed
+		post body
+			{
+				"revision" : number, //必須
+				"group_id" : number, //任意
+				"name" : string, //任意
+				"extension" : {extension}, //任意
+				"active" : boolean //任意
+			}
+		response
+			/locations/:id
+	PUT /locations/:id/on
+		set active true
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/locations/:id
+	PUT /locations/:id/off
+		set active false
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/locations/:id
+	DELETE /locations/:id
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		parameters
+			embed
+		response
+			/locations/:id
+
+---------
+
+object: status
+endpoint: blackbox/v1/statuses
+method:
+	GET /statuses/:id
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他status情報の参照は可能
+		response
+			{
+				"type" : "status",
+				"id" : number,
+				"group_id" : number,
+				"name" : string,
+				"revision" : number,
+				"extension" : {extension},
+				"active" : boolean,
+				"created_at" " timestamp,
+				"create_by" : number,
+				"updated_at" : timestamp,
+				"updated_by" : number,
+				"embed" : {embed}
+			}
+	GET /statuses
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他status情報の参照は可能
+		parameters
+			検索条件
+				group_id (contains)
+				name (like)
+				active (boolean)
+				created_at (equals)
+				created_by (timestamp)
+				updated_at (equals)
+				updated_by (timestamp)
+				ex.{column} (ex)
+			追加情報
+				embed
+		response
+			status配列
+	POST /statuses
+		権限
+			SYSTEM_ADMIN
+				全group設定可能
+			ORG_ADMIN
+				org配下全group設定可能
+			GROUP_ADMIN
+				自groupのみ設定可能
+		parameters
+			embed
+		post body
+			{
+				"group_id" : number, //任意(指定なしの場合、作業userに従属)
+				"name" : string, //必須
+				"extension" : {extension} //任意
+			}
+		response
+			/statuses/:id
+	PUT /statuses/:id
+	PATCH /statuses/:id
+		権限
+			SYSTEM_ADMIN
+				全group設定可能
+			ORG_ADMIN
+				org配下全group設定可能
+			GROUP_ADMIN
+				自groupのみ設定可能
+		parameters
+			embed
+		post body
+			{
+				"revision" : number, //必須
+				"group_id" : number, //任意
+				"name" : string, //任意
+				"extension" : {extension}, //任意
+				"active" : boolean //任意
+			}
+		response
+			/statuses/:id
+	PUT /statuses/:id/on
+		set active true
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/statuses/:id
+	PUT /statuses/:id/off
+		set active false
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/statuses/:id
+	DELETE /statuses/:id
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		parameters
+			embed
+		response
+			/statuses/:id
+
+---------
+
+object: transfer
+endpoint: blackbox/v1/transfers
+method:
+	GET /transfers/:id
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他user情報の参照は可能
+		parameters
+			embed
+		response
+			{
+				"type" : "transfer",
+				"id" : number,
+				"group_id" : number,
+				"denied_id" : number?,
+				"transferred_at" : timestamp,
+				"extension" : {extension},
+				"org_extension" : {extension},
+				"group_extension" : {extension},
+				"user_extension" : {extension},
+				"created_at" " timestamp,
+				"create_by" : number,
+				"embed" : {embed},
+				"bundles" : [bundle]
+			}
+	GET /transfers/:id/bundles
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他user情報の参照は可能
+		parameters
+			embed
+				nodes基準で取得可能
+		response
+			{
+				"type" : "bundle",
+				"id" : number,
+				"extension" : {extension},
+				"embed" : {embed},
+				"nodes" : [
+					{
+						"type" : "node",
+						"id" : number,
+						"stock_id" : number,
+						"item_id" : number?,
+						"owner_id" : number?,
+						"location_id" : number?,
+						"status_id" : number?,
+						"in_out" : string, //in="I", out="O"
+						"extension" : {extension},
+						"item_extension" : {extension},
+						"owner_extension" : {extension},
+						"location_extension" : {extension},
+						"status_extension" : {extension}
+					}
+				]
+			}
+	GET /transfers
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他status情報の参照は可能
+		parameters
+			検索条件
+				group_id (contains)
+				transferred_at (timestamp)
+				created_at (equals)
+				created_by (timestamp)
+				ex.{column} (ex)
+			追加情報
+				embed
+		response
+			/transfers/:idからbundlesを除外したものの配列
+	POST /transfers
+		権限
+			SYSTEM_ADMIN
+				全group設定可能
+			ORG_ADMIN
+				org配下全group設定可能
+			GROUP_ADMIN
+				自groupのみ設定可能
+		parameters
+			embed
+		post body
+			{
+				"group_id" : number, //任意(指定なしの場合、作業userに従属)
+				"transferred_at" : timestamp, //必須
+				"trigger_id" : number, //任意
+				"parameter" : {object}, //任意 triggerへ渡すparameter
+				"extension" : {extension}, //任意
+				"bundles" : [
+					{
+						"extension" : {extension}, //任意
+						"nodes" : [
+							{
+								"item_id" : number?, //必須
+								"owner_id" : number?, //必須
+								"location_id" : number?, //必須
+								"status_id" : number?, //必須
+								"in_out" : string, //必須(in="I", out="O")
+								"quantity" : number,
+								 "extension" : {extension} //任意
+							},
+							...
+						]
+					},
+					...
+				]
+			}
+		response
+			/transfers/:id
+	PUT /transfers/:id/deny
+		伝票の打消し
+		nodeのin_outを反転させ、transferred_atが同じ別のtransferを登録する
+		権限
+			SYSTEM_ADMIN
+			ORG_ADMIN
+			GROUP_ADMIN
+		response
+			/transfers/:id
+				新しく登録された伝票
+
+---------
+
+object: stock
+endpoint: blackbox/v1/stocks
+method:
+	GET /stocks/now/:id
+		現在時刻での在庫数を返却
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他user情報の参照は可能
+		parameters
+			embed
+		response
+			{
+				"type" : "stock",
+				"id" : number,
+				"group_id" : number,
+				"item_id" : number?,
+				"owner_id" : number?,
+				"location_id" : number?,
+				"status_id" : number?,
+				"quantity" : number,
+				"embed" : {embed}
+			}
+	GET /stocks/now
+		現在時刻での在庫数を返却
+		権限
+			SYSTEM_ADMIN
+			対象orgに属するuser
+				同一orgであれば他user情報の参照は可能
+		parameters
+			検索条件
+				group_id (contains)
+				item_id (equals)
+				owner_id (equals)
+				location_id (equals)
+				status_id (equals)
+				quantity (range)
+				ex.{column} (ex)
+			追加情報
+				embed
+		response
+			{
+				[stock]
+			}
+	GET /stocks/:timestamp/:id
+	GET /stocks/:timestamp
+		timestampの形式はyyyyMMddHHmmss
+		timestamp時点での在庫数を返却
+		embedでnodes以降を取得可能(snapshots参照のため)
+		その他はGET /stocksと同じ
+
+---------
+
+object: transient
+endpoint: blackbox/v1/transients
+method:
+	GET /transients/:id
+	GET /transients/:id/transfers/:id
+	GET /transients/:id/transfers/:id/bundles
+	PUT /transients/:id/transfers/:id/bundles/:id
+	PATCH /transients/:id/transfers/:id/bundles/:id
+	DELETE /transients/:id/transfers/:id/bundles/:id
+	GET /transients/:id/transfers
+	POST /transients/:id/transfers
+	PUT /transients/:id/transfers/:id
+	PATCH /transients/:id/transfers/:id
+	DELETE /transients/:id/transfers/:id
+	PUT /transients/:id/transfers/:id/merge
+	GET /transients/:id/stocks/now/:id
+	GET /transients/:id/stocks/now
+	GET /transients/:id/stocks/:timestamp/:id
+	GET /transients/:id/stocks/:timestamp
+	PUT /transients/:id/merge
+	GET /transients

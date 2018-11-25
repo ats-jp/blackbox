@@ -1,0 +1,12 @@
+ANALYZE log.orgs;
+ANALYZE log.groups;
+ANALYZE log.users;
+ANALYZE log.items;
+ANALYZE log.owners;
+ANALYZE log.locations;
+ANALYZE log.statuses;
+ANALYZE log.jobs;
+ANALYZE log.transients;
+ANALYZE log.transient_transfers;
+ANALYZE log.transient_bundles;
+ANALYZE log.transient_nodes;
