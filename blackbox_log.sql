@@ -24,20 +24,20 @@ database
 */
 
 --全削除
-DROP SCHEMA IF EXISTS log CASCADE;
+DROP SCHEMA IF EXISTS bb_log CASCADE;
 
 --===========================
 --log tables
 --===========================
 
-create SCHEMA log;
+create SCHEMA bb_log;
 
-COMMENT ON SCHEMA log IS 'Blackbox Log Schema';
+COMMENT ON SCHEMA bb_log IS 'Blackbox Log Schema';
 
 --開発環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
 SET default_tablespace = 'blackbox_log';
 
-CREATE TABLE log.orgs (
+CREATE TABLE bb_log.orgs (
 	id bigint,
 	name text,
 	revision bigint,
@@ -53,28 +53,28 @@ CREATE TABLE log.orgs (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.orgs_logfunction() RETURNS TRIGGER AS $orgs_logtrigger$
+CREATE FUNCTION bb_log.orgs_logfunction() RETURNS TRIGGER AS $orgs_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.orgs SELECT OLD.*, 'D';
+			INSERT INTO bb_log.orgs SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.orgs SELECT NEW.*, 'U';
+			INSERT INTO bb_log.orgs SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.orgs SELECT NEW.*, 'I';
+			INSERT INTO bb_log.orgs SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $orgs_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER orgs_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.orgs
-FOR EACH ROW EXECUTE PROCEDURE log.orgs_logfunction();
+CREATE TRIGGER orgs_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.orgs
+FOR EACH ROW EXECUTE PROCEDURE bb_log.orgs_logfunction();
 
 ----------
 
-CREATE TABLE log.groups (
+CREATE TABLE bb_log.groups (
 	id bigint,
 	org_id bigint,
 	name text,
@@ -92,28 +92,28 @@ CREATE TABLE log.groups (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.groups_logfunction() RETURNS TRIGGER AS $groups_logtrigger$
+CREATE FUNCTION bb_log.groups_logfunction() RETURNS TRIGGER AS $groups_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.groups SELECT OLD.*, 'D';
+			INSERT INTO bb_log.groups SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.groups SELECT NEW.*, 'U';
+			INSERT INTO bb_log.groups SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.groups SELECT NEW.*, 'I';
+			INSERT INTO bb_log.groups SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $groups_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER groups_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.groups
-FOR EACH ROW EXECUTE PROCEDURE log.groups_logfunction();
+CREATE TRIGGER groups_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.groups
+FOR EACH ROW EXECUTE PROCEDURE bb_log.groups_logfunction();
 
 ----------
 
-CREATE TABLE log.users (
+CREATE TABLE bb_log.users (
 	id bigint,
 	group_id bigint,
 	name text,
@@ -131,28 +131,28 @@ CREATE TABLE log.users (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.users_logfunction() RETURNS TRIGGER AS $users_logtrigger$
+CREATE FUNCTION bb_log.users_logfunction() RETURNS TRIGGER AS $users_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.users SELECT OLD.*, 'D';
+			INSERT INTO bb_log.users SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.users SELECT NEW.*, 'U';
+			INSERT INTO bb_log.users SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.users SELECT NEW.*, 'I';
+			INSERT INTO bb_log.users SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $users_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER users_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.users
-FOR EACH ROW EXECUTE PROCEDURE log.users_logfunction();
+CREATE TRIGGER users_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.users
+FOR EACH ROW EXECUTE PROCEDURE bb_log.users_logfunction();
 
 ----------
 
-CREATE TABLE log.items (
+CREATE TABLE bb_log.items (
 	id bigint,
 	group_id bigint,
 	name text,
@@ -169,28 +169,28 @@ CREATE TABLE log.items (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.items_logfunction() RETURNS TRIGGER AS $items_logtrigger$
+CREATE FUNCTION bb_log.items_logfunction() RETURNS TRIGGER AS $items_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.items SELECT OLD.*, 'D';
+			INSERT INTO bb_log.items SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.items SELECT NEW.*, 'U';
+			INSERT INTO bb_log.items SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.items SELECT NEW.*, 'I';
+			INSERT INTO bb_log.items SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $items_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER items_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.items
-FOR EACH ROW EXECUTE PROCEDURE log.items_logfunction();
+CREATE TRIGGER items_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.items
+FOR EACH ROW EXECUTE PROCEDURE bb_log.items_logfunction();
 
 ----------
 
-CREATE TABLE log.owners (
+CREATE TABLE bb_log.owners (
 	id bigint,
 	group_id bigint,
 	name text,
@@ -207,28 +207,28 @@ CREATE TABLE log.owners (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.owners_logfunction() RETURNS TRIGGER AS $owners_logtrigger$
+CREATE FUNCTION bb_log.owners_logfunction() RETURNS TRIGGER AS $owners_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.owners SELECT OLD.*, 'D';
+			INSERT INTO bb_log.owners SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.owners SELECT NEW.*, 'U';
+			INSERT INTO bb_log.owners SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.owners SELECT NEW.*, 'I';
+			INSERT INTO bb_log.owners SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $owners_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER owners_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.owners
-FOR EACH ROW EXECUTE PROCEDURE log.owners_logfunction();
+CREATE TRIGGER owners_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.owners
+FOR EACH ROW EXECUTE PROCEDURE bb_log.owners_logfunction();
 
 ----------
 
-CREATE TABLE log.locations (
+CREATE TABLE bb_log.locations (
 	id bigint,
 	group_id bigint,
 	name text,
@@ -245,28 +245,28 @@ CREATE TABLE log.locations (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.locations_logfunction() RETURNS TRIGGER AS $locations_logtrigger$
+CREATE FUNCTION bb_log.locations_logfunction() RETURNS TRIGGER AS $locations_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.locations SELECT OLD.*, 'D';
+			INSERT INTO bb_log.locations SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.locations SELECT NEW.*, 'U';
+			INSERT INTO bb_log.locations SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.locations SELECT NEW.*, 'I';
+			INSERT INTO bb_log.locations SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $locations_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER locations_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.locations
-FOR EACH ROW EXECUTE PROCEDURE log.locations_logfunction();
+CREATE TRIGGER locations_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.locations
+FOR EACH ROW EXECUTE PROCEDURE bb_log.locations_logfunction();
 
 ----------
 
-CREATE TABLE log.statuses (
+CREATE TABLE bb_log.statuses (
 	id bigint,
 	group_id bigint,
 	name text,
@@ -283,28 +283,28 @@ CREATE TABLE log.statuses (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.statuses_logfunction() RETURNS TRIGGER AS $statuses_logtrigger$
+CREATE FUNCTION bb_log.statuses_logfunction() RETURNS TRIGGER AS $statuses_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.statuses SELECT OLD.*, 'D';
+			INSERT INTO bb_log.statuses SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.statuses SELECT NEW.*, 'U';
+			INSERT INTO bb_log.statuses SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.statuses SELECT NEW.*, 'I';
+			INSERT INTO bb_log.statuses SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $statuses_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER statuses_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.statuses
-FOR EACH ROW EXECUTE PROCEDURE log.statuses_logfunction();
+CREATE TRIGGER statuses_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.statuses
+FOR EACH ROW EXECUTE PROCEDURE bb_log.statuses_logfunction();
 
 ----------
 
-CREATE TABLE log.jobs (
+CREATE TABLE bb_log.jobs (
 	id bigint,
 	starts_at timestamptz,
 	completed boolean,
@@ -312,37 +312,37 @@ CREATE TABLE log.jobs (
 	parameter jsonb,
 	revision bigint,
 	created_at timestamptz DEFAULT now(),
-	created_by bigint REFERENCES main.users,
+	created_by bigint REFERENCES bb.users,
 	updated_at timestamptz DEFAULT now(),
-	updated_by bigint REFERENCES main.users,
+	updated_by bigint REFERENCES bb.users,
 	action "char" CHECK (action IN ('I', 'U', 'D')),
 	log_id bigserial PRIMARY KEY,
 	txid bigint DEFAULT txid_current(),
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.jobs_logfunction() RETURNS TRIGGER AS $jobs_logtrigger$
+CREATE FUNCTION bb_log.jobs_logfunction() RETURNS TRIGGER AS $jobs_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.jobs SELECT OLD.*, 'D';
+			INSERT INTO bb_log.jobs SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.jobs SELECT NEW.*, 'U';
+			INSERT INTO bb_log.jobs SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.jobs SELECT NEW.*, 'I';
+			INSERT INTO bb_log.jobs SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $jobs_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER jobs_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.jobs
-FOR EACH ROW EXECUTE PROCEDURE log.jobs_logfunction();
+CREATE TRIGGER jobs_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.jobs
+FOR EACH ROW EXECUTE PROCEDURE bb_log.jobs_logfunction();
 
 ----------
 
-CREATE TABLE log.transients (
+CREATE TABLE bb_log.transients (
 	id bigint,
 	group_id bigint,
 	user_id bigint,
@@ -357,28 +357,28 @@ CREATE TABLE log.transients (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.transients_logfunction() RETURNS TRIGGER AS $transients_logtrigger$
+CREATE FUNCTION bb_log.transients_logfunction() RETURNS TRIGGER AS $transients_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.transients SELECT OLD.*, 'D';
+			INSERT INTO bb_log.transients SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.transients SELECT NEW.*, 'U';
+			INSERT INTO bb_log.transients SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.transients SELECT NEW.*, 'I';
+			INSERT INTO bb_log.transients SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $transients_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER transients_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.transients
-FOR EACH ROW EXECUTE PROCEDURE log.transients_logfunction();
+CREATE TRIGGER transients_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.transients
+FOR EACH ROW EXECUTE PROCEDURE bb_log.transients_logfunction();
 
 ----------
 
-CREATE TABLE log.transient_transfers (
+CREATE TABLE bb_log.transient_transfers (
 	id bigint,
 	transient_id bigint,
 	group_id bigint,
@@ -398,28 +398,28 @@ CREATE TABLE log.transient_transfers (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.transient_transfers_logfunction() RETURNS TRIGGER AS $transient_transfers_logtrigger$
+CREATE FUNCTION bb_log.transient_transfers_logfunction() RETURNS TRIGGER AS $transient_transfers_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.transient_transfers SELECT OLD.*, 'D';
+			INSERT INTO bb_log.transient_transfers SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.transient_transfers SELECT NEW.*, 'U';
+			INSERT INTO bb_log.transient_transfers SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.transient_transfers SELECT NEW.*, 'I';
+			INSERT INTO bb_log.transient_transfers SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $transient_transfers_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER transient_transfers_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.transient_transfers
-FOR EACH ROW EXECUTE PROCEDURE log.transient_transfers_logfunction();
+CREATE TRIGGER transient_transfers_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.transient_transfers
+FOR EACH ROW EXECUTE PROCEDURE bb_log.transient_transfers_logfunction();
 
 ----------
 
-CREATE TABLE log.transient_bundles (
+CREATE TABLE bb_log.transient_bundles (
 	id bigint,
 	transfer_branch_id bigint,
 	extension jsonb,
@@ -431,28 +431,28 @@ CREATE TABLE log.transient_bundles (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.transient_bundles_logfunction() RETURNS TRIGGER AS $transient_bundles_logtrigger$
+CREATE FUNCTION bb_log.transient_bundles_logfunction() RETURNS TRIGGER AS $transient_bundles_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.transient_bundles SELECT OLD.*, 'D';
+			INSERT INTO bb_log.transient_bundles SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.transient_bundles SELECT NEW.*, 'U';
+			INSERT INTO bb_log.transient_bundles SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.transient_bundles SELECT NEW.*, 'I';
+			INSERT INTO bb_log.transient_bundles SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $transient_bundles_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER transient_bundles_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.transient_bundles
-FOR EACH ROW EXECUTE PROCEDURE log.transient_bundles_logfunction();
+CREATE TRIGGER transient_bundles_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.transient_bundles
+FOR EACH ROW EXECUTE PROCEDURE bb_log.transient_bundles_logfunction();
 
 ----------
 
-CREATE TABLE log.transient_nodes (
+CREATE TABLE bb_log.transient_nodes (
 	id bigint,
 	transient_bundle_id bigint,
 	transient_stock_id bigint,
@@ -470,24 +470,24 @@ CREATE TABLE log.transient_nodes (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION log.transient_nodes_logfunction() RETURNS TRIGGER AS $transient_nodes_logtrigger$
+CREATE FUNCTION bb_log.transient_nodes_logfunction() RETURNS TRIGGER AS $transient_nodes_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO log.transient_nodes SELECT OLD.*, 'D';
+			INSERT INTO bb_log.transient_nodes SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO log.transient_nodes SELECT NEW.*, 'U';
+			INSERT INTO bb_log.transient_nodes SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO log.transient_nodes SELECT NEW.*, 'I';
+			INSERT INTO bb_log.transient_nodes SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
 $transient_nodes_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER transient_nodes_logtrigger AFTER INSERT OR UPDATE OR DELETE ON main.transient_nodes
-FOR EACH ROW EXECUTE PROCEDURE log.transient_nodes_logfunction();
+CREATE TRIGGER transient_nodes_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.transient_nodes
+FOR EACH ROW EXECUTE PROCEDURE bb_log.transient_nodes_logfunction();
 
 ----------
 
@@ -495,22 +495,22 @@ FOR EACH ROW EXECUTE PROCEDURE log.transient_nodes_logfunction();
 
 --log系のテーブルはINSERTのみなので、autovacuumは行わない
 --ただし、ANALYZEがかからなくなるので、定期的に実施する必要がある
-ALTER TABLE log.orgs SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.groups SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.users SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.items SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.owners SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.locations SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.statuses SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.jobs SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.transients SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.transient_transfers SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.transient_bundles SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE log.transient_nodes SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.orgs SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.groups SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.users SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.items SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.owners SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.locations SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.statuses SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.jobs SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.transients SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.transient_transfers SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.transient_bundles SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.transient_nodes SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 
 --===========================
 --privileges
 --===========================
 
 --logはSELECT, INSERTのみ
-GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA log TO blackbox;
+GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA bb_log TO blackbox;

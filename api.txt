@@ -78,8 +78,9 @@ REST API
 		boolean
 			true, false
 		timestamp
+			実質は文字列
 			ISO 8601拡張形式
-			例) 2018-01-31T23:00:00+09:00
+			例) "2018-01-31T23:00:00+09:00"
 		{extension}
 			外部アプリケーション追加情報JSON
 		{object}
