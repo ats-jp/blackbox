@@ -74,7 +74,7 @@ CREATE SCHEMA bb;
 COMMENT ON SCHEMA bb IS 'Blackbox Main Schema';
 
 --postgresql tablespace
---開発環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
+--開発環境、クラウド環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
 SET default_tablespace = 'blackbox';
 
 --組織
@@ -183,7 +183,7 @@ INSERT INTO bb.groups (
 ----------
 
 --グループ親子関係
-CREATE TABLE bb.relationships (
+CREATE UNLOGGED TABLE bb.relationships (
 	parent_id bigint REFERENCES bb.groups NOT NULL,
 	child_id bigint REFERENCES bb.groups NOT NULL,
 	UNIQUE (parent_id, child_id));
@@ -200,6 +200,12 @@ CREATE TABLE bb.relationships (
 --(子, 孫)
 --(孫, 孫)
 --が必要となる
+
+COMMENT ON TABLE bb.relationships IS 'グループ親子関係
+親IDが指定されたら子も対象とするための補助テーブル';
+COMMENT ON COLUMN bb.relationships.parent_id IS '親グループID';
+COMMENT ON COLUMN bb.relationships.child_id IS '子グループID
+親グループIDに対して、親自身と親から辿れるすべての子が登録されている';
 
 ----------
 
@@ -262,6 +268,20 @@ ALTER TABLE bb.groups ADD FOREIGN KEY (created_by) REFERENCES bb.users;
 ALTER TABLE bb.groups ADD FOREIGN KEY (updated_by) REFERENCES bb.users;
 ALTER TABLE bb.users ADD FOREIGN KEY (created_by) REFERENCES bb.users;
 ALTER TABLE bb.users ADD FOREIGN KEY (updated_by) REFERENCES bb.users;
+
+----------
+
+--ロック中グループ
+CREATE UNLOGGED TABLE bb.locking_groups (
+	id bigint PRIMARY KEY REFERENCES bb.groups,
+	user_id bigint REFERENCES bb.users NOT NULL,
+	locked_at timestamptz DEFAULT now() NOT NULL);
+--log対象外
+--WAL対象外
+--ロックのたびにグループの親子関係を展開してINSERTし、解放時はROLLBACKかDELETEで行う
+--PKの一意制約を利用して他でロック中であればINSERTできないことで排他を行う
+
+COMMENT ON TABLE bb.locking_groups IS 'ロック中グループ';
 
 --===========================
 --master tables
@@ -425,6 +445,51 @@ INSERT INTO bb.statuses (
 	updated_by
 ) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
 
+----------
+
+--締め
+CREATE TABLE bb.closings (
+	id bigserial PRIMARY KEY,
+	group_id bigint REFERENCES bb.groups NOT NULL,
+	closed_at timestamptz NOT NULL,
+	created_at timestamptz DEFAULT now() NOT NULL,
+	created_by bigint REFERENCES bb.users NOT NULL);
+
+--締め済グループ
+CREATE UNLOGGED TABLE bb.last_closings (
+	id bigint PRIMARY KEY REFERENCES bb.groups,
+	closing_id bigint REFERENCES bb.closings NOT NULL,
+	closed_at timestamptz NOT NULL);
+--log対象外
+--WAL対象外
+--締め済のグループを、親子関係を展開して登録し、締済みかどうかを高速に判定できるようにする
+
+----------
+
+--在庫
+CREATE TABLE bb.stocks (
+	id bigserial PRIMARY KEY,
+	group_id bigint REFERENCES bb.groups NOT NULL,
+	item_id bigint REFERENCES bb.items NOT NULL,
+	owner_id bigint REFERENCES bb.owners NOT NULL,
+	location_id bigint REFERENCES bb.locations NOT NULL,
+	status_id bigint REFERENCES bb.statuses NOT NULL,
+	created_at timestamptz DEFAULT now() NOT NULL,
+	created_by bigint REFERENCES bb.users NOT NULL,
+	UNIQUE (group_id, item_id, owner_id, location_id, status_id));
+--log対象外
+
+COMMENT ON TABLE bb.stocks IS '在庫
+Blackboxで数量管理する在庫の最小単位';
+COMMENT ON COLUMN bb.stocks.id IS 'ID';
+COMMENT ON COLUMN bb.stocks.group_id IS 'グループID';
+COMMENT ON COLUMN bb.stocks.item_id IS 'アイテムID';
+COMMENT ON COLUMN bb.stocks.owner_id IS '所有者ID';
+COMMENT ON COLUMN bb.stocks.location_id IS '置き場ID';
+COMMENT ON COLUMN bb.stocks.status_id IS '状態ID';
+COMMENT ON COLUMN bb.stocks.created_at IS '作成時刻';
+COMMENT ON COLUMN bb.stocks.created_by IS '作成ユーザー';
+
 --===========================
 --transfer tables
 --===========================
@@ -486,32 +551,6 @@ COMMENT ON COLUMN bb.bundles.extension IS '外部アプリケーション情報J
 
 ----------
 
---在庫
-CREATE TABLE bb.stocks (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
-	item_id bigint REFERENCES bb.items NOT NULL,
-	owner_id bigint REFERENCES bb.owners NOT NULL,
-	location_id bigint REFERENCES bb.locations NOT NULL,
-	status_id bigint REFERENCES bb.statuses NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
-	UNIQUE (group_id, item_id, owner_id, location_id, status_id));
---log対象外
-
-COMMENT ON TABLE bb.stocks IS '在庫
-Blackboxで数量管理する在庫の最小単位';
-COMMENT ON COLUMN bb.stocks.id IS 'ID';
-COMMENT ON COLUMN bb.stocks.group_id IS 'グループID';
-COMMENT ON COLUMN bb.stocks.item_id IS 'アイテムID';
-COMMENT ON COLUMN bb.stocks.owner_id IS '所有者ID';
-COMMENT ON COLUMN bb.stocks.location_id IS '置き場ID';
-COMMENT ON COLUMN bb.stocks.status_id IS '状態ID';
-COMMENT ON COLUMN bb.stocks.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.stocks.created_by IS '作成ユーザー';
-
-----------
-
 --移動ノード
 CREATE TABLE bb.nodes (
 	id bigserial PRIMARY KEY,
@@ -550,42 +589,50 @@ ALTER TABLE bb.nodes SET (autovacuum_enabled = false, toast.autovacuum_enabled =
 ----------
 
 --移動ノード状態
-CREATE TABLE bb.snapshots (
+CREATE UNLOGGED TABLE bb.snapshots (
 	id bigint PRIMARY KEY REFERENCES bb.nodes,
 	total numeric CHECK (total >= 0) NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by bigint REFERENCES bb.users NOT NULL);
 --log対象外
+--WAL対象外のため、クラッシュ時transfersから復元する必要あり
+--頻繁に参照、更新されることが予想されるので締め済のデータは削除する
 
 COMMENT ON TABLE bb.snapshots IS '移動ノード状態
 transferred_at時点でのstockの状態';
 COMMENT ON COLUMN bb.snapshots.id IS 'ID
 nodes.node_idに従属';
 COMMENT ON COLUMN bb.snapshots.total IS 'この時点の在庫総数';
-COMMENT ON COLUMN bb.snapshots.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.snapshots.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
 
 ----------
 
 --現在在庫
-CREATE TABLE bb.current_stocks (
+CREATE UNLOGGED TABLE bb.current_stocks (
 	id bigserial PRIMARY KEY REFERENCES bb.stocks,
 	total numeric CHECK (total >= 0) NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by bigint REFERENCES bb.users NOT NULL);
 --log対象外
+--WAL対象外のため、クラッシュ時transfersから復元する必要あり
 
 COMMENT ON TABLE bb.current_stocks IS '現在在庫
 在庫の現在数を保持';
 COMMENT ON COLUMN bb.current_stocks.id IS 'ID
 stocks.stock_idに従属';
 COMMENT ON COLUMN bb.current_stocks.total IS '現時点の在庫総数';
-COMMENT ON COLUMN bb.current_stocks.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.current_stocks.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.current_stocks.updated_by IS '更新ユーザー';
+
+----------
+
+CREATE UNLOGGED TABLE closed_stocks (
+	id bigint REFERENCES bb.stocks,
+	closing_id bigint REFERENCES bb.closings NOT NULL,
+	total numeric CHECK (total >= 0) NOT NULL,
+	updated_at timestamptz DEFAULT now() NOT NULL,
+	updated_by bigint REFERENCES bb.users NOT NULL);
 
 --===========================
 --job tables
@@ -717,6 +764,7 @@ CREATE TABLE bb.transient_bundles (
 	id bigserial PRIMARY KEY,
 	transient_transfer_id bigint REFERENCES bb.transient_transfers NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
+	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,-- 編集でtransient_bundlesだけ追加することもあるので必要
 	created_by bigint REFERENCES bb.users NOT NULL);
 
@@ -724,6 +772,7 @@ COMMENT ON TABLE bb.transient_bundles IS '一時作業移動伝票明細';
 COMMENT ON COLUMN bb.transient_bundles.id IS 'ID';
 COMMENT ON COLUMN bb.transient_bundles.transient_transfer_id IS '一時作業移動伝票ID';
 COMMENT ON COLUMN bb.transient_bundles.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.transient_bundles.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_bundles.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_bundles.created_by IS '作成ユーザー';
 
@@ -762,7 +811,6 @@ COMMENT ON COLUMN bb.transient_nodes.updated_by IS '更新ユーザー';
 CREATE TABLE bb.transient_snapshots (
 	id bigint PRIMARY KEY REFERENCES bb.transient_nodes,
 	total numeric CHECK (total >= 0) NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
@@ -771,7 +819,6 @@ CREATE TABLE bb.transient_snapshots (
 COMMENT ON TABLE bb.transient_snapshots IS '一時作業移動ノード状態';
 COMMENT ON COLUMN bb.transient_snapshots.id IS 'ID';
 COMMENT ON COLUMN bb.transient_snapshots.total IS 'この時点の在庫総数';
-COMMENT ON COLUMN bb.transient_snapshots.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_snapshots.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_snapshots.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transient_snapshots.updated_at IS '更新時刻';
@@ -784,7 +831,6 @@ CREATE TABLE bb.transient_current_stocks (
 	id bigint PRIMARY KEY REFERENCES bb.stocks, --先にstocksにデータを作成してからこのテーブルにデータ作成
 	transient_id bigint REFERENCES bb.transients NOT NULL,
 	total numeric CHECK (total >= 0) NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
@@ -795,7 +841,6 @@ COMMENT ON COLUMN bb.transient_current_stocks.id IS 'ID
 stocks.stock_idに従属';
 COMMENT ON COLUMN bb.transient_current_stocks.transient_id IS '一時作業ID';
 COMMENT ON COLUMN bb.transient_current_stocks.total IS '現時点の在庫総数';
-COMMENT ON COLUMN bb.transient_current_stocks.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_current_stocks.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_current_stocks.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transient_current_stocks.updated_at IS '更新時刻';
@@ -805,7 +850,7 @@ COMMENT ON COLUMN bb.transient_current_stocks.updated_by IS '更新ユーザー'
 --indexes
 --===========================
 
---開発環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
+--開発環境、クラウド環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
 SET default_tablespace = 'blackbox_index';
 
 --orgs

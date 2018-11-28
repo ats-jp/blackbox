@@ -34,7 +34,7 @@ create SCHEMA bb_log;
 
 COMMENT ON SCHEMA bb_log IS 'Blackbox Log Schema';
 
---開発環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
+--開発環境、クラウド環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
 SET default_tablespace = 'blackbox_log';
 
 CREATE TABLE bb_log.orgs (
