@@ -452,8 +452,10 @@ CREATE TABLE bb.closings (
 	id bigserial PRIMARY KEY,
 	group_id bigint REFERENCES bb.groups NOT NULL,
 	closed_at timestamptz NOT NULL,
+	extension jsonb DEFAULT '{}' NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL);
+--更新不可
 
 --締め済グループ
 CREATE UNLOGGED TABLE bb.last_closings (
@@ -463,6 +465,8 @@ CREATE UNLOGGED TABLE bb.last_closings (
 --log対象外
 --WAL対象外
 --締め済のグループを、親子関係を展開して登録し、締済みかどうかを高速に判定できるようにする
+--先に子が締めを行い、その後親で締めを行った場合、親側で上書きするためclosing_idは親側に変更する
+--具体的には、指定されたグループIDの子すべてをこのテーブルから一旦削除し、全部の子分を追加することで実現する
 
 ----------
 
@@ -531,6 +535,21 @@ INSERT INTO bb.transfers (
 	user_extension,
 	created_by
 ) VALUES (0, 0, 0, '0-1-1'::timestamptz, '{}', '{}', '{}', '{}', 0);
+
+--締め済グループチェック
+CREATE FUNCTION bb.closed_check() RETURNS TRIGGER AS $closed_checktrigger$
+	DECLARE closed_at timestamptz;
+	BEGIN
+		SELECT INTO closed_at closed_at FROM bb.last_closings WHERE id = NEW.group_id;
+		IF closed_at IS NOT NULL AND NEW.transferred_at < closed_at THEN
+			RAISE EXCEPTION 'closed_check(): group id=[%] closed at %', NEW.group_id, closed_at;
+		END IF;
+		RETURN NEW;
+	END;
+$closed_checktrigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER closed_checktrigger BEFORE INSERT ON bb.transfers
+FOR EACH ROW EXECUTE PROCEDURE bb.closed_check();
 
 ----------
 
@@ -627,7 +646,8 @@ COMMENT ON COLUMN bb.current_stocks.updated_by IS '更新ユーザー';
 
 ----------
 
-CREATE UNLOGGED TABLE closed_stocks (
+--締め在庫
+CREATE UNLOGGED TABLE bb.closed_stocks (
 	id bigint REFERENCES bb.stocks,
 	closing_id bigint REFERENCES bb.closings NOT NULL,
 	total numeric CHECK (total >= 0) NOT NULL,
@@ -963,8 +983,9 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb.transient_snapshots
 TO blackbox;
 
---triggersはINSERT, DELETEのみ
+--closings, triggersはINSERT, DELETEのみ
 GRANT INSERT, DELETE ON TABLE
+	bb.closings,
 	bb.triggers
 TO blackbox;
 

@@ -31,17 +31,17 @@ CREATE USER blackbox WITH
 -- アプリケーション用
 CREATE TABLESPACE blackbox
 	OWNER blackbox_admin
-	LOCATION 'xxxxx/blackbox'; --絶対パスで指定すること
+	LOCATION 'C:\ats_chiba\blackbox_tablespaces\blackbox'; --絶対パスで指定すること
 
 -- logスキーマ用
 CREATE TABLESPACE blackbox_log
 	OWNER blackbox_admin
-	LOCATION 'xxxxx/blackbox_log'; --絶対パスで指定すること
+	LOCATION 'C:\ats_chiba\blackbox_tablespaces\blackbox_log'; --絶対パスで指定すること
 
 -- index用
 CREATE TABLESPACE blackbox_index
 	OWNER blackbox_admin
-	LOCATION 'xxxxx/blackbox_index'; --絶対パスで指定すること
+	LOCATION 'C:\ats_chiba\blackbox_tablespaces\blackbox_index'; --絶対パスで指定すること
 
 -- CREATE DATABASE
 

@@ -304,6 +304,40 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.statuses_logfunction();
 
 ----------
 
+CREATE TABLE bb_log.closings (
+	id bigint,
+	group_id bigint,
+	closed_at timestamptz,
+	extension jsonb,
+	created_at timestamptz,
+	created_by bigint,
+	action "char" CHECK (action IN ('I', 'U', 'D')),
+	log_id bigserial PRIMARY KEY,
+	txid bigint DEFAULT txid_current(),
+	logged_by name DEFAULT current_user,
+	logged_at timestamptz DEFAULT now());
+
+CREATE FUNCTION bb_log.closings_logfunction() RETURNS TRIGGER AS $closings_logtrigger$
+	BEGIN
+		IF (TG_OP = 'DELETE') THEN
+			INSERT INTO bb_log.closings SELECT OLD.*, 'D';
+			RETURN OLD;
+		ELSIF (TG_OP = 'UPDATE') THEN
+			INSERT INTO bb_log.closings SELECT NEW.*, 'U';
+			RETURN NEW;
+		ELSIF (TG_OP = 'INSERT') THEN
+			INSERT INTO bb_log.closings SELECT NEW.*, 'I';
+			RETURN NEW;
+		END IF;
+		RETURN NULL;
+	END;
+$closings_logtrigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER closings_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.closings
+FOR EACH ROW EXECUTE PROCEDURE bb_log.closings_logfunction();
+
+----------
+
 CREATE TABLE bb_log.jobs (
 	id bigint,
 	starts_at timestamptz,
@@ -311,10 +345,10 @@ CREATE TABLE bb_log.jobs (
 	trigger_id bigint,
 	parameter jsonb,
 	revision bigint,
-	created_at timestamptz DEFAULT now(),
-	created_by bigint REFERENCES bb.users,
-	updated_at timestamptz DEFAULT now(),
-	updated_by bigint REFERENCES bb.users,
+	created_at timestamptz,
+	created_by bigint,
+	updated_at timestamptz,
+	updated_by bigint,
 	action "char" CHECK (action IN ('I', 'U', 'D')),
 	log_id bigserial PRIMARY KEY,
 	txid bigint DEFAULT txid_current(),
@@ -502,6 +536,7 @@ ALTER TABLE bb_log.items SET (autovacuum_enabled = false, toast.autovacuum_enabl
 ALTER TABLE bb_log.owners SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.locations SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.statuses SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.closings SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.jobs SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.transients SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.transient_transfers SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
