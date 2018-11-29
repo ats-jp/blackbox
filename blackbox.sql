@@ -457,6 +457,14 @@ CREATE TABLE bb.closings (
 	created_by bigint REFERENCES bb.users NOT NULL);
 --更新不可
 
+COMMENT ON TABLE bb.closings IS '締め';
+COMMENT ON COLUMN bb.closings.id IS 'ID';
+COMMENT ON COLUMN bb.closings.group_id IS 'グループID';
+COMMENT ON COLUMN bb.closings.closed_at IS '締め時刻';
+COMMENT ON COLUMN bb.closings.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.closings.created_at IS '作成時刻';
+COMMENT ON COLUMN bb.closings.created_by IS '作成ユーザー';
+
 --締め済グループ
 CREATE UNLOGGED TABLE bb.last_closings (
 	id bigint PRIMARY KEY REFERENCES bb.groups,
@@ -467,6 +475,12 @@ CREATE UNLOGGED TABLE bb.last_closings (
 --締め済のグループを、親子関係を展開して登録し、締済みかどうかを高速に判定できるようにする
 --先に子が締めを行い、その後親で締めを行った場合、親側で上書きするためclosing_idは親側に変更する
 --具体的には、指定されたグループIDの子すべてをこのテーブルから一旦削除し、全部の子分を追加することで実現する
+
+COMMENT ON TABLE bb.last_closings IS 'グループ最終締め情報';
+COMMENT ON COLUMN bb.last_closings.id IS 'ID
+グループIDに従属';
+COMMENT ON COLUMN bb.last_closings.closing_id IS '締めID';
+COMMENT ON COLUMN bb.last_closings.closed_at IS '締め時刻';
 
 ----------
 
@@ -537,7 +551,7 @@ INSERT INTO bb.transfers (
 ) VALUES (0, 0, 0, '0-1-1'::timestamptz, '{}', '{}', '{}', '{}', 0);
 
 --締め済グループチェック
-CREATE FUNCTION bb.closed_check() RETURNS TRIGGER AS $closed_checktrigger$
+CREATE FUNCTION bb.closed_check() RETURNS TRIGGER AS $$
 	DECLARE closed_at timestamptz;
 	BEGIN
 		SELECT INTO closed_at closed_at FROM bb.last_closings WHERE id = NEW.group_id;
@@ -546,7 +560,7 @@ CREATE FUNCTION bb.closed_check() RETURNS TRIGGER AS $closed_checktrigger$
 		END IF;
 		RETURN NEW;
 	END;
-$closed_checktrigger$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER closed_checktrigger BEFORE INSERT ON bb.transfers
 FOR EACH ROW EXECUTE PROCEDURE bb.closed_check();
@@ -653,6 +667,14 @@ CREATE UNLOGGED TABLE bb.closed_stocks (
 	total numeric CHECK (total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by bigint REFERENCES bb.users NOT NULL);
+
+COMMENT ON TABLE bb.closed_stocks IS '締め在庫';
+COMMENT ON COLUMN bb.closed_stocks.id IS 'ID
+在庫IDに従属';
+COMMENT ON COLUMN bb.closed_stocks.closing_id IS '締めID';
+COMMENT ON COLUMN bb.closed_stocks.total IS '締め後の在庫総数';
+COMMENT ON COLUMN bb.closed_stocks.updated_at IS '更新時刻';
+COMMENT ON COLUMN bb.closed_stocks.updated_by IS '更新ユーザー';
 
 --===========================
 --job tables
@@ -776,6 +798,21 @@ COMMENT ON COLUMN bb.transient_transfers.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_transfers.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transient_transfers.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transient_transfers.updated_by IS '更新ユーザー';
+
+--締め済グループチェック
+CREATE FUNCTION bb.transient_closed_check() RETURNS TRIGGER AS $$
+	DECLARE closed_at timestamptz;
+	BEGIN
+		SELECT INTO closed_at closed_at FROM bb.last_closings WHERE id = NEW.group_id;
+		IF closed_at IS NOT NULL AND NEW.transferred_at < closed_at THEN
+			RAISE EXCEPTION 'closed_check(): group id=[%] closed at %', NEW.group_id, closed_at;
+		END IF;
+		RETURN NEW;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER transient_closed_checktrigger BEFORE INSERT ON bb.transient_transfers
+FOR EACH ROW EXECUTE PROCEDURE bb.transient_closed_check();
 
 ----------
 
