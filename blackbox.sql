@@ -667,6 +667,9 @@ CREATE UNLOGGED TABLE bb.closed_stocks (
 	total numeric CHECK (total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by bigint REFERENCES bb.users NOT NULL);
+--log対象外
+--WAL対象外のため、クラッシュ時transfersから復元する必要あり
+--締め完了後の在庫数を保持
 
 COMMENT ON TABLE bb.closed_stocks IS '締め在庫';
 COMMENT ON COLUMN bb.closed_stocks.id IS 'ID
