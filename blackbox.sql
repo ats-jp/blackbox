@@ -1000,6 +1000,12 @@ CREATE INDEX ON bb.transient_nodes (stock_id);
 --privileges
 --===========================
 
+--スキーマ使用権を付与
+GRANT USAGE ON SCHEMA bb TO blackbox;
+
+--シーケンス使用権を付与
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA bb TO blackbox;
+
 --全テーブルSELECT可能
 GRANT SELECT ON ALL TABLES IN SCHEMA bb TO blackbox;
 

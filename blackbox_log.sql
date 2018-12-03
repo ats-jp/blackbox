@@ -547,5 +547,11 @@ ALTER TABLE bb_log.transient_nodes SET (autovacuum_enabled = false, toast.autova
 --privileges
 --===========================
 
---logはSELECT, INSERTのみ
-GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA bb_log TO blackbox;
+--スキーマ使用権を付与
+GRANT USAGE ON SCHEMA bb_log TO blackbox;
+
+--シーケンス使用権を付与
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA bb_log TO blackbox;
+
+--logはSELECTのみ
+GRANT INSERT ON ALL TABLES IN SCHEMA bb_log TO blackbox;
