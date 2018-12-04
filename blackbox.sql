@@ -85,9 +85,9 @@ CREATE TABLE bb.orgs (
 	extension jsonb DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint NOT NULL, --あとでREFERENCES userに
+	created_by bigint NOT NULL, --あとでREFERENCES usersに
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint NOT NULL); --あとでREFERENCES userに
+	updated_by bigint NOT NULL); --あとでREFERENCES usersに
 --システム利用者最大単位
 --log対象
 
@@ -178,34 +178,80 @@ INSERT INTO bb.groups (
 	extension,
 	created_by,
 	updated_by
-) VALUES (1, 'Superuser Groups', 0, 0, '{}', 1, 1);
+) VALUES (1, 'Superusers', 0, 0, '{}', 1, 1);
 
 ----------
 
 --グループ親子関係
 CREATE UNLOGGED TABLE bb.relationships (
+	id bigserial PRIMARY KEY,
 	parent_id bigint REFERENCES bb.groups NOT NULL,
 	child_id bigint REFERENCES bb.groups NOT NULL,
+	cascade_id bigint NOT NULL, --あとでREFERENCES relationshipsに
 	UNIQUE (parent_id, child_id));
 --log対象外
 --親IDが指定されたら子も対象とするための補助テーブル
 --groupの親子関係を物理的に展開し、検索を高速化することが目的
 --子グループから辿れるすべての親(0を除く)と自分自身にこのエントリを作成する
---例)
---親 <- 子 <- 孫という関係性の場合
---(親, 親)
---(親, 子)
---(親, 孫)
---(子, 子)
---(子, 孫)
---(孫, 孫)
---が必要となる
+
+/*
+例)
+親 <- 子 <- 孫という関係性の場合
+	(親, 親)
+	(親, 子)
+	(親, 孫)
+	(子, 子)
+	(子, 孫)
+	(孫, 孫)
+が必要となる
+
+cascade_idの用途は、世代が離れた連携を削除するために、一つ上のrelationshipのIDをもつ
+例)
+親 <- 子 <- 孫 <- 曾孫という関係性の場合
+親を登録
+	(1, 親, 親, 0)
+子を登録
+	(2, 子, 子, 0)
+	(3, 親, 子, 0)
+孫を登録
+	(4, 孫, 孫, 0)
+	(5, 子, 孫, 0)
+	(6, 親, 孫, 5)
+曾孫を登録
+	(7, 曾孫, 曾孫, 0)
+	(8, 孫, 曾孫, 0)
+	(9, 子, 曾孫, 8)
+	(10, 親, 曾孫, 9)
+親 <- 子の連携を変更する場合、一旦子の関係する連携を削除し、その後再度子以下の連携を登録することで実現する
+削除のフェーズにおいて、子のIDを持つ全行を削除すると
+2, 3, 5, 9が削除される
+5が削除された際、カスケードで6も削除
+9が削除された際、カスケードで10も削除される
+	(1, 親, 親, 0)
+	(4, 孫, 孫, 0)
+	(7, 曾孫, 曾孫, 0)
+	(8, 孫, 曾孫, 0)
+が残る
+*/
 
 COMMENT ON TABLE bb.relationships IS 'グループ親子関係
 親IDが指定されたら子も対象とするための補助テーブル';
+COMMENT ON COLUMN bb.relationships.id IS 'ID';
 COMMENT ON COLUMN bb.relationships.parent_id IS '親グループID';
 COMMENT ON COLUMN bb.relationships.child_id IS '子グループID
 親グループIDに対して、親自身と親から辿れるすべての子が登録されている';
+COMMENT ON COLUMN bb.relationships.cascade_id IS 'カスケード削除用ID
+自身が依存する親のIDを持っておき、親が削除されたときに連鎖的にすべて削除するための項目';
+
+--NULLの代用(id=0)
+INSERT INTO bb.relationships (
+	id,
+	parent_id,
+	child_id,
+	cascade_id
+) VALUES (0, 0, 0, 0);
+
+ALTER TABLE bb.relationships ADD CONSTRAINT relationships_cascade_id_fkey FOREIGN KEY (cascade_id) REFERENCES bb.relationships ON DELETE CASCADE;
 
 ----------
 
@@ -219,9 +265,9 @@ CREATE TABLE bb.users (
 	extension jsonb DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint NOT NULL, --あとでREFERENCES userに
+	created_by bigint NOT NULL, --あとでREFERENCES usersに
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint NOT NULL); --あとでREFERENCES userに
+	updated_by bigint NOT NULL); --あとでREFERENCES usersに
 --log対象
 
 COMMENT ON TABLE bb.users IS 'ユーザー
@@ -260,7 +306,7 @@ INSERT INTO bb.users (
 	extension,
 	created_by,
 	updated_by
-) VALUES (1, 'Superuser', 0, 0, '{}', 1, 1);
+) VALUES (1, 'superuser', 0, 0, '{}', 1, 1);
 
 ALTER TABLE bb.orgs ADD FOREIGN KEY (created_by) REFERENCES bb.users;
 ALTER TABLE bb.orgs ADD FOREIGN KEY (updated_by) REFERENCES bb.users;
