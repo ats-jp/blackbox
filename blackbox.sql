@@ -124,6 +124,10 @@ INSERT INTO bb.orgs (
 
 ----------
 
+CREATE TABLE bb.tags (
+	id bigserial PRIMARY KEY,
+	tag text UNIQUE NOT NULL);
+
 --グループ
 CREATE TABLE bb.groups (
 	id bigserial PRIMARY KEY,
@@ -132,6 +136,7 @@ CREATE TABLE bb.groups (
 	parent_id bigint REFERENCES bb.groups NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint NOT NULL, --あとでREFERENCES userに
@@ -151,6 +156,7 @@ COMMENT ON COLUMN bb.groups.name IS '名称';
 COMMENT ON COLUMN bb.groups.parent_id IS '親グループID';
 COMMENT ON COLUMN bb.groups.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.groups.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.groups.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb.groups.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb.groups.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.groups.created_by IS '作成ユーザー';
@@ -180,16 +186,21 @@ INSERT INTO bb.groups (
 	updated_by
 ) VALUES (1, 'Superusers', 0, 0, '{}', 1, 1);
 
+CREATE TABLE bb.group_tags (
+	group_id bigint REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+
 ----------
 
 --グループ親子関係
-CREATE UNLOGGED TABLE bb.relationships (
+CREATE TABLE bb.relationships (
 	id bigserial PRIMARY KEY,
-	parent_id bigint REFERENCES bb.groups NOT NULL,
-	child_id bigint REFERENCES bb.groups NOT NULL,
+	parent_id bigint REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
+	child_id bigint REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
 	cascade_id bigint NOT NULL, --あとでREFERENCES relationshipsに
 	UNIQUE (parent_id, child_id));
 --log対象外
+--groupsから復元できるデータであるが、更新頻度は高くないと思われるのでWAL対象
 --親IDが指定されたら子も対象とするための補助テーブル
 --groupの親子関係を物理的に展開し、検索を高速化することが目的
 --子グループから辿れるすべての親(0を除く)と自分自身にこのエントリを作成する
@@ -263,6 +274,7 @@ CREATE TABLE bb.users (
 	role smallint CHECK (role IN (0, 1, 2, 3, 9)) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint NOT NULL, --あとでREFERENCES usersに
@@ -279,6 +291,7 @@ COMMENT ON COLUMN bb.users.role IS '役割
 0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE';
 COMMENT ON COLUMN bb.users.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.users.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.users.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb.users.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb.users.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.users.created_by IS '作成ユーザー';
@@ -315,11 +328,15 @@ ALTER TABLE bb.groups ADD FOREIGN KEY (updated_by) REFERENCES bb.users;
 ALTER TABLE bb.users ADD FOREIGN KEY (created_by) REFERENCES bb.users;
 ALTER TABLE bb.users ADD FOREIGN KEY (updated_by) REFERENCES bb.users;
 
+CREATE TABLE bb.user_tags (
+	user_id bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+
 ----------
 
 --ロック中グループ
 CREATE UNLOGGED TABLE bb.locking_groups (
-	id bigint PRIMARY KEY REFERENCES bb.groups,
+	id bigint PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,
 	user_id bigint REFERENCES bb.users NOT NULL,
 	locked_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
@@ -340,6 +357,7 @@ CREATE TABLE bb.items (
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL,
@@ -354,6 +372,7 @@ COMMENT ON COLUMN bb.items.group_id IS 'グループID';
 COMMENT ON COLUMN bb.items.name IS '名称';
 COMMENT ON COLUMN bb.items.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.items.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.items.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb.items.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb.items.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.items.created_by IS '作成ユーザー';
@@ -371,6 +390,10 @@ INSERT INTO bb.items (
 	updated_by
 ) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
 
+CREATE TABLE bb.item_tags (
+	item_id bigint REFERENCES bb.items ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+
 ----------
 
 --所有者
@@ -380,6 +403,7 @@ CREATE TABLE bb.owners (
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL,
@@ -394,6 +418,7 @@ COMMENT ON COLUMN bb.owners.group_id IS 'グループID';
 COMMENT ON COLUMN bb.owners.name IS '名称';
 COMMENT ON COLUMN bb.owners.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.owners.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.owners.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb.owners.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb.owners.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.owners.created_by IS '作成ユーザー';
@@ -411,6 +436,10 @@ INSERT INTO bb.owners (
 	updated_by
 ) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
 
+CREATE TABLE bb.owner_tags (
+	owner_id bigint REFERENCES bb.owners ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+
 ----------
 
 --置き場
@@ -420,6 +449,7 @@ CREATE TABLE bb.locations (
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL,
@@ -434,6 +464,7 @@ COMMENT ON COLUMN bb.locations.group_id IS 'グループID';
 COMMENT ON COLUMN bb.locations.name IS '名称';
 COMMENT ON COLUMN bb.locations.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.locations.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.locations.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb.locations.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb.locations.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.locations.created_by IS '作成ユーザー';
@@ -451,6 +482,10 @@ INSERT INTO bb.locations (
 	updated_by
 ) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
 
+CREATE TABLE bb.location_tags (
+	location_id bigint REFERENCES bb.locations ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+
 ----------
 
 --状態
@@ -460,6 +495,7 @@ CREATE TABLE bb.statuses (
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL,
@@ -474,6 +510,7 @@ COMMENT ON COLUMN bb.statuses.group_id IS 'グループID';
 COMMENT ON COLUMN bb.statuses.name IS '名称';
 COMMENT ON COLUMN bb.statuses.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.statuses.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.statuses.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb.statuses.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb.statuses.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.statuses.created_by IS '作成ユーザー';
@@ -490,6 +527,10 @@ INSERT INTO bb.statuses (
 	created_by,
 	updated_by
 ) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
+
+CREATE TABLE bb.status_tags (
+	status_id bigint REFERENCES bb.statuses ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
 
 ----------
 
@@ -513,8 +554,8 @@ COMMENT ON COLUMN bb.closings.created_by IS '作成ユーザー';
 
 --締め済グループ
 CREATE UNLOGGED TABLE bb.last_closings (
-	id bigint PRIMARY KEY REFERENCES bb.groups,
-	closing_id bigint REFERENCES bb.closings NOT NULL,
+	id bigint PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,
+	closing_id bigint REFERENCES bb.closings ON DELETE CASCADE NOT NULL,
 	closed_at timestamptz NOT NULL);
 --log対象外
 --WAL対象外
@@ -568,6 +609,7 @@ CREATE TABLE bb.transfers (
 	org_extension jsonb NOT NULL,
 	group_extension jsonb NOT NULL,
 	user_extension jsonb NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL);
 --log対象外
@@ -575,11 +617,15 @@ CREATE TABLE bb.transfers (
 COMMENT ON TABLE bb.transfers IS '移動伝票';
 COMMENT ON COLUMN bb.transfers.id IS 'ID';
 COMMENT ON COLUMN bb.transfers.group_id IS 'グループID';
+COMMENT ON COLUMN bb.transfers.denied_id IS '取消元伝票ID
+訂正後の伝票が訂正前の伝票のIDを持つ
+ここに入っているIDが指す伝票は、取り消されたものとなる';
 COMMENT ON COLUMN bb.transfers.transferred_at IS '移動時刻';
 COMMENT ON COLUMN bb.transfers.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.transfers.org_extension IS '組織のextension';
 COMMENT ON COLUMN bb.transfers.group_extension IS 'グループのextension';
 COMMENT ON COLUMN bb.transfers.user_extension IS '作成ユーザーのextension';
+COMMENT ON COLUMN bb.transfers.tags IS '保存用タグ';
 COMMENT ON COLUMN bb.transfers.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transfers.created_by IS '作成ユーザー';
 
@@ -610,6 +656,10 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER closed_checktrigger BEFORE INSERT ON bb.transfers
 FOR EACH ROW EXECUTE PROCEDURE bb.closed_check();
+
+CREATE TABLE bb.transfer_tags (
+	transfer_id bigint REFERENCES bb.transfers ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
 
 ----------
 
@@ -672,7 +722,7 @@ CREATE UNLOGGED TABLE bb.snapshots (
 	id bigint PRIMARY KEY REFERENCES bb.nodes,
 	total numeric CHECK (total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時transfersから復元する必要あり
 --頻繁に参照、更新されることが予想されるので締め済のデータは削除する
@@ -689,10 +739,10 @@ COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
 
 --現在在庫
 CREATE UNLOGGED TABLE bb.current_stocks (
-	id bigserial PRIMARY KEY REFERENCES bb.stocks,
+	id bigserial PRIMARY KEY REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
 	total numeric CHECK (total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時transfersから復元する必要あり
 
@@ -707,15 +757,15 @@ COMMENT ON COLUMN bb.current_stocks.updated_by IS '更新ユーザー';
 ----------
 
 --締め在庫
-CREATE UNLOGGED TABLE bb.closed_stocks (
-	id bigint REFERENCES bb.stocks,
-	closing_id bigint REFERENCES bb.closings NOT NULL,
+CREATE TABLE bb.closed_stocks (
+	id bigint REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
+	closing_id bigint REFERENCES bb.closings ON DELETE CASCADE NOT NULL,
 	total numeric CHECK (total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
---WAL対象外のため、クラッシュ時transfersから復元する必要あり
 --締め完了後の在庫数を保持
+--クラッシュ時、ここからsnapshotsとcurrent_stocksを復元する
 
 COMMENT ON TABLE bb.closed_stocks IS '締め在庫';
 COMMENT ON COLUMN bb.closed_stocks.id IS 'ID
@@ -815,6 +865,10 @@ COMMENT ON COLUMN bb.transients.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transients.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transients.updated_by IS '更新ユーザー';
 
+CREATE TABLE bb.transient_tags (
+	transient_id bigint REFERENCES bb.transients ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+
 ----------
 
 --一時作業移動伝票
@@ -862,6 +916,10 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER transient_closed_checktrigger BEFORE INSERT ON bb.transient_transfers
 FOR EACH ROW EXECUTE PROCEDURE bb.transient_closed_check();
+
+CREATE TABLE bb.transient_transfer_tags (
+	transient_transfer_id bigint REFERENCES bb.transient_transfers ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
 
 ----------
 
@@ -1042,6 +1100,16 @@ CREATE INDEX ON bb.transient_nodes (stock_id);
 
 --transient_snapshots
 
+--tags
+CREATE INDEX ON bb.group_tags (tag_id);
+CREATE INDEX ON bb.user_tags (tag_id);
+CREATE INDEX ON bb.item_tags (tag_id);
+CREATE INDEX ON bb.owner_tags (tag_id);
+CREATE INDEX ON bb.location_tags (tag_id);
+CREATE INDEX ON bb.status_tags (tag_id);
+CREATE INDEX ON bb.transfer_tags (tag_id);
+CREATE INDEX ON bb.transient_tags (tag_id);
+
 --===========================
 --privileges
 --===========================
@@ -1077,8 +1145,17 @@ TO blackbox;
 
 --closings, triggersはINSERT, DELETEのみ
 GRANT INSERT, DELETE ON TABLE
+	bb.tags,
 	bb.closings,
-	bb.triggers
+	bb.triggers,
+	bb.group_tags,
+	bb.user_tags,
+	bb.item_tags,
+	bb.owner_tags,
+	bb.location_tags,
+	bb.status_tags,
+	bb.transfer_tags,
+	bb.transient_tags
 TO blackbox;
 
 --transfers関連はINSERTのみ
