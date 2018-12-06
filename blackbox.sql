@@ -640,7 +640,7 @@ INSERT INTO bb.transfers (
 	group_extension,
 	user_extension,
 	created_by
-) VALUES (0, 0, 0, '0-1-1'::timestamptz, '{}', '{}', '{}', '{}', 0);
+) VALUES (0, 0, 0, '1900-1-1'::timestamptz, '{}', '{}', '{}', '{}', 0);
 
 --締め済グループチェック
 CREATE FUNCTION bb.closed_check() RETURNS TRIGGER AS $$

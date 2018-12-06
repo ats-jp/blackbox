@@ -32,16 +32,19 @@ CREATE USER blackbox WITH
 CREATE TABLESPACE blackbox
 	OWNER blackbox_admin
 	LOCATION 'xxxxx/blackbox'; --絶対パスで指定すること
+--	LOCATION '/var/lib/postgresql/tablespaces/blackbox'; --docker用
 
 -- logスキーマ用
 CREATE TABLESPACE blackbox_log
 	OWNER blackbox_admin
 	LOCATION 'xxxxx/blackbox_log'; --絶対パスで指定すること
+--	LOCATION '/var/lib/postgresql/tablespaces/blackbox_log'; --docker用
 
 -- index用
 CREATE TABLESPACE blackbox_index
 	OWNER blackbox_admin
 	LOCATION 'xxxxx/blackbox_index'; --絶対パスで指定すること
+--	LOCATION '/var/lib/postgresql/tablespaces/blackbox_index'; --docker用
 
 -- CREATE DATABASE
 
