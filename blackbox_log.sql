@@ -424,6 +424,7 @@ CREATE TABLE bb_log.transient_transfers (
 	group_id bigint,
 	transferred_at timestamptz,
 	extension jsonb,
+	tags text[],
 	completed boolean,
 	trigger_id bigint,
 	parameter jsonb,

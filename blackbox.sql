@@ -878,6 +878,7 @@ CREATE TABLE bb.transient_transfers (
 	group_id bigint REFERENCES bb.groups NOT NULL,
 	transferred_at timestamptz NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
 	completed boolean DEFAULT false NOT NULL,
 	trigger_id bigint REFERENCES bb.triggers DEFAULT 0 NOT NULL,
 	parameter jsonb DEFAULT '{}' NOT NULL,
@@ -893,6 +894,7 @@ COMMENT ON COLUMN bb.transient_transfers.transient_id IS '一時作業ID';
 COMMENT ON COLUMN bb.transient_transfers.group_id IS 'グループID';
 COMMENT ON COLUMN bb.transient_transfers.transferred_at IS '移動時刻';
 COMMENT ON COLUMN bb.transient_transfers.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.transient_transfers.tags IS '保存用タグ';
 COMMENT ON COLUMN bb.transient_transfers.completed IS '実施済フラグ';
 COMMENT ON COLUMN bb.transient_transfers.trigger_id IS '追加処理ID';
 COMMENT ON COLUMN bb.transient_transfers.parameter IS 'triggerパラメータ';
