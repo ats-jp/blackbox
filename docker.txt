@@ -1,0 +1,45 @@
+#dockerのpostgresqlでblackboxの準備
+
+#bb-db起動
+docker run -d --name bb-db -p 5432:5432 postgres:11.1
+
+#起動確認
+docker ps
+
+#init.sqlの実行準備
+#カレントパスにinit.sqlを用意しておく
+#init.sqlのtablespaceのパスを↓に書き換えておく
+#コンテナ内にコピー
+docker cp init.sql bb-db:/var/tmp/init.sql
+
+#tablespace用ディレクトリを作成
+#コンテナにログイン
+docker exec -it bb-db bash
+su postgres
+#開発用テーブルスペース作成
+mkdir /var/lib/postgresql/tablespaces
+mkdir /var/lib/postgresql/tablespaces/blackbox
+mkdir /var/lib/postgresql/tablespaces/blackbox_log
+mkdir /var/lib/postgresql/tablespaces/blackbox_index
+
+#psqlでinit.sql実行
+psql
+\i /var/tmp/init.sql
+\q
+
+rm /var/tmp/init.sql
+
+#あとはpgAdminで操作する
+
+#その他
+#psql起動
+docker run -it --rm --link bb-db:bb-db postgres:11.1 psql -h bb-db -U postgres
+
+#bb-db開始
+docker start bb-db
+
+#bb-db停止
+docker stop bb-db
+
+#bb-db削除
+docker rm bb-db
