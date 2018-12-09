@@ -5,7 +5,7 @@
 	<groupId>jp.ats</groupId>
 	<artifactId>blackbox-webapp</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>blackbox-webapp Maven Webapp</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
