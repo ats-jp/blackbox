@@ -1,0 +1,15 @@
+#
+#Mon Dec 10 15:02:36 JST 2018
+columnRepositoryFactoryClass=
+jdbcDriverClass=org.postgresql.Driver
+rowParentClass=
+notUseNullGuard=
+metadataFactoryClass=
+columnRepositoryFile=
+queryParentClass=
+outputPackageName=jp.ats.blackbox.blendee
+codeFormatterClass=
+useNumberClass=
+transactionFactoryClass=
+schemaNames=bb
+tableFacadeParentClass=
