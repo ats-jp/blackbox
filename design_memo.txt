@@ -795,3 +795,11 @@ transfersが全て反映されたかどうかを確認するAPI
 ANALYZEを掛けるAPI
 	外部のjobでスケジュールした通りにANALYZEを実行
 	一番負荷の少ない時間を外部に任せるために
+
+2018/12/12
+Spark Framework
+https://qiita.com/5zm/items/0332250e5d2775198242
+
+Basic認証をJavaで実装する
+https://qiita.com/momosetkn/items/7b4cb7b0e3e086e69b8e
+->Basic認証をつける?
