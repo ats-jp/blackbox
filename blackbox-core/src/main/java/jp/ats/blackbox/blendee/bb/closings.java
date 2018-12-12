@@ -34,60 +34,60 @@ import org.blendee.sql.ValueExtractor;
 import org.blendee.sql.ValueExtractorsConfigure;
 import org.blendee.sql.RuntimeId;
 import org.blendee.sql.RuntimeIdFactory;
-import org.blendee.support.CriteriaContext;
-import org.blendee.support.DataManipulationStatement;
-import org.blendee.support.DataManipulationStatementBehavior;
-import org.blendee.support.DataManipulator;
-import org.blendee.support.DeleteStatementIntermediate;
-import org.blendee.support.GroupByColumn;
-import org.blendee.support.GroupByOfferFunction;
-import org.blendee.support.GroupByRelationship;
-import org.blendee.support.HavingColumn;
-import org.blendee.support.HavingRelationship;
-import org.blendee.support.InsertColumn;
-import org.blendee.support.InsertOfferFunction;
-import org.blendee.support.InsertRelationship;
-import org.blendee.support.InsertStatementIntermediate;
-import org.blendee.support.InstantOneToManyQuery;
-import org.blendee.support.annotation.PrimaryKey;
-import org.blendee.support.annotation.ForeignKey;
-import org.blendee.support.Many;
-import org.blendee.support.LogicalOperators;
-import org.blendee.support.OnClause;
-import org.blendee.support.OnLeftColumn;
-import org.blendee.support.OnLeftRelationship;
-import org.blendee.support.OnRightColumn;
-import org.blendee.support.OnRightRelationship;
-import org.blendee.support.OneToManyQuery;
-import org.blendee.support.OneToManyRelationship;
-import org.blendee.support.OrderByColumn;
-import org.blendee.support.OrderByOfferFunction;
-import org.blendee.support.OrderByRelationship;
-import org.blendee.support.Query;
-import org.blendee.support.RightTable;
-import org.blendee.support.Row;
-import org.blendee.support.RowIterator;
-import org.blendee.support.SelectColumn;
-import org.blendee.support.SelectOfferFunction;
-import org.blendee.support.SelectRelationship;
-import org.blendee.support.Statement;
-import org.blendee.support.SelectStatement;
-import org.blendee.support.SelectStatementBehavior;
-import org.blendee.support.SelectStatementBehavior.PlaybackQuery;
-import org.blendee.support.TableFacade;
-import org.blendee.support.TableFacadeColumn;
-import org.blendee.support.TableFacadeContext;
-import org.blendee.support.TableFacadeRelationship;
-import org.blendee.support.UpdateColumn;
-import org.blendee.support.UpdateRelationship;
-import org.blendee.support.UpdateStatementIntermediate;
-import org.blendee.support.WhereColumn;
-import org.blendee.support.WhereRelationship;
-import org.blendee.support.SQLDecorators;
-import org.blendee.support.annotation.Column;
-import org.blendee.support.Paren;
+import org.blendee.assist.CriteriaContext;
+import org.blendee.assist.DataManipulationStatement;
+import org.blendee.assist.DataManipulationStatementBehavior;
+import org.blendee.assist.DataManipulator;
+import org.blendee.assist.DeleteStatementIntermediate;
+import org.blendee.assist.GroupByColumn;
+import org.blendee.assist.GroupByOfferFunction;
+import org.blendee.assist.GroupByClauseAssist;
+import org.blendee.assist.HavingColumn;
+import org.blendee.assist.HavingClauseAssist;
+import org.blendee.assist.InsertColumn;
+import org.blendee.assist.InsertOfferFunction;
+import org.blendee.assist.InsertClauseAssist;
+import org.blendee.assist.InsertStatementIntermediate;
+import org.blendee.assist.InstantOneToManyQuery;
+import org.blendee.assist.annotation.PrimaryKey;
+import org.blendee.assist.annotation.ForeignKey;
+import org.blendee.assist.Many;
+import org.blendee.assist.LogicalOperators;
+import org.blendee.assist.OnClause;
+import org.blendee.assist.OnLeftColumn;
+import org.blendee.assist.OnLeftClauseAssist;
+import org.blendee.assist.OnRightColumn;
+import org.blendee.assist.OnRightClauseAssist;
+import org.blendee.assist.OneToManyQuery;
+import org.blendee.assist.OneToManyBehavior;
+import org.blendee.assist.OrderByColumn;
+import org.blendee.assist.OrderByOfferFunction;
+import org.blendee.assist.OrderByClauseAssist;
+import org.blendee.assist.Query;
+import org.blendee.assist.RightTable;
+import org.blendee.assist.Row;
+import org.blendee.assist.RowIterator;
+import org.blendee.assist.SelectColumn;
+import org.blendee.assist.SelectOfferFunction;
+import org.blendee.assist.SelectClauseAssist;
+import org.blendee.assist.Statement;
+import org.blendee.assist.SelectStatement;
+import org.blendee.assist.SelectStatementBehavior;
+import org.blendee.assist.SelectStatementBehavior.PlaybackQuery;
+import org.blendee.assist.TableFacade;
+import org.blendee.assist.TableFacadeColumn;
+import org.blendee.assist.TableFacadeContext;
+import org.blendee.assist.TableFacadeAssist;
+import org.blendee.assist.UpdateColumn;
+import org.blendee.assist.UpdateClauseAssist;
+import org.blendee.assist.UpdateStatementIntermediate;
+import org.blendee.assist.WhereColumn;
+import org.blendee.assist.WhereClauseAssist;
+import org.blendee.assist.SQLDecorators;
+import org.blendee.assist.annotation.Column;
+import org.blendee.assist.Paren;
 
-import org.blendee.support.annotation.Table;
+import org.blendee.assist.annotation.Table;
 
 /**
  * 自動生成されたテーブル操作クラスです。
@@ -105,7 +105,7 @@ public class closings
 	SelectStatement,
 	SQLDecorators,
 	Query<closings.Iterator, closings.Row>,
-	RightTable<closings.OnRightRel> {
+	RightTable<closings.OnRightAssist> {
 
 	/**
 	 * この定数クラスのスキーマ名
@@ -227,7 +227,7 @@ public class closings
 	 * 自動生成された {@link Row} の実装クラスです。
 	 */
 	public static class Row extends java.lang.Object
-		implements org.blendee.support.Row {
+		implements org.blendee.assist.Row {
 
 		private final DataObject data$;
 
@@ -461,15 +461,15 @@ public class closings
 
 	}
 
-	private static final TableFacadeContext<SelectCol> selectContext$ = (relationship, name) -> new SelectCol(relationship, name);
+	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
 
-	private static final TableFacadeContext<GroupByCol> groupByContext$ = (relationship, name) -> new GroupByCol(relationship, name);
+	private static final TableFacadeContext<GroupByCol> groupByContext$ = (assist, name) -> new GroupByCol(assist, name);
 
-	private static final TableFacadeContext<OrderByCol> orderByContext$ = (relationship, name) -> new OrderByCol(relationship, name);
+	private static final TableFacadeContext<OrderByCol> orderByContext$ = (assist, name) -> new OrderByCol(assist, name);
 
-	private static final TableFacadeContext<InsertCol> insertContext$ = (relationship, name) -> new InsertCol(relationship, name);
+	private static final TableFacadeContext<InsertCol> insertContext$ = (assist, name) -> new InsertCol(assist, name);
 
-	private static final TableFacadeContext<UpdateCol> updateContext$ = (relationship, name) -> new UpdateCol(relationship, name);
+	private static final TableFacadeContext<UpdateCol> updateContext$ = (assist, name) -> new UpdateCol(assist, name);
 
 	private static final TableFacadeContext<WhereColumn<WhereLogicalOperators>> whereContext$ = TableFacadeContext.newWhereBuilder();
 
@@ -484,30 +484,30 @@ public class closings
 	/**
 	 * WHERE 句 で使用する AND, OR です。
 	 */
-	public class WhereLogicalOperators implements LogicalOperators<WhereRel> {
+	public class WhereLogicalOperators implements LogicalOperators<WhereAssist> {
 
 		private WhereLogicalOperators() {}
 
 		/**
-		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeRelationship} です。
+		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
-		public final WhereRel OR = new WhereRel(
+		public final WhereAssist OR = new WhereAssist(
 			closings.this,
 			whereContext$,
 			CriteriaContext.OR,
 			null);
 
 		/**
-		 * WHERE 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeRelationship} です。
+		 * WHERE 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
-		public final WhereRel AND = new WhereRel(
+		public final WhereAssist AND = new WhereAssist(
 			closings.this,
 			whereContext$,
 			CriteriaContext.AND,
 			OR);
 
 		@Override
-		public WhereRel defaultOperator() {
+		public WhereAssist defaultOperator() {
 			return AND;
 		}
 	}
@@ -515,30 +515,30 @@ public class closings
 	/**
 	 * HAVING 句 で使用する AND, OR です。
 	 */
-	public class HavingLogicalOperators implements LogicalOperators<HavingRel> {
+	public class HavingLogicalOperators implements LogicalOperators<HavingAssist> {
 
 		private HavingLogicalOperators() {}
 
 		/**
-		 * HAVING 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeRelationship} です。
+		 * HAVING 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
-		public final HavingRel OR = new HavingRel(
+		public final HavingAssist OR = new HavingAssist(
 			closings.this,
 			havingContext$,
 			CriteriaContext.OR,
 			null);
 
 		/**
-		 * HAVING 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeRelationship} です。
+		 * HAVING 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
-		public final HavingRel AND = new HavingRel(
+		public final HavingAssist AND = new HavingAssist(
 			closings.this,
 			havingContext$,
 			CriteriaContext.AND,
 			OR);
 
 		@Override
-		public HavingRel defaultOperator() {
+		public HavingAssist defaultOperator() {
 			return AND;
 		}
 	}
@@ -546,30 +546,30 @@ public class closings
 	/**
 	 * ON 句 (LEFT) で使用する AND, OR です。
 	 */
-	public class OnLeftLogicalOperators implements LogicalOperators<OnLeftRel> {
+	public class OnLeftLogicalOperators implements LogicalOperators<OnLeftAssist> {
 
 		private OnLeftLogicalOperators() {}
 
 		/**
-		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeRelationship} です。
+		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
-		public final OnLeftRel OR = new OnLeftRel(
+		public final OnLeftAssist OR = new OnLeftAssist(
 			closings.this,
 			onLeftContext$,
 			CriteriaContext.OR,
 			null);
 
 		/**
-		 * ON 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeRelationship} です。
+		 * ON 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
-		public final OnLeftRel AND = new OnLeftRel(
+		public final OnLeftAssist AND = new OnLeftAssist(
 			closings.this,
 			onLeftContext$,
 			CriteriaContext.AND,
 			OR);
 
 		@Override
-		public OnLeftRel defaultOperator() {
+		public OnLeftAssist defaultOperator() {
 			return AND;
 		}
 	}
@@ -577,30 +577,30 @@ public class closings
 	/**
 	 * ON 句 (RIGHT) で使用する AND, OR です。
 	 */
-	public class OnRightLogicalOperators implements LogicalOperators<OnRightRel> {
+	public class OnRightLogicalOperators implements LogicalOperators<OnRightAssist> {
 
 		private OnRightLogicalOperators() {}
 
 		/**
-		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeRelationship} です。
+		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
-		public final OnRightRel OR = new OnRightRel(
+		public final OnRightAssist OR = new OnRightAssist(
 			closings.this,
 			onRightContext$,
 			CriteriaContext.OR,
 			null);
 
 		/**
-		 * ON 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeRelationship} です。
+		 * ON 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
-		public final OnRightRel AND = new OnRightRel(
+		public final OnRightAssist AND = new OnRightAssist(
 			closings.this,
 			onRightContext$,
 			CriteriaContext.AND,
 			OR);
 
 		@Override
-		public OnRightRel defaultOperator() {
+		public OnRightAssist defaultOperator() {
 			return AND;
 		}
 	}
@@ -608,30 +608,30 @@ public class closings
 	/**
 	 * WHERE 句 で使用する AND, OR です。
 	 */
-	public class DMSWhereLogicalOperators implements LogicalOperators<DMSWhereRel> {
+	public class DMSWhereLogicalOperators implements LogicalOperators<DMSWhereAssist> {
 
 		private DMSWhereLogicalOperators() {}
 
 		/**
-		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeRelationship} です。
+		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
-		public final DMSWhereRel OR = new DMSWhereRel(
+		public final DMSWhereAssist OR = new DMSWhereAssist(
 			closings.this,
 			dmsWhereContext$,
 			CriteriaContext.OR,
 			null);
 
 		/**
-		 * WHERE 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeRelationship} です。
+		 * WHERE 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
-		public final DMSWhereRel AND = new DMSWhereRel(
+		public final DMSWhereAssist AND = new DMSWhereAssist(
 			closings.this,
 			dmsWhereContext$,
 			CriteriaContext.AND,
 			OR);
 
 		@Override
-		public DMSWhereRel defaultOperator() {
+		public DMSWhereAssist defaultOperator() {
 			return AND;
 		}
 	}
@@ -651,29 +651,29 @@ public class closings
 		return id$ == null ? (id$ = RuntimeIdFactory.getRuntimeInstance()) : id$;
 	}
 
-	private class SelectBehavior extends SelectStatementBehavior<SelectRel, GroupByRel, WhereRel, HavingRel, OrderByRel, OnLeftRel> {
+	private class SelectBehavior extends SelectStatementBehavior<SelectAssist, GroupByAssist, WhereAssist, HavingAssist, OrderByAssist, OnLeftAssist> {
 
 		private SelectBehavior() {
 			super($TABLE, getRuntimeId(), closings.this);
 		}
 
 		@Override
-		protected SelectRel newSelect() {
-			return new SelectRel(
+		protected SelectAssist newSelect() {
+			return new SelectAssist(
 				closings.this,
 				selectContext$);
 		}
 
 		@Override
-		protected GroupByRel newGroupBy() {
-			return new GroupByRel(
+		protected GroupByAssist newGroupBy() {
+			return new GroupByAssist(
 				closings.this,
 				groupByContext$);
 		}
 
 		@Override
-		protected OrderByRel newOrderBy() {
-			return new OrderByRel(
+		protected OrderByAssist newOrderBy() {
+			return new OrderByAssist(
 				closings.this,
 				orderByContext$);
 		}
@@ -700,28 +700,28 @@ public class closings
 		return dmsBehavior$ == null ? (dmsBehavior$ = new DMSBehavior()) : dmsBehavior$;
 	}
 
-	private class DMSBehavior extends DataManipulationStatementBehavior<InsertRel, UpdateRel, DMSWhereRel> {
+	private class DMSBehavior extends DataManipulationStatementBehavior<InsertAssist, UpdateAssist, DMSWhereAssist> {
 
 		public DMSBehavior() {
 			super($TABLE, closings.this.getRuntimeId(), closings.this);
 		}
 
 		@Override
-		protected InsertRel newInsert() {
-			return new InsertRel(
+		protected InsertAssist newInsert() {
+			return new InsertAssist(
 				closings.this,
 				insertContext$);
 		}
 
 		@Override
-		protected UpdateRel newUpdate() {
-			return new UpdateRel(
+		protected UpdateAssist newUpdate() {
+			return new UpdateAssist(
 				closings.this,
 				updateContext$);
 		}
 
 		@Override
-		protected LogicalOperators<DMSWhereRel> newWhereOperators() {
+		protected LogicalOperators<DMSWhereAssist> newWhereOperators() {
 			return new DMSWhereLogicalOperators();
 		}
 	}
@@ -799,11 +799,11 @@ public class closings
 	}
 
 	/**
-	 * この {@link SelectStatement} のテーブルを表す {@link TableFacadeRelationship} を参照するためのインスタンスです。
-	 * @return rel
+	 * この {@link SelectStatement} のテーブルを表す {@link TableFacadeAssist} を参照するためのインスタンスです。
+	 * @return assist
 	 */
-	public ExtRel<TableFacadeColumn, Void> rel() {
-		return new ExtRel<>(this, TableFacadeContext.OTHER, CriteriaContext.NULL);
+	public ExtAssist<TableFacadeColumn, Void> assist() {
+		return new ExtAssist<>(this, TableFacadeContext.OTHER, CriteriaContext.NULL);
 	}
 
 	/**
@@ -812,7 +812,7 @@ public class closings
 	 * @return この {@link SelectStatement}
 	 */
 	public closings SELECT(
-		SelectOfferFunction<SelectRel> function) {
+		SelectOfferFunction<SelectAssist> function) {
 		selectBehavior().SELECT(function);
 		return this;
 	}
@@ -823,7 +823,7 @@ public class closings
 	 * @return この {@link SelectStatement}
 	 */
 	public closings SELECT_DISTINCT(
-		SelectOfferFunction<SelectRel> function) {
+		SelectOfferFunction<SelectAssist> function) {
 		selectBehavior().SELECT_DISTINCT(function);
 		return this;
 	}
@@ -843,7 +843,7 @@ public class closings
 	 * @return この {@link SelectStatement}
 	 */
 	public closings GROUP_BY(
-		GroupByOfferFunction<GroupByRel> function) {
+		GroupByOfferFunction<GroupByAssist> function) {
 		selectBehavior().GROUP_BY(function);
 		return this;
 	}
@@ -855,7 +855,7 @@ public class closings
 	 */
 	@SafeVarargs
 	public final closings WHERE(
-		Consumer<WhereRel>... consumers) {
+		Consumer<WhereAssist>... consumers) {
 		selectBehavior().WHERE(consumers);
 		return this;
 	}
@@ -866,7 +866,7 @@ public class closings
 	 * @return {@link Criteria}
 	 */
 	public Criteria createWhereCriteria(
-		Consumer<WhereRel> consumer) {
+		Consumer<WhereAssist> consumer) {
 		return selectBehavior().createWhereCriteria(consumer);
 	}
 
@@ -877,7 +877,7 @@ public class closings
 	 */
 	@SafeVarargs
 	public final closings HAVING(
-		Consumer<HavingRel>... consumers) {
+		Consumer<HavingAssist>... consumers) {
 		selectBehavior().HAVING(consumers);
 		return this;
 	}
@@ -888,7 +888,7 @@ public class closings
 	 * @return {@link Criteria}
 	 */
 	public Criteria createHavingCriteria(
-		Consumer<HavingRel> consumer) {
+		Consumer<HavingAssist> consumer) {
 		return selectBehavior().createHavingCriteria(consumer);
 	}
 
@@ -897,7 +897,7 @@ public class closings
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightRelationship<?>> OnClause<OnLeftRel, R, closings> INNER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, closings> INNER_JOIN(RightTable<R> right) {
 		return selectBehavior().INNER_JOIN(right, this);
 	}
 
@@ -906,7 +906,7 @@ public class closings
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightRelationship<?>> OnClause<OnLeftRel, R, closings> LEFT_OUTER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, closings> LEFT_OUTER_JOIN(RightTable<R> right) {
 		return selectBehavior().LEFT_OUTER_JOIN(right, this);
 	}
 
@@ -915,7 +915,7 @@ public class closings
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightRelationship<?>> OnClause<OnLeftRel, R, closings> RIGHT_OUTER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, closings> RIGHT_OUTER_JOIN(RightTable<R> right) {
 		return selectBehavior().RIGHT_OUTER_JOIN(right, this);
 	}
 
@@ -924,7 +924,7 @@ public class closings
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightRelationship<?>> OnClause<OnLeftRel, R, closings> FULL_OUTER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, closings> FULL_OUTER_JOIN(RightTable<R> right) {
 		return selectBehavior().FULL_OUTER_JOIN(right, this);
 	}
 
@@ -933,7 +933,7 @@ public class closings
 	 * @param right 別クエリ
 	 * @return この {@link SelectStatement}
 	 */
-	public <R extends OnRightRelationship<?>> closings CROSS_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> closings CROSS_JOIN(RightTable<R> right) {
 		selectBehavior().CROSS_JOIN(right, this);
 		return this;
 	}
@@ -966,7 +966,7 @@ public class closings
 	 * @return この {@link SelectStatement}
 	 */
 	public closings ORDER_BY(
-		OrderByOfferFunction<OrderByRel> function) {
+		OrderByOfferFunction<OrderByAssist> function) {
 		selectBehavior().ORDER_BY(function);
 		return this;
 	}
@@ -1060,17 +1060,17 @@ public class closings
 	}
 
 	@Override
-	public LogicalOperators<WhereRel> getWhereLogicalOperators() {
+	public LogicalOperators<WhereAssist> getWhereLogicalOperators() {
 		return selectBehavior().whereOperators();
 	}
 
 	@Override
-	public LogicalOperators<HavingRel> getHavingLogicalOperators() {
+	public LogicalOperators<HavingAssist> getHavingLogicalOperators() {
 		return selectBehavior().havingOperators();
 	}
 
 	@Override
-	public LogicalOperators<OnLeftRel> getOnLeftLogicalOperators() {
+	public LogicalOperators<OnLeftAssist> getOnLeftLogicalOperators() {
 		return selectBehavior().onLeftOperators();
 	}
 
@@ -1123,19 +1123,19 @@ public class closings
 	@Override
 	public void aggregate(Consumer<BResultSet> consumer) {
 		selectBehavior().quitRowMode();
-		org.blendee.support.Query.super.aggregate(consumer);
+		org.blendee.assist.Query.super.aggregate(consumer);
 	}
 
 	@Override
 	public <T> T aggregateAndGet(Function<BResultSet, T> function) {
 		selectBehavior().quitRowMode();
-		return org.blendee.support.Query.super.aggregateAndGet(function);
+		return org.blendee.assist.Query.super.aggregateAndGet(function);
 	}
 
 	@Override
 	public ResultSetIterator aggregate() {
 		selectBehavior().quitRowMode();
-		return org.blendee.support.Query.super.aggregate();
+		return org.blendee.assist.Query.super.aggregate();
 	}
 
 	@Override
@@ -1304,7 +1304,7 @@ public class closings
 	}
 
 	@Override
-	public OnRightRel joint() {
+	public OnRightAssist joint() {
 		return getOnRightLogicalOperators().AND;
 	}
 
@@ -1318,7 +1318,7 @@ public class closings
 	 * @param function function
 	 * @return {@link InsertStatementIntermediate}
 	 */
-	public InsertStatementIntermediate INSERT(InsertOfferFunction<InsertRel> function) {
+	public InsertStatementIntermediate INSERT(InsertOfferFunction<InsertAssist> function) {
 		return dmsBehavior().INSERT(function);
 	}
 
@@ -1338,7 +1338,7 @@ public class closings
 	 * @param select select
 	 * @return {@link InsertStatementIntermediate}
 	 */
-	public DataManipulator INSERT(InsertOfferFunction<InsertRel> function, SelectStatement select) {
+	public DataManipulator INSERT(InsertOfferFunction<InsertAssist> function, SelectStatement select) {
 		return dmsBehavior().INSERT(function, select);
 	}
 
@@ -1356,7 +1356,7 @@ public class closings
 	 * @param consumer
 	 * @return {@link UpdateStatementIntermediate}
 	 */
-	public UpdateStatementIntermediate<DMSWhereRel> UPDATE(Consumer<UpdateRel> consumer) {
+	public UpdateStatementIntermediate<DMSWhereAssist> UPDATE(Consumer<UpdateAssist> consumer) {
 		return dmsBehavior().UPDATE(consumer);
 	}
 
@@ -1364,7 +1364,7 @@ public class closings
 	 * UPDATE 文を生成します。
 	 * @return {@link UpdateStatementIntermediate}
 	 */
-	public UpdateStatementIntermediate<DMSWhereRel> UPDATE() {
+	public UpdateStatementIntermediate<DMSWhereAssist> UPDATE() {
 		return dmsBehavior().UPDATE();
 	}
 
@@ -1372,7 +1372,7 @@ public class closings
 	 * DELETE 文を生成します。
 	 * @return {@link DeleteStatementIntermediate}
 	 */
-	public final DeleteStatementIntermediate<DMSWhereRel> DELETE() {
+	public final DeleteStatementIntermediate<DMSWhereAssist> DELETE() {
 		return dmsBehavior().DELETE();
 	}
 
@@ -1390,18 +1390,18 @@ public class closings
 	}
 
 	/**
-	 * 自動生成された {@link TableFacadeRelationship} の実装クラスです。<br>
+	 * 自動生成された {@link TableFacadeAssist} の実装クラスです。<br>
 	 * 条件として使用できるカラムを内包しており、それらを使用して検索 SQL を生成可能にします。
 	 * @param <T> 使用されるカラムのタイプにあった型
 	 * @param <M> Many 一対多の多側の型連鎖
 	 */
-	public static class Rel<T, M> implements TableFacadeRelationship {
+	public static class Assist<T, M> implements TableFacadeAssist {
 
 		private final closings table$;
 
 		private final CriteriaContext context$;
 
-		private final TableFacadeRelationship parent$;
+		private final TableFacadeAssist parent$;
 
 		private final String fkName$;
 
@@ -1441,9 +1441,9 @@ public class closings
 		 * @param parent$ parent
 		 * @param fkName$ fkName
 		 */
-		public Rel(
+		public Assist(
 			TableFacadeContext<T> builder$,
-			TableFacadeRelationship parent$,
+			TableFacadeAssist parent$,
 			String fkName$) {
 			table$ = null;
 			context$ = null;
@@ -1471,7 +1471,7 @@ public class closings
 
 		}
 
-		private Rel(
+		private Assist(
 			closings table$,
 			TableFacadeContext<T> builder$,
 			CriteriaContext context$) {
@@ -1531,9 +1531,9 @@ public class closings
 
 		@Override
 		public boolean equals(Object o) {
-			if (!(o instanceof TableFacadeRelationship)) return false;
+			if (!(o instanceof TableFacadeAssist)) return false;
 			return getRelationship()
-				.equals(((TableFacadeRelationship) o).getRelationship());
+				.equals(((TableFacadeAssist) o).getRelationship());
 		}
 
 		@Override
@@ -1542,22 +1542,22 @@ public class closings
 		}
 
 		@Override
-		public OneToManyRelationship getOneToManyRelationship() {
-			return new OneToManyRelationship(
-				parent$ == null ? null : parent$.getOneToManyRelationship(),
-				Rel.this.getRelationship(),
+		public OneToManyBehavior getOneToManyBehavior() {
+			return new OneToManyBehavior(
+				parent$ == null ? null : parent$.getOneToManyBehavior(),
+				Assist.this.getRelationship(),
 				data -> new Row(data),
 				table$ != null ? table$.id$ : parent$.getSelectStatement().getRuntimeId());
 		}
 	}
 
 	/**
-	 * 自動生成された {@link TableFacadeRelationship} の実装クラスです。<br>
+	 * 自動生成された {@link TableFacadeAssist} の実装クラスです。<br>
 	 * 条件として使用できるカラムと、参照しているテーブルを内包しており、それらを使用して検索 SQL を生成可能にします。
 	 * @param <T> 使用されるカラムのタイプにあった型
 	 * @param <M> Many 一対多の多側の型連鎖
 	 */
-	public static class ExtRel<T, M> extends Rel<T, M> {
+	public static class ExtAssist<T, M> extends Assist<T, M> {
 
 		private final TableFacadeContext<T> builder$;
 
@@ -1567,15 +1567,15 @@ public class closings
 		 * @param parent$ parent
 		 * @param fkName$ fkName
 		 */
-		public ExtRel(
+		public ExtAssist(
 			TableFacadeContext<T> builder$,
-			TableFacadeRelationship parent$,
+			TableFacadeAssist parent$,
 			String fkName$) {
 			super(builder$, parent$, fkName$);
 			this.builder$ = builder$;
 		}
 
-		private ExtRel(
+		private ExtAssist(
 			closings table$,
 			TableFacadeContext<T> builder$,
 			CriteriaContext context$) {
@@ -1584,7 +1584,7 @@ public class closings
 		}
 
 		/**
-		 * この {@link TableFacadeRelationship} が表すテーブルの Row を一とし、多をもつ検索結果を生成する {@link OneToManyQuery} を返します。
+		 * この {@link TableFacadeAssist} が表すテーブルの Row を一とし、多をもつ検索結果を生成する {@link OneToManyQuery} を返します。
 		 * @return {@link OneToManyQuery}
 		 */
 		public OneToManyQuery<Row, M> intercept() {
@@ -1599,8 +1599,8 @@ public class closings
 		 * 項目名 group_id
 		 * @return groups relationship
 		 */
-		public jp.ats.blackbox.blendee.bb.groups.ExtRel<T, Many<jp.ats.blackbox.blendee.bb.closings.Row, M>> $groups() {
-			return new jp.ats.blackbox.blendee.bb.groups.ExtRel<>(
+		public jp.ats.blackbox.blendee.bb.groups.ExtAssist<T, Many<jp.ats.blackbox.blendee.bb.closings.Row, M>> $groups() {
+			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
 				jp.ats.blackbox.blendee.bb.closings.groups$closings_group_id_fkey);
@@ -1612,8 +1612,8 @@ public class closings
 		 * 項目名 created_by
 		 * @return users relationship
 		 */
-		public jp.ats.blackbox.blendee.bb.users.ExtRel<T, Many<jp.ats.blackbox.blendee.bb.closings.Row, M>> $users() {
-			return new jp.ats.blackbox.blendee.bb.users.ExtRel<>(
+		public jp.ats.blackbox.blendee.bb.users.ExtAssist<T, Many<jp.ats.blackbox.blendee.bb.closings.Row, M>> $users() {
+			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
 				jp.ats.blackbox.blendee.bb.closings.users$closings_created_by_fkey);
@@ -1624,9 +1624,9 @@ public class closings
 	/**
 	 * SELECT 句用
 	 */
-	public static class SelectRel extends ExtRel<SelectCol, Void> implements SelectRelationship {
+	public static class SelectAssist extends ExtAssist<SelectCol, Void> implements SelectClauseAssist {
 
-		private SelectRel(
+		private SelectAssist(
 			closings table$,
 			TableFacadeContext<SelectCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
@@ -1636,18 +1636,18 @@ public class closings
 	/**
 	 * SELECT 文 WHERE 句用
 	 */
-	public static class WhereRel extends ExtRel<WhereColumn<WhereLogicalOperators>, Void> implements WhereRelationship<WhereRel> {
+	public static class WhereAssist extends ExtAssist<WhereColumn<WhereLogicalOperators>, Void> implements WhereClauseAssist<WhereAssist> {
 
 		/**
 		 * 条件接続 OR
 		 */
-		public final WhereRel OR;
+		public final WhereAssist OR;
 
-		private WhereRel(
+		private WhereAssist(
 			closings table$,
 			TableFacadeContext<WhereColumn<WhereLogicalOperators>> builder$,
 			CriteriaContext context$,
-			WhereRel or$) {
+			WhereAssist or$) {
 			super(table$, builder$, context$);
 			OR = or$ == null ? this : or$;
 		}
@@ -1671,7 +1671,7 @@ public class closings
 		 * @return this
 		 */
 		@Override
-		public WhereLogicalOperators paren(Consumer<WhereRel> consumer) {
+		public WhereLogicalOperators paren(Consumer<WhereAssist> consumer) {
 			SelectStatement statement = getSelectStatement();
 			Paren.execute(statement.getRuntimeId(), getContext(), consumer, this);
 			return (WhereLogicalOperators) statement.getWhereLogicalOperators();
@@ -1686,9 +1686,9 @@ public class closings
 	/**
 	 * GROUB BY 句用
 	 */
-	public static class GroupByRel extends ExtRel<GroupByCol, Void> implements GroupByRelationship {
+	public static class GroupByAssist extends ExtAssist<GroupByCol, Void> implements GroupByClauseAssist {
 
-		private GroupByRel(
+		private GroupByAssist(
 			closings table$,
 			TableFacadeContext<GroupByCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
@@ -1698,18 +1698,18 @@ public class closings
 	/**
 	 * HAVING 句用
 	 */
-	public static class HavingRel extends ExtRel<HavingColumn<HavingLogicalOperators>, Void> implements HavingRelationship<HavingRel> {
+	public static class HavingAssist extends ExtAssist<HavingColumn<HavingLogicalOperators>, Void> implements HavingClauseAssist<HavingAssist> {
 
 		/**
 		 * 条件接続 OR
 		 */
-		public final HavingRel OR;
+		public final HavingAssist OR;
 
-		private HavingRel(
+		private HavingAssist(
 			closings table$,
 			TableFacadeContext<HavingColumn<HavingLogicalOperators>> builder$,
 			CriteriaContext context$,
-			HavingRel or$) {
+			HavingAssist or$) {
 			super(table$, builder$, context$);
 			OR = or$ == null ? this : or$;
 		}
@@ -1733,7 +1733,7 @@ public class closings
 		 * @return this
 		 */
 		@Override
-		public HavingLogicalOperators paren(Consumer<HavingRel> consumer) {
+		public HavingLogicalOperators paren(Consumer<HavingAssist> consumer) {
 			SelectStatement statement = getSelectStatement();
 			Paren.execute(statement.getRuntimeId(), getContext(), consumer, this);
 			return (HavingLogicalOperators) statement.getHavingLogicalOperators();
@@ -1743,9 +1743,9 @@ public class closings
 	/**
 	 * ORDER BY 句用
 	 */
-	public static class OrderByRel extends ExtRel<OrderByCol, Void> implements OrderByRelationship {
+	public static class OrderByAssist extends ExtAssist<OrderByCol, Void> implements OrderByClauseAssist {
 
-		private OrderByRel(
+		private OrderByAssist(
 			closings table$,
 			TableFacadeContext<OrderByCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
@@ -1760,18 +1760,18 @@ public class closings
 	/**
 	 * ON 句 (LEFT) 用
 	 */
-	public static class OnLeftRel extends ExtRel<OnLeftColumn<OnLeftLogicalOperators>, Void> implements OnLeftRelationship<OnLeftRel> {
+	public static class OnLeftAssist extends ExtAssist<OnLeftColumn<OnLeftLogicalOperators>, Void> implements OnLeftClauseAssist<OnLeftAssist> {
 
 		/**
 		 * 条件接続 OR
 		 */
-		public final OnLeftRel OR;
+		public final OnLeftAssist OR;
 
-		private OnLeftRel(
+		private OnLeftAssist(
 			closings table$,
 			TableFacadeContext<OnLeftColumn<OnLeftLogicalOperators>> builder$,
 			CriteriaContext context$,
-			OnLeftRel or$) {
+			OnLeftAssist or$) {
 			super(table$, builder$, context$);
 			OR = or$ == null ? this : or$;
 		}
@@ -1795,7 +1795,7 @@ public class closings
 		 * @return this
 		 */
 		@Override
-		public OnLeftLogicalOperators paren(Consumer<OnLeftRel> consumer) {
+		public OnLeftLogicalOperators paren(Consumer<OnLeftAssist> consumer) {
 			SelectStatement statement = getSelectStatement();
 			Paren.execute(statement.getRuntimeId(), getContext(), consumer, this);
 			return (OnLeftLogicalOperators) statement.getOnLeftLogicalOperators();
@@ -1805,18 +1805,18 @@ public class closings
 	/**
 	 * ON 句 (RIGHT) 用
 	 */
-	public static class OnRightRel extends Rel<OnRightColumn<OnRightLogicalOperators>, Void> implements OnRightRelationship<OnRightRel> {
+	public static class OnRightAssist extends Assist<OnRightColumn<OnRightLogicalOperators>, Void> implements OnRightClauseAssist<OnRightAssist> {
 
 		/**
 		 * 条件接続 OR
 		 */
-		public final OnRightRel OR;
+		public final OnRightAssist OR;
 
-		private OnRightRel(
+		private OnRightAssist(
 			closings table$,
 			TableFacadeContext<OnRightColumn<OnRightLogicalOperators>> builder$,
 			CriteriaContext context$,
-			OnRightRel or$) {
+			OnRightAssist or$) {
 			super(table$, builder$, context$);
 			OR = or$ == null ? this : or$;
 		}
@@ -1840,7 +1840,7 @@ public class closings
 		 * @return this
 		 */
 		@Override
-		public OnRightLogicalOperators paren(Consumer<OnRightRel> consumer) {
+		public OnRightLogicalOperators paren(Consumer<OnRightAssist> consumer) {
 			SelectStatement statement = getSelectStatement();
 			Paren.execute(statement.getRuntimeId(), getContext(), consumer, this);
 			return (OnRightLogicalOperators) statement.getOnRightLogicalOperators();
@@ -1850,9 +1850,9 @@ public class closings
 	/**
 	 * INSERT 用
 	 */
-	public static class InsertRel extends Rel<InsertCol, Void> implements InsertRelationship {
+	public static class InsertAssist extends Assist<InsertCol, Void> implements InsertClauseAssist {
 
-		private InsertRel(
+		private InsertAssist(
 			closings table$,
 			TableFacadeContext<InsertCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
@@ -1862,9 +1862,9 @@ public class closings
 	/**
 	 * UPDATE 用
 	 */
-	public static class UpdateRel extends Rel<UpdateCol, Void> implements UpdateRelationship {
+	public static class UpdateAssist extends Assist<UpdateCol, Void> implements UpdateClauseAssist {
 
-		private UpdateRel(
+		private UpdateAssist(
 			closings table$,
 			TableFacadeContext<UpdateCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
@@ -1874,18 +1874,18 @@ public class closings
 	/**
 	 * UPDATE, DELETE 文 WHERE 句用
 	 */
-	public static class DMSWhereRel extends Rel<WhereColumn<DMSWhereLogicalOperators>, Void> implements WhereRelationship<DMSWhereRel> {
+	public static class DMSWhereAssist extends Assist<WhereColumn<DMSWhereLogicalOperators>, Void> implements WhereClauseAssist<DMSWhereAssist> {
 
 		/**
 		 * 条件接続 OR
 		 */
-		public final DMSWhereRel OR;
+		public final DMSWhereAssist OR;
 
-		private DMSWhereRel(
+		private DMSWhereAssist(
 			closings table$,
 			TableFacadeContext<WhereColumn<DMSWhereLogicalOperators>> builder$,
 			CriteriaContext context$,
-			DMSWhereRel or$) {
+			DMSWhereAssist or$) {
 			super(table$, builder$, context$);
 			OR = or$ == null ? this : or$;
 		}
@@ -1909,7 +1909,7 @@ public class closings
 		 * @return {@link DMSWhereLogicalOperators}
 		 */
 		@Override
-		public DMSWhereLogicalOperators paren(Consumer<DMSWhereRel> consumer) {
+		public DMSWhereLogicalOperators paren(Consumer<DMSWhereAssist> consumer) {
 			DataManipulationStatement statement = getDataManipulationStatement();
 			Paren.execute(statement.getRuntimeId(), getContext(), consumer, this);
 			return (DMSWhereLogicalOperators) statement.getWhereLogicalOperators();
@@ -1926,8 +1926,8 @@ public class closings
 	 */
 	public static class SelectCol extends SelectColumn {
 
-		private SelectCol(TableFacadeRelationship relationship, String name) {
-			super(relationship, name);
+		private SelectCol(TableFacadeAssist assist, String name) {
+			super(assist, name);
 		}
 	}
 
@@ -1936,8 +1936,8 @@ public class closings
 	 */
 	public static class GroupByCol extends GroupByColumn {
 
-		private GroupByCol(TableFacadeRelationship relationship, String name) {
-			super(relationship, name);
+		private GroupByCol(TableFacadeAssist assist, String name) {
+			super(assist, name);
 		}
 	}
 
@@ -1946,8 +1946,8 @@ public class closings
 	 */
 	public static class OrderByCol extends OrderByColumn {
 
-		private OrderByCol(TableFacadeRelationship relationship, String name) {
-			super(relationship, name);
+		private OrderByCol(TableFacadeAssist assist, String name) {
+			super(assist, name);
 		}
 	}
 
@@ -1956,8 +1956,8 @@ public class closings
 	 */
 	public static class InsertCol extends InsertColumn {
 
-		private InsertCol(TableFacadeRelationship relationship, String name) {
-			super(relationship, name);
+		private InsertCol(TableFacadeAssist assist, String name) {
+			super(assist, name);
 		}
 	}
 
@@ -1966,15 +1966,15 @@ public class closings
 	 */
 	public static class UpdateCol extends UpdateColumn {
 
-		private UpdateCol(TableFacadeRelationship relationship, String name) {
-			super(relationship, name);
+		private UpdateCol(TableFacadeAssist assist, String name) {
+			super(assist, name);
 		}
 	}
 
 	/**
 	 * Query
 	 */
-	public class Query implements org.blendee.support.Query<Iterator, Row> {
+	public class Query implements org.blendee.assist.Query<Iterator, Row> {
 
 		private final PlaybackQuery inner;
 
