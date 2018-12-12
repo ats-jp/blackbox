@@ -30,7 +30,7 @@
 		</init-param>
 		<init-param>
 			<param-name>enable-log</param-name>
-			<param-value>false</param-value>
+			<param-value>true</param-value>
 		</init-param>
 		<init-param>
 			<param-name>log-stacktrace-filter</param-name>
@@ -41,16 +41,28 @@
 			<param-value>org.blendee.jdbc.DataSourceTransactionFactory</param-value>
 		</init-param>
 		<init-param>
-			<param-name>annotated-row-packages</param-name>
-			<param-value></param-value>
-		</init-param>
-		<init-param>
 			<param-name>can-add-new-entries</param-name>
-			<param-value>false</param-value>
+			<param-value>true</param-value>
 		</init-param>
 		<init-param>
 			<param-name>error-converter-class</param-name>
 			<param-value>org.blendee.dialect.postgresql.PostgreSQLErrorConverter</param-value>
+		</init-param>
+		<init-param>
+			<param-name>home-storage-identifier</param-name>
+			<param-value>blackbox-core</param-value>
+		</init-param>
+		<init-param>
+			<param-name>use-lazy-transaction</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>logger-class</param-name>
+			<param-value>org.blendee.jdbc.SystemOutLogger</param-value>
+		</init-param>
+		<init-param>
+			<param-name>table-facade-package</param-name>
+			<param-value>jp.ats.blackbox.blendee</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
@@ -77,7 +89,7 @@
 
 	<login-config>
 		<auth-method>BASIC</auth-method>
-		<realm-name>Blackbox API</realm-name>
+		<realm-name>Blackbox Backend</realm-name>
 	</login-config>
 
 	<security-role>

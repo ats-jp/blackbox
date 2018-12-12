@@ -1,4 +1,4 @@
-ANALYZE main.stocks;
-ANALYZE main.transfers;
-ANALYZE main.bundles;
-ANALYZE main.nodes;
+ANALYZE bb.stocks;
+ANALYZE bb.transfers;
+ANALYZE bb.bundles;
+ANALYZE bb.nodes;
