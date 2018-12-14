@@ -34,6 +34,7 @@ import org.blendee.sql.ValueExtractor;
 import org.blendee.sql.ValueExtractorsConfigure;
 import org.blendee.sql.RuntimeId;
 import org.blendee.sql.RuntimeIdFactory;
+import org.blendee.assist.CriteriaColumn;
 import org.blendee.assist.CriteriaContext;
 import org.blendee.assist.DataManipulationStatement;
 import org.blendee.assist.DataManipulationStatementBehavior;
@@ -85,7 +86,8 @@ import org.blendee.assist.WhereColumn;
 import org.blendee.assist.WhereClauseAssist;
 import org.blendee.assist.SQLDecorators;
 import org.blendee.assist.annotation.Column;
-import org.blendee.assist.Paren;
+import org.blendee.assist.Helper;
+import org.blendee.assist.Vargs;
 
 import org.blendee.assist.annotation.Table;
 
@@ -1306,18 +1308,14 @@ public class last_closings
 		 */
 		public final T closed_at;
 
-		/**
-		 * 直接使用しないでください。
-		 * @param builder$ builder
-		 * @param parent$ parent
-		 * @param fkName$ fkName
-		 */
-		public Assist(
+		private Assist(
+			last_closings table$,
 			TableFacadeContext<T> builder$,
+			CriteriaContext context$,
 			TableFacadeAssist parent$,
 			String fkName$) {
-			table$ = null;
-			context$ = null;
+			this.table$ = table$;
+			this.context$ = context$;
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
@@ -1333,25 +1331,24 @@ public class last_closings
 
 		}
 
+		/**
+		 * 直接使用しないでください。
+		 * @param builder$ builder
+		 * @param parent$ parent
+		 * @param fkName$ fkName
+		 */
+		public Assist(
+			TableFacadeContext<T> builder$,
+			TableFacadeAssist parent$,
+			String fkName$) {
+			this(null, builder$, null, parent$, fkName$);
+		}
+
 		private Assist(
 			last_closings table$,
 			TableFacadeContext<T> builder$,
 			CriteriaContext context$) {
-			this.table$ = table$;
-			this.context$ = context$;
-			parent$ = null;
-			fkName$ = null;
-
-			this.id = builder$.buildColumn(
-				this,
-				jp.ats.blackbox.blendee.bb.last_closings.id);
-			this.closing_id = builder$.buildColumn(
-				this,
-				jp.ats.blackbox.blendee.bb.last_closings.closing_id);
-			this.closed_at = builder$.buildColumn(
-				this,
-				jp.ats.blackbox.blendee.bb.last_closings.closed_at);
-
+			this(table$, builder$, context$, null, null);
 		}
 
 		@Override
@@ -1505,6 +1502,32 @@ public class last_closings
 			OR = or$ == null ? this : or$;
 		}
 
+		@Override
+		public WhereLogicalOperators EXISTS(SelectStatement subquery) {
+			SelectStatement statement = getSelectStatement();
+			Helper.setExists(statement.getRuntimeId(), this, subquery);
+			return (WhereLogicalOperators) statement.getWhereLogicalOperators();
+		}
+
+		@Override
+		public WhereLogicalOperators NOT_EXISTS(SelectStatement subquery) {
+			SelectStatement statement = getSelectStatement();
+			Helper.setNotExists(statement.getRuntimeId(), this, subquery);
+			return (WhereLogicalOperators) statement.getWhereLogicalOperators();
+		}
+
+		@Override
+		public WhereLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+			Helper.addInCriteria(this, false, mainColumns, subquery);
+			return (WhereLogicalOperators) getSelectStatement().getWhereLogicalOperators();
+		}
+
+		@Override
+		public WhereLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+			Helper.addInCriteria(this, true, mainColumns, subquery);
+			return (WhereLogicalOperators) getSelectStatement().getWhereLogicalOperators();
+		}
+
 		/**
 		 * この句に任意のカラムを追加します。
 		 * @param template カラムのテンプレート
@@ -1526,7 +1549,7 @@ public class last_closings
 		@Override
 		public WhereLogicalOperators paren(Consumer<WhereAssist> consumer) {
 			SelectStatement statement = getSelectStatement();
-			Paren.execute(statement.getRuntimeId(), getContext(), consumer, this);
+			Helper.paren(statement.getRuntimeId(), getContext(), consumer, this);
 			return (WhereLogicalOperators) statement.getWhereLogicalOperators();
 		}
 
@@ -1567,6 +1590,32 @@ public class last_closings
 			OR = or$ == null ? this : or$;
 		}
 
+		@Override
+		public HavingLogicalOperators EXISTS(SelectStatement subquery) {
+			SelectStatement statement = getSelectStatement();
+			Helper.setExists(statement.getRuntimeId(), this, subquery);
+			return (HavingLogicalOperators) statement.getHavingLogicalOperators();
+		}
+
+		@Override
+		public HavingLogicalOperators NOT_EXISTS(SelectStatement subquery) {
+			SelectStatement statement = getSelectStatement();
+			Helper.setNotExists(statement.getRuntimeId(), this, subquery);
+			return (HavingLogicalOperators) statement.getHavingLogicalOperators();
+		}
+
+		@Override
+		public HavingLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+			Helper.addInCriteria(this, false, mainColumns, subquery);
+			return (HavingLogicalOperators) getSelectStatement().getHavingLogicalOperators();
+		}
+
+		@Override
+		public HavingLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+			Helper.addInCriteria(this, true, mainColumns, subquery);
+			return (HavingLogicalOperators) getSelectStatement().getHavingLogicalOperators();
+		}
+
 		/**
 		 * この句に任意のカラムを追加します。
 		 * @param template カラムのテンプレート
@@ -1588,7 +1637,7 @@ public class last_closings
 		@Override
 		public HavingLogicalOperators paren(Consumer<HavingAssist> consumer) {
 			SelectStatement statement = getSelectStatement();
-			Paren.execute(statement.getRuntimeId(), getContext(), consumer, this);
+			Helper.paren(statement.getRuntimeId(), getContext(), consumer, this);
 			return (HavingLogicalOperators) statement.getHavingLogicalOperators();
 		}
 	}
@@ -1629,6 +1678,32 @@ public class last_closings
 			OR = or$ == null ? this : or$;
 		}
 
+		@Override
+		public OnLeftLogicalOperators EXISTS(SelectStatement subquery) {
+			SelectStatement statement = getSelectStatement();
+			Helper.setExists(statement.getRuntimeId(), this, subquery);
+			return (OnLeftLogicalOperators) statement.getOnLeftLogicalOperators();
+		}
+
+		@Override
+		public OnLeftLogicalOperators NOT_EXISTS(SelectStatement subquery) {
+			SelectStatement statement = getSelectStatement();
+			Helper.setNotExists(statement.getRuntimeId(), this, subquery);
+			return (OnLeftLogicalOperators) statement.getOnLeftLogicalOperators();
+		}
+
+		@Override
+		public OnLeftLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+			Helper.addInCriteria(this, false, mainColumns, subquery);
+			return (OnLeftLogicalOperators) getSelectStatement().getOnLeftLogicalOperators();
+		}
+
+		@Override
+		public OnLeftLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+			Helper.addInCriteria(this, true, mainColumns, subquery);
+			return (OnLeftLogicalOperators) getSelectStatement().getOnLeftLogicalOperators();
+		}
+
 		/**
 		 * この句に任意のカラムを追加します。
 		 * @param template カラムのテンプレート
@@ -1650,7 +1725,7 @@ public class last_closings
 		@Override
 		public OnLeftLogicalOperators paren(Consumer<OnLeftAssist> consumer) {
 			SelectStatement statement = getSelectStatement();
-			Paren.execute(statement.getRuntimeId(), getContext(), consumer, this);
+			Helper.paren(statement.getRuntimeId(), getContext(), consumer, this);
 			return (OnLeftLogicalOperators) statement.getOnLeftLogicalOperators();
 		}
 	}
@@ -1674,6 +1749,32 @@ public class last_closings
 			OR = or$ == null ? this : or$;
 		}
 
+		@Override
+		public OnRightLogicalOperators EXISTS(SelectStatement subquery) {
+			SelectStatement statement = getSelectStatement();
+			Helper.setExists(statement.getRuntimeId(), this, subquery);
+			return (OnRightLogicalOperators) statement.getOnRightLogicalOperators();
+		}
+
+		@Override
+		public OnRightLogicalOperators NOT_EXISTS(SelectStatement subquery) {
+			SelectStatement statement = getSelectStatement();
+			Helper.setNotExists(statement.getRuntimeId(), this, subquery);
+			return (OnRightLogicalOperators) statement.getOnRightLogicalOperators();
+		}
+
+		@Override
+		public OnRightLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+			Helper.addInCriteria(this, false, mainColumns, subquery);
+			return (OnRightLogicalOperators) getSelectStatement().getOnRightLogicalOperators();
+		}
+
+		@Override
+		public OnRightLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+			Helper.addInCriteria(this, true, mainColumns, subquery);
+			return (OnRightLogicalOperators) getSelectStatement().getOnRightLogicalOperators();
+		}
+
 		/**
 		 * この句に任意のカラムを追加します。
 		 * @param template カラムのテンプレート
@@ -1695,7 +1796,7 @@ public class last_closings
 		@Override
 		public OnRightLogicalOperators paren(Consumer<OnRightAssist> consumer) {
 			SelectStatement statement = getSelectStatement();
-			Paren.execute(statement.getRuntimeId(), getContext(), consumer, this);
+			Helper.paren(statement.getRuntimeId(), getContext(), consumer, this);
 			return (OnRightLogicalOperators) statement.getOnRightLogicalOperators();
 		}
 	}
@@ -1743,6 +1844,32 @@ public class last_closings
 			OR = or$ == null ? this : or$;
 		}
 
+		@Override
+		public DMSWhereLogicalOperators EXISTS(SelectStatement subquery) {
+			DataManipulationStatement statement = getDataManipulationStatement();
+			Helper.setExists(statement.getRuntimeId(), this, subquery);
+			return (DMSWhereLogicalOperators) statement.getWhereLogicalOperators();
+		}
+
+		@Override
+		public DMSWhereLogicalOperators NOT_EXISTS(SelectStatement subquery) {
+			DataManipulationStatement statement = getDataManipulationStatement();
+			Helper.setNotExists(statement.getRuntimeId(), this, subquery);
+			return (DMSWhereLogicalOperators) statement.getWhereLogicalOperators();
+		}
+
+		@Override
+		public DMSWhereLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+			Helper.addInCriteria(this, false, mainColumns, subquery);
+			return (DMSWhereLogicalOperators) getDataManipulationStatement().getWhereLogicalOperators();
+		}
+
+		@Override
+		public DMSWhereLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+			Helper.addInCriteria(this, true, mainColumns, subquery);
+			return (DMSWhereLogicalOperators) getDataManipulationStatement().getWhereLogicalOperators();
+		}
+
 		/**
 		 * この句に任意のカラムを追加します。
 		 * @param template カラムのテンプレート
@@ -1764,7 +1891,7 @@ public class last_closings
 		@Override
 		public DMSWhereLogicalOperators paren(Consumer<DMSWhereAssist> consumer) {
 			DataManipulationStatement statement = getDataManipulationStatement();
-			Paren.execute(statement.getRuntimeId(), getContext(), consumer, this);
+			Helper.paren(statement.getRuntimeId(), getContext(), consumer, this);
 			return (DMSWhereLogicalOperators) statement.getWhereLogicalOperators();
 		}
 
