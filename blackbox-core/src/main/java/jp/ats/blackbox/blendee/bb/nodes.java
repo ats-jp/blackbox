@@ -85,6 +85,11 @@ import org.blendee.assist.UpdateStatementIntermediate;
 import org.blendee.assist.WhereColumn;
 import org.blendee.assist.WhereClauseAssist;
 import org.blendee.assist.SQLDecorators;
+import org.blendee.assist.ListSelectClauseAssist;
+import org.blendee.assist.ListGroupByClauseAssist;
+import org.blendee.assist.ListOrderByClauseAssist;
+import org.blendee.assist.ListInsertClauseAssist;
+import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
@@ -810,7 +815,7 @@ public class nodes
 		return id$ == null ? (id$ = RuntimeIdFactory.getRuntimeInstance()) : id$;
 	}
 
-	private class SelectBehavior extends SelectStatementBehavior<SelectAssist, GroupByAssist, WhereAssist, HavingAssist, OrderByAssist, OnLeftAssist> {
+	private class SelectBehavior extends SelectStatementBehavior<SelectAssist, ListSelectAssist, GroupByAssist, ListGroupByAssist, WhereAssist, HavingAssist, OrderByAssist, ListOrderByAssist, OnLeftAssist> {
 
 		private SelectBehavior() {
 			super($TABLE, getRuntimeId(), nodes.this);
@@ -824,6 +829,13 @@ public class nodes
 		}
 
 		@Override
+		protected ListSelectAssist newListSelect() {
+			return new ListSelectAssist(
+				nodes.this,
+				selectContext$);
+		}
+
+		@Override
 		protected GroupByAssist newGroupBy() {
 			return new GroupByAssist(
 				nodes.this,
@@ -831,8 +843,22 @@ public class nodes
 		}
 
 		@Override
+		protected ListGroupByAssist newListGroupBy() {
+			return new ListGroupByAssist(
+				nodes.this,
+				groupByContext$);
+		}
+
+		@Override
 		protected OrderByAssist newOrderBy() {
 			return new OrderByAssist(
+				nodes.this,
+				orderByContext$);
+		}
+
+		@Override
+		protected ListOrderByAssist newListOrderBy() {
+			return new ListOrderByAssist(
 				nodes.this,
 				orderByContext$);
 		}
@@ -859,7 +885,7 @@ public class nodes
 		return dmsBehavior$ == null ? (dmsBehavior$ = new DMSBehavior()) : dmsBehavior$;
 	}
 
-	private class DMSBehavior extends DataManipulationStatementBehavior<InsertAssist, UpdateAssist, DMSWhereAssist> {
+	private class DMSBehavior extends DataManipulationStatementBehavior<InsertAssist, ListInsertAssist, UpdateAssist, ListUpdateAssist, DMSWhereAssist> {
 
 		public DMSBehavior() {
 			super($TABLE, nodes.this.getRuntimeId(), nodes.this);
@@ -873,8 +899,22 @@ public class nodes
 		}
 
 		@Override
+		protected ListInsertAssist newListInsert() {
+			return new ListInsertAssist(
+				nodes.this,
+				insertContext$);
+		}
+
+		@Override
 		protected UpdateAssist newUpdate() {
 			return new UpdateAssist(
+				nodes.this,
+				updateContext$);
+		}
+
+		@Override
+		protected ListUpdateAssist newListUpdate() {
+			return new ListUpdateAssist(
 				nodes.this,
 				updateContext$);
 		}
@@ -963,6 +1003,36 @@ public class nodes
 	 */
 	public ExtAssist<TableFacadeColumn, Void> assist() {
 		return new ExtAssist<>(this, TableFacadeContext.OTHER, CriteriaContext.NULL);
+	}
+
+	/**
+	 * SELECT 句を作成する {@link Consumer}
+	 * @param consumer {@link Consumer}
+	 * @return this
+	 */
+	public nodes selectClause(Consumer<ListSelectAssist> consumer) {
+		selectBehavior().selectClause(consumer);
+		return this;
+	}
+
+	/**
+	 * GROUP BY 句を作成する {@link Consumer}
+	 * @param consumer {@link Consumer}
+	 * @return this
+	 */
+	public nodes groupByClause(Consumer<ListGroupByAssist> consumer) {
+		selectBehavior().groupByClause(consumer);
+		return this;
+	}
+
+	/**
+	 * GROUP BY 句を作成する {@link Consumer}
+	 * @param consumer {@link Consumer}
+	 * @return this
+	 */
+	public nodes orderByClause(Consumer<ListOrderByAssist> consumer) {
+		selectBehavior().orderByClause(consumer);
+		return this;
 	}
 
 	/**
@@ -1141,7 +1211,7 @@ public class nodes
 	 * @return {@link SelectStatement} 自身
 	 * @throws IllegalStateException 既に ORDER BY 句がセットされている場合
 	 */
-	public nodes groupBy(GroupByClause clause) {
+	public nodes setGroupByClause(GroupByClause clause) {
 		selectBehavior().setGroupByClause(clause);
 		return this;
 	}
@@ -1152,7 +1222,7 @@ public class nodes
 	 * @return {@link SelectStatement} 自身
 	 * @throws IllegalStateException 既に ORDER BY 句がセットされている場合
 	 */
-	public nodes orderBy(OrderByClause clause) {
+	public nodes setOrderByClause(OrderByClause clause) {
 		selectBehavior().setOrderByClause(clause);
 		return this;
 	}
@@ -1473,6 +1543,24 @@ public class nodes
 	}
 
 	/**
+	 * INSERT 文を作成する {@link Consumer}
+	 * @param function {@link Function}
+	 * @return {@link DataManipulator}
+	 */
+	public DataManipulator insertStatement(Function<ListInsertAssist, DataManipulator> function) {
+		return dmsBehavior().insertStatement(function);
+	}
+
+	/**
+	 * UPDATE 文を作成する {@link Consumer}
+	 * @param function {@link Function}
+	 * @return {@link DataManipulator}
+	 */
+	public DataManipulator updateStatement(Function<ListUpdateAssist, DataManipulator> function) {
+		return dmsBehavior().updateStatement(function);
+	}
+
+	/**
 	 * INSERT 文を生成します。
 	 * @param function function
 	 * @return {@link InsertStatementIntermediate}
@@ -1556,7 +1644,7 @@ public class nodes
 	 */
 	public static class Assist<T, M> implements TableFacadeAssist {
 
-		private final nodes table$;
+		final nodes table$;
 
 		private final CriteriaContext context$;
 
@@ -1811,6 +1899,23 @@ public class nodes
 	}
 
 	/**
+	 * SELECT 句用
+	 */
+	public static class ListSelectAssist extends SelectAssist implements ListSelectClauseAssist {
+
+		private ListSelectAssist(
+			nodes table$,
+			TableFacadeContext<SelectCol> builder$) {
+			super(table$, builder$);
+		}
+
+		@Override
+		public SelectBehavior behavior() {
+			return table$.selectBehavior();
+		}
+	}
+
+	/**
 	 * SELECT 文 WHERE 句用
 	 */
 	public static class WhereAssist extends ExtAssist<WhereColumn<WhereLogicalOperators>, Void> implements WhereClauseAssist<WhereAssist> {
@@ -1899,6 +2004,23 @@ public class nodes
 	}
 
 	/**
+	 * GROUB BY 句用
+	 */
+	public static class ListGroupByAssist extends GroupByAssist implements ListGroupByClauseAssist {
+
+		private ListGroupByAssist(
+			nodes table$,
+			TableFacadeContext<GroupByCol> builder$) {
+			super(table$, builder$);
+		}
+
+		@Override
+		public SelectBehavior behavior() {
+			return table$.selectBehavior();
+		}
+	}
+
+	/**
 	 * HAVING 句用
 	 */
 	public static class HavingAssist extends ExtAssist<HavingColumn<HavingLogicalOperators>, Void> implements HavingClauseAssist<HavingAssist> {
@@ -1983,6 +2105,23 @@ public class nodes
 		@Override
 		public OrderByClause getOrderByClause() {
 			return getSelectStatement().getOrderByClause();
+		}
+	}
+
+	/**
+	 * GROUB BY 句用
+	 */
+	public static class ListOrderByAssist extends OrderByAssist implements ListOrderByClauseAssist {
+
+		private ListOrderByAssist(
+			nodes table$,
+			TableFacadeContext<OrderByCol> builder$) {
+			super(table$, builder$);
+		}
+
+		@Override
+		public SelectBehavior behavior() {
+			return table$.selectBehavior();
 		}
 	}
 
@@ -2141,6 +2280,23 @@ public class nodes
 	}
 
 	/**
+	 * INSERT 用
+	 */
+	public static class ListInsertAssist extends InsertAssist implements ListInsertClauseAssist {
+
+		private ListInsertAssist(
+			nodes table$,
+			TableFacadeContext<InsertCol> builder$) {
+			super(table$, builder$);
+		}
+
+		@Override
+		public DataManipulationStatementBehavior<?, ?, ?, ?, ?> behavior() {
+			return table$.dmsBehavior();
+		}
+	}
+
+	/**
 	 * UPDATE 用
 	 */
 	public static class UpdateAssist extends Assist<UpdateCol, Void> implements UpdateClauseAssist {
@@ -2149,6 +2305,23 @@ public class nodes
 			nodes table$,
 			TableFacadeContext<UpdateCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
+		}
+	}
+
+	/**
+	 * INSERT 用
+	 */
+	public static class ListUpdateAssist extends UpdateAssist implements ListUpdateClauseAssist<DMSWhereAssist> {
+
+		private ListUpdateAssist(
+			nodes table$,
+			TableFacadeContext<UpdateCol> builder$) {
+			super(table$, builder$);
+		}
+
+		@Override
+		public DataManipulationStatementBehavior<?, ?, ?, ?, DMSWhereAssist> behavior() {
+			return table$.dmsBehavior();
 		}
 	}
 

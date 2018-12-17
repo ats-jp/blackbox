@@ -85,6 +85,11 @@ import org.blendee.assist.UpdateStatementIntermediate;
 import org.blendee.assist.WhereColumn;
 import org.blendee.assist.WhereClauseAssist;
 import org.blendee.assist.SQLDecorators;
+import org.blendee.assist.ListSelectClauseAssist;
+import org.blendee.assist.ListGroupByClauseAssist;
+import org.blendee.assist.ListOrderByClauseAssist;
+import org.blendee.assist.ListInsertClauseAssist;
+import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
@@ -653,7 +658,7 @@ public class transient_bundles
 		return id$ == null ? (id$ = RuntimeIdFactory.getRuntimeInstance()) : id$;
 	}
 
-	private class SelectBehavior extends SelectStatementBehavior<SelectAssist, GroupByAssist, WhereAssist, HavingAssist, OrderByAssist, OnLeftAssist> {
+	private class SelectBehavior extends SelectStatementBehavior<SelectAssist, ListSelectAssist, GroupByAssist, ListGroupByAssist, WhereAssist, HavingAssist, OrderByAssist, ListOrderByAssist, OnLeftAssist> {
 
 		private SelectBehavior() {
 			super($TABLE, getRuntimeId(), transient_bundles.this);
@@ -667,6 +672,13 @@ public class transient_bundles
 		}
 
 		@Override
+		protected ListSelectAssist newListSelect() {
+			return new ListSelectAssist(
+				transient_bundles.this,
+				selectContext$);
+		}
+
+		@Override
 		protected GroupByAssist newGroupBy() {
 			return new GroupByAssist(
 				transient_bundles.this,
@@ -674,8 +686,22 @@ public class transient_bundles
 		}
 
 		@Override
+		protected ListGroupByAssist newListGroupBy() {
+			return new ListGroupByAssist(
+				transient_bundles.this,
+				groupByContext$);
+		}
+
+		@Override
 		protected OrderByAssist newOrderBy() {
 			return new OrderByAssist(
+				transient_bundles.this,
+				orderByContext$);
+		}
+
+		@Override
+		protected ListOrderByAssist newListOrderBy() {
+			return new ListOrderByAssist(
 				transient_bundles.this,
 				orderByContext$);
 		}
@@ -702,7 +728,7 @@ public class transient_bundles
 		return dmsBehavior$ == null ? (dmsBehavior$ = new DMSBehavior()) : dmsBehavior$;
 	}
 
-	private class DMSBehavior extends DataManipulationStatementBehavior<InsertAssist, UpdateAssist, DMSWhereAssist> {
+	private class DMSBehavior extends DataManipulationStatementBehavior<InsertAssist, ListInsertAssist, UpdateAssist, ListUpdateAssist, DMSWhereAssist> {
 
 		public DMSBehavior() {
 			super($TABLE, transient_bundles.this.getRuntimeId(), transient_bundles.this);
@@ -716,8 +742,22 @@ public class transient_bundles
 		}
 
 		@Override
+		protected ListInsertAssist newListInsert() {
+			return new ListInsertAssist(
+				transient_bundles.this,
+				insertContext$);
+		}
+
+		@Override
 		protected UpdateAssist newUpdate() {
 			return new UpdateAssist(
+				transient_bundles.this,
+				updateContext$);
+		}
+
+		@Override
+		protected ListUpdateAssist newListUpdate() {
+			return new ListUpdateAssist(
 				transient_bundles.this,
 				updateContext$);
 		}
@@ -806,6 +846,36 @@ public class transient_bundles
 	 */
 	public ExtAssist<TableFacadeColumn, Void> assist() {
 		return new ExtAssist<>(this, TableFacadeContext.OTHER, CriteriaContext.NULL);
+	}
+
+	/**
+	 * SELECT 句を作成する {@link Consumer}
+	 * @param consumer {@link Consumer}
+	 * @return this
+	 */
+	public transient_bundles selectClause(Consumer<ListSelectAssist> consumer) {
+		selectBehavior().selectClause(consumer);
+		return this;
+	}
+
+	/**
+	 * GROUP BY 句を作成する {@link Consumer}
+	 * @param consumer {@link Consumer}
+	 * @return this
+	 */
+	public transient_bundles groupByClause(Consumer<ListGroupByAssist> consumer) {
+		selectBehavior().groupByClause(consumer);
+		return this;
+	}
+
+	/**
+	 * GROUP BY 句を作成する {@link Consumer}
+	 * @param consumer {@link Consumer}
+	 * @return this
+	 */
+	public transient_bundles orderByClause(Consumer<ListOrderByAssist> consumer) {
+		selectBehavior().orderByClause(consumer);
+		return this;
 	}
 
 	/**
@@ -984,7 +1054,7 @@ public class transient_bundles
 	 * @return {@link SelectStatement} 自身
 	 * @throws IllegalStateException 既に ORDER BY 句がセットされている場合
 	 */
-	public transient_bundles groupBy(GroupByClause clause) {
+	public transient_bundles setGroupByClause(GroupByClause clause) {
 		selectBehavior().setGroupByClause(clause);
 		return this;
 	}
@@ -995,7 +1065,7 @@ public class transient_bundles
 	 * @return {@link SelectStatement} 自身
 	 * @throws IllegalStateException 既に ORDER BY 句がセットされている場合
 	 */
-	public transient_bundles orderBy(OrderByClause clause) {
+	public transient_bundles setOrderByClause(OrderByClause clause) {
 		selectBehavior().setOrderByClause(clause);
 		return this;
 	}
@@ -1316,6 +1386,24 @@ public class transient_bundles
 	}
 
 	/**
+	 * INSERT 文を作成する {@link Consumer}
+	 * @param function {@link Function}
+	 * @return {@link DataManipulator}
+	 */
+	public DataManipulator insertStatement(Function<ListInsertAssist, DataManipulator> function) {
+		return dmsBehavior().insertStatement(function);
+	}
+
+	/**
+	 * UPDATE 文を作成する {@link Consumer}
+	 * @param function {@link Function}
+	 * @return {@link DataManipulator}
+	 */
+	public DataManipulator updateStatement(Function<ListUpdateAssist, DataManipulator> function) {
+		return dmsBehavior().updateStatement(function);
+	}
+
+	/**
 	 * INSERT 文を生成します。
 	 * @param function function
 	 * @return {@link InsertStatementIntermediate}
@@ -1399,7 +1487,7 @@ public class transient_bundles
 	 */
 	public static class Assist<T, M> implements TableFacadeAssist {
 
-		private final transient_bundles table$;
+		final transient_bundles table$;
 
 		private final CriteriaContext context$;
 
@@ -1622,6 +1710,23 @@ public class transient_bundles
 	}
 
 	/**
+	 * SELECT 句用
+	 */
+	public static class ListSelectAssist extends SelectAssist implements ListSelectClauseAssist {
+
+		private ListSelectAssist(
+			transient_bundles table$,
+			TableFacadeContext<SelectCol> builder$) {
+			super(table$, builder$);
+		}
+
+		@Override
+		public SelectBehavior behavior() {
+			return table$.selectBehavior();
+		}
+	}
+
+	/**
 	 * SELECT 文 WHERE 句用
 	 */
 	public static class WhereAssist extends ExtAssist<WhereColumn<WhereLogicalOperators>, Void> implements WhereClauseAssist<WhereAssist> {
@@ -1710,6 +1815,23 @@ public class transient_bundles
 	}
 
 	/**
+	 * GROUB BY 句用
+	 */
+	public static class ListGroupByAssist extends GroupByAssist implements ListGroupByClauseAssist {
+
+		private ListGroupByAssist(
+			transient_bundles table$,
+			TableFacadeContext<GroupByCol> builder$) {
+			super(table$, builder$);
+		}
+
+		@Override
+		public SelectBehavior behavior() {
+			return table$.selectBehavior();
+		}
+	}
+
+	/**
 	 * HAVING 句用
 	 */
 	public static class HavingAssist extends ExtAssist<HavingColumn<HavingLogicalOperators>, Void> implements HavingClauseAssist<HavingAssist> {
@@ -1794,6 +1916,23 @@ public class transient_bundles
 		@Override
 		public OrderByClause getOrderByClause() {
 			return getSelectStatement().getOrderByClause();
+		}
+	}
+
+	/**
+	 * GROUB BY 句用
+	 */
+	public static class ListOrderByAssist extends OrderByAssist implements ListOrderByClauseAssist {
+
+		private ListOrderByAssist(
+			transient_bundles table$,
+			TableFacadeContext<OrderByCol> builder$) {
+			super(table$, builder$);
+		}
+
+		@Override
+		public SelectBehavior behavior() {
+			return table$.selectBehavior();
 		}
 	}
 
@@ -1952,6 +2091,23 @@ public class transient_bundles
 	}
 
 	/**
+	 * INSERT 用
+	 */
+	public static class ListInsertAssist extends InsertAssist implements ListInsertClauseAssist {
+
+		private ListInsertAssist(
+			transient_bundles table$,
+			TableFacadeContext<InsertCol> builder$) {
+			super(table$, builder$);
+		}
+
+		@Override
+		public DataManipulationStatementBehavior<?, ?, ?, ?, ?> behavior() {
+			return table$.dmsBehavior();
+		}
+	}
+
+	/**
 	 * UPDATE 用
 	 */
 	public static class UpdateAssist extends Assist<UpdateCol, Void> implements UpdateClauseAssist {
@@ -1960,6 +2116,23 @@ public class transient_bundles
 			transient_bundles table$,
 			TableFacadeContext<UpdateCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
+		}
+	}
+
+	/**
+	 * INSERT 用
+	 */
+	public static class ListUpdateAssist extends UpdateAssist implements ListUpdateClauseAssist<DMSWhereAssist> {
+
+		private ListUpdateAssist(
+			transient_bundles table$,
+			TableFacadeContext<UpdateCol> builder$) {
+			super(table$, builder$);
+		}
+
+		@Override
+		public DataManipulationStatementBehavior<?, ?, ?, ?, DMSWhereAssist> behavior() {
+			return table$.dmsBehavior();
 		}
 	}
 
