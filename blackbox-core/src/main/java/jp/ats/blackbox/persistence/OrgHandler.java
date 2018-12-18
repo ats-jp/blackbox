@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 import org.blendee.jdbc.Result;
 
-import jp.ats.blackbox.blendee.bb.orgs;
+import sqlassist.bb.orgs;
 
 public class OrgHandler {
 

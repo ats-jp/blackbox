@@ -3,7 +3,7 @@ package jp.ats.blackbox.persistence;
 import org.blendee.assist.Row;
 import org.blendee.dialect.postgresql.ReturningUtilities;
 
-import jp.ats.blackbox.blendee.bb.orgs;
+import sqlassist.bb.orgs;
 
 public class CommonHandler {
 
