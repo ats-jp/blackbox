@@ -165,16 +165,16 @@ public class locking_groups
 	 * reference: groups<br>
 	 * columns: id
 	 */
-	@ForeignKey(name = "locking_groups_id_fkey", references = "groups", columns = { "id" }, refColumns = { "id" })
-	public static final String groups$locking_groups_id_fkey = "locking_groups_id_fkey";
+	@ForeignKey(name = "locking_groups_id_fkey", references = "bb.groups", columns = { "id" }, refColumns = { "id" })
+	public static final String bb$groups$locking_groups_id_fkey = "locking_groups_id_fkey";
 
 	/**
 	 * name: locking_groups_user_id_fkey<br>
 	 * reference: users<br>
 	 * columns: user_id
 	 */
-	@ForeignKey(name = "locking_groups_user_id_fkey", references = "users", columns = { "user_id" }, refColumns = { "id" })
-	public static final String users$locking_groups_user_id_fkey = "locking_groups_user_id_fkey";
+	@ForeignKey(name = "locking_groups_user_id_fkey", references = "bb.users", columns = { "user_id" }, refColumns = { "id" })
+	public static final String bb$users$locking_groups_user_id_fkey = "locking_groups_user_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -334,7 +334,7 @@ public class locking_groups
 		 */
 		public jp.ats.blackbox.blendee.bb.groups.Row $groups() {
 			return jp.ats.blackbox.blendee.bb.groups.row(
-				data$.getDataObject(groups$locking_groups_id_fkey));
+				data$.getDataObject(bb$groups$locking_groups_id_fkey));
 		}
 
 		/**
@@ -346,7 +346,7 @@ public class locking_groups
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$locking_groups_user_id_fkey));
+				data$.getDataObject(bb$users$locking_groups_user_id_fkey));
 		}
 
 	}
@@ -1538,7 +1538,7 @@ public class locking_groups
 			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.locking_groups.groups$locking_groups_id_fkey);
+				jp.ats.blackbox.blendee.bb.locking_groups.bb$groups$locking_groups_id_fkey);
 		}
 
 		/**
@@ -1551,7 +1551,7 @@ public class locking_groups
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.locking_groups.users$locking_groups_user_id_fkey);
+				jp.ats.blackbox.blendee.bb.locking_groups.bb$users$locking_groups_user_id_fkey);
 		}
 
 	}

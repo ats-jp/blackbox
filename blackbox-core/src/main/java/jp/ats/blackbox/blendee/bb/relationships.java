@@ -177,24 +177,24 @@ public class relationships
 	 * reference: groups<br>
 	 * columns: child_id
 	 */
-	@ForeignKey(name = "relationships_child_id_fkey", references = "groups", columns = { "child_id" }, refColumns = { "id" })
-	public static final String groups$relationships_child_id_fkey = "relationships_child_id_fkey";
+	@ForeignKey(name = "relationships_child_id_fkey", references = "bb.groups", columns = { "child_id" }, refColumns = { "id" })
+	public static final String bb$groups$relationships_child_id_fkey = "relationships_child_id_fkey";
 
 	/**
 	 * name: relationships_parent_id_fkey<br>
 	 * reference: groups<br>
 	 * columns: parent_id
 	 */
-	@ForeignKey(name = "relationships_parent_id_fkey", references = "groups", columns = { "parent_id" }, refColumns = { "id" })
-	public static final String groups$relationships_parent_id_fkey = "relationships_parent_id_fkey";
+	@ForeignKey(name = "relationships_parent_id_fkey", references = "bb.groups", columns = { "parent_id" }, refColumns = { "id" })
+	public static final String bb$groups$relationships_parent_id_fkey = "relationships_parent_id_fkey";
 
 	/**
 	 * name: relationships_cascade_id_fkey<br>
 	 * reference: relationships<br>
 	 * columns: cascade_id
 	 */
-	@ForeignKey(name = "relationships_cascade_id_fkey", references = "relationships", columns = { "cascade_id" }, refColumns = { "id" })
-	public static final String relationships$relationships_cascade_id_fkey = "relationships_cascade_id_fkey";
+	@ForeignKey(name = "relationships_cascade_id_fkey", references = "bb.relationships", columns = { "cascade_id" }, refColumns = { "id" })
+	public static final String bb$relationships$relationships_cascade_id_fkey = "relationships_cascade_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -388,7 +388,7 @@ public class relationships
 		 */
 		public jp.ats.blackbox.blendee.bb.groups.Row $groups$relationships_child_id_fkey() {
 			return jp.ats.blackbox.blendee.bb.groups.row(
-				data$.getDataObject(groups$relationships_child_id_fkey));
+				data$.getDataObject(bb$groups$relationships_child_id_fkey));
 		}
 
 		/**
@@ -400,7 +400,7 @@ public class relationships
 		 */
 		public jp.ats.blackbox.blendee.bb.groups.Row $groups$relationships_parent_id_fkey() {
 			return jp.ats.blackbox.blendee.bb.groups.row(
-				data$.getDataObject(groups$relationships_parent_id_fkey));
+				data$.getDataObject(bb$groups$relationships_parent_id_fkey));
 		}
 
 		/**
@@ -412,7 +412,7 @@ public class relationships
 		 */
 		public jp.ats.blackbox.blendee.bb.relationships.Row $relationships() {
 			return jp.ats.blackbox.blendee.bb.relationships.row(
-				data$.getDataObject(relationships$relationships_cascade_id_fkey));
+				data$.getDataObject(bb$relationships$relationships_cascade_id_fkey));
 		}
 
 	}
@@ -1612,7 +1612,7 @@ public class relationships
 			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.relationships.groups$relationships_child_id_fkey);
+				jp.ats.blackbox.blendee.bb.relationships.bb$groups$relationships_child_id_fkey);
 		}
 
 		/**
@@ -1625,7 +1625,7 @@ public class relationships
 			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.relationships.groups$relationships_parent_id_fkey);
+				jp.ats.blackbox.blendee.bb.relationships.bb$groups$relationships_parent_id_fkey);
 		}
 
 		/**
@@ -1638,7 +1638,7 @@ public class relationships
 			return new jp.ats.blackbox.blendee.bb.relationships.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.relationships.relationships$relationships_cascade_id_fkey);
+				jp.ats.blackbox.blendee.bb.relationships.bb$relationships$relationships_cascade_id_fkey);
 		}
 
 	}

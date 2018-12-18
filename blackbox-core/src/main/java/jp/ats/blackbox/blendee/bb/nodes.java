@@ -229,16 +229,16 @@ public class nodes
 	 * reference: bundles<br>
 	 * columns: bundle_id
 	 */
-	@ForeignKey(name = "nodes_bundle_id_fkey", references = "bundles", columns = { "bundle_id" }, refColumns = { "id" })
-	public static final String bundles$nodes_bundle_id_fkey = "nodes_bundle_id_fkey";
+	@ForeignKey(name = "nodes_bundle_id_fkey", references = "bb.bundles", columns = { "bundle_id" }, refColumns = { "id" })
+	public static final String bb$bundles$nodes_bundle_id_fkey = "nodes_bundle_id_fkey";
 
 	/**
 	 * name: nodes_stock_id_fkey<br>
 	 * reference: stocks<br>
 	 * columns: stock_id
 	 */
-	@ForeignKey(name = "nodes_stock_id_fkey", references = "stocks", columns = { "stock_id" }, refColumns = { "id" })
-	public static final String stocks$nodes_stock_id_fkey = "nodes_stock_id_fkey";
+	@ForeignKey(name = "nodes_stock_id_fkey", references = "bb.stocks", columns = { "stock_id" }, refColumns = { "id" })
+	public static final String bb$stocks$nodes_stock_id_fkey = "nodes_stock_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -608,7 +608,7 @@ public class nodes
 		 */
 		public jp.ats.blackbox.blendee.bb.bundles.Row $bundles() {
 			return jp.ats.blackbox.blendee.bb.bundles.row(
-				data$.getDataObject(bundles$nodes_bundle_id_fkey));
+				data$.getDataObject(bb$bundles$nodes_bundle_id_fkey));
 		}
 
 		/**
@@ -620,7 +620,7 @@ public class nodes
 		 */
 		public jp.ats.blackbox.blendee.bb.stocks.Row $stocks() {
 			return jp.ats.blackbox.blendee.bb.stocks.row(
-				data$.getDataObject(stocks$nodes_stock_id_fkey));
+				data$.getDataObject(bb$stocks$nodes_stock_id_fkey));
 		}
 
 	}
@@ -1868,7 +1868,7 @@ public class nodes
 			return new jp.ats.blackbox.blendee.bb.bundles.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.nodes.bundles$nodes_bundle_id_fkey);
+				jp.ats.blackbox.blendee.bb.nodes.bb$bundles$nodes_bundle_id_fkey);
 		}
 
 		/**
@@ -1881,7 +1881,7 @@ public class nodes
 			return new jp.ats.blackbox.blendee.bb.stocks.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.nodes.stocks$nodes_stock_id_fkey);
+				jp.ats.blackbox.blendee.bb.nodes.bb$stocks$nodes_stock_id_fkey);
 		}
 
 	}

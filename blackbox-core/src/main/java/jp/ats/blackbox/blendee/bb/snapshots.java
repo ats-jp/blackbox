@@ -176,16 +176,16 @@ public class snapshots
 	 * reference: nodes<br>
 	 * columns: id
 	 */
-	@ForeignKey(name = "snapshots_id_fkey", references = "nodes", columns = { "id" }, refColumns = { "id" })
-	public static final String nodes$snapshots_id_fkey = "snapshots_id_fkey";
+	@ForeignKey(name = "snapshots_id_fkey", references = "bb.nodes", columns = { "id" }, refColumns = { "id" })
+	public static final String bb$nodes$snapshots_id_fkey = "snapshots_id_fkey";
 
 	/**
 	 * name: snapshots_updated_by_fkey<br>
 	 * reference: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "snapshots_updated_by_fkey", references = "users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String users$snapshots_updated_by_fkey = "snapshots_updated_by_fkey";
+	@ForeignKey(name = "snapshots_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$snapshots_updated_by_fkey = "snapshots_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -377,7 +377,7 @@ public class snapshots
 		 */
 		public jp.ats.blackbox.blendee.bb.nodes.Row $nodes() {
 			return jp.ats.blackbox.blendee.bb.nodes.row(
-				data$.getDataObject(nodes$snapshots_id_fkey));
+				data$.getDataObject(bb$nodes$snapshots_id_fkey));
 		}
 
 		/**
@@ -389,7 +389,7 @@ public class snapshots
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$snapshots_updated_by_fkey));
+				data$.getDataObject(bb$users$snapshots_updated_by_fkey));
 		}
 
 	}
@@ -1589,7 +1589,7 @@ public class snapshots
 			return new jp.ats.blackbox.blendee.bb.nodes.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.snapshots.nodes$snapshots_id_fkey);
+				jp.ats.blackbox.blendee.bb.snapshots.bb$nodes$snapshots_id_fkey);
 		}
 
 		/**
@@ -1602,7 +1602,7 @@ public class snapshots
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.snapshots.users$snapshots_updated_by_fkey);
+				jp.ats.blackbox.blendee.bb.snapshots.bb$users$snapshots_updated_by_fkey);
 		}
 
 	}

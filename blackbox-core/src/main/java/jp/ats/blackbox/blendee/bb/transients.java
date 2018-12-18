@@ -212,32 +212,32 @@ public class transients
 	 * reference: groups<br>
 	 * columns: group_id
 	 */
-	@ForeignKey(name = "transients_group_id_fkey", references = "groups", columns = { "group_id" }, refColumns = { "id" })
-	public static final String groups$transients_group_id_fkey = "transients_group_id_fkey";
+	@ForeignKey(name = "transients_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
+	public static final String bb$groups$transients_group_id_fkey = "transients_group_id_fkey";
 
 	/**
 	 * name: transients_created_by_fkey<br>
 	 * reference: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "transients_created_by_fkey", references = "users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String users$transients_created_by_fkey = "transients_created_by_fkey";
+	@ForeignKey(name = "transients_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$transients_created_by_fkey = "transients_created_by_fkey";
 
 	/**
 	 * name: transients_updated_by_fkey<br>
 	 * reference: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "transients_updated_by_fkey", references = "users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String users$transients_updated_by_fkey = "transients_updated_by_fkey";
+	@ForeignKey(name = "transients_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$transients_updated_by_fkey = "transients_updated_by_fkey";
 
 	/**
 	 * name: transients_user_id_fkey<br>
 	 * reference: users<br>
 	 * columns: user_id
 	 */
-	@ForeignKey(name = "transients_user_id_fkey", references = "users", columns = { "user_id" }, refColumns = { "id" })
-	public static final String users$transients_user_id_fkey = "transients_user_id_fkey";
+	@ForeignKey(name = "transients_user_id_fkey", references = "bb.users", columns = { "user_id" }, refColumns = { "id" })
+	public static final String bb$users$transients_user_id_fkey = "transients_user_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -551,7 +551,7 @@ public class transients
 		 */
 		public jp.ats.blackbox.blendee.bb.groups.Row $groups() {
 			return jp.ats.blackbox.blendee.bb.groups.row(
-				data$.getDataObject(groups$transients_group_id_fkey));
+				data$.getDataObject(bb$groups$transients_group_id_fkey));
 		}
 
 		/**
@@ -563,7 +563,7 @@ public class transients
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$transients_created_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$transients_created_by_fkey));
+				data$.getDataObject(bb$users$transients_created_by_fkey));
 		}
 
 		/**
@@ -575,7 +575,7 @@ public class transients
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$transients_updated_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$transients_updated_by_fkey));
+				data$.getDataObject(bb$users$transients_updated_by_fkey));
 		}
 
 		/**
@@ -587,7 +587,7 @@ public class transients
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$transients_user_id_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$transients_user_id_fkey));
+				data$.getDataObject(bb$users$transients_user_id_fkey));
 		}
 
 	}
@@ -1819,7 +1819,7 @@ public class transients
 			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transients.groups$transients_group_id_fkey);
+				jp.ats.blackbox.blendee.bb.transients.bb$groups$transients_group_id_fkey);
 		}
 
 		/**
@@ -1832,7 +1832,7 @@ public class transients
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transients.users$transients_created_by_fkey);
+				jp.ats.blackbox.blendee.bb.transients.bb$users$transients_created_by_fkey);
 		}
 
 		/**
@@ -1845,7 +1845,7 @@ public class transients
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transients.users$transients_updated_by_fkey);
+				jp.ats.blackbox.blendee.bb.transients.bb$users$transients_updated_by_fkey);
 		}
 
 		/**
@@ -1858,7 +1858,7 @@ public class transients
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transients.users$transients_user_id_fkey);
+				jp.ats.blackbox.blendee.bb.transients.bb$users$transients_user_id_fkey);
 		}
 
 	}

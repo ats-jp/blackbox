@@ -154,16 +154,16 @@ public class group_tags
 	 * reference: groups<br>
 	 * columns: group_id
 	 */
-	@ForeignKey(name = "group_tags_group_id_fkey", references = "groups", columns = { "group_id" }, refColumns = { "id" })
-	public static final String groups$group_tags_group_id_fkey = "group_tags_group_id_fkey";
+	@ForeignKey(name = "group_tags_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
+	public static final String bb$groups$group_tags_group_id_fkey = "group_tags_group_id_fkey";
 
 	/**
 	 * name: group_tags_tag_id_fkey<br>
 	 * reference: tags<br>
 	 * columns: tag_id
 	 */
-	@ForeignKey(name = "group_tags_tag_id_fkey", references = "tags", columns = { "tag_id" }, refColumns = { "id" })
-	public static final String tags$group_tags_tag_id_fkey = "group_tags_tag_id_fkey";
+	@ForeignKey(name = "group_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
+	public static final String bb$tags$group_tags_tag_id_fkey = "group_tags_tag_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -293,7 +293,7 @@ public class group_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.groups.Row $groups() {
 			return jp.ats.blackbox.blendee.bb.groups.row(
-				data$.getDataObject(groups$group_tags_group_id_fkey));
+				data$.getDataObject(bb$groups$group_tags_group_id_fkey));
 		}
 
 		/**
@@ -305,7 +305,7 @@ public class group_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.tags.Row $tags() {
 			return jp.ats.blackbox.blendee.bb.tags.row(
-				data$.getDataObject(tags$group_tags_tag_id_fkey));
+				data$.getDataObject(bb$tags$group_tags_tag_id_fkey));
 		}
 
 	}
@@ -1489,7 +1489,7 @@ public class group_tags
 			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.group_tags.groups$group_tags_group_id_fkey);
+				jp.ats.blackbox.blendee.bb.group_tags.bb$groups$group_tags_group_id_fkey);
 		}
 
 		/**
@@ -1502,7 +1502,7 @@ public class group_tags
 			return new jp.ats.blackbox.blendee.bb.tags.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.group_tags.tags$group_tags_tag_id_fkey);
+				jp.ats.blackbox.blendee.bb.group_tags.bb$tags$group_tags_tag_id_fkey);
 		}
 
 	}

@@ -248,24 +248,24 @@ public class users
 	 * reference: groups<br>
 	 * columns: group_id
 	 */
-	@ForeignKey(name = "users_group_id_fkey", references = "groups", columns = { "group_id" }, refColumns = { "id" })
-	public static final String groups$users_group_id_fkey = "users_group_id_fkey";
+	@ForeignKey(name = "users_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
+	public static final String bb$groups$users_group_id_fkey = "users_group_id_fkey";
 
 	/**
 	 * name: users_created_by_fkey<br>
 	 * reference: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "users_created_by_fkey", references = "users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String users$users_created_by_fkey = "users_created_by_fkey";
+	@ForeignKey(name = "users_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$users_created_by_fkey = "users_created_by_fkey";
 
 	/**
 	 * name: users_updated_by_fkey<br>
 	 * reference: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "users_updated_by_fkey", references = "users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String users$users_updated_by_fkey = "users_updated_by_fkey";
+	@ForeignKey(name = "users_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$users_updated_by_fkey = "users_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -697,7 +697,7 @@ public class users
 		 */
 		public jp.ats.blackbox.blendee.bb.groups.Row $groups() {
 			return jp.ats.blackbox.blendee.bb.groups.row(
-				data$.getDataObject(groups$users_group_id_fkey));
+				data$.getDataObject(bb$groups$users_group_id_fkey));
 		}
 
 		/**
@@ -709,7 +709,7 @@ public class users
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$users_created_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$users_created_by_fkey));
+				data$.getDataObject(bb$users$users_created_by_fkey));
 		}
 
 		/**
@@ -721,7 +721,7 @@ public class users
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$users_updated_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$users_updated_by_fkey));
+				data$.getDataObject(bb$users$users_updated_by_fkey));
 		}
 
 	}
@@ -1985,7 +1985,7 @@ public class users
 			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.users.groups$users_group_id_fkey);
+				jp.ats.blackbox.blendee.bb.users.bb$groups$users_group_id_fkey);
 		}
 
 		/**
@@ -1998,7 +1998,7 @@ public class users
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.users.users$users_created_by_fkey);
+				jp.ats.blackbox.blendee.bb.users.bb$users$users_created_by_fkey);
 		}
 
 		/**
@@ -2011,7 +2011,7 @@ public class users
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.users.users$users_updated_by_fkey);
+				jp.ats.blackbox.blendee.bb.users.bb$users$users_updated_by_fkey);
 		}
 
 	}

@@ -154,16 +154,16 @@ public class location_tags
 	 * reference: locations<br>
 	 * columns: location_id
 	 */
-	@ForeignKey(name = "location_tags_location_id_fkey", references = "locations", columns = { "location_id" }, refColumns = { "id" })
-	public static final String locations$location_tags_location_id_fkey = "location_tags_location_id_fkey";
+	@ForeignKey(name = "location_tags_location_id_fkey", references = "bb.locations", columns = { "location_id" }, refColumns = { "id" })
+	public static final String bb$locations$location_tags_location_id_fkey = "location_tags_location_id_fkey";
 
 	/**
 	 * name: location_tags_tag_id_fkey<br>
 	 * reference: tags<br>
 	 * columns: tag_id
 	 */
-	@ForeignKey(name = "location_tags_tag_id_fkey", references = "tags", columns = { "tag_id" }, refColumns = { "id" })
-	public static final String tags$location_tags_tag_id_fkey = "location_tags_tag_id_fkey";
+	@ForeignKey(name = "location_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
+	public static final String bb$tags$location_tags_tag_id_fkey = "location_tags_tag_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -293,7 +293,7 @@ public class location_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.locations.Row $locations() {
 			return jp.ats.blackbox.blendee.bb.locations.row(
-				data$.getDataObject(locations$location_tags_location_id_fkey));
+				data$.getDataObject(bb$locations$location_tags_location_id_fkey));
 		}
 
 		/**
@@ -305,7 +305,7 @@ public class location_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.tags.Row $tags() {
 			return jp.ats.blackbox.blendee.bb.tags.row(
-				data$.getDataObject(tags$location_tags_tag_id_fkey));
+				data$.getDataObject(bb$tags$location_tags_tag_id_fkey));
 		}
 
 	}
@@ -1489,7 +1489,7 @@ public class location_tags
 			return new jp.ats.blackbox.blendee.bb.locations.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.location_tags.locations$location_tags_location_id_fkey);
+				jp.ats.blackbox.blendee.bb.location_tags.bb$locations$location_tags_location_id_fkey);
 		}
 
 		/**
@@ -1502,7 +1502,7 @@ public class location_tags
 			return new jp.ats.blackbox.blendee.bb.tags.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.location_tags.tags$location_tags_tag_id_fkey);
+				jp.ats.blackbox.blendee.bb.location_tags.bb$tags$location_tags_tag_id_fkey);
 		}
 
 	}

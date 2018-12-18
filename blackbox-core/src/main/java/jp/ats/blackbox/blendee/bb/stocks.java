@@ -211,48 +211,48 @@ public class stocks
 	 * reference: groups<br>
 	 * columns: group_id
 	 */
-	@ForeignKey(name = "stocks_group_id_fkey", references = "groups", columns = { "group_id" }, refColumns = { "id" })
-	public static final String groups$stocks_group_id_fkey = "stocks_group_id_fkey";
+	@ForeignKey(name = "stocks_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
+	public static final String bb$groups$stocks_group_id_fkey = "stocks_group_id_fkey";
 
 	/**
 	 * name: stocks_item_id_fkey<br>
 	 * reference: items<br>
 	 * columns: item_id
 	 */
-	@ForeignKey(name = "stocks_item_id_fkey", references = "items", columns = { "item_id" }, refColumns = { "id" })
-	public static final String items$stocks_item_id_fkey = "stocks_item_id_fkey";
+	@ForeignKey(name = "stocks_item_id_fkey", references = "bb.items", columns = { "item_id" }, refColumns = { "id" })
+	public static final String bb$items$stocks_item_id_fkey = "stocks_item_id_fkey";
 
 	/**
 	 * name: stocks_location_id_fkey<br>
 	 * reference: locations<br>
 	 * columns: location_id
 	 */
-	@ForeignKey(name = "stocks_location_id_fkey", references = "locations", columns = { "location_id" }, refColumns = { "id" })
-	public static final String locations$stocks_location_id_fkey = "stocks_location_id_fkey";
+	@ForeignKey(name = "stocks_location_id_fkey", references = "bb.locations", columns = { "location_id" }, refColumns = { "id" })
+	public static final String bb$locations$stocks_location_id_fkey = "stocks_location_id_fkey";
 
 	/**
 	 * name: stocks_owner_id_fkey<br>
 	 * reference: owners<br>
 	 * columns: owner_id
 	 */
-	@ForeignKey(name = "stocks_owner_id_fkey", references = "owners", columns = { "owner_id" }, refColumns = { "id" })
-	public static final String owners$stocks_owner_id_fkey = "stocks_owner_id_fkey";
+	@ForeignKey(name = "stocks_owner_id_fkey", references = "bb.owners", columns = { "owner_id" }, refColumns = { "id" })
+	public static final String bb$owners$stocks_owner_id_fkey = "stocks_owner_id_fkey";
 
 	/**
 	 * name: stocks_status_id_fkey<br>
 	 * reference: statuses<br>
 	 * columns: status_id
 	 */
-	@ForeignKey(name = "stocks_status_id_fkey", references = "statuses", columns = { "status_id" }, refColumns = { "id" })
-	public static final String statuses$stocks_status_id_fkey = "stocks_status_id_fkey";
+	@ForeignKey(name = "stocks_status_id_fkey", references = "bb.statuses", columns = { "status_id" }, refColumns = { "id" })
+	public static final String bb$statuses$stocks_status_id_fkey = "stocks_status_id_fkey";
 
 	/**
 	 * name: stocks_created_by_fkey<br>
 	 * reference: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "stocks_created_by_fkey", references = "users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String users$stocks_created_by_fkey = "stocks_created_by_fkey";
+	@ForeignKey(name = "stocks_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$stocks_created_by_fkey = "stocks_created_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -562,7 +562,7 @@ public class stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.groups.Row $groups() {
 			return jp.ats.blackbox.blendee.bb.groups.row(
-				data$.getDataObject(groups$stocks_group_id_fkey));
+				data$.getDataObject(bb$groups$stocks_group_id_fkey));
 		}
 
 		/**
@@ -574,7 +574,7 @@ public class stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.items.Row $items() {
 			return jp.ats.blackbox.blendee.bb.items.row(
-				data$.getDataObject(items$stocks_item_id_fkey));
+				data$.getDataObject(bb$items$stocks_item_id_fkey));
 		}
 
 		/**
@@ -586,7 +586,7 @@ public class stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.locations.Row $locations() {
 			return jp.ats.blackbox.blendee.bb.locations.row(
-				data$.getDataObject(locations$stocks_location_id_fkey));
+				data$.getDataObject(bb$locations$stocks_location_id_fkey));
 		}
 
 		/**
@@ -598,7 +598,7 @@ public class stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.owners.Row $owners() {
 			return jp.ats.blackbox.blendee.bb.owners.row(
-				data$.getDataObject(owners$stocks_owner_id_fkey));
+				data$.getDataObject(bb$owners$stocks_owner_id_fkey));
 		}
 
 		/**
@@ -610,7 +610,7 @@ public class stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.statuses.Row $statuses() {
 			return jp.ats.blackbox.blendee.bb.statuses.row(
-				data$.getDataObject(statuses$stocks_status_id_fkey));
+				data$.getDataObject(bb$statuses$stocks_status_id_fkey));
 		}
 
 		/**
@@ -622,7 +622,7 @@ public class stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$stocks_created_by_fkey));
+				data$.getDataObject(bb$users$stocks_created_by_fkey));
 		}
 
 	}
@@ -1854,7 +1854,7 @@ public class stocks
 			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.stocks.groups$stocks_group_id_fkey);
+				jp.ats.blackbox.blendee.bb.stocks.bb$groups$stocks_group_id_fkey);
 		}
 
 		/**
@@ -1867,7 +1867,7 @@ public class stocks
 			return new jp.ats.blackbox.blendee.bb.items.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.stocks.items$stocks_item_id_fkey);
+				jp.ats.blackbox.blendee.bb.stocks.bb$items$stocks_item_id_fkey);
 		}
 
 		/**
@@ -1880,7 +1880,7 @@ public class stocks
 			return new jp.ats.blackbox.blendee.bb.locations.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.stocks.locations$stocks_location_id_fkey);
+				jp.ats.blackbox.blendee.bb.stocks.bb$locations$stocks_location_id_fkey);
 		}
 
 		/**
@@ -1893,7 +1893,7 @@ public class stocks
 			return new jp.ats.blackbox.blendee.bb.owners.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.stocks.owners$stocks_owner_id_fkey);
+				jp.ats.blackbox.blendee.bb.stocks.bb$owners$stocks_owner_id_fkey);
 		}
 
 		/**
@@ -1906,7 +1906,7 @@ public class stocks
 			return new jp.ats.blackbox.blendee.bb.statuses.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.stocks.statuses$stocks_status_id_fkey);
+				jp.ats.blackbox.blendee.bb.stocks.bb$statuses$stocks_status_id_fkey);
 		}
 
 		/**
@@ -1919,7 +1919,7 @@ public class stocks
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.stocks.users$stocks_created_by_fkey);
+				jp.ats.blackbox.blendee.bb.stocks.bb$users$stocks_created_by_fkey);
 		}
 
 	}

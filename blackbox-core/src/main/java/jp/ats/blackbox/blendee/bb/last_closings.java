@@ -166,16 +166,16 @@ public class last_closings
 	 * reference: closings<br>
 	 * columns: closing_id
 	 */
-	@ForeignKey(name = "last_closings_closing_id_fkey", references = "closings", columns = { "closing_id" }, refColumns = { "id" })
-	public static final String closings$last_closings_closing_id_fkey = "last_closings_closing_id_fkey";
+	@ForeignKey(name = "last_closings_closing_id_fkey", references = "bb.closings", columns = { "closing_id" }, refColumns = { "id" })
+	public static final String bb$closings$last_closings_closing_id_fkey = "last_closings_closing_id_fkey";
 
 	/**
 	 * name: last_closings_id_fkey<br>
 	 * reference: groups<br>
 	 * columns: id
 	 */
-	@ForeignKey(name = "last_closings_id_fkey", references = "groups", columns = { "id" }, refColumns = { "id" })
-	public static final String groups$last_closings_id_fkey = "last_closings_id_fkey";
+	@ForeignKey(name = "last_closings_id_fkey", references = "bb.groups", columns = { "id" }, refColumns = { "id" })
+	public static final String bb$groups$last_closings_id_fkey = "last_closings_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -337,7 +337,7 @@ public class last_closings
 		 */
 		public jp.ats.blackbox.blendee.bb.closings.Row $closings() {
 			return jp.ats.blackbox.blendee.bb.closings.row(
-				data$.getDataObject(closings$last_closings_closing_id_fkey));
+				data$.getDataObject(bb$closings$last_closings_closing_id_fkey));
 		}
 
 		/**
@@ -349,7 +349,7 @@ public class last_closings
 		 */
 		public jp.ats.blackbox.blendee.bb.groups.Row $groups() {
 			return jp.ats.blackbox.blendee.bb.groups.row(
-				data$.getDataObject(groups$last_closings_id_fkey));
+				data$.getDataObject(bb$groups$last_closings_id_fkey));
 		}
 
 	}
@@ -1541,7 +1541,7 @@ public class last_closings
 			return new jp.ats.blackbox.blendee.bb.closings.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.last_closings.closings$last_closings_closing_id_fkey);
+				jp.ats.blackbox.blendee.bb.last_closings.bb$closings$last_closings_closing_id_fkey);
 		}
 
 		/**
@@ -1554,7 +1554,7 @@ public class last_closings
 			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.last_closings.groups$last_closings_id_fkey);
+				jp.ats.blackbox.blendee.bb.last_closings.bb$groups$last_closings_id_fkey);
 		}
 
 	}

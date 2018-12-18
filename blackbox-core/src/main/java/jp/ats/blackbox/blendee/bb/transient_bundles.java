@@ -192,16 +192,16 @@ public class transient_bundles
 	 * reference: transient_transfers<br>
 	 * columns: transient_transfer_id
 	 */
-	@ForeignKey(name = "transient_bundles_transient_transfer_id_fkey", references = "transient_transfers", columns = { "transient_transfer_id" }, refColumns = { "id" })
-	public static final String transient_transfers$transient_bundles_transient_transfer_id_fkey = "transient_bundles_transient_transfer_id_fkey";
+	@ForeignKey(name = "transient_bundles_transient_transfer_id_fkey", references = "bb.transient_transfers", columns = { "transient_transfer_id" }, refColumns = { "id" })
+	public static final String bb$transient_transfers$transient_bundles_transient_transfer_id_fkey = "transient_bundles_transient_transfer_id_fkey";
 
 	/**
 	 * name: transient_bundles_created_by_fkey<br>
 	 * reference: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "transient_bundles_created_by_fkey", references = "users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String users$transient_bundles_created_by_fkey = "transient_bundles_created_by_fkey";
+	@ForeignKey(name = "transient_bundles_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$transient_bundles_created_by_fkey = "transient_bundles_created_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -451,7 +451,7 @@ public class transient_bundles
 		 */
 		public jp.ats.blackbox.blendee.bb.transient_transfers.Row $transient_transfers() {
 			return jp.ats.blackbox.blendee.bb.transient_transfers.row(
-				data$.getDataObject(transient_transfers$transient_bundles_transient_transfer_id_fkey));
+				data$.getDataObject(bb$transient_transfers$transient_bundles_transient_transfer_id_fkey));
 		}
 
 		/**
@@ -463,7 +463,7 @@ public class transient_bundles
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$transient_bundles_created_by_fkey));
+				data$.getDataObject(bb$users$transient_bundles_created_by_fkey));
 		}
 
 	}
@@ -1679,7 +1679,7 @@ public class transient_bundles
 			return new jp.ats.blackbox.blendee.bb.transient_transfers.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transient_bundles.transient_transfers$transient_bundles_transient_transfer_id_fkey);
+				jp.ats.blackbox.blendee.bb.transient_bundles.bb$transient_transfers$transient_bundles_transient_transfer_id_fkey);
 		}
 
 		/**
@@ -1692,7 +1692,7 @@ public class transient_bundles
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transient_bundles.users$transient_bundles_created_by_fkey);
+				jp.ats.blackbox.blendee.bb.transient_bundles.bb$users$transient_bundles_created_by_fkey);
 		}
 
 	}

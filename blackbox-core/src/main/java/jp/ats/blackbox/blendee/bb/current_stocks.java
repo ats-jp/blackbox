@@ -176,16 +176,16 @@ public class current_stocks
 	 * reference: stocks<br>
 	 * columns: id
 	 */
-	@ForeignKey(name = "current_stocks_id_fkey", references = "stocks", columns = { "id" }, refColumns = { "id" })
-	public static final String stocks$current_stocks_id_fkey = "current_stocks_id_fkey";
+	@ForeignKey(name = "current_stocks_id_fkey", references = "bb.stocks", columns = { "id" }, refColumns = { "id" })
+	public static final String bb$stocks$current_stocks_id_fkey = "current_stocks_id_fkey";
 
 	/**
 	 * name: current_stocks_updated_by_fkey<br>
 	 * reference: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "current_stocks_updated_by_fkey", references = "users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String users$current_stocks_updated_by_fkey = "current_stocks_updated_by_fkey";
+	@ForeignKey(name = "current_stocks_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$current_stocks_updated_by_fkey = "current_stocks_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -377,7 +377,7 @@ public class current_stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.stocks.Row $stocks() {
 			return jp.ats.blackbox.blendee.bb.stocks.row(
-				data$.getDataObject(stocks$current_stocks_id_fkey));
+				data$.getDataObject(bb$stocks$current_stocks_id_fkey));
 		}
 
 		/**
@@ -389,7 +389,7 @@ public class current_stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$current_stocks_updated_by_fkey));
+				data$.getDataObject(bb$users$current_stocks_updated_by_fkey));
 		}
 
 	}
@@ -1589,7 +1589,7 @@ public class current_stocks
 			return new jp.ats.blackbox.blendee.bb.stocks.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.current_stocks.stocks$current_stocks_id_fkey);
+				jp.ats.blackbox.blendee.bb.current_stocks.bb$stocks$current_stocks_id_fkey);
 		}
 
 		/**
@@ -1602,7 +1602,7 @@ public class current_stocks
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.current_stocks.users$current_stocks_updated_by_fkey);
+				jp.ats.blackbox.blendee.bb.current_stocks.bb$users$current_stocks_updated_by_fkey);
 		}
 
 	}

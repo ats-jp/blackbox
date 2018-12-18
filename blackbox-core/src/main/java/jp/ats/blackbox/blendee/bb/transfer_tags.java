@@ -154,16 +154,16 @@ public class transfer_tags
 	 * reference: tags<br>
 	 * columns: tag_id
 	 */
-	@ForeignKey(name = "transfer_tags_tag_id_fkey", references = "tags", columns = { "tag_id" }, refColumns = { "id" })
-	public static final String tags$transfer_tags_tag_id_fkey = "transfer_tags_tag_id_fkey";
+	@ForeignKey(name = "transfer_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
+	public static final String bb$tags$transfer_tags_tag_id_fkey = "transfer_tags_tag_id_fkey";
 
 	/**
 	 * name: transfer_tags_transfer_id_fkey<br>
 	 * reference: transfers<br>
 	 * columns: transfer_id
 	 */
-	@ForeignKey(name = "transfer_tags_transfer_id_fkey", references = "transfers", columns = { "transfer_id" }, refColumns = { "id" })
-	public static final String transfers$transfer_tags_transfer_id_fkey = "transfer_tags_transfer_id_fkey";
+	@ForeignKey(name = "transfer_tags_transfer_id_fkey", references = "bb.transfers", columns = { "transfer_id" }, refColumns = { "id" })
+	public static final String bb$transfers$transfer_tags_transfer_id_fkey = "transfer_tags_transfer_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -293,7 +293,7 @@ public class transfer_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.tags.Row $tags() {
 			return jp.ats.blackbox.blendee.bb.tags.row(
-				data$.getDataObject(tags$transfer_tags_tag_id_fkey));
+				data$.getDataObject(bb$tags$transfer_tags_tag_id_fkey));
 		}
 
 		/**
@@ -305,7 +305,7 @@ public class transfer_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.transfers.Row $transfers() {
 			return jp.ats.blackbox.blendee.bb.transfers.row(
-				data$.getDataObject(transfers$transfer_tags_transfer_id_fkey));
+				data$.getDataObject(bb$transfers$transfer_tags_transfer_id_fkey));
 		}
 
 	}
@@ -1489,7 +1489,7 @@ public class transfer_tags
 			return new jp.ats.blackbox.blendee.bb.tags.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transfer_tags.tags$transfer_tags_tag_id_fkey);
+				jp.ats.blackbox.blendee.bb.transfer_tags.bb$tags$transfer_tags_tag_id_fkey);
 		}
 
 		/**
@@ -1502,7 +1502,7 @@ public class transfer_tags
 			return new jp.ats.blackbox.blendee.bb.transfers.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transfer_tags.transfers$transfer_tags_transfer_id_fkey);
+				jp.ats.blackbox.blendee.bb.transfer_tags.bb$transfers$transfer_tags_transfer_id_fkey);
 		}
 
 	}

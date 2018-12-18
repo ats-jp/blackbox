@@ -154,16 +154,16 @@ public class user_tags
 	 * reference: tags<br>
 	 * columns: tag_id
 	 */
-	@ForeignKey(name = "user_tags_tag_id_fkey", references = "tags", columns = { "tag_id" }, refColumns = { "id" })
-	public static final String tags$user_tags_tag_id_fkey = "user_tags_tag_id_fkey";
+	@ForeignKey(name = "user_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
+	public static final String bb$tags$user_tags_tag_id_fkey = "user_tags_tag_id_fkey";
 
 	/**
 	 * name: user_tags_user_id_fkey<br>
 	 * reference: users<br>
 	 * columns: user_id
 	 */
-	@ForeignKey(name = "user_tags_user_id_fkey", references = "users", columns = { "user_id" }, refColumns = { "id" })
-	public static final String users$user_tags_user_id_fkey = "user_tags_user_id_fkey";
+	@ForeignKey(name = "user_tags_user_id_fkey", references = "bb.users", columns = { "user_id" }, refColumns = { "id" })
+	public static final String bb$users$user_tags_user_id_fkey = "user_tags_user_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -293,7 +293,7 @@ public class user_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.tags.Row $tags() {
 			return jp.ats.blackbox.blendee.bb.tags.row(
-				data$.getDataObject(tags$user_tags_tag_id_fkey));
+				data$.getDataObject(bb$tags$user_tags_tag_id_fkey));
 		}
 
 		/**
@@ -305,7 +305,7 @@ public class user_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$user_tags_user_id_fkey));
+				data$.getDataObject(bb$users$user_tags_user_id_fkey));
 		}
 
 	}
@@ -1489,7 +1489,7 @@ public class user_tags
 			return new jp.ats.blackbox.blendee.bb.tags.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.user_tags.tags$user_tags_tag_id_fkey);
+				jp.ats.blackbox.blendee.bb.user_tags.bb$tags$user_tags_tag_id_fkey);
 		}
 
 		/**
@@ -1502,7 +1502,7 @@ public class user_tags
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.user_tags.users$user_tags_user_id_fkey);
+				jp.ats.blackbox.blendee.bb.user_tags.bb$users$user_tags_user_id_fkey);
 		}
 
 	}

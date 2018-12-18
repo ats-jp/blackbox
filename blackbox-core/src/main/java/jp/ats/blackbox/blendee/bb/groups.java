@@ -247,32 +247,32 @@ public class groups
 	 * reference: groups<br>
 	 * columns: parent_id
 	 */
-	@ForeignKey(name = "groups_parent_id_fkey", references = "groups", columns = { "parent_id" }, refColumns = { "id" })
-	public static final String groups$groups_parent_id_fkey = "groups_parent_id_fkey";
+	@ForeignKey(name = "groups_parent_id_fkey", references = "bb.groups", columns = { "parent_id" }, refColumns = { "id" })
+	public static final String bb$groups$groups_parent_id_fkey = "groups_parent_id_fkey";
 
 	/**
 	 * name: groups_org_id_fkey<br>
 	 * reference: orgs<br>
 	 * columns: org_id
 	 */
-	@ForeignKey(name = "groups_org_id_fkey", references = "orgs", columns = { "org_id" }, refColumns = { "id" })
-	public static final String orgs$groups_org_id_fkey = "groups_org_id_fkey";
+	@ForeignKey(name = "groups_org_id_fkey", references = "bb.orgs", columns = { "org_id" }, refColumns = { "id" })
+	public static final String bb$orgs$groups_org_id_fkey = "groups_org_id_fkey";
 
 	/**
 	 * name: groups_created_by_fkey<br>
 	 * reference: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "groups_created_by_fkey", references = "users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String users$groups_created_by_fkey = "groups_created_by_fkey";
+	@ForeignKey(name = "groups_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$groups_created_by_fkey = "groups_created_by_fkey";
 
 	/**
 	 * name: groups_updated_by_fkey<br>
 	 * reference: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "groups_updated_by_fkey", references = "users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String users$groups_updated_by_fkey = "groups_updated_by_fkey";
+	@ForeignKey(name = "groups_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$groups_updated_by_fkey = "groups_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -702,7 +702,7 @@ public class groups
 		 */
 		public jp.ats.blackbox.blendee.bb.groups.Row $groups() {
 			return jp.ats.blackbox.blendee.bb.groups.row(
-				data$.getDataObject(groups$groups_parent_id_fkey));
+				data$.getDataObject(bb$groups$groups_parent_id_fkey));
 		}
 
 		/**
@@ -714,7 +714,7 @@ public class groups
 		 */
 		public jp.ats.blackbox.blendee.bb.orgs.Row $orgs() {
 			return jp.ats.blackbox.blendee.bb.orgs.row(
-				data$.getDataObject(orgs$groups_org_id_fkey));
+				data$.getDataObject(bb$orgs$groups_org_id_fkey));
 		}
 
 		/**
@@ -726,7 +726,7 @@ public class groups
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$groups_created_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$groups_created_by_fkey));
+				data$.getDataObject(bb$users$groups_created_by_fkey));
 		}
 
 		/**
@@ -738,7 +738,7 @@ public class groups
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$groups_updated_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$groups_updated_by_fkey));
+				data$.getDataObject(bb$users$groups_updated_by_fkey));
 		}
 
 	}
@@ -2002,7 +2002,7 @@ public class groups
 			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.groups.groups$groups_parent_id_fkey);
+				jp.ats.blackbox.blendee.bb.groups.bb$groups$groups_parent_id_fkey);
 		}
 
 		/**
@@ -2015,7 +2015,7 @@ public class groups
 			return new jp.ats.blackbox.blendee.bb.orgs.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.groups.orgs$groups_org_id_fkey);
+				jp.ats.blackbox.blendee.bb.groups.bb$orgs$groups_org_id_fkey);
 		}
 
 		/**
@@ -2028,7 +2028,7 @@ public class groups
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.groups.users$groups_created_by_fkey);
+				jp.ats.blackbox.blendee.bb.groups.bb$users$groups_created_by_fkey);
 		}
 
 		/**
@@ -2041,7 +2041,7 @@ public class groups
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.groups.users$groups_updated_by_fkey);
+				jp.ats.blackbox.blendee.bb.groups.bb$users$groups_updated_by_fkey);
 		}
 
 	}

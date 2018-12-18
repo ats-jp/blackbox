@@ -192,24 +192,24 @@ public class transient_snapshots
 	 * reference: transient_nodes<br>
 	 * columns: id
 	 */
-	@ForeignKey(name = "transient_snapshots_id_fkey", references = "transient_nodes", columns = { "id" }, refColumns = { "id" })
-	public static final String transient_nodes$transient_snapshots_id_fkey = "transient_snapshots_id_fkey";
+	@ForeignKey(name = "transient_snapshots_id_fkey", references = "bb.transient_nodes", columns = { "id" }, refColumns = { "id" })
+	public static final String bb$transient_nodes$transient_snapshots_id_fkey = "transient_snapshots_id_fkey";
 
 	/**
 	 * name: transient_snapshots_created_by_fkey<br>
 	 * reference: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "transient_snapshots_created_by_fkey", references = "users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String users$transient_snapshots_created_by_fkey = "transient_snapshots_created_by_fkey";
+	@ForeignKey(name = "transient_snapshots_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$transient_snapshots_created_by_fkey = "transient_snapshots_created_by_fkey";
 
 	/**
 	 * name: transient_snapshots_updated_by_fkey<br>
 	 * reference: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "transient_snapshots_updated_by_fkey", references = "users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String users$transient_snapshots_updated_by_fkey = "transient_snapshots_updated_by_fkey";
+	@ForeignKey(name = "transient_snapshots_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$transient_snapshots_updated_by_fkey = "transient_snapshots_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -459,7 +459,7 @@ public class transient_snapshots
 		 */
 		public jp.ats.blackbox.blendee.bb.transient_nodes.Row $transient_nodes() {
 			return jp.ats.blackbox.blendee.bb.transient_nodes.row(
-				data$.getDataObject(transient_nodes$transient_snapshots_id_fkey));
+				data$.getDataObject(bb$transient_nodes$transient_snapshots_id_fkey));
 		}
 
 		/**
@@ -471,7 +471,7 @@ public class transient_snapshots
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$transient_snapshots_created_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$transient_snapshots_created_by_fkey));
+				data$.getDataObject(bb$users$transient_snapshots_created_by_fkey));
 		}
 
 		/**
@@ -483,7 +483,7 @@ public class transient_snapshots
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$transient_snapshots_updated_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$transient_snapshots_updated_by_fkey));
+				data$.getDataObject(bb$users$transient_snapshots_updated_by_fkey));
 		}
 
 	}
@@ -1699,7 +1699,7 @@ public class transient_snapshots
 			return new jp.ats.blackbox.blendee.bb.transient_nodes.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transient_snapshots.transient_nodes$transient_snapshots_id_fkey);
+				jp.ats.blackbox.blendee.bb.transient_snapshots.bb$transient_nodes$transient_snapshots_id_fkey);
 		}
 
 		/**
@@ -1712,7 +1712,7 @@ public class transient_snapshots
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transient_snapshots.users$transient_snapshots_created_by_fkey);
+				jp.ats.blackbox.blendee.bb.transient_snapshots.bb$users$transient_snapshots_created_by_fkey);
 		}
 
 		/**
@@ -1725,7 +1725,7 @@ public class transient_snapshots
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transient_snapshots.users$transient_snapshots_updated_by_fkey);
+				jp.ats.blackbox.blendee.bb.transient_snapshots.bb$users$transient_snapshots_updated_by_fkey);
 		}
 
 	}

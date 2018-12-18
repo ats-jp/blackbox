@@ -220,32 +220,32 @@ public class jobs
 	 * reference: transfers<br>
 	 * columns: id
 	 */
-	@ForeignKey(name = "jobs_id_fkey", references = "transfers", columns = { "id" }, refColumns = { "id" })
-	public static final String transfers$jobs_id_fkey = "jobs_id_fkey";
+	@ForeignKey(name = "jobs_id_fkey", references = "bb.transfers", columns = { "id" }, refColumns = { "id" })
+	public static final String bb$transfers$jobs_id_fkey = "jobs_id_fkey";
 
 	/**
 	 * name: jobs_trigger_id_fkey<br>
 	 * reference: triggers<br>
 	 * columns: trigger_id
 	 */
-	@ForeignKey(name = "jobs_trigger_id_fkey", references = "triggers", columns = { "trigger_id" }, refColumns = { "id" })
-	public static final String triggers$jobs_trigger_id_fkey = "jobs_trigger_id_fkey";
+	@ForeignKey(name = "jobs_trigger_id_fkey", references = "bb.triggers", columns = { "trigger_id" }, refColumns = { "id" })
+	public static final String bb$triggers$jobs_trigger_id_fkey = "jobs_trigger_id_fkey";
 
 	/**
 	 * name: jobs_created_by_fkey<br>
 	 * reference: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "jobs_created_by_fkey", references = "users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String users$jobs_created_by_fkey = "jobs_created_by_fkey";
+	@ForeignKey(name = "jobs_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$jobs_created_by_fkey = "jobs_created_by_fkey";
 
 	/**
 	 * name: jobs_updated_by_fkey<br>
 	 * reference: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "jobs_updated_by_fkey", references = "users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String users$jobs_updated_by_fkey = "jobs_updated_by_fkey";
+	@ForeignKey(name = "jobs_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$jobs_updated_by_fkey = "jobs_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -587,7 +587,7 @@ public class jobs
 		 */
 		public jp.ats.blackbox.blendee.bb.transfers.Row $transfers() {
 			return jp.ats.blackbox.blendee.bb.transfers.row(
-				data$.getDataObject(transfers$jobs_id_fkey));
+				data$.getDataObject(bb$transfers$jobs_id_fkey));
 		}
 
 		/**
@@ -599,7 +599,7 @@ public class jobs
 		 */
 		public jp.ats.blackbox.blendee.bb.triggers.Row $triggers() {
 			return jp.ats.blackbox.blendee.bb.triggers.row(
-				data$.getDataObject(triggers$jobs_trigger_id_fkey));
+				data$.getDataObject(bb$triggers$jobs_trigger_id_fkey));
 		}
 
 		/**
@@ -611,7 +611,7 @@ public class jobs
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$jobs_created_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$jobs_created_by_fkey));
+				data$.getDataObject(bb$users$jobs_created_by_fkey));
 		}
 
 		/**
@@ -623,7 +623,7 @@ public class jobs
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$jobs_updated_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$jobs_updated_by_fkey));
+				data$.getDataObject(bb$users$jobs_updated_by_fkey));
 		}
 
 	}
@@ -1863,7 +1863,7 @@ public class jobs
 			return new jp.ats.blackbox.blendee.bb.transfers.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.jobs.transfers$jobs_id_fkey);
+				jp.ats.blackbox.blendee.bb.jobs.bb$transfers$jobs_id_fkey);
 		}
 
 		/**
@@ -1876,7 +1876,7 @@ public class jobs
 			return new jp.ats.blackbox.blendee.bb.triggers.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.jobs.triggers$jobs_trigger_id_fkey);
+				jp.ats.blackbox.blendee.bb.jobs.bb$triggers$jobs_trigger_id_fkey);
 		}
 
 		/**
@@ -1889,7 +1889,7 @@ public class jobs
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.jobs.users$jobs_created_by_fkey);
+				jp.ats.blackbox.blendee.bb.jobs.bb$users$jobs_created_by_fkey);
 		}
 
 		/**
@@ -1902,7 +1902,7 @@ public class jobs
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.jobs.users$jobs_updated_by_fkey);
+				jp.ats.blackbox.blendee.bb.jobs.bb$users$jobs_updated_by_fkey);
 		}
 
 	}

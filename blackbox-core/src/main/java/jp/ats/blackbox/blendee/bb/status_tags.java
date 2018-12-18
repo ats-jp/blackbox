@@ -154,16 +154,16 @@ public class status_tags
 	 * reference: statuses<br>
 	 * columns: status_id
 	 */
-	@ForeignKey(name = "status_tags_status_id_fkey", references = "statuses", columns = { "status_id" }, refColumns = { "id" })
-	public static final String statuses$status_tags_status_id_fkey = "status_tags_status_id_fkey";
+	@ForeignKey(name = "status_tags_status_id_fkey", references = "bb.statuses", columns = { "status_id" }, refColumns = { "id" })
+	public static final String bb$statuses$status_tags_status_id_fkey = "status_tags_status_id_fkey";
 
 	/**
 	 * name: status_tags_tag_id_fkey<br>
 	 * reference: tags<br>
 	 * columns: tag_id
 	 */
-	@ForeignKey(name = "status_tags_tag_id_fkey", references = "tags", columns = { "tag_id" }, refColumns = { "id" })
-	public static final String tags$status_tags_tag_id_fkey = "status_tags_tag_id_fkey";
+	@ForeignKey(name = "status_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
+	public static final String bb$tags$status_tags_tag_id_fkey = "status_tags_tag_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -293,7 +293,7 @@ public class status_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.statuses.Row $statuses() {
 			return jp.ats.blackbox.blendee.bb.statuses.row(
-				data$.getDataObject(statuses$status_tags_status_id_fkey));
+				data$.getDataObject(bb$statuses$status_tags_status_id_fkey));
 		}
 
 		/**
@@ -305,7 +305,7 @@ public class status_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.tags.Row $tags() {
 			return jp.ats.blackbox.blendee.bb.tags.row(
-				data$.getDataObject(tags$status_tags_tag_id_fkey));
+				data$.getDataObject(bb$tags$status_tags_tag_id_fkey));
 		}
 
 	}
@@ -1489,7 +1489,7 @@ public class status_tags
 			return new jp.ats.blackbox.blendee.bb.statuses.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.status_tags.statuses$status_tags_status_id_fkey);
+				jp.ats.blackbox.blendee.bb.status_tags.bb$statuses$status_tags_status_id_fkey);
 		}
 
 		/**
@@ -1502,7 +1502,7 @@ public class status_tags
 			return new jp.ats.blackbox.blendee.bb.tags.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.status_tags.tags$status_tags_tag_id_fkey);
+				jp.ats.blackbox.blendee.bb.status_tags.bb$tags$status_tags_tag_id_fkey);
 		}
 
 	}

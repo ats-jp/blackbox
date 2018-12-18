@@ -182,24 +182,24 @@ public class closed_stocks
 	 * reference: closings<br>
 	 * columns: closing_id
 	 */
-	@ForeignKey(name = "closed_stocks_closing_id_fkey", references = "closings", columns = { "closing_id" }, refColumns = { "id" })
-	public static final String closings$closed_stocks_closing_id_fkey = "closed_stocks_closing_id_fkey";
+	@ForeignKey(name = "closed_stocks_closing_id_fkey", references = "bb.closings", columns = { "closing_id" }, refColumns = { "id" })
+	public static final String bb$closings$closed_stocks_closing_id_fkey = "closed_stocks_closing_id_fkey";
 
 	/**
 	 * name: closed_stocks_id_fkey<br>
 	 * reference: stocks<br>
 	 * columns: id
 	 */
-	@ForeignKey(name = "closed_stocks_id_fkey", references = "stocks", columns = { "id" }, refColumns = { "id" })
-	public static final String stocks$closed_stocks_id_fkey = "closed_stocks_id_fkey";
+	@ForeignKey(name = "closed_stocks_id_fkey", references = "bb.stocks", columns = { "id" }, refColumns = { "id" })
+	public static final String bb$stocks$closed_stocks_id_fkey = "closed_stocks_id_fkey";
 
 	/**
 	 * name: closed_stocks_updated_by_fkey<br>
 	 * reference: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "closed_stocks_updated_by_fkey", references = "users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String users$closed_stocks_updated_by_fkey = "closed_stocks_updated_by_fkey";
+	@ForeignKey(name = "closed_stocks_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$closed_stocks_updated_by_fkey = "closed_stocks_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -420,7 +420,7 @@ public class closed_stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.closings.Row $closings() {
 			return jp.ats.blackbox.blendee.bb.closings.row(
-				data$.getDataObject(closings$closed_stocks_closing_id_fkey));
+				data$.getDataObject(bb$closings$closed_stocks_closing_id_fkey));
 		}
 
 		/**
@@ -432,7 +432,7 @@ public class closed_stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.stocks.Row $stocks() {
 			return jp.ats.blackbox.blendee.bb.stocks.row(
-				data$.getDataObject(stocks$closed_stocks_id_fkey));
+				data$.getDataObject(bb$stocks$closed_stocks_id_fkey));
 		}
 
 		/**
@@ -444,7 +444,7 @@ public class closed_stocks
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$closed_stocks_updated_by_fkey));
+				data$.getDataObject(bb$users$closed_stocks_updated_by_fkey));
 		}
 
 	}
@@ -1652,7 +1652,7 @@ public class closed_stocks
 			return new jp.ats.blackbox.blendee.bb.closings.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.closed_stocks.closings$closed_stocks_closing_id_fkey);
+				jp.ats.blackbox.blendee.bb.closed_stocks.bb$closings$closed_stocks_closing_id_fkey);
 		}
 
 		/**
@@ -1665,7 +1665,7 @@ public class closed_stocks
 			return new jp.ats.blackbox.blendee.bb.stocks.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.closed_stocks.stocks$closed_stocks_id_fkey);
+				jp.ats.blackbox.blendee.bb.closed_stocks.bb$stocks$closed_stocks_id_fkey);
 		}
 
 		/**
@@ -1678,7 +1678,7 @@ public class closed_stocks
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.closed_stocks.users$closed_stocks_updated_by_fkey);
+				jp.ats.blackbox.blendee.bb.closed_stocks.bb$users$closed_stocks_updated_by_fkey);
 		}
 
 	}

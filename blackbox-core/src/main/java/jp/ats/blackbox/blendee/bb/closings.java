@@ -192,16 +192,16 @@ public class closings
 	 * reference: groups<br>
 	 * columns: group_id
 	 */
-	@ForeignKey(name = "closings_group_id_fkey", references = "groups", columns = { "group_id" }, refColumns = { "id" })
-	public static final String groups$closings_group_id_fkey = "closings_group_id_fkey";
+	@ForeignKey(name = "closings_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
+	public static final String bb$groups$closings_group_id_fkey = "closings_group_id_fkey";
 
 	/**
 	 * name: closings_created_by_fkey<br>
 	 * reference: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "closings_created_by_fkey", references = "users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String users$closings_created_by_fkey = "closings_created_by_fkey";
+	@ForeignKey(name = "closings_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$closings_created_by_fkey = "closings_created_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -451,7 +451,7 @@ public class closings
 		 */
 		public jp.ats.blackbox.blendee.bb.groups.Row $groups() {
 			return jp.ats.blackbox.blendee.bb.groups.row(
-				data$.getDataObject(groups$closings_group_id_fkey));
+				data$.getDataObject(bb$groups$closings_group_id_fkey));
 		}
 
 		/**
@@ -463,7 +463,7 @@ public class closings
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$closings_created_by_fkey));
+				data$.getDataObject(bb$users$closings_created_by_fkey));
 		}
 
 	}
@@ -1679,7 +1679,7 @@ public class closings
 			return new jp.ats.blackbox.blendee.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.closings.groups$closings_group_id_fkey);
+				jp.ats.blackbox.blendee.bb.closings.bb$groups$closings_group_id_fkey);
 		}
 
 		/**
@@ -1692,7 +1692,7 @@ public class closings
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.closings.users$closings_created_by_fkey);
+				jp.ats.blackbox.blendee.bb.closings.bb$users$closings_created_by_fkey);
 		}
 
 	}

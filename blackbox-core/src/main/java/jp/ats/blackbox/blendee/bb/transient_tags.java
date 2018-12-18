@@ -154,16 +154,16 @@ public class transient_tags
 	 * reference: tags<br>
 	 * columns: tag_id
 	 */
-	@ForeignKey(name = "transient_tags_tag_id_fkey", references = "tags", columns = { "tag_id" }, refColumns = { "id" })
-	public static final String tags$transient_tags_tag_id_fkey = "transient_tags_tag_id_fkey";
+	@ForeignKey(name = "transient_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
+	public static final String bb$tags$transient_tags_tag_id_fkey = "transient_tags_tag_id_fkey";
 
 	/**
 	 * name: transient_tags_transient_id_fkey<br>
 	 * reference: transients<br>
 	 * columns: transient_id
 	 */
-	@ForeignKey(name = "transient_tags_transient_id_fkey", references = "transients", columns = { "transient_id" }, refColumns = { "id" })
-	public static final String transients$transient_tags_transient_id_fkey = "transient_tags_transient_id_fkey";
+	@ForeignKey(name = "transient_tags_transient_id_fkey", references = "bb.transients", columns = { "transient_id" }, refColumns = { "id" })
+	public static final String bb$transients$transient_tags_transient_id_fkey = "transient_tags_transient_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -293,7 +293,7 @@ public class transient_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.tags.Row $tags() {
 			return jp.ats.blackbox.blendee.bb.tags.row(
-				data$.getDataObject(tags$transient_tags_tag_id_fkey));
+				data$.getDataObject(bb$tags$transient_tags_tag_id_fkey));
 		}
 
 		/**
@@ -305,7 +305,7 @@ public class transient_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.transients.Row $transients() {
 			return jp.ats.blackbox.blendee.bb.transients.row(
-				data$.getDataObject(transients$transient_tags_transient_id_fkey));
+				data$.getDataObject(bb$transients$transient_tags_transient_id_fkey));
 		}
 
 	}
@@ -1489,7 +1489,7 @@ public class transient_tags
 			return new jp.ats.blackbox.blendee.bb.tags.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transient_tags.tags$transient_tags_tag_id_fkey);
+				jp.ats.blackbox.blendee.bb.transient_tags.bb$tags$transient_tags_tag_id_fkey);
 		}
 
 		/**
@@ -1502,7 +1502,7 @@ public class transient_tags
 			return new jp.ats.blackbox.blendee.bb.transients.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.transient_tags.transients$transient_tags_transient_id_fkey);
+				jp.ats.blackbox.blendee.bb.transient_tags.bb$transients$transient_tags_transient_id_fkey);
 		}
 
 	}

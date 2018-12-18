@@ -220,16 +220,16 @@ public class orgs
 	 * reference: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "orgs_created_by_fkey", references = "users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String users$orgs_created_by_fkey = "orgs_created_by_fkey";
+	@ForeignKey(name = "orgs_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$orgs_created_by_fkey = "orgs_created_by_fkey";
 
 	/**
 	 * name: orgs_updated_by_fkey<br>
 	 * reference: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "orgs_updated_by_fkey", references = "users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String users$orgs_updated_by_fkey = "orgs_updated_by_fkey";
+	@ForeignKey(name = "orgs_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$orgs_updated_by_fkey = "orgs_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -569,7 +569,7 @@ public class orgs
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$orgs_created_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$orgs_created_by_fkey));
+				data$.getDataObject(bb$users$orgs_created_by_fkey));
 		}
 
 		/**
@@ -581,7 +581,7 @@ public class orgs
 		 */
 		public jp.ats.blackbox.blendee.bb.users.Row $users$orgs_updated_by_fkey() {
 			return jp.ats.blackbox.blendee.bb.users.row(
-				data$.getDataObject(users$orgs_updated_by_fkey));
+				data$.getDataObject(bb$users$orgs_updated_by_fkey));
 		}
 
 	}
@@ -1821,7 +1821,7 @@ public class orgs
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.orgs.users$orgs_created_by_fkey);
+				jp.ats.blackbox.blendee.bb.orgs.bb$users$orgs_created_by_fkey);
 		}
 
 		/**
@@ -1834,7 +1834,7 @@ public class orgs
 			return new jp.ats.blackbox.blendee.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.orgs.users$orgs_updated_by_fkey);
+				jp.ats.blackbox.blendee.bb.orgs.bb$users$orgs_updated_by_fkey);
 		}
 
 	}

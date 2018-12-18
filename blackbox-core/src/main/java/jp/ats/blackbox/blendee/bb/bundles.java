@@ -168,8 +168,8 @@ public class bundles
 	 * reference: transfers<br>
 	 * columns: transfer_id
 	 */
-	@ForeignKey(name = "bundles_transfer_id_fkey", references = "transfers", columns = { "transfer_id" }, refColumns = { "id" })
-	public static final String transfers$bundles_transfer_id_fkey = "bundles_transfer_id_fkey";
+	@ForeignKey(name = "bundles_transfer_id_fkey", references = "bb.transfers", columns = { "transfer_id" }, refColumns = { "id" })
+	public static final String bb$transfers$bundles_transfer_id_fkey = "bundles_transfer_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -329,7 +329,7 @@ public class bundles
 		 */
 		public jp.ats.blackbox.blendee.bb.transfers.Row $transfers() {
 			return jp.ats.blackbox.blendee.bb.transfers.row(
-				data$.getDataObject(transfers$bundles_transfer_id_fkey));
+				data$.getDataObject(bb$transfers$bundles_transfer_id_fkey));
 		}
 
 	}
@@ -1521,7 +1521,7 @@ public class bundles
 			return new jp.ats.blackbox.blendee.bb.transfers.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.bundles.transfers$bundles_transfer_id_fkey);
+				jp.ats.blackbox.blendee.bb.bundles.bb$transfers$bundles_transfer_id_fkey);
 		}
 
 	}

@@ -154,16 +154,16 @@ public class item_tags
 	 * reference: items<br>
 	 * columns: item_id
 	 */
-	@ForeignKey(name = "item_tags_item_id_fkey", references = "items", columns = { "item_id" }, refColumns = { "id" })
-	public static final String items$item_tags_item_id_fkey = "item_tags_item_id_fkey";
+	@ForeignKey(name = "item_tags_item_id_fkey", references = "bb.items", columns = { "item_id" }, refColumns = { "id" })
+	public static final String bb$items$item_tags_item_id_fkey = "item_tags_item_id_fkey";
 
 	/**
 	 * name: item_tags_tag_id_fkey<br>
 	 * reference: tags<br>
 	 * columns: tag_id
 	 */
-	@ForeignKey(name = "item_tags_tag_id_fkey", references = "tags", columns = { "tag_id" }, refColumns = { "id" })
-	public static final String tags$item_tags_tag_id_fkey = "item_tags_tag_id_fkey";
+	@ForeignKey(name = "item_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
+	public static final String bb$tags$item_tags_tag_id_fkey = "item_tags_tag_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -293,7 +293,7 @@ public class item_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.items.Row $items() {
 			return jp.ats.blackbox.blendee.bb.items.row(
-				data$.getDataObject(items$item_tags_item_id_fkey));
+				data$.getDataObject(bb$items$item_tags_item_id_fkey));
 		}
 
 		/**
@@ -305,7 +305,7 @@ public class item_tags
 		 */
 		public jp.ats.blackbox.blendee.bb.tags.Row $tags() {
 			return jp.ats.blackbox.blendee.bb.tags.row(
-				data$.getDataObject(tags$item_tags_tag_id_fkey));
+				data$.getDataObject(bb$tags$item_tags_tag_id_fkey));
 		}
 
 	}
@@ -1489,7 +1489,7 @@ public class item_tags
 			return new jp.ats.blackbox.blendee.bb.items.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.item_tags.items$item_tags_item_id_fkey);
+				jp.ats.blackbox.blendee.bb.item_tags.bb$items$item_tags_item_id_fkey);
 		}
 
 		/**
@@ -1502,7 +1502,7 @@ public class item_tags
 			return new jp.ats.blackbox.blendee.bb.tags.ExtAssist<>(
 				builder$,
 				this,
-				jp.ats.blackbox.blendee.bb.item_tags.tags$item_tags_tag_id_fkey);
+				jp.ats.blackbox.blendee.bb.item_tags.bb$tags$item_tags_tag_id_fkey);
 		}
 
 	}
