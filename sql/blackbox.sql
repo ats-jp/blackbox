@@ -73,9 +73,11 @@ CREATE SCHEMA bb;
 
 COMMENT ON SCHEMA bb IS 'Blackbox Main Schema';
 
+/*
 --postgresql tablespace
 --開発環境、クラウド環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
 SET default_tablespace = 'blackbox';
+*/
 
 --組織
 CREATE TABLE bb.orgs (
@@ -1016,8 +1018,10 @@ COMMENT ON COLUMN bb.transient_current_stocks.updated_by IS '更新ユーザー'
 --indexes
 --===========================
 
+/*
 --開発環境、クラウド環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
 SET default_tablespace = 'blackbox_index';
+*/
 
 --orgs
 CREATE INDEX ON bb.orgs (active);

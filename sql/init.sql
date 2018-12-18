@@ -26,6 +26,7 @@ CREATE USER blackbox WITH
 	CONNECTION LIMIT -1;
 -- passwordはpgAdminで設定すること
 
+/*
 -- CREATE TABLESPACE
 
 -- アプリケーション用
@@ -45,6 +46,7 @@ CREATE TABLESPACE blackbox_index
 	OWNER blackbox_admin
 	LOCATION 'xxxxx/blackbox_index'; --絶対パスで指定すること
 --	LOCATION '/var/lib/postgresql/tablespaces/blackbox_index'; --docker用
+*/
 
 -- CREATE DATABASE
 
