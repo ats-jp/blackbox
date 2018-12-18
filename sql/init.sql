@@ -53,5 +53,5 @@ CREATE TABLESPACE blackbox_index
 CREATE DATABASE blackbox WITH
 	OWNER = blackbox_admin
 	ENCODING = 'UTF8'
-	TABLESPACE = blackbox
+--	TABLESPACE = blackbox
 	CONNECTION LIMIT = -1;
