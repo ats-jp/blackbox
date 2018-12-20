@@ -151,7 +151,7 @@ public class transient_tags
 
 	/**
 	 * name: transient_tags_tag_id_fkey<br>
-	 * reference: tags<br>
+	 * references: tags<br>
 	 * columns: tag_id
 	 */
 	@ForeignKey(name = "transient_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
@@ -159,7 +159,7 @@ public class transient_tags
 
 	/**
 	 * name: transient_tags_transient_id_fkey<br>
-	 * reference: transients<br>
+	 * references: transients<br>
 	 * columns: transient_id
 	 */
 	@ForeignKey(name = "transient_tags_transient_id_fkey", references = "bb.transients", columns = { "transient_id" }, refColumns = { "id" })

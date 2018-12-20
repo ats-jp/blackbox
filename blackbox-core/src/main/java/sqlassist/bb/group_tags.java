@@ -151,7 +151,7 @@ public class group_tags
 
 	/**
 	 * name: group_tags_group_id_fkey<br>
-	 * reference: groups<br>
+	 * references: groups<br>
 	 * columns: group_id
 	 */
 	@ForeignKey(name = "group_tags_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
@@ -159,7 +159,7 @@ public class group_tags
 
 	/**
 	 * name: group_tags_tag_id_fkey<br>
-	 * reference: tags<br>
+	 * references: tags<br>
 	 * columns: tag_id
 	 */
 	@ForeignKey(name = "group_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })

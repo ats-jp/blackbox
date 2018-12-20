@@ -235,7 +235,7 @@ public class owners
 
 	/**
 	 * name: owners_group_id_fkey<br>
-	 * reference: groups<br>
+	 * references: groups<br>
 	 * columns: group_id
 	 */
 	@ForeignKey(name = "owners_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
@@ -243,7 +243,7 @@ public class owners
 
 	/**
 	 * name: owners_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "owners_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
@@ -251,7 +251,7 @@ public class owners
 
 	/**
 	 * name: owners_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "owners_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })

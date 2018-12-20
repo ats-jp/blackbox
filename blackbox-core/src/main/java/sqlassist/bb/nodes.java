@@ -226,7 +226,7 @@ public class nodes
 
 	/**
 	 * name: nodes_bundle_id_fkey<br>
-	 * reference: bundles<br>
+	 * references: bundles<br>
 	 * columns: bundle_id
 	 */
 	@ForeignKey(name = "nodes_bundle_id_fkey", references = "bb.bundles", columns = { "bundle_id" }, refColumns = { "id" })
@@ -234,7 +234,7 @@ public class nodes
 
 	/**
 	 * name: nodes_stock_id_fkey<br>
-	 * reference: stocks<br>
+	 * references: stocks<br>
 	 * columns: stock_id
 	 */
 	@ForeignKey(name = "nodes_stock_id_fkey", references = "bb.stocks", columns = { "stock_id" }, refColumns = { "id" })

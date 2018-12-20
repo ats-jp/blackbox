@@ -234,7 +234,7 @@ public class transient_nodes
 
 	/**
 	 * name: transient_nodes_stock_id_fkey<br>
-	 * reference: stocks<br>
+	 * references: stocks<br>
 	 * columns: stock_id
 	 */
 	@ForeignKey(name = "transient_nodes_stock_id_fkey", references = "bb.stocks", columns = { "stock_id" }, refColumns = { "id" })
@@ -242,7 +242,7 @@ public class transient_nodes
 
 	/**
 	 * name: transient_nodes_transient_bundle_id_fkey<br>
-	 * reference: transient_bundles<br>
+	 * references: transient_bundles<br>
 	 * columns: transient_bundle_id
 	 */
 	@ForeignKey(name = "transient_nodes_transient_bundle_id_fkey", references = "bb.transient_bundles", columns = { "transient_bundle_id" }, refColumns = { "id" })
@@ -250,7 +250,7 @@ public class transient_nodes
 
 	/**
 	 * name: transient_nodes_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "transient_nodes_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
@@ -258,7 +258,7 @@ public class transient_nodes
 
 	/**
 	 * name: transient_nodes_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "transient_nodes_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })

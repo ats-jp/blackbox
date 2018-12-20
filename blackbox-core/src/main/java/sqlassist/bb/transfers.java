@@ -236,7 +236,7 @@ public class transfers
 
 	/**
 	 * name: transfers_group_id_fkey<br>
-	 * reference: groups<br>
+	 * references: groups<br>
 	 * columns: group_id
 	 */
 	@ForeignKey(name = "transfers_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
@@ -244,7 +244,7 @@ public class transfers
 
 	/**
 	 * name: transfers_denied_id_fkey<br>
-	 * reference: transfers<br>
+	 * references: transfers<br>
 	 * columns: denied_id
 	 */
 	@ForeignKey(name = "transfers_denied_id_fkey", references = "bb.transfers", columns = { "denied_id" }, refColumns = { "id" })
@@ -252,7 +252,7 @@ public class transfers
 
 	/**
 	 * name: transfers_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "transfers_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })

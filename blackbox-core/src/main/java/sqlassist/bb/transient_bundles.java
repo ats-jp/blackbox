@@ -189,7 +189,7 @@ public class transient_bundles
 
 	/**
 	 * name: transient_bundles_transient_transfer_id_fkey<br>
-	 * reference: transient_transfers<br>
+	 * references: transient_transfers<br>
 	 * columns: transient_transfer_id
 	 */
 	@ForeignKey(name = "transient_bundles_transient_transfer_id_fkey", references = "bb.transient_transfers", columns = { "transient_transfer_id" }, refColumns = { "id" })
@@ -197,7 +197,7 @@ public class transient_bundles
 
 	/**
 	 * name: transient_bundles_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "transient_bundles_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })

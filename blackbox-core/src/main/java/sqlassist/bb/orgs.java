@@ -217,7 +217,7 @@ public class orgs
 
 	/**
 	 * name: orgs_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "orgs_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
@@ -225,7 +225,7 @@ public class orgs
 
 	/**
 	 * name: orgs_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "orgs_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })

@@ -174,7 +174,7 @@ public class relationships
 
 	/**
 	 * name: relationships_child_id_fkey<br>
-	 * reference: groups<br>
+	 * references: groups<br>
 	 * columns: child_id
 	 */
 	@ForeignKey(name = "relationships_child_id_fkey", references = "bb.groups", columns = { "child_id" }, refColumns = { "id" })
@@ -182,7 +182,7 @@ public class relationships
 
 	/**
 	 * name: relationships_parent_id_fkey<br>
-	 * reference: groups<br>
+	 * references: groups<br>
 	 * columns: parent_id
 	 */
 	@ForeignKey(name = "relationships_parent_id_fkey", references = "bb.groups", columns = { "parent_id" }, refColumns = { "id" })
@@ -190,7 +190,7 @@ public class relationships
 
 	/**
 	 * name: relationships_cascade_id_fkey<br>
-	 * reference: relationships<br>
+	 * references: relationships<br>
 	 * columns: cascade_id
 	 */
 	@ForeignKey(name = "relationships_cascade_id_fkey", references = "bb.relationships", columns = { "cascade_id" }, refColumns = { "id" })

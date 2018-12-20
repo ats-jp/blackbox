@@ -179,7 +179,7 @@ public class closed_stocks
 
 	/**
 	 * name: closed_stocks_closing_id_fkey<br>
-	 * reference: closings<br>
+	 * references: closings<br>
 	 * columns: closing_id
 	 */
 	@ForeignKey(name = "closed_stocks_closing_id_fkey", references = "bb.closings", columns = { "closing_id" }, refColumns = { "id" })
@@ -187,7 +187,7 @@ public class closed_stocks
 
 	/**
 	 * name: closed_stocks_id_fkey<br>
-	 * reference: stocks<br>
+	 * references: stocks<br>
 	 * columns: id
 	 */
 	@ForeignKey(name = "closed_stocks_id_fkey", references = "bb.stocks", columns = { "id" }, refColumns = { "id" })
@@ -195,7 +195,7 @@ public class closed_stocks
 
 	/**
 	 * name: closed_stocks_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "closed_stocks_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })

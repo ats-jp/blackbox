@@ -208,7 +208,7 @@ public class stocks
 
 	/**
 	 * name: stocks_group_id_fkey<br>
-	 * reference: groups<br>
+	 * references: groups<br>
 	 * columns: group_id
 	 */
 	@ForeignKey(name = "stocks_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
@@ -216,7 +216,7 @@ public class stocks
 
 	/**
 	 * name: stocks_item_id_fkey<br>
-	 * reference: items<br>
+	 * references: items<br>
 	 * columns: item_id
 	 */
 	@ForeignKey(name = "stocks_item_id_fkey", references = "bb.items", columns = { "item_id" }, refColumns = { "id" })
@@ -224,7 +224,7 @@ public class stocks
 
 	/**
 	 * name: stocks_location_id_fkey<br>
-	 * reference: locations<br>
+	 * references: locations<br>
 	 * columns: location_id
 	 */
 	@ForeignKey(name = "stocks_location_id_fkey", references = "bb.locations", columns = { "location_id" }, refColumns = { "id" })
@@ -232,7 +232,7 @@ public class stocks
 
 	/**
 	 * name: stocks_owner_id_fkey<br>
-	 * reference: owners<br>
+	 * references: owners<br>
 	 * columns: owner_id
 	 */
 	@ForeignKey(name = "stocks_owner_id_fkey", references = "bb.owners", columns = { "owner_id" }, refColumns = { "id" })
@@ -240,7 +240,7 @@ public class stocks
 
 	/**
 	 * name: stocks_status_id_fkey<br>
-	 * reference: statuses<br>
+	 * references: statuses<br>
 	 * columns: status_id
 	 */
 	@ForeignKey(name = "stocks_status_id_fkey", references = "bb.statuses", columns = { "status_id" }, refColumns = { "id" })
@@ -248,7 +248,7 @@ public class stocks
 
 	/**
 	 * name: stocks_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "stocks_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })

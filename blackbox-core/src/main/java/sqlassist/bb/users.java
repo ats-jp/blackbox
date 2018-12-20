@@ -245,7 +245,7 @@ public class users
 
 	/**
 	 * name: users_group_id_fkey<br>
-	 * reference: groups<br>
+	 * references: groups<br>
 	 * columns: group_id
 	 */
 	@ForeignKey(name = "users_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
@@ -253,7 +253,7 @@ public class users
 
 	/**
 	 * name: users_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "users_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
@@ -261,7 +261,7 @@ public class users
 
 	/**
 	 * name: users_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "users_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })

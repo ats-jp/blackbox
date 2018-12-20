@@ -151,7 +151,7 @@ public class transfer_tags
 
 	/**
 	 * name: transfer_tags_tag_id_fkey<br>
-	 * reference: tags<br>
+	 * references: tags<br>
 	 * columns: tag_id
 	 */
 	@ForeignKey(name = "transfer_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
@@ -159,7 +159,7 @@ public class transfer_tags
 
 	/**
 	 * name: transfer_tags_transfer_id_fkey<br>
-	 * reference: transfers<br>
+	 * references: transfers<br>
 	 * columns: transfer_id
 	 */
 	@ForeignKey(name = "transfer_tags_transfer_id_fkey", references = "bb.transfers", columns = { "transfer_id" }, refColumns = { "id" })

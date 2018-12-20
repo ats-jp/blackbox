@@ -162,7 +162,7 @@ public class locking_groups
 
 	/**
 	 * name: locking_groups_id_fkey<br>
-	 * reference: groups<br>
+	 * references: groups<br>
 	 * columns: id
 	 */
 	@ForeignKey(name = "locking_groups_id_fkey", references = "bb.groups", columns = { "id" }, refColumns = { "id" })
@@ -170,7 +170,7 @@ public class locking_groups
 
 	/**
 	 * name: locking_groups_user_id_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: user_id
 	 */
 	@ForeignKey(name = "locking_groups_user_id_fkey", references = "bb.users", columns = { "user_id" }, refColumns = { "id" })

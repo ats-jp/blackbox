@@ -163,7 +163,7 @@ public class last_closings
 
 	/**
 	 * name: last_closings_closing_id_fkey<br>
-	 * reference: closings<br>
+	 * references: closings<br>
 	 * columns: closing_id
 	 */
 	@ForeignKey(name = "last_closings_closing_id_fkey", references = "bb.closings", columns = { "closing_id" }, refColumns = { "id" })
@@ -171,7 +171,7 @@ public class last_closings
 
 	/**
 	 * name: last_closings_id_fkey<br>
-	 * reference: groups<br>
+	 * references: groups<br>
 	 * columns: id
 	 */
 	@ForeignKey(name = "last_closings_id_fkey", references = "bb.groups", columns = { "id" }, refColumns = { "id" })

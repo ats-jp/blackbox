@@ -165,7 +165,7 @@ public class bundles
 
 	/**
 	 * name: bundles_transfer_id_fkey<br>
-	 * reference: transfers<br>
+	 * references: transfers<br>
 	 * columns: transfer_id
 	 */
 	@ForeignKey(name = "bundles_transfer_id_fkey", references = "bb.transfers", columns = { "transfer_id" }, refColumns = { "id" })

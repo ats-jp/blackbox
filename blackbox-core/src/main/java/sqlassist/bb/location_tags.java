@@ -151,7 +151,7 @@ public class location_tags
 
 	/**
 	 * name: location_tags_location_id_fkey<br>
-	 * reference: locations<br>
+	 * references: locations<br>
 	 * columns: location_id
 	 */
 	@ForeignKey(name = "location_tags_location_id_fkey", references = "bb.locations", columns = { "location_id" }, refColumns = { "id" })
@@ -159,7 +159,7 @@ public class location_tags
 
 	/**
 	 * name: location_tags_tag_id_fkey<br>
-	 * reference: tags<br>
+	 * references: tags<br>
 	 * columns: tag_id
 	 */
 	@ForeignKey(name = "location_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })

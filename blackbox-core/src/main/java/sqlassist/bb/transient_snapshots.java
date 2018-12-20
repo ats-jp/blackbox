@@ -189,7 +189,7 @@ public class transient_snapshots
 
 	/**
 	 * name: transient_snapshots_id_fkey<br>
-	 * reference: transient_nodes<br>
+	 * references: transient_nodes<br>
 	 * columns: id
 	 */
 	@ForeignKey(name = "transient_snapshots_id_fkey", references = "bb.transient_nodes", columns = { "id" }, refColumns = { "id" })
@@ -197,7 +197,7 @@ public class transient_snapshots
 
 	/**
 	 * name: transient_snapshots_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "transient_snapshots_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
@@ -205,7 +205,7 @@ public class transient_snapshots
 
 	/**
 	 * name: transient_snapshots_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "transient_snapshots_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })

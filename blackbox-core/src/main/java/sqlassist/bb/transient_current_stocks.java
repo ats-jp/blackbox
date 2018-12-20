@@ -199,7 +199,7 @@ public class transient_current_stocks
 
 	/**
 	 * name: transient_current_stocks_id_fkey<br>
-	 * reference: stocks<br>
+	 * references: stocks<br>
 	 * columns: id
 	 */
 	@ForeignKey(name = "transient_current_stocks_id_fkey", references = "bb.stocks", columns = { "id" }, refColumns = { "id" })
@@ -207,7 +207,7 @@ public class transient_current_stocks
 
 	/**
 	 * name: transient_current_stocks_transient_id_fkey<br>
-	 * reference: transients<br>
+	 * references: transients<br>
 	 * columns: transient_id
 	 */
 	@ForeignKey(name = "transient_current_stocks_transient_id_fkey", references = "bb.transients", columns = { "transient_id" }, refColumns = { "id" })
@@ -215,7 +215,7 @@ public class transient_current_stocks
 
 	/**
 	 * name: transient_current_stocks_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "transient_current_stocks_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
@@ -223,7 +223,7 @@ public class transient_current_stocks
 
 	/**
 	 * name: transient_current_stocks_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "transient_current_stocks_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })

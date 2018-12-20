@@ -173,7 +173,7 @@ public class snapshots
 
 	/**
 	 * name: snapshots_id_fkey<br>
-	 * reference: nodes<br>
+	 * references: nodes<br>
 	 * columns: id
 	 */
 	@ForeignKey(name = "snapshots_id_fkey", references = "bb.nodes", columns = { "id" }, refColumns = { "id" })
@@ -181,7 +181,7 @@ public class snapshots
 
 	/**
 	 * name: snapshots_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "snapshots_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })

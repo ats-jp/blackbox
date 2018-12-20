@@ -151,7 +151,7 @@ public class status_tags
 
 	/**
 	 * name: status_tags_status_id_fkey<br>
-	 * reference: statuses<br>
+	 * references: statuses<br>
 	 * columns: status_id
 	 */
 	@ForeignKey(name = "status_tags_status_id_fkey", references = "bb.statuses", columns = { "status_id" }, refColumns = { "id" })
@@ -159,7 +159,7 @@ public class status_tags
 
 	/**
 	 * name: status_tags_tag_id_fkey<br>
-	 * reference: tags<br>
+	 * references: tags<br>
 	 * columns: tag_id
 	 */
 	@ForeignKey(name = "status_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })

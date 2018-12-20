@@ -261,7 +261,7 @@ public class transient_transfers
 
 	/**
 	 * name: transient_transfers_group_id_fkey<br>
-	 * reference: groups<br>
+	 * references: groups<br>
 	 * columns: group_id
 	 */
 	@ForeignKey(name = "transient_transfers_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
@@ -269,7 +269,7 @@ public class transient_transfers
 
 	/**
 	 * name: transient_transfers_transient_id_fkey<br>
-	 * reference: transients<br>
+	 * references: transients<br>
 	 * columns: transient_id
 	 */
 	@ForeignKey(name = "transient_transfers_transient_id_fkey", references = "bb.transients", columns = { "transient_id" }, refColumns = { "id" })
@@ -277,7 +277,7 @@ public class transient_transfers
 
 	/**
 	 * name: transient_transfers_trigger_id_fkey<br>
-	 * reference: triggers<br>
+	 * references: triggers<br>
 	 * columns: trigger_id
 	 */
 	@ForeignKey(name = "transient_transfers_trigger_id_fkey", references = "bb.triggers", columns = { "trigger_id" }, refColumns = { "id" })
@@ -285,7 +285,7 @@ public class transient_transfers
 
 	/**
 	 * name: transient_transfers_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "transient_transfers_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
@@ -293,7 +293,7 @@ public class transient_transfers
 
 	/**
 	 * name: transient_transfers_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "transient_transfers_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })

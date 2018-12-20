@@ -173,7 +173,7 @@ public class current_stocks
 
 	/**
 	 * name: current_stocks_id_fkey<br>
-	 * reference: stocks<br>
+	 * references: stocks<br>
 	 * columns: id
 	 */
 	@ForeignKey(name = "current_stocks_id_fkey", references = "bb.stocks", columns = { "id" }, refColumns = { "id" })
@@ -181,7 +181,7 @@ public class current_stocks
 
 	/**
 	 * name: current_stocks_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "current_stocks_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })

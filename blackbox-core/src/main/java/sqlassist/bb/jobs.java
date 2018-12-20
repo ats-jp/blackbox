@@ -217,7 +217,7 @@ public class jobs
 
 	/**
 	 * name: jobs_id_fkey<br>
-	 * reference: transfers<br>
+	 * references: transfers<br>
 	 * columns: id
 	 */
 	@ForeignKey(name = "jobs_id_fkey", references = "bb.transfers", columns = { "id" }, refColumns = { "id" })
@@ -225,7 +225,7 @@ public class jobs
 
 	/**
 	 * name: jobs_trigger_id_fkey<br>
-	 * reference: triggers<br>
+	 * references: triggers<br>
 	 * columns: trigger_id
 	 */
 	@ForeignKey(name = "jobs_trigger_id_fkey", references = "bb.triggers", columns = { "trigger_id" }, refColumns = { "id" })
@@ -233,7 +233,7 @@ public class jobs
 
 	/**
 	 * name: jobs_created_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: created_by
 	 */
 	@ForeignKey(name = "jobs_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
@@ -241,7 +241,7 @@ public class jobs
 
 	/**
 	 * name: jobs_updated_by_fkey<br>
-	 * reference: users<br>
+	 * references: users<br>
 	 * columns: updated_by
 	 */
 	@ForeignKey(name = "jobs_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
