@@ -17,6 +17,8 @@ public class StockComponent {
 	}
 
 	public static class UpdateRequest {
+		
+		public long id;
 
 		public long group_id;
 
@@ -33,6 +35,8 @@ public class StockComponent {
 
 	public static class Response {
 
+		public String type;
+		
 		public long id;
 
 		public long group_id;

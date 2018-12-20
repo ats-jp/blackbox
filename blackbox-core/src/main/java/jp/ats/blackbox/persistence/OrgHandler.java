@@ -24,21 +24,21 @@ public class OrgHandler {
 		Optional<String> name,
 		Optional<String> extension,
 		Optional<Boolean> active) {
-		orgs orgs = new orgs();
-		int result = orgs.UPDATE(a -> {
+		orgs facade = new orgs();
+		int result = facade.UPDATE(a -> {
 			a.revision.set(revision + 1);
 			name.ifPresent(v -> a.name.set(v));
 			extension.ifPresent(v -> a.extension.set(v));
 			active.ifPresent(v -> a.active.set(v));
 		}).WHERE(a -> a.id.eq(id).AND.revision.eq(revision)).execute();
 
-		if (result != 1) throw new IllegalStateException();
+		if (result != 1) throw Utils.decisionException(orgs.$TABLE, id);
 	}
 
 	public static void delete(long id, long revision) {
-		int result = new orgs().DELETE().WHERE(r -> r.id.eq(id).AND.revision.eq(revision)).execute();
+		int result = new orgs().DELETE().WHERE(a -> a.id.eq(id).AND.revision.eq(revision)).execute();
 
-		if (result != 1) throw new IllegalStateException();
+		if (result != 1) throw Utils.decisionException(orgs.$TABLE, id);
 	}
 
 	public static void fetch(long id, Consumer<Result> consumer) {

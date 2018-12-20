@@ -52,18 +52,18 @@ public class StockComponentHandler {
 			request.name.ifPresent(v -> a.col(name).set(v));
 			request.extension.ifPresent(v -> a.col(extension).set(v));
 			request.active.ifPresent(v -> a.col(active).set(v));
-		}).WHERE(a -> a.col(id).eq(id).AND.col(revision).eq(revision)).execute();
+		}).WHERE(a -> a.col(id).eq(request.id).AND.col(revision).eq(request.revision)).execute();
 
-		if (result != 1) throw new IllegalStateException();
+		if (result != 1) throw Utils.decisionException(table, request.id);
 	}
 
 	public static void delete(TablePath table, long id, long revision) {
 		int result = new GenericTable(table)
 			.DELETE()
-			.WHERE(r -> r.col(StockComponentHandler.id).eq(id).AND.col(StockComponentHandler.revision).eq(revision))
+			.WHERE(a -> a.col(StockComponentHandler.id).eq(id).AND.col(StockComponentHandler.revision).eq(revision))
 			.execute();
 
-		if (result != 1) throw new IllegalStateException();
+		if (result != 1) throw Utils.decisionException(table, id);
 	}
 
 	public static void fetch(TablePath table, long id, Consumer<Result> consumer) {}
