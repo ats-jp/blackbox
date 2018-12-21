@@ -690,6 +690,7 @@ CREATE TABLE bb.nodes (
 	in_out "char" CHECK (in_out IN ('I', 'O')) NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
+	group_extension jsonb DEFAULT '{}' NOT NULL,
 	item_extension jsonb DEFAULT '{}' NOT NULL,
 	owner_extension jsonb DEFAULT '{}' NOT NULL,
 	location_extension jsonb DEFAULT '{}' NOT NULL,
@@ -705,6 +706,7 @@ COMMENT ON COLUMN bb.nodes.stock_id IS '在庫ID';
 COMMENT ON COLUMN bb.nodes.in_out IS '入出庫区分';
 COMMENT ON COLUMN bb.nodes.quantity IS '移動数量';
 COMMENT ON COLUMN bb.nodes.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.nodes.group_extension IS 'グループのextension';
 COMMENT ON COLUMN bb.nodes.item_extension IS 'アイテムのextension';
 COMMENT ON COLUMN bb.nodes.owner_extension IS '所有者のextension';
 COMMENT ON COLUMN bb.nodes.location_extension IS '置き場のextension';

@@ -189,12 +189,21 @@ public class nodes
 	public static final String extension = "extension";
 
 	/**
+	 * name: group_extension<br>
+	 * remarks: グループのextension<br>
+	 * type: jsonb(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 7, notNull = true)
+	public static final String group_extension = "group_extension";
+
+	/**
 	 * name: item_extension<br>
 	 * remarks: アイテムのextension<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "item_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 7, notNull = true)
+	@Column(name = "item_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
 	public static final String item_extension = "item_extension";
 
 	/**
@@ -203,7 +212,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "owner_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
+	@Column(name = "owner_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
 	public static final String owner_extension = "owner_extension";
 
 	/**
@@ -212,7 +221,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "location_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
+	@Column(name = "location_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 10, notNull = true)
 	public static final String location_extension = "location_extension";
 
 	/**
@@ -221,7 +230,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "status_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 10, notNull = true)
+	@Column(name = "status_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 11, notNull = true)
 	public static final String status_extension = "status_extension";
 
 	/**
@@ -476,6 +485,36 @@ public class nodes
 		 */
 		public java.lang.Object getExtension() {
 			Binder binder = data$.getValue("extension");
+			return binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: group_extension<br>
+		* remarks: グループのextension<br>
+		* type: jsonb(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.lang.Object
+		 */
+		public void setGroup_extension(java.lang.Object value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("group_extension").getType());
+			data$.setValue("group_extension", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: group_extension<br>
+		* remarks: グループのextension<br>
+		* type: jsonb(2147483647)<br>
+		* not null: true<br>
+		 * @return java.lang.Object
+		 */
+		public java.lang.Object getGroup_extension() {
+			Binder binder = data$.getValue("group_extension");
 			return binder.getValue();
 		}
 
@@ -1683,6 +1722,11 @@ public class nodes
 		public final T extension;
 
 		/**
+		 * 項目名 group_extension
+		 */
+		public final T group_extension;
+
+		/**
 		 * 項目名 item_extension
 		 */
 		public final T item_extension;
@@ -1731,6 +1775,9 @@ public class nodes
 			this.extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.extension);
+			this.group_extension = builder$.buildColumn(
+				this,
+				sqlassist.bb.nodes.group_extension);
 			this.item_extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.item_extension);

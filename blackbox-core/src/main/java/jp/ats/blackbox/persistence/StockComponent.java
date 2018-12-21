@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public class StockComponent {
 
-	public static class InsertRequest {
+	public static class RegisterRequest {
 
 		public long group_id;
 

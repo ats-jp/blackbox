@@ -33,13 +33,18 @@ public class StockComponentHandler {
 
 	static long register(
 		TablePath table,
-		StockComponent.InsertRequest request) {
+		StockComponent.RegisterRequest request) {
 		var row = new GenericTable(table).row();
 
 		row.setLong(group_id, request.group_id);
 		row.setString(name, request.name);
 		request.extension.ifPresent(v -> row.setString(extension, v));
 		request.tags.ifPresent(v -> row.setObject(tags, v));
+
+		long userId = User.currentUserId();
+
+		row.setLong(created_by, userId);
+		row.setLong(updated_by, userId);
 
 		return CommonHandler.register(row);
 	}
@@ -52,6 +57,7 @@ public class StockComponentHandler {
 			request.name.ifPresent(v -> a.col(name).set(v));
 			request.extension.ifPresent(v -> a.col(extension).set(v));
 			request.active.ifPresent(v -> a.col(active).set(v));
+			a.col(updated_by).set(User.currentUserId());
 		}).WHERE(a -> a.col(id).eq(request.id).AND.col(revision).eq(request.revision)).execute();
 
 		if (result != 1) throw Utils.decisionException(table, request.id);
