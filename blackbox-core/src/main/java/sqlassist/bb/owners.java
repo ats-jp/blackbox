@@ -1602,7 +1602,7 @@ public class owners
 	}
 
 	/**
-	 * INSERT 文を作成する {@link Consumer}
+	 * INSERT 文を作成する {@link Function}
 	 * @param function {@link Function}
 	 * @return {@link DataManipulator}
 	 */
@@ -1611,7 +1611,7 @@ public class owners
 	}
 
 	/**
-	 * UPDATE 文を作成する {@link Consumer}
+	 * UPDATE 文を作成する {@link Function}
 	 * @param function {@link Function}
 	 * @return {@link DataManipulator}
 	 */
