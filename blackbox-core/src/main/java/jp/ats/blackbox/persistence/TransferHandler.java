@@ -12,6 +12,7 @@ import org.blendee.jdbc.exception.CheckConstraintViolationException;
 import sqlassist.bb.bundles;
 import sqlassist.bb.current_stocks;
 import sqlassist.bb.groups;
+import sqlassist.bb.jobs;
 import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
 import sqlassist.bb.stocks;
@@ -21,14 +22,16 @@ import sqlassist.bb.users;
 public class TransferHandler {
 
 	public static void register(TransferComponent.TransferRegisterRequest request) {
+		long userId = User.currentUserId();
+
 		var group = new groups().selectClause(
 			a -> a.SELECT(a.extension, a.$orgs().extension))
 			.fetch(request.group_id)
 			.orElseThrow(() -> new DataNotFoundException());
 
 		var user = new users().SELECT(r -> r.extension)
-			.fetch(User.currentUserId())
-			.orElseThrow(() -> new DataNotFoundException());;
+			.fetch(userId)
+			.orElseThrow(() -> new DataNotFoundException());
 
 		long transferId = ReturningUtilities.insertAndReturn(
 			transfers.$TABLE,
@@ -45,6 +48,8 @@ public class TransferHandler {
 			transfers.id);
 
 		Arrays.stream(request.bundles).forEach(r -> registerBundle(transferId, request.transferred_at, r));
+
+		new jobs().insertStatement(a -> a.INSERT(a.id, a.created_at, a.updated_at).VALUES(transferId, userId, userId)).execute();
 	}
 
 	private static void registerBundle(

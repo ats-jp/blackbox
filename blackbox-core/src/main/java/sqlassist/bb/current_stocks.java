@@ -184,7 +184,7 @@ public class current_stocks
 	 * references: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "current_stocks_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	@ForeignKey(name = "current_stocks_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" }, pseudo = true)
 	public static final String bb$users$current_stocks_updated_by_fkey = "current_stocks_updated_by_fkey";
 
 	/**
