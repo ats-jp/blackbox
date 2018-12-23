@@ -745,10 +745,10 @@ COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
 CREATE UNLOGGED TABLE bb.current_stocks (
 	id bigserial PRIMARY KEY REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
 	total numeric CHECK (total >= 0) NOT NULL,
-	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL);
+	updated_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時transfersから復元する必要あり
+--totalの更新は常にポーリング処理から行われるためcreated_byを持たない
 
 COMMENT ON TABLE bb.current_stocks IS '現在在庫
 在庫の現在数を保持';
@@ -756,7 +756,6 @@ COMMENT ON COLUMN bb.current_stocks.id IS 'ID
 stocks.stock_idに従属';
 COMMENT ON COLUMN bb.current_stocks.total IS '現時点の在庫総数';
 COMMENT ON COLUMN bb.current_stocks.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.current_stocks.updated_by IS '更新ユーザー';
 
 ----------
 
