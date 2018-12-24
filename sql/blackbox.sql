@@ -748,7 +748,7 @@ CREATE UNLOGGED TABLE bb.current_stocks (
 	updated_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時transfersから復元する必要あり
---totalの更新は常にポーリング処理から行われるためcreated_byを持たない
+--totalの更新は常にポーリング処理から行われるためupdated_byを持たない
 
 COMMENT ON TABLE bb.current_stocks IS '現在在庫
 在庫の現在数を保持';
@@ -778,68 +778,21 @@ COMMENT ON COLUMN bb.closed_stocks.total IS '締め後の在庫総数';
 COMMENT ON COLUMN bb.closed_stocks.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.closed_stocks.updated_by IS '更新ユーザー';
 
---===========================
---job tables
---===========================
-
---追加処理トリガ
-CREATE TABLE bb.triggers (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
-	fqcn text NOT NULL,
-	name text NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL);
---簡略化のためログ不要
---簡略化のため更新無し
---削除可能
---更新が必要になれば別行として追加していく
-
-COMMENT ON TABLE bb.triggers IS '追加処理トリガ';
-COMMENT ON COLUMN bb.triggers.id IS 'ID';
-COMMENT ON COLUMN bb.triggers.group_id IS 'グループID';
-COMMENT ON COLUMN bb.triggers.fqcn IS '実施FQCN';
-COMMENT ON COLUMN bb.triggers.name IS '処理名';
-COMMENT ON COLUMN bb.triggers.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.triggers.created_by IS '作成ユーザー';
-
---NULLの代用(id=0)
-INSERT INTO bb.triggers (
-	id,
-	group_id,
-	fqcn,
-	name,
-	created_by
-) VALUES (0, 0, '', 'NULL', 0);
-
-----------
-
 --現在在庫数量反映ジョブ
 CREATE TABLE bb.jobs (
 	id bigserial PRIMARY KEY REFERENCES bb.transfers,
 	completed boolean DEFAULT false NOT NULL,
-	trigger_id bigint REFERENCES bb.triggers DEFAULT 0 NOT NULL,
-	parameter jsonb DEFAULT '{}' NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
-	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_at timestamptz DEFAULT now() NOT NULL);
 --transfer毎に作成
 --transfers.transferred_atに実行
 --currentの更新は必ず実行するためactive=falseによる無効が行えないようにactiveは無し
+--completedの更新は常にポーリング処理から行われるためupdated_byを持たない
 
 COMMENT ON TABLE bb.jobs IS '現在在庫数量反映ジョブ';
 COMMENT ON COLUMN bb.jobs.id IS 'ID
 transfers.transfers_idに従属';
 COMMENT ON COLUMN bb.jobs.completed IS '実施済フラグ';
-COMMENT ON COLUMN bb.jobs.trigger_id IS '追加処理ID';
-COMMENT ON COLUMN bb.jobs.parameter IS 'triggerパラメータ';
-COMMENT ON COLUMN bb.jobs.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb.jobs.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.jobs.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.jobs.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.jobs.updated_by IS '更新ユーザー';
 
 --===========================
 --transient tables
@@ -883,8 +836,6 @@ CREATE TABLE bb.transient_transfers (
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	completed boolean DEFAULT false NOT NULL,
-	trigger_id bigint REFERENCES bb.triggers DEFAULT 0 NOT NULL,
-	parameter jsonb DEFAULT '{}' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL,
@@ -899,8 +850,6 @@ COMMENT ON COLUMN bb.transient_transfers.transferred_at IS '移動時刻';
 COMMENT ON COLUMN bb.transient_transfers.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.transient_transfers.tags IS '保存用タグ';
 COMMENT ON COLUMN bb.transient_transfers.completed IS '実施済フラグ';
-COMMENT ON COLUMN bb.transient_transfers.trigger_id IS '追加処理ID';
-COMMENT ON COLUMN bb.transient_transfers.parameter IS 'triggerパラメータ';
 COMMENT ON COLUMN bb.transient_transfers.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_transfers.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_transfers.created_by IS '作成ユーザー';
@@ -1079,8 +1028,6 @@ CREATE INDEX ON bb.nodes (stock_id);
 
 --snapshots
 
---triggers
-
 --jobs
 CREATE INDEX ON bb.jobs (completed);
 --worker_idで検索することはないのでindex不要
@@ -1150,11 +1097,10 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb.transient_snapshots
 TO blackbox;
 
---closings, triggersはINSERT, DELETEのみ
+--closings, tag関連はINSERT, DELETEのみ
 GRANT INSERT, DELETE ON TABLE
 	bb.tags,
 	bb.closings,
-	bb.triggers,
 	bb.group_tags,
 	bb.user_tags,
 	bb.item_tags,

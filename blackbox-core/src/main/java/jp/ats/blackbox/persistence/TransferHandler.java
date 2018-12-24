@@ -49,7 +49,7 @@ public class TransferHandler {
 
 		Arrays.stream(request.bundles).forEach(r -> registerBundle(transferId, request.transferred_at, r));
 
-		new jobs().insertStatement(a -> a.INSERT(a.id, a.created_at, a.updated_at).VALUES(transferId, userId, userId)).execute();
+		new jobs().insertStatement(a -> a.INSERT(a.id).VALUES(transferId)).execute();
 	}
 
 	private static void registerBundle(

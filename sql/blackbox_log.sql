@@ -344,44 +344,6 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.closings_logfunction();
 
 ----------
 
-CREATE TABLE bb_log.jobs (
-	id bigint,
-	starts_at timestamptz,
-	completed boolean,
-	trigger_id bigint,
-	parameter jsonb,
-	revision bigint,
-	created_at timestamptz,
-	created_by bigint,
-	updated_at timestamptz,
-	updated_by bigint,
-	action "char",
-	log_id bigserial PRIMARY KEY,
-	txid bigint DEFAULT txid_current(),
-	logged_by name DEFAULT current_user,
-	logged_at timestamptz DEFAULT now());
-
-CREATE FUNCTION bb_log.jobs_logfunction() RETURNS TRIGGER AS $jobs_logtrigger$
-	BEGIN
-		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO bb_log.jobs SELECT OLD.*, 'D';
-			RETURN OLD;
-		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO bb_log.jobs SELECT NEW.*, 'U';
-			RETURN NEW;
-		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO bb_log.jobs SELECT NEW.*, 'I';
-			RETURN NEW;
-		END IF;
-		RETURN NULL;
-	END;
-$jobs_logtrigger$ LANGUAGE plpgsql;
-
-CREATE TRIGGER jobs_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.jobs
-FOR EACH ROW EXECUTE PROCEDURE bb_log.jobs_logfunction();
-
-----------
-
 CREATE TABLE bb_log.transients (
 	id bigint,
 	group_id bigint,
@@ -426,8 +388,6 @@ CREATE TABLE bb_log.transient_transfers (
 	extension jsonb,
 	tags text[],
 	completed boolean,
-	trigger_id bigint,
-	parameter jsonb,
 	revision bigint,
 	created_at timestamptz,
 	created_by bigint,
@@ -544,7 +504,6 @@ ALTER TABLE bb_log.owners SET (autovacuum_enabled = false, toast.autovacuum_enab
 ALTER TABLE bb_log.locations SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.statuses SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.closings SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE bb_log.jobs SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.transients SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.transient_transfers SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.transient_bundles SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);

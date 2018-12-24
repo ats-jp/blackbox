@@ -197,30 +197,12 @@ public class transient_transfers
 	public static final String completed = "completed";
 
 	/**
-	 * name: trigger_id<br>
-	 * remarks: 追加処理ID<br>
-	 * type: int8(19)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "trigger_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "追加処理ID", defaultValue = "0", ordinalPosition = 8, notNull = true)
-	public static final String trigger_id = "trigger_id";
-
-	/**
-	 * name: parameter<br>
-	 * remarks: triggerパラメータ<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "parameter", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "triggerパラメータ", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
-	public static final String parameter = "parameter";
-
-	/**
 	 * name: revision<br>
 	 * remarks: リビジョン番号<br>
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 10, notNull = true)
+	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 8, notNull = true)
 	public static final String revision = "revision";
 
 	/**
@@ -229,7 +211,7 @@ public class transient_transfers
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 11, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 9, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -238,7 +220,7 @@ public class transient_transfers
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 12, notNull = true)
+	@Column(name = "created_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 10, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -247,7 +229,7 @@ public class transient_transfers
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 13, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 11, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -256,7 +238,7 @@ public class transient_transfers
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 14, notNull = true)
+	@Column(name = "updated_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 12, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -274,14 +256,6 @@ public class transient_transfers
 	 */
 	@ForeignKey(name = "transient_transfers_transient_id_fkey", references = "bb.transients", columns = { "transient_id" }, refColumns = { "id" })
 	public static final String bb$transients$transient_transfers_transient_id_fkey = "transient_transfers_transient_id_fkey";
-
-	/**
-	 * name: transient_transfers_trigger_id_fkey<br>
-	 * references: triggers<br>
-	 * columns: trigger_id
-	 */
-	@ForeignKey(name = "transient_transfers_trigger_id_fkey", references = "bb.triggers", columns = { "trigger_id" }, refColumns = { "id" })
-	public static final String bb$triggers$transient_transfers_trigger_id_fkey = "transient_transfers_trigger_id_fkey";
 
 	/**
 	 * name: transient_transfers_created_by_fkey<br>
@@ -570,66 +544,6 @@ public class transient_transfers
 
 		/**
 		 * setter
-		 * name: trigger_id<br>
-		* remarks: 追加処理ID<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @param value java.lang.Long
-		 */
-		public void setTrigger_id(java.lang.Long value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("trigger_id").getType());
-			data$.setValue("trigger_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: trigger_id<br>
-		* remarks: 追加処理ID<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @return java.lang.Long
-		 */
-		public java.lang.Long getTrigger_id() {
-			Binder binder = data$.getValue("trigger_id");
-			return (java.lang.Long) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: parameter<br>
-		* remarks: triggerパラメータ<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.lang.Object
-		 */
-		public void setParameter(java.lang.Object value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("parameter").getType());
-			data$.setValue("parameter", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: parameter<br>
-		* remarks: triggerパラメータ<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @return java.lang.Object
-		 */
-		public java.lang.Object getParameter() {
-			Binder binder = data$.getValue("parameter");
-			return binder.getValue();
-		}
-
-		/**
-		 * setter
 		 * name: revision<br>
 		* remarks: リビジョン番号<br>
 		* type: int8(19)<br>
@@ -800,18 +714,6 @@ public class transient_transfers
 		public sqlassist.bb.transients.Row $transients() {
 			return sqlassist.bb.transients.row(
 				data$.getDataObject(bb$transients$transient_transfers_transient_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 triggers<br>
-		 * 外部キー名 transient_transfers_trigger_id_fkey<br>
-		 * 項目名 trigger_id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.triggers.Row $triggers() {
-			return sqlassist.bb.triggers.row(
-				data$.getDataObject(bb$triggers$transient_transfers_trigger_id_fkey));
 		}
 
 		/**
@@ -1903,16 +1805,6 @@ public class transient_transfers
 		public final T completed;
 
 		/**
-		 * 項目名 trigger_id
-		 */
-		public final T trigger_id;
-
-		/**
-		 * 項目名 parameter
-		 */
-		public final T parameter;
-
-		/**
 		 * 項目名 revision
 		 */
 		public final T revision;
@@ -1969,12 +1861,6 @@ public class transient_transfers
 			this.completed = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_transfers.completed);
-			this.trigger_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_transfers.trigger_id);
-			this.parameter = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_transfers.parameter);
 			this.revision = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_transfers.revision);
@@ -2129,19 +2015,6 @@ public class transient_transfers
 				builder$,
 				this,
 				sqlassist.bb.transient_transfers.bb$transients$transient_transfers_transient_id_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 triggers<br>
-		 * 外部キー名 transient_transfers_trigger_id_fkey<br>
-		 * 項目名 trigger_id
-		 * @return triggers relationship
-		 */
-		public sqlassist.bb.triggers.ExtAssist<T, Many<sqlassist.bb.transient_transfers.Row, M>> $triggers() {
-			return new sqlassist.bb.triggers.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb.transient_transfers.bb$triggers$transient_transfers_trigger_id_fkey);
 		}
 
 		/**

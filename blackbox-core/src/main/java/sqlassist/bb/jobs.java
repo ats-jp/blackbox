@@ -153,67 +153,13 @@ public class jobs
 	public static final String completed = "completed";
 
 	/**
-	 * name: trigger_id<br>
-	 * remarks: 追加処理ID<br>
-	 * type: int8(19)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "trigger_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "追加処理ID", defaultValue = "0", ordinalPosition = 3, notNull = true)
-	public static final String trigger_id = "trigger_id";
-
-	/**
-	 * name: parameter<br>
-	 * remarks: triggerパラメータ<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "parameter", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "triggerパラメータ", defaultValue = "'{}'::jsonb", ordinalPosition = 4, notNull = true)
-	public static final String parameter = "parameter";
-
-	/**
-	 * name: revision<br>
-	 * remarks: リビジョン番号<br>
-	 * type: int8(19)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 5, notNull = true)
-	public static final String revision = "revision";
-
-	/**
-	 * name: created_at<br>
-	 * remarks: 作成時刻<br>
-	 * type: timestamptz(35, 6)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 6, notNull = true)
-	public static final String created_at = "created_at";
-
-	/**
-	 * name: created_by<br>
-	 * remarks: 作成ユーザー<br>
-	 * type: int8(19)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "created_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 7, notNull = true)
-	public static final String created_by = "created_by";
-
-	/**
 	 * name: updated_at<br>
 	 * remarks: 更新時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 3, notNull = true)
 	public static final String updated_at = "updated_at";
-
-	/**
-	 * name: updated_by<br>
-	 * remarks: 更新ユーザー<br>
-	 * type: int8(19)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "updated_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 9, notNull = true)
-	public static final String updated_by = "updated_by";
 
 	/**
 	 * name: jobs_id_fkey<br>
@@ -222,30 +168,6 @@ public class jobs
 	 */
 	@ForeignKey(name = "jobs_id_fkey", references = "bb.transfers", columns = { "id" }, refColumns = { "id" })
 	public static final String bb$transfers$jobs_id_fkey = "jobs_id_fkey";
-
-	/**
-	 * name: jobs_trigger_id_fkey<br>
-	 * references: triggers<br>
-	 * columns: trigger_id
-	 */
-	@ForeignKey(name = "jobs_trigger_id_fkey", references = "bb.triggers", columns = { "trigger_id" }, refColumns = { "id" })
-	public static final String bb$triggers$jobs_trigger_id_fkey = "jobs_trigger_id_fkey";
-
-	/**
-	 * name: jobs_created_by_fkey<br>
-	 * references: users<br>
-	 * columns: created_by
-	 */
-	@ForeignKey(name = "jobs_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String bb$users$jobs_created_by_fkey = "jobs_created_by_fkey";
-
-	/**
-	 * name: jobs_updated_by_fkey<br>
-	 * references: users<br>
-	 * columns: updated_by
-	 */
-	@ForeignKey(name = "jobs_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String bb$users$jobs_updated_by_fkey = "jobs_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -370,156 +292,6 @@ public class jobs
 
 		/**
 		 * setter
-		 * name: trigger_id<br>
-		* remarks: 追加処理ID<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @param value java.lang.Long
-		 */
-		public void setTrigger_id(java.lang.Long value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("trigger_id").getType());
-			data$.setValue("trigger_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: trigger_id<br>
-		* remarks: 追加処理ID<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @return java.lang.Long
-		 */
-		public java.lang.Long getTrigger_id() {
-			Binder binder = data$.getValue("trigger_id");
-			return (java.lang.Long) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: parameter<br>
-		* remarks: triggerパラメータ<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.lang.Object
-		 */
-		public void setParameter(java.lang.Object value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("parameter").getType());
-			data$.setValue("parameter", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: parameter<br>
-		* remarks: triggerパラメータ<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @return java.lang.Object
-		 */
-		public java.lang.Object getParameter() {
-			Binder binder = data$.getValue("parameter");
-			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: revision<br>
-		* remarks: リビジョン番号<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @param value java.lang.Long
-		 */
-		public void setRevision(java.lang.Long value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("revision").getType());
-			data$.setValue("revision", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: revision<br>
-		* remarks: リビジョン番号<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @return java.lang.Long
-		 */
-		public java.lang.Long getRevision() {
-			Binder binder = data$.getValue("revision");
-			return (java.lang.Long) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
-		 * @param value java.sql.Timestamp
-		 */
-		public void setCreated_at(java.sql.Timestamp value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("created_at").getType());
-			data$.setValue("created_at", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
-		 * @return java.sql.Timestamp
-		 */
-		public java.sql.Timestamp getCreated_at() {
-			Binder binder = data$.getValue("created_at");
-			return (java.sql.Timestamp) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @param value java.lang.Long
-		 */
-		public void setCreated_by(java.lang.Long value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("created_by").getType());
-			data$.setValue("created_by", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @return java.lang.Long
-		 */
-		public java.lang.Long getCreated_by() {
-			Binder binder = data$.getValue("created_by");
-			return (java.lang.Long) binder.getValue();
-		}
-
-		/**
-		 * setter
 		 * name: updated_at<br>
 		* remarks: 更新時刻<br>
 		* type: timestamptz(35, 6)<br>
@@ -549,36 +321,6 @@ public class jobs
 		}
 
 		/**
-		 * setter
-		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @param value java.lang.Long
-		 */
-		public void setUpdated_by(java.lang.Long value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("updated_by").getType());
-			data$.setValue("updated_by", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @return java.lang.Long
-		 */
-		public java.lang.Long getUpdated_by() {
-			Binder binder = data$.getValue("updated_by");
-			return (java.lang.Long) binder.getValue();
-		}
-
-		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 transfers<br>
 		 * 外部キー名 jobs_id_fkey<br>
@@ -588,42 +330,6 @@ public class jobs
 		public sqlassist.bb.transfers.Row $transfers() {
 			return sqlassist.bb.transfers.row(
 				data$.getDataObject(bb$transfers$jobs_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 triggers<br>
-		 * 外部キー名 jobs_trigger_id_fkey<br>
-		 * 項目名 trigger_id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.triggers.Row $triggers() {
-			return sqlassist.bb.triggers.row(
-				data$.getDataObject(bb$triggers$jobs_trigger_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 jobs_created_by_fkey<br>
-		 * 項目名 created_by
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.users.Row $users$jobs_created_by_fkey() {
-			return sqlassist.bb.users.row(
-				data$.getDataObject(bb$users$jobs_created_by_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 jobs_updated_by_fkey<br>
-		 * 項目名 updated_by
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.users.Row $users$jobs_updated_by_fkey() {
-			return sqlassist.bb.users.row(
-				data$.getDataObject(bb$users$jobs_updated_by_fkey));
 		}
 
 	}
@@ -1666,39 +1372,9 @@ public class jobs
 		public final T completed;
 
 		/**
-		 * 項目名 trigger_id
-		 */
-		public final T trigger_id;
-
-		/**
-		 * 項目名 parameter
-		 */
-		public final T parameter;
-
-		/**
-		 * 項目名 revision
-		 */
-		public final T revision;
-
-		/**
-		 * 項目名 created_at
-		 */
-		public final T created_at;
-
-		/**
-		 * 項目名 created_by
-		 */
-		public final T created_by;
-
-		/**
 		 * 項目名 updated_at
 		 */
 		public final T updated_at;
-
-		/**
-		 * 項目名 updated_by
-		 */
-		public final T updated_by;
 
 		private Assist(
 			jobs table$,
@@ -1717,27 +1393,9 @@ public class jobs
 			this.completed = builder$.buildColumn(
 				this,
 				sqlassist.bb.jobs.completed);
-			this.trigger_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.jobs.trigger_id);
-			this.parameter = builder$.buildColumn(
-				this,
-				sqlassist.bb.jobs.parameter);
-			this.revision = builder$.buildColumn(
-				this,
-				sqlassist.bb.jobs.revision);
-			this.created_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.jobs.created_at);
-			this.created_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.jobs.created_by);
 			this.updated_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.jobs.updated_at);
-			this.updated_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.jobs.updated_by);
 
 		}
 
@@ -1864,45 +1522,6 @@ public class jobs
 				builder$,
 				this,
 				sqlassist.bb.jobs.bb$transfers$jobs_id_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 triggers<br>
-		 * 外部キー名 jobs_trigger_id_fkey<br>
-		 * 項目名 trigger_id
-		 * @return triggers relationship
-		 */
-		public sqlassist.bb.triggers.ExtAssist<T, Many<sqlassist.bb.jobs.Row, M>> $triggers() {
-			return new sqlassist.bb.triggers.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb.jobs.bb$triggers$jobs_trigger_id_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 jobs_created_by_fkey<br>
-		 * 項目名 created_by
-		 * @return users relationship
-		 */
-		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb.jobs.Row, M>> $users$jobs_created_by_fkey() {
-			return new sqlassist.bb.users.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb.jobs.bb$users$jobs_created_by_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 jobs_updated_by_fkey<br>
-		 * 項目名 updated_by
-		 * @return users relationship
-		 */
-		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb.jobs.Row, M>> $users$jobs_updated_by_fkey() {
-			return new sqlassist.bb.users.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb.jobs.bb$users$jobs_updated_by_fkey);
 		}
 
 	}
