@@ -46,6 +46,8 @@ public class TransferComponent {
 
 		public BigDecimal quantity;
 
+		public Optional<Boolean> grants_infinity = Optional.empty();
+
 		public Optional<String> extension = Optional.empty();
 	}
 }

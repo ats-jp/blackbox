@@ -91,7 +91,8 @@ public class TransferHandler {
 				u.add(nodes.stock_id, stockId);
 				u.add(nodes.in_out, request.in_out.value);
 				u.add(nodes.quantity, request.quantity);
-				request.extension.ifPresent(v -> u.add(bundles.extension, toJson(v)));
+				request.grants_infinity.ifPresent(v -> u.add(nodes.grants_infinity, v));
+				request.extension.ifPresent(v -> u.add(nodes.extension, toJson(v)));
 				u.add(nodes.group_extension, stock.$groups().getExtension());
 				u.add(nodes.item_extension, stock.$items().getExtension());
 				u.add(nodes.owner_extension, stock.$owners().getExtension());
@@ -101,10 +102,11 @@ public class TransferHandler {
 			r -> r.getLong(bundles.id),
 			bundles.id);
 
-		BigDecimal justBefore = new AnonymousTable(
+		JustBefore justBefore = new AnonymousTable(
 			new snapshots().SELECT(
 				a -> a.ls(
 					a.total,
+					a.infinity,
 					//transferred_atの逆順、登録順の逆順
 					a.any("RANK() OVER (ORDER BY {0} DESC, {1} DESC)").AS("rank"),
 					a.$nodes().$bundles().$transfers().transferred_at,
@@ -113,27 +115,42 @@ public class TransferHandler {
 			"ordered").SELECT(a -> a.col("total"))
 				.WHERE(a -> a.col("rank").eq(1))
 				.aggregateAndGet(r -> {
+					var container = new JustBefore();
 					while (r.next()) {
-						return r.getBigDecimal(1);
+						container.total = r.getBigDecimal(1);
+						container.infinity = r.getBoolean(2);
+						return container;
 					}
 
-					return BigDecimal.ZERO;
+					container.total = BigDecimal.ZERO;
+					container.infinity = false;
+
+					return container;
 				});
 
-		BigDecimal total = request.in_out.calcurate(justBefore, request.quantity);
+		BigDecimal total = request.in_out.calcurate(justBefore.total, request.quantity);
 
-		//移動した結果数量がマイナスになる場合、エラー
-		if (total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
+		//移動した結果数量がマイナスになり無制限でもない場合、エラー
+		if (!justBefore.infinity && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
+
+		//直前のsnapshotが無制限の場合、引き継ぐ
+		//そうでなければ今回のリクエストに従う
+		boolean infinity = justBefore.infinity ? true : request.grants_infinity.orElse(false);
 
 		new snapshots().insertStatement(
-			a -> a.INSERT(a.id, a.total, a.updated_by)
-				.VALUES(nodeId, total, User.currentUserId()))
+			a -> a.INSERT(a.id, a.infinity, a.total, a.updated_by)
+				.VALUES(
+					nodeId,
+					infinity,
+					total,
+					User.currentUserId()))
 			.execute();
 
 		//登録以降のsnapshotの数量を更新
 		try {
 			new snapshots().updateStatement(
 				a -> a.UPDATE(
+					a.infinity.set("{0} OR ?", infinity),
 					a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of(request.quantity)))
 					.WHERE(
 						wa -> wa.id.IN(
@@ -144,6 +161,13 @@ public class TransferHandler {
 			//未来のsnapshotで数量がマイナスになった
 			throw new MinusTotalException();
 		}
+	}
+
+	private static class JustBefore {
+
+		private BigDecimal total;
+
+		private boolean infinity;
 	}
 
 	private static stocks.Row registerStock(TransferComponent.NodeRegisterRequest request) {

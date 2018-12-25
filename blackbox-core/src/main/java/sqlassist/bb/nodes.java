@@ -180,14 +180,14 @@ public class nodes
 	public static final String quantity = "quantity";
 
 	/**
-	 * name: grant_infinity<br>
+	 * name: grants_infinity<br>
 	 * remarks: 数量無制限の許可<br>
 	 * trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない<br>
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "grant_infinity", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "数量無制限の許可\ntrueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない", defaultValue = "false", ordinalPosition = 6, notNull = true)
-	public static final String grant_infinity = "grant_infinity";
+	@Column(name = "grants_infinity", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "数量無制限の許可\ntrueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない", defaultValue = "false", ordinalPosition = 6, notNull = true)
+	public static final String grants_infinity = "grants_infinity";
 
 	/**
 	 * name: extension<br>
@@ -470,33 +470,33 @@ public class nodes
 
 		/**
 		 * setter
-		 * name: grant_infinity<br>
+		 * name: grants_infinity<br>
 		* remarks: 数量無制限の許可<br>
 		* trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない<br>
 		* type: bool(1)<br>
 		* not null: true<br>
 		 * @param value java.lang.Boolean
 		 */
-		public void setGrant_infinity(java.lang.Boolean value) {
+		public void setGrants_infinity(java.lang.Boolean value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("grant_infinity").getType());
-			data$.setValue("grant_infinity", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("grants_infinity").getType());
+			data$.setValue("grants_infinity", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: grant_infinity<br>
+		 * name: grants_infinity<br>
 		* remarks: 数量無制限の許可<br>
 		* trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない<br>
 		* type: bool(1)<br>
 		* not null: true<br>
 		 * @return java.lang.Boolean
 		 */
-		public java.lang.Boolean getGrant_infinity() {
-			Binder binder = data$.getValue("grant_infinity");
+		public java.lang.Boolean getGrants_infinity() {
+			Binder binder = data$.getValue("grants_infinity");
 			return (java.lang.Boolean) binder.getValue();
 		}
 
@@ -1759,9 +1759,9 @@ public class nodes
 		public final T quantity;
 
 		/**
-		 * 項目名 grant_infinity
+		 * 項目名 grants_infinity
 		 */
-		public final T grant_infinity;
+		public final T grants_infinity;
 
 		/**
 		 * 項目名 extension
@@ -1819,9 +1819,9 @@ public class nodes
 			this.quantity = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.quantity);
-			this.grant_infinity = builder$.buildColumn(
+			this.grants_infinity = builder$.buildColumn(
 				this,
-				sqlassist.bb.nodes.grant_infinity);
+				sqlassist.bb.nodes.grants_infinity);
 			this.extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.extension);
