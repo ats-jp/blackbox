@@ -1,5 +1,7 @@
 package jp.ats.blackbox.persistence;
 
+import static jp.ats.blackbox.persistence.JsonHelper.toJson;
+
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -38,7 +40,7 @@ public class TransferHandler {
 				u.add(transfers.group_id, request.group_id);
 				request.denied_id.ifPresent(v -> u.add(transfers.denied_id, v));
 				u.add(transfers.transferred_at, request.transferred_at);
-				request.extension.ifPresent(v -> u.add(transfers.extension, v));
+				request.extension.ifPresent(v -> u.add(transfers.extension, toJson(v)));
 				u.add(transfers.group_extension, group.getExtension());
 				u.add(transfers.org_extension, group.$orgs().getExtension());
 				u.add(transfers.user_extension, user.getExtension());
@@ -59,7 +61,7 @@ public class TransferHandler {
 			bundles.$TABLE,
 			u -> {
 				u.add(bundles.transfer_id, transferId);
-				request.extension.ifPresent(v -> u.add(bundles.extension, v));
+				request.extension.ifPresent(v -> u.add(bundles.extension, toJson(v)));
 			},
 			r -> r.getLong(bundles.id),
 			bundles.id);
@@ -85,7 +87,7 @@ public class TransferHandler {
 				u.add(nodes.stock_id, stockId);
 				u.add(nodes.in_out, request.in_out.value);
 				u.add(nodes.quantity, request.quantity);
-				request.extension.ifPresent(v -> u.add(bundles.extension, v));
+				request.extension.ifPresent(v -> u.add(bundles.extension, toJson(v)));
 				u.add(nodes.group_extension, stock.$groups().getExtension());
 				u.add(nodes.item_extension, stock.$items().getExtension());
 				u.add(nodes.owner_extension, stock.$owners().getExtension());
@@ -116,7 +118,7 @@ public class TransferHandler {
 
 		BigDecimal total = request.in_out.calcurate(justBefore, request.quantity);
 
-		//移動した結果数量がマイナスになる
+		//移動した結果数量がマイナスになる場合、エラー
 		if (total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
 
 		new snapshots().insertStatement(

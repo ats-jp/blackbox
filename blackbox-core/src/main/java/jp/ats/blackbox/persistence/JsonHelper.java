@@ -6,6 +6,7 @@ import org.postgresql.util.PGobject;
 
 public class JsonHelper {
 
+	//JDBC URLに?stringtype=unspecifiedとつけてもJSONを変換してくれるようになるが、JDBC URLはソース管理に含まれないので直接変換してセットすることとする
 	public static Object toJson(String json) {
 		PGobject object = new PGobject();
 		object.setType("json");

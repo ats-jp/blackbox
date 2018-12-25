@@ -12,20 +12,20 @@ public class TransferComponent {
 
 		public long group_id;
 
-		public Optional<Long> denied_id;
+		public Optional<Long> denied_id = Optional.empty();
 
 		public Timestamp transferred_at;
 
-		public Optional<String> extension;
+		public Optional<String> extension = Optional.empty();
 
-		public Optional<String[]> tags;
+		public Optional<String[]> tags = Optional.empty();
 
 		public BundleRegisterRequest[] bundles;
 	}
 
 	public static class BundleRegisterRequest {
 
-		public Optional<String> extension;
+		public Optional<String> extension = Optional.empty();
 
 		public NodeRegisterRequest[] nodes;
 	}
@@ -46,6 +46,6 @@ public class TransferComponent {
 
 		public BigDecimal quantity;
 
-		public Optional<String> extension;
+		public Optional<String> extension = Optional.empty();
 	}
 }
