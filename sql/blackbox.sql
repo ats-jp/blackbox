@@ -697,7 +697,7 @@ CREATE TABLE bb.nodes (
 	stock_id bigint REFERENCES bb.stocks NOT NULL,
 	in_out "char" CHECK (in_out IN ('I', 'O')) NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
-	grant_infinity boolean DEFAULT false NOT NULL,
+	grants_infinity boolean DEFAULT false NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	group_extension jsonb DEFAULT '{}' NOT NULL,
 	item_extension jsonb DEFAULT '{}' NOT NULL,
@@ -714,7 +714,7 @@ COMMENT ON COLUMN bb.nodes.bundle_id IS '移動ID';
 COMMENT ON COLUMN bb.nodes.stock_id IS '在庫ID';
 COMMENT ON COLUMN bb.nodes.in_out IS '入出庫区分';
 COMMENT ON COLUMN bb.nodes.quantity IS '移動数量';
-COMMENT ON COLUMN bb.nodes.grant_infinity IS '数量無制限の許可
+COMMENT ON COLUMN bb.nodes.grants_infinity IS '数量無制限の許可
 trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない';
 COMMENT ON COLUMN bb.nodes.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.nodes.group_extension IS 'グループのextension';
