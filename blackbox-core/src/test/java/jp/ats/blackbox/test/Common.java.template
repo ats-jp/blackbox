@@ -1,0 +1,28 @@
+package jp.ats.blackbox.test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.blendee.jdbc.OptionKey;
+import org.blendee.util.Blendee;
+import org.blendee.util.BlendeeConstants;
+
+public class Common {
+
+	public static void start() {
+		Map<OptionKey<?>, Object> param = new HashMap<>();
+		param.put(BlendeeConstants.SCHEMA_NAMES, new String[] { "bb" });
+		param.put(BlendeeConstants.LOGGER_CLASS, org.blendee.jdbc.SystemOutLogger.class);
+		param.put(BlendeeConstants.LOG_STACKTRACE_FILTER, "^jp\\.ats\\.blackbox\\.test");
+		param.put(BlendeeConstants.TABLE_FACADE_PACKAGE, "sqlassist");
+		param.put(BlendeeConstants.CAN_ADD_NEW_ENTRIES, true);
+		param.put(BlendeeConstants.JDBC_DRIVER_CLASS_NAME, "org.postgresql.Driver");
+		param.put(BlendeeConstants.JDBC_URL, "jdbc:postgresql://[address]:[port]/blackbox");
+		param.put(BlendeeConstants.JDBC_USER, "[user]");
+		param.put(BlendeeConstants.JDBC_PASSWORD, "[password]");
+		param.put(BlendeeConstants.HOME_STORAGE_IDENTIFIER, "blackbox-core");
+		param.put(BlendeeConstants.AUTO_CLOSE_INTERVAL_MILLIS, 300);
+
+		Blendee.start(param);
+	}
+}
