@@ -24,8 +24,7 @@ public class TransferHandler {
 	public static void register(TransferComponent.TransferRegisterRequest request) {
 		long userId = User.currentUserId();
 
-		var group = new groups().selectClause(
-			a -> a.SELECT(a.extension, a.$orgs().extension))
+		var group = new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension))
 			.fetch(request.group_id)
 			.orElseThrow(() -> new DataNotFoundException());
 
@@ -49,7 +48,7 @@ public class TransferHandler {
 
 		Arrays.stream(request.bundles).forEach(r -> registerBundle(transferId, request.transferred_at, r));
 
-		new jobs().insertStatement(a -> a.INSERT(a.id).VALUES(transferId)).execute();
+		new jobs().INSERT(a -> a.id).VALUES(transferId).execute();
 	}
 
 	private static void registerBundle(
@@ -97,8 +96,8 @@ public class TransferHandler {
 			bundles.id);
 
 		BigDecimal justBefore = new AnonymousTable(
-			new snapshots().selectClause(
-				a -> a.SELECT(
+			new snapshots().SELECT(
+				a -> a.ls(
 					a.total,
 					//transferred_atの逆順、登録順の逆順
 					a.any("RANK() OVER (ORDER BY {0} DESC, {1} DESC)").AS("rank"),
@@ -163,8 +162,8 @@ public class TransferHandler {
 	}
 
 	private static stocks selectedStocks() {
-		return new stocks().selectClause(
-			a -> a.SELECT(
+		return new stocks().SELECT(
+			a -> a.ls(
 				a.id,
 				a.$groups().extension,
 				a.$items().extension,

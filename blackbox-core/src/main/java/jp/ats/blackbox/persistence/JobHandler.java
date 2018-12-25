@@ -15,26 +15,31 @@ import sqlassist.bb.snapshots;
 public class JobHandler {
 
 	public void execute(LocalDateTime time) {
-		var subquery = new jobs()
-			.SELECT(a -> a.id)
-			.WHERE(a -> a.completed.eq(false).AND.$transfers().transferred_at.le(Timestamp.valueOf(time)));
-
 		BatchStatement batch = BlendeeManager.getConnection().getBatchStatement();
 
-		new snapshots().selectClause(a -> a.SELECT(a.total, a.$nodes().stock_id))
-			.WHERE(
-				sa -> sa.$nodes().$bundles().transfer_id.IN(subquery))
-			.aggregate(r -> {
-				var updater = new current_stocks()
-					.UPDATE(a -> a.total.set(Placeholder.$B))
-					.WHERE(a -> a.id.eq(Placeholder.$L));
+		new jobs()
+			.SELECT(a -> a.id)
+			.WHERE(a -> a.completed.eq(false).AND.$transfers().transferred_at.le(Timestamp.valueOf(time)))
+			.ORDER_BY(a -> a.ls(a.$transfers().transferred_at, a.id))
+			.forEach(r -> {
+				new snapshots()
+					.SELECT(a -> a.ls(a.total, a.$nodes().stock_id))
+					.WHERE(sa -> sa.$nodes().$bundles().transfer_id.eq(r.getId()))
+					.aggregate(result -> {
+						var updater = new current_stocks()
+							.UPDATE(a -> a.total.set(Placeholder.$B))
+							.WHERE(a -> a.id.eq(Placeholder.$L));
 
-				while (r.next()) {
-					//TODO pluginで個別処理を複数スレッドで行うようにする
-					updater.reproduce(
-						r.getBigDecimal(snapshots.total),
-						r.getLong(nodes.stock_id)).execute(batch);
-				}
+						while (result.next()) {
+							//TODO pluginで個別処理を複数スレッドで行うようにする
+							updater.reproduce(
+								result.getBigDecimal(snapshots.total),
+								result.getLong(nodes.stock_id)).execute(batch);
+						}
+					});
+
+				r.setCompleted(true);
+				r.update(batch);
 			});
 
 		batch.executeBatch();
