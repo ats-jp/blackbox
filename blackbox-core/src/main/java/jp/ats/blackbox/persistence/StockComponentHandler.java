@@ -1,7 +1,10 @@
 package jp.ats.blackbox.persistence;
 
+import static jp.ats.blackbox.persistence.JsonHelper.toJson;
+
 import java.util.function.Consumer;
 
+import org.blendee.assist.Vargs;
 import org.blendee.jdbc.BResultSet;
 import org.blendee.jdbc.Result;
 import org.blendee.jdbc.TablePath;
@@ -31,14 +34,14 @@ public class StockComponentHandler {
 
 	private static final String updated_by = "updated_by";
 
-	static long register(
+	public static long register(
 		TablePath table,
 		StockComponent.RegisterRequest request) {
 		var row = new GenericTable(table).row();
 
 		row.setLong(group_id, request.group_id);
 		row.setString(name, request.name);
-		request.extension.ifPresent(v -> row.setString(extension, v));
+		request.extension.ifPresent(v -> row.setObject(extension, toJson(v)));
 		request.tags.ifPresent(v -> row.setObject(tags, v));
 
 		long userId = User.currentUserId();
@@ -53,9 +56,9 @@ public class StockComponentHandler {
 		TablePath table,
 		StockComponent.UpdateRequest request) {
 		int result = new GenericTable(table).UPDATE(a -> {
-			a.col(revision).set(revision + 1);
+			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
 			request.name.ifPresent(v -> a.col(name).set(v));
-			request.extension.ifPresent(v -> a.col(extension).set(v));
+			request.extension.ifPresent(v -> a.col(extension).set(toJson(v)));
 			request.active.ifPresent(v -> a.col(active).set(v));
 			a.col(updated_by).set(User.currentUserId());
 		}).WHERE(a -> a.col(id).eq(request.id).AND.col(revision).eq(request.revision)).execute();
