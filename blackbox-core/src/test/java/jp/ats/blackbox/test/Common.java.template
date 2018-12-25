@@ -1,3 +1,4 @@
+//rename this file to Common.java
 package jp.ats.blackbox.test;
 
 import java.util.HashMap;
