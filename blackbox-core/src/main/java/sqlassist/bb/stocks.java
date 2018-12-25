@@ -146,10 +146,11 @@ public class stocks
 	/**
 	 * name: group_id<br>
 	 * remarks: グループID<br>
+	 * この在庫の属するグループ<br>
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "group_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID\nこの在庫の属するグループ", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String group_id = "group_id";
 
 	/**
@@ -347,6 +348,7 @@ public class stocks
 		 * setter
 		 * name: group_id<br>
 		* remarks: グループID<br>
+		* この在庫の属するグループ<br>
 		* type: int8(19)<br>
 		* not null: true<br>
 		 * @param value java.lang.Long
@@ -364,6 +366,7 @@ public class stocks
 		 * getter
 		 * name: group_id<br>
 		* remarks: グループID<br>
+		* この在庫の属するグループ<br>
 		* type: int8(19)<br>
 		* not null: true<br>
 		 * @return java.lang.Long

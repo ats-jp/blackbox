@@ -180,12 +180,22 @@ public class nodes
 	public static final String quantity = "quantity";
 
 	/**
+	 * name: grant_infinity<br>
+	 * remarks: 数量無制限の許可<br>
+	 * trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない<br>
+	 * type: bool(1)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "grant_infinity", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "数量無制限の許可\ntrueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない", defaultValue = "false", ordinalPosition = 6, notNull = true)
+	public static final String grant_infinity = "grant_infinity";
+
+	/**
 	 * name: extension<br>
 	 * remarks: 外部アプリケーション情報JSON<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 6, notNull = true)
+	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 7, notNull = true)
 	public static final String extension = "extension";
 
 	/**
@@ -194,7 +204,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 7, notNull = true)
+	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
 	public static final String group_extension = "group_extension";
 
 	/**
@@ -203,7 +213,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "item_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
+	@Column(name = "item_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
 	public static final String item_extension = "item_extension";
 
 	/**
@@ -212,7 +222,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "owner_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
+	@Column(name = "owner_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 10, notNull = true)
 	public static final String owner_extension = "owner_extension";
 
 	/**
@@ -221,7 +231,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "location_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 10, notNull = true)
+	@Column(name = "location_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 11, notNull = true)
 	public static final String location_extension = "location_extension";
 
 	/**
@@ -230,7 +240,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "status_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 11, notNull = true)
+	@Column(name = "status_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 12, notNull = true)
 	public static final String status_extension = "status_extension";
 
 	/**
@@ -456,6 +466,38 @@ public class nodes
 		public java.math.BigDecimal getQuantity() {
 			Binder binder = data$.getValue("quantity");
 			return (java.math.BigDecimal) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: grant_infinity<br>
+		* remarks: 数量無制限の許可<br>
+		* trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない<br>
+		* type: bool(1)<br>
+		* not null: true<br>
+		 * @param value java.lang.Boolean
+		 */
+		public void setGrant_infinity(java.lang.Boolean value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("grant_infinity").getType());
+			data$.setValue("grant_infinity", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: grant_infinity<br>
+		* remarks: 数量無制限の許可<br>
+		* trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない<br>
+		* type: bool(1)<br>
+		* not null: true<br>
+		 * @return java.lang.Boolean
+		 */
+		public java.lang.Boolean getGrant_infinity() {
+			Binder binder = data$.getValue("grant_infinity");
+			return (java.lang.Boolean) binder.getValue();
 		}
 
 		/**
@@ -1717,6 +1759,11 @@ public class nodes
 		public final T quantity;
 
 		/**
+		 * 項目名 grant_infinity
+		 */
+		public final T grant_infinity;
+
+		/**
 		 * 項目名 extension
 		 */
 		public final T extension;
@@ -1772,6 +1819,9 @@ public class nodes
 			this.quantity = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.quantity);
+			this.grant_infinity = builder$.buildColumn(
+				this,
+				sqlassist.bb.nodes.grant_infinity);
 			this.extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.extension);

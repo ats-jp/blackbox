@@ -14,9 +14,13 @@ import org.blendee.jdbc.exception.CheckConstraintViolationException;
 import sqlassist.bb.bundles;
 import sqlassist.bb.current_stocks;
 import sqlassist.bb.groups;
+import sqlassist.bb.items;
 import sqlassist.bb.jobs;
+import sqlassist.bb.locations;
 import sqlassist.bb.nodes;
+import sqlassist.bb.owners;
 import sqlassist.bb.snapshots;
+import sqlassist.bb.statuses;
 import sqlassist.bb.stocks;
 import sqlassist.bb.transfers;
 import sqlassist.bb.users;
@@ -142,8 +146,7 @@ public class TransferHandler {
 		}
 	}
 
-	private static stocks.Row registerStock(
-		TransferComponent.NodeRegisterRequest request) {
+	private static stocks.Row registerStock(TransferComponent.NodeRegisterRequest request) {
 		long stockId = ReturningUtilities.insertAndReturn(
 			stocks.$TABLE,
 			u -> {
@@ -156,7 +159,7 @@ public class TransferHandler {
 			transfers.id);
 
 		new current_stocks().insertStatement(
-			a -> a.INSERT(a.id, a.total, a.updated_by).VALUES(stockId, 0, User.currentUserId()))//TODO 現在時刻の数量をセットする必要あり
+			a -> a.INSERT(a.id, a.total).VALUES(stockId, 0))//TODO Jobをこなすプロセスをキックする必要あり
 			.execute();
 
 		//関連情報取得のため改めて検索

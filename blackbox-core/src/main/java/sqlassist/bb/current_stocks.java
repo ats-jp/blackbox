@@ -145,12 +145,22 @@ public class current_stocks
 	public static final String id = "id";
 
 	/**
+	 * name: infinity<br>
+	 * remarks: 在庫無制限<br>
+	 * trueの場合、totalがマイナスでもエラーとならない<br>
+	 * type: bool(1)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "infinity", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫無制限\ntrueの場合、totalがマイナスでもエラーとならない", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	public static final String infinity = "infinity";
+
+	/**
 	 * name: total<br>
 	 * remarks: 現時点の在庫総数<br>
 	 * type: numeric(131089)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "total", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "現時点の在庫総数", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "total", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "現時点の在庫総数", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String total = "total";
 
 	/**
@@ -159,17 +169,8 @@ public class current_stocks
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 3, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 4, notNull = true)
 	public static final String updated_at = "updated_at";
-
-	/**
-	 * name: updated_by<br>
-	 * remarks: 更新ユーザー<br>
-	 * type: int8(19)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "updated_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 4, notNull = true)
-	public static final String updated_by = "updated_by";
 
 	/**
 	 * name: current_stocks_id_fkey<br>
@@ -178,14 +179,6 @@ public class current_stocks
 	 */
 	@ForeignKey(name = "current_stocks_id_fkey", references = "bb.stocks", columns = { "id" }, refColumns = { "id" })
 	public static final String bb$stocks$current_stocks_id_fkey = "current_stocks_id_fkey";
-
-	/**
-	 * name: current_stocks_updated_by_fkey<br>
-	 * references: users<br>
-	 * columns: updated_by
-	 */
-	@ForeignKey(name = "current_stocks_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" }, pseudo = true)
-	public static final String bb$users$current_stocks_updated_by_fkey = "current_stocks_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -280,6 +273,38 @@ public class current_stocks
 
 		/**
 		 * setter
+		 * name: infinity<br>
+		* remarks: 在庫無制限<br>
+		* trueの場合、totalがマイナスでもエラーとならない<br>
+		* type: bool(1)<br>
+		* not null: true<br>
+		 * @param value java.lang.Boolean
+		 */
+		public void setInfinity(java.lang.Boolean value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("infinity").getType());
+			data$.setValue("infinity", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: infinity<br>
+		* remarks: 在庫無制限<br>
+		* trueの場合、totalがマイナスでもエラーとならない<br>
+		* type: bool(1)<br>
+		* not null: true<br>
+		 * @return java.lang.Boolean
+		 */
+		public java.lang.Boolean getInfinity() {
+			Binder binder = data$.getValue("infinity");
+			return (java.lang.Boolean) binder.getValue();
+		}
+
+		/**
+		 * setter
 		 * name: total<br>
 		* remarks: 現時点の在庫総数<br>
 		* type: numeric(131089)<br>
@@ -339,36 +364,6 @@ public class current_stocks
 		}
 
 		/**
-		 * setter
-		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @param value java.lang.Long
-		 */
-		public void setUpdated_by(java.lang.Long value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("updated_by").getType());
-			data$.setValue("updated_by", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
-		* not null: true<br>
-		 * @return java.lang.Long
-		 */
-		public java.lang.Long getUpdated_by() {
-			Binder binder = data$.getValue("updated_by");
-			return (java.lang.Long) binder.getValue();
-		}
-
-		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 stocks<br>
 		 * 外部キー名 current_stocks_id_fkey<br>
@@ -378,18 +373,6 @@ public class current_stocks
 		public sqlassist.bb.stocks.Row $stocks() {
 			return sqlassist.bb.stocks.row(
 				data$.getDataObject(bb$stocks$current_stocks_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 current_stocks_updated_by_fkey<br>
-		 * 項目名 updated_by
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.users.Row $users() {
-			return sqlassist.bb.users.row(
-				data$.getDataObject(bb$users$current_stocks_updated_by_fkey));
 		}
 
 	}
@@ -1427,6 +1410,11 @@ public class current_stocks
 		public final T id;
 
 		/**
+		 * 項目名 infinity
+		 */
+		public final T infinity;
+
+		/**
 		 * 項目名 total
 		 */
 		public final T total;
@@ -1435,11 +1423,6 @@ public class current_stocks
 		 * 項目名 updated_at
 		 */
 		public final T updated_at;
-
-		/**
-		 * 項目名 updated_by
-		 */
-		public final T updated_by;
 
 		private Assist(
 			current_stocks table$,
@@ -1455,15 +1438,15 @@ public class current_stocks
 			this.id = builder$.buildColumn(
 				this,
 				sqlassist.bb.current_stocks.id);
+			this.infinity = builder$.buildColumn(
+				this,
+				sqlassist.bb.current_stocks.infinity);
 			this.total = builder$.buildColumn(
 				this,
 				sqlassist.bb.current_stocks.total);
 			this.updated_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.current_stocks.updated_at);
-			this.updated_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.current_stocks.updated_by);
 
 		}
 
@@ -1590,19 +1573,6 @@ public class current_stocks
 				builder$,
 				this,
 				sqlassist.bb.current_stocks.bb$stocks$current_stocks_id_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 current_stocks_updated_by_fkey<br>
-		 * 項目名 updated_by
-		 * @return users relationship
-		 */
-		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb.current_stocks.Row, M>> $users() {
-			return new sqlassist.bb.users.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb.current_stocks.bb$users$current_stocks_updated_by_fkey);
 		}
 
 	}

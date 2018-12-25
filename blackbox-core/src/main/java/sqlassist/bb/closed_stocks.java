@@ -151,12 +151,22 @@ public class closed_stocks
 	public static final String closing_id = "closing_id";
 
 	/**
+	 * name: infinity<br>
+	 * remarks: 在庫無制限<br>
+	 * trueの場合、totalがマイナスでもエラーとならない<br>
+	 * type: bool(1)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "infinity", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫無制限\ntrueの場合、totalがマイナスでもエラーとならない", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String infinity = "infinity";
+
+	/**
 	 * name: total<br>
 	 * remarks: 締め後の在庫総数<br>
 	 * type: numeric(131089)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "total", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "締め後の在庫総数", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "total", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "締め後の在庫総数", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String total = "total";
 
 	/**
@@ -165,7 +175,7 @@ public class closed_stocks
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 4, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 5, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -174,7 +184,7 @@ public class closed_stocks
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "updated_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -319,6 +329,38 @@ public class closed_stocks
 		public java.lang.Long getClosing_id() {
 			Binder binder = data$.getValue("closing_id");
 			return (java.lang.Long) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: infinity<br>
+		* remarks: 在庫無制限<br>
+		* trueの場合、totalがマイナスでもエラーとならない<br>
+		* type: bool(1)<br>
+		* not null: true<br>
+		 * @param value java.lang.Boolean
+		 */
+		public void setInfinity(java.lang.Boolean value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("infinity").getType());
+			data$.setValue("infinity", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: infinity<br>
+		* remarks: 在庫無制限<br>
+		* trueの場合、totalがマイナスでもエラーとならない<br>
+		* type: bool(1)<br>
+		* not null: true<br>
+		 * @return java.lang.Boolean
+		 */
+		public java.lang.Boolean getInfinity() {
+			Binder binder = data$.getValue("infinity");
+			return (java.lang.Boolean) binder.getValue();
 		}
 
 		/**
@@ -1487,6 +1529,11 @@ public class closed_stocks
 		public final T closing_id;
 
 		/**
+		 * 項目名 infinity
+		 */
+		public final T infinity;
+
+		/**
 		 * 項目名 total
 		 */
 		public final T total;
@@ -1518,6 +1565,9 @@ public class closed_stocks
 			this.closing_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.closed_stocks.closing_id);
+			this.infinity = builder$.buildColumn(
+				this,
+				sqlassist.bb.closed_stocks.infinity);
 			this.total = builder$.buildColumn(
 				this,
 				sqlassist.bb.closed_stocks.total);

@@ -366,6 +366,7 @@ CREATE TABLE bb.items (
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by bigint REFERENCES bb.users NOT NULL);
 --log対象
+--infinityは変更不可
 
 COMMENT ON TABLE bb.items IS 'アイテム
 在庫管理する対象となる「もの」';
@@ -412,6 +413,7 @@ CREATE TABLE bb.owners (
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by bigint REFERENCES bb.users NOT NULL);
 --log対象
+--infinityは変更不可
 
 COMMENT ON TABLE bb.owners IS '所有者
 アイテムの所有者';
@@ -458,6 +460,7 @@ CREATE TABLE bb.locations (
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by bigint REFERENCES bb.users NOT NULL);
 --log対象
+--infinityは変更不可
 
 COMMENT ON TABLE bb.locations IS '置き場
 アイテムの置き場';
@@ -504,6 +507,7 @@ CREATE TABLE bb.statuses (
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by bigint REFERENCES bb.users NOT NULL);
 --log対象
+--infinityは変更不可
 
 COMMENT ON TABLE bb.statuses IS '状態
 Blackbox内でのアイテムの状態';
@@ -585,11 +589,14 @@ CREATE TABLE bb.stocks (
 	created_by bigint REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, item_id, owner_id, location_id, status_id));
 --log対象外
+--infinity=trueの場合、在庫計算を行わない
+--infinityは変更不可
 
 COMMENT ON TABLE bb.stocks IS '在庫
 Blackboxで数量管理する在庫の最小単位';
 COMMENT ON COLUMN bb.stocks.id IS 'ID';
-COMMENT ON COLUMN bb.stocks.group_id IS 'グループID';
+COMMENT ON COLUMN bb.stocks.group_id IS 'グループID
+この在庫の属するグループ';
 COMMENT ON COLUMN bb.stocks.item_id IS 'アイテムID';
 COMMENT ON COLUMN bb.stocks.owner_id IS '所有者ID';
 COMMENT ON COLUMN bb.stocks.location_id IS '置き場ID';
@@ -618,7 +625,8 @@ CREATE TABLE bb.transfers (
 
 COMMENT ON TABLE bb.transfers IS '移動伝票';
 COMMENT ON COLUMN bb.transfers.id IS 'ID';
-COMMENT ON COLUMN bb.transfers.group_id IS 'グループID';
+COMMENT ON COLUMN bb.transfers.group_id IS 'グループID
+この伝票の属するグループ';
 COMMENT ON COLUMN bb.transfers.denied_id IS '取消元伝票ID
 訂正後の伝票が訂正前の伝票のIDを持つ
 ここに入っているIDが指す伝票は、取り消されたものとなる';
@@ -689,6 +697,7 @@ CREATE TABLE bb.nodes (
 	stock_id bigint REFERENCES bb.stocks NOT NULL,
 	in_out "char" CHECK (in_out IN ('I', 'O')) NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
+	grant_infinity boolean DEFAULT false NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	group_extension jsonb DEFAULT '{}' NOT NULL,
 	item_extension jsonb DEFAULT '{}' NOT NULL,
@@ -705,6 +714,8 @@ COMMENT ON COLUMN bb.nodes.bundle_id IS '移動ID';
 COMMENT ON COLUMN bb.nodes.stock_id IS '在庫ID';
 COMMENT ON COLUMN bb.nodes.in_out IS '入出庫区分';
 COMMENT ON COLUMN bb.nodes.quantity IS '移動数量';
+COMMENT ON COLUMN bb.nodes.grant_infinity IS '数量無制限の許可
+trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない';
 COMMENT ON COLUMN bb.nodes.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.nodes.group_extension IS 'グループのextension';
 COMMENT ON COLUMN bb.nodes.item_extension IS 'アイテムのextension';
@@ -724,7 +735,8 @@ ALTER TABLE bb.nodes SET (autovacuum_enabled = false, toast.autovacuum_enabled =
 --移動ノード状態
 CREATE UNLOGGED TABLE bb.snapshots (
 	id bigint PRIMARY KEY REFERENCES bb.nodes,
-	total numeric CHECK (total >= 0) NOT NULL,
+	infinity boolean NOT NULL,
+	total numeric CHECK (infinity OR total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
@@ -735,6 +747,8 @@ COMMENT ON TABLE bb.snapshots IS '移動ノード状態
 transferred_at時点でのstockの状態';
 COMMENT ON COLUMN bb.snapshots.id IS 'ID
 nodes.node_idに従属';
+COMMENT ON COLUMN bb.snapshots.infinity IS '在庫無制限
+trueの場合、totalがマイナスでもエラーとならない';
 COMMENT ON COLUMN bb.snapshots.total IS 'この時点の在庫総数';
 COMMENT ON COLUMN bb.snapshots.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
@@ -744,7 +758,8 @@ COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
 --現在在庫
 CREATE UNLOGGED TABLE bb.current_stocks (
 	id bigserial PRIMARY KEY REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
-	total numeric CHECK (total >= 0) NOT NULL,
+	infinity boolean NOT NULL,
+	total numeric CHECK (infinity OR total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時transfersから復元する必要あり
@@ -754,6 +769,8 @@ COMMENT ON TABLE bb.current_stocks IS '現在在庫
 在庫の現在数を保持';
 COMMENT ON COLUMN bb.current_stocks.id IS 'ID
 stocks.stock_idに従属';
+COMMENT ON COLUMN bb.current_stocks.infinity IS '在庫無制限
+trueの場合、totalがマイナスでもエラーとならない';
 COMMENT ON COLUMN bb.current_stocks.total IS '現時点の在庫総数';
 COMMENT ON COLUMN bb.current_stocks.updated_at IS '更新時刻';
 
@@ -763,7 +780,8 @@ COMMENT ON COLUMN bb.current_stocks.updated_at IS '更新時刻';
 CREATE TABLE bb.closed_stocks (
 	id bigint REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
 	closing_id bigint REFERENCES bb.closings ON DELETE CASCADE NOT NULL,
-	total numeric CHECK (total >= 0) NOT NULL,
+	infinity boolean NOT NULL,
+	total numeric CHECK (infinity OR total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
@@ -774,6 +792,8 @@ COMMENT ON TABLE bb.closed_stocks IS '締め在庫';
 COMMENT ON COLUMN bb.closed_stocks.id IS 'ID
 在庫IDに従属';
 COMMENT ON COLUMN bb.closed_stocks.closing_id IS '締めID';
+COMMENT ON COLUMN bb.closed_stocks.infinity IS '在庫無制限
+trueの場合、totalがマイナスでもエラーとならない';
 COMMENT ON COLUMN bb.closed_stocks.total IS '締め後の在庫総数';
 COMMENT ON COLUMN bb.closed_stocks.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.closed_stocks.updated_by IS '更新ユーザー';
@@ -928,7 +948,8 @@ COMMENT ON COLUMN bb.transient_nodes.updated_by IS '更新ユーザー';
 --一時作業移動ノード状態
 CREATE TABLE bb.transient_snapshots (
 	id bigint PRIMARY KEY REFERENCES bb.transient_nodes,
-	total numeric CHECK (total >= 0) NOT NULL,
+	infinity boolean NOT NULL,
+	total numeric CHECK (infinity OR total >= 0) NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
@@ -936,6 +957,8 @@ CREATE TABLE bb.transient_snapshots (
 
 COMMENT ON TABLE bb.transient_snapshots IS '一時作業移動ノード状態';
 COMMENT ON COLUMN bb.transient_snapshots.id IS 'ID';
+COMMENT ON COLUMN bb.transient_snapshots.infinity IS '在庫無制限
+trueの場合、totalがマイナスでもエラーとならない';
 COMMENT ON COLUMN bb.transient_snapshots.total IS 'この時点の在庫総数';
 COMMENT ON COLUMN bb.transient_snapshots.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_snapshots.created_by IS '作成ユーザー';
@@ -948,7 +971,8 @@ COMMENT ON COLUMN bb.transient_snapshots.updated_by IS '更新ユーザー';
 CREATE TABLE bb.transient_current_stocks (
 	id bigint PRIMARY KEY REFERENCES bb.stocks, --先にstocksにデータを作成してからこのテーブルにデータ作成
 	transient_id bigint REFERENCES bb.transients NOT NULL,
-	total numeric CHECK (total >= 0) NOT NULL,
+	infinity boolean NOT NULL,
+	total numeric CHECK (infinity OR total >= 0) NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by bigint REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
@@ -958,6 +982,8 @@ COMMENT ON TABLE bb.transient_current_stocks IS '一時作業現在在庫';
 COMMENT ON COLUMN bb.transient_current_stocks.id IS 'ID
 stocks.stock_idに従属';
 COMMENT ON COLUMN bb.transient_current_stocks.transient_id IS '一時作業ID';
+COMMENT ON COLUMN bb.transient_current_stocks.infinity IS '在庫無制限
+trueの場合、totalがマイナスでもエラーとならない';
 COMMENT ON COLUMN bb.transient_current_stocks.total IS '現時点の在庫総数';
 COMMENT ON COLUMN bb.transient_current_stocks.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_current_stocks.created_by IS '作成ユーザー';
