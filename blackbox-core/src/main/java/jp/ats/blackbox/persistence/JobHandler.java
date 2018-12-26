@@ -15,9 +15,16 @@ import sqlassist.bb.jobs;
 import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
 
+/**
+ * job関連クラス
+ */
 public class JobHandler {
 
+	/**
+	 * パラメータのtime以降のjobをもとにcurrent_stockを更新する
+	 */
 	public static void execute(LocalDateTime time) {
+		//トランザクション内の他の検索で参照されない、数が多い可能性があるのでbatchで実行
 		BatchStatement batch = BlendeeManager.getConnection().getBatchStatement();
 
 		new jobs()
@@ -29,6 +36,7 @@ public class JobHandler {
 					.SELECT(a -> a.ls(a.infinity, a.total, a.$nodes().stock_id))
 					.WHERE(sa -> sa.$nodes().$bundles().transfer_id.eq(r.getId()))
 					.aggregate(result -> {
+						//繰り返しのためのSQLを先に作る
 						var updater = new current_stocks()
 							.UPDATE(a -> a.ls(a.infinity.set($BO), a.total.set($B)))
 							.WHERE(a -> a.id.eq($L));
@@ -42,6 +50,7 @@ public class JobHandler {
 						}
 					});
 
+				//完了済み
 				r.setCompleted(true);
 				r.update(batch);
 			});
