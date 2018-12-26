@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import org.blendee.jdbc.BatchStatement;
 import org.blendee.jdbc.BlendeeManager;
 
+import jp.ats.blackbox.common.U;
 import sqlassist.bb.current_stocks;
 import sqlassist.bb.jobs;
 import sqlassist.bb.nodes;
@@ -58,8 +59,25 @@ public class JobHandler {
 		batch.executeBatch();
 	}
 
+	public static LocalDateTime getNextTime() {
+		return new jobs()
+			.SELECT(a -> a.MIN(a.$transfers().transferred_at))
+			.WHERE(a -> a.completed.eq(false))
+			.aggregateAndGet(r -> {
+				if (r.next()) return U.convert(r.getTimestamp(1));
+
+				//一件もない場合は次にjobが登録されるまで待つために最大値を返す
+				return LocalDateTime.MAX;
+			});
+	}
+
 	public static void executeTransient(LocalDateTime time) {
 		//TODO transient用
 		//jobsの代わりにtransient_transfersを使用する
+	}
+
+	public static LocalDateTime getNextTimeTransient() {
+		//TODO transient用
+		return null;
 	}
 }
