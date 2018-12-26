@@ -14,13 +14,9 @@ import org.blendee.jdbc.exception.CheckConstraintViolationException;
 import sqlassist.bb.bundles;
 import sqlassist.bb.current_stocks;
 import sqlassist.bb.groups;
-import sqlassist.bb.items;
 import sqlassist.bb.jobs;
-import sqlassist.bb.locations;
 import sqlassist.bb.nodes;
-import sqlassist.bb.owners;
 import sqlassist.bb.snapshots;
-import sqlassist.bb.statuses;
 import sqlassist.bb.stocks;
 import sqlassist.bb.transfers;
 import sqlassist.bb.users;
@@ -48,6 +44,8 @@ public class TransferHandler {
 				u.add(transfers.group_extension, group.getExtension());
 				u.add(transfers.org_extension, group.$orgs().getExtension());
 				u.add(transfers.user_extension, user.getExtension());
+				request.tags.ifPresent(v -> u.add(transfers.tags, v));
+				u.add(transfers.created_by, User.currentUserId());
 			},
 			r -> r.getLong(transfers.id),
 			transfers.id);
@@ -80,7 +78,7 @@ public class TransferHandler {
 		var stock = selectedStocks()
 			.WHERE(a -> a.group_id.eq(request.group_id).AND.item_id.eq(request.item_id).AND.owner_id.eq(request.owner_id).AND.location_id.eq(request.location_id).AND.status_id.eq(request.status_id))
 			.willUnique()
-			.orElse(registerStock(request));
+			.orElseGet(() -> registerStock(request));
 
 		long stockId = stock.getId();
 
@@ -108,11 +106,12 @@ public class TransferHandler {
 					a.total,
 					a.infinity,
 					//transferred_atの逆順、登録順の逆順
-					a.any("RANK() OVER (ORDER BY {0} DESC, {1} DESC)").AS("rank"),
-					a.$nodes().$bundles().$transfers().transferred_at,
-					a.$nodes().id))
+					a.any(
+						"RANK() OVER (ORDER BY {0} DESC, {1} DESC)",
+						a.$nodes().$bundles().$transfers().transferred_at,
+						a.$nodes().id).AS("rank")))
 				.WHERE(a -> a.$nodes().stock_id.eq(stockId)),
-			"ordered").SELECT(a -> a.col("total"))
+			"ordered").SELECT(a -> a.ls(a.col("total"), a.col("infinity")))
 				.WHERE(a -> a.col("rank").eq(1))
 				.aggregateAndGet(r -> {
 					var container = new JustBefore();
@@ -174,16 +173,19 @@ public class TransferHandler {
 		long stockId = ReturningUtilities.insertAndReturn(
 			stocks.$TABLE,
 			u -> {
+				u.add(stocks.group_id, request.group_id);
 				u.add(stocks.item_id, request.item_id);
 				u.add(stocks.owner_id, request.owner_id);
 				u.add(stocks.location_id, request.location_id);
 				u.add(stocks.status_id, request.status_id);
+				u.add(stocks.created_by, User.currentUserId());
 			},
 			r -> r.getLong(transfers.id),
 			transfers.id);
 
 		new current_stocks().insertStatement(
-			a -> a.INSERT(a.id, a.total).VALUES(stockId, 0))//TODO Jobをこなすプロセスをキックする必要あり
+			//後で更新されるのでinfinityはとりあえずfalse
+			a -> a.INSERT(a.id, a.infinity, a.total).VALUES(stockId, false, 0))//TODO Jobをこなすプロセスをキックする必要あり
 			.execute();
 
 		//関連情報取得のため改めて検索

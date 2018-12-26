@@ -14,7 +14,7 @@ import sqlassist.bb.snapshots;
 
 public class JobHandler {
 
-	public void execute(LocalDateTime time) {
+	public static void execute(LocalDateTime time) {
 		BatchStatement batch = BlendeeManager.getConnection().getBatchStatement();
 
 		new jobs()
@@ -46,7 +46,7 @@ public class JobHandler {
 		batch.executeBatch();
 	}
 
-	public void executeTransient(LocalDateTime time) {
+	public static void executeTransient(LocalDateTime time) {
 		//TODO transient用
 		//jobsの代わりにtransient_transfersを使用する
 	}
