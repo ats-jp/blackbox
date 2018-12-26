@@ -188,9 +188,10 @@ INSERT INTO bb.groups (
 	updated_by
 ) VALUES (1, 'Superusers', 0, 0, '{}', 1, 1);
 
-CREATE TABLE bb.group_tags (
-	group_id bigint REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+CREATE TABLE bb.groups_tags (
+	id bigint REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
 
 ----------
 
@@ -330,9 +331,10 @@ ALTER TABLE bb.groups ADD FOREIGN KEY (updated_by) REFERENCES bb.users;
 ALTER TABLE bb.users ADD FOREIGN KEY (created_by) REFERENCES bb.users;
 ALTER TABLE bb.users ADD FOREIGN KEY (updated_by) REFERENCES bb.users;
 
-CREATE TABLE bb.user_tags (
-	user_id bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+CREATE TABLE bb.users_tags (
+	id bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
 
 ----------
 
@@ -393,9 +395,10 @@ INSERT INTO bb.items (
 	updated_by
 ) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
 
-CREATE TABLE bb.item_tags (
-	item_id bigint REFERENCES bb.items ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+CREATE TABLE bb.items_tags (
+	id bigint REFERENCES bb.items ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
 
 ----------
 
@@ -440,9 +443,10 @@ INSERT INTO bb.owners (
 	updated_by
 ) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
 
-CREATE TABLE bb.owner_tags (
-	owner_id bigint REFERENCES bb.owners ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+CREATE TABLE bb.owners_tags (
+	id bigint REFERENCES bb.owners ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
 
 ----------
 
@@ -487,9 +491,10 @@ INSERT INTO bb.locations (
 	updated_by
 ) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
 
-CREATE TABLE bb.location_tags (
-	location_id bigint REFERENCES bb.locations ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+CREATE TABLE bb.locations_tags (
+	id bigint REFERENCES bb.locations ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
 
 ----------
 
@@ -534,9 +539,10 @@ INSERT INTO bb.statuses (
 	updated_by
 ) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
 
-CREATE TABLE bb.status_tags (
-	status_id bigint REFERENCES bb.statuses ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+CREATE TABLE bb.statuses_tags (
+	id bigint REFERENCES bb.statuses ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
 
 ----------
 
@@ -667,9 +673,10 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER closed_checktrigger BEFORE INSERT ON bb.transfers
 FOR EACH ROW EXECUTE PROCEDURE bb.closed_check();
 
-CREATE TABLE bb.transfer_tags (
-	transfer_id bigint REFERENCES bb.transfers ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+CREATE TABLE bb.transfers_tags (
+	id bigint REFERENCES bb.transfers ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
 
 ----------
 
@@ -841,9 +848,10 @@ COMMENT ON COLUMN bb.transients.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transients.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transients.updated_by IS '更新ユーザー';
 
-CREATE TABLE bb.transient_tags (
-	transient_id bigint REFERENCES bb.transients ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+CREATE TABLE bb.transients_tags (
+	id bigint REFERENCES bb.transients ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
 
 ----------
 
@@ -891,9 +899,10 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER transient_closed_checktrigger BEFORE INSERT ON bb.transient_transfers
 FOR EACH ROW EXECUTE PROCEDURE bb.transient_closed_check();
 
-CREATE TABLE bb.transient_transfer_tags (
-	transient_transfer_id bigint REFERENCES bb.transient_transfers ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL);
+CREATE TABLE bb.transient_transfers_tags (
+	id bigint REFERENCES bb.transient_transfers ON DELETE CASCADE NOT NULL,
+	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
 
 ----------
 
@@ -1081,14 +1090,15 @@ CREATE INDEX ON bb.transient_nodes (stock_id);
 --transient_snapshots
 
 --tags
-CREATE INDEX ON bb.group_tags (tag_id);
-CREATE INDEX ON bb.user_tags (tag_id);
-CREATE INDEX ON bb.item_tags (tag_id);
-CREATE INDEX ON bb.owner_tags (tag_id);
-CREATE INDEX ON bb.location_tags (tag_id);
-CREATE INDEX ON bb.status_tags (tag_id);
-CREATE INDEX ON bb.transfer_tags (tag_id);
-CREATE INDEX ON bb.transient_tags (tag_id);
+CREATE INDEX ON bb.groups_tags (tag_id);
+CREATE INDEX ON bb.users_tags (tag_id);
+CREATE INDEX ON bb.items_tags (tag_id);
+CREATE INDEX ON bb.owners_tags (tag_id);
+CREATE INDEX ON bb.locations_tags (tag_id);
+CREATE INDEX ON bb.statuses_tags (tag_id);
+CREATE INDEX ON bb.transfers_tags (tag_id);
+CREATE INDEX ON bb.transients_tags (tag_id);
+CREATE INDEX ON bb.transient_transfers_tags (tag_id);
 
 --===========================
 --privileges
@@ -1127,14 +1137,15 @@ TO blackbox;
 GRANT INSERT, DELETE ON TABLE
 	bb.tags,
 	bb.closings,
-	bb.group_tags,
-	bb.user_tags,
-	bb.item_tags,
-	bb.owner_tags,
-	bb.location_tags,
-	bb.status_tags,
-	bb.transfer_tags,
-	bb.transient_tags
+	bb.groups_tags,
+	bb.users_tags,
+	bb.items_tags,
+	bb.owners_tags,
+	bb.locations_tags,
+	bb.statuses_tags,
+	bb.transfers_tags,
+	bb.transients_tags,
+	bb.transient_transfers_tags
 TO blackbox;
 
 --transfers関連はINSERTのみ

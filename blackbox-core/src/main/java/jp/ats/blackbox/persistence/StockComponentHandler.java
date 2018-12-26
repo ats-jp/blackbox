@@ -49,7 +49,11 @@ public class StockComponentHandler {
 		row.setLong(created_by, userId);
 		row.setLong(updated_by, userId);
 
-		return CommonHandler.register(row);
+		long id = CommonHandler.register(row);
+
+		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, id));
+
+		return id;
 	}
 
 	public static void update(
@@ -59,9 +63,12 @@ public class StockComponentHandler {
 			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
 			request.name.ifPresent(v -> a.col(name).set(v));
 			request.extension.ifPresent(v -> a.col(extension).set(toJson(v)));
+			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
 			a.col(updated_by).set(User.currentUserId());
 		}).WHERE(a -> a.col(id).eq(request.id).AND.col(revision).eq(request.revision)).execute();
+
+		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, request.id));
 
 		if (result != 1) throw Utils.decisionException(table, request.id);
 	}

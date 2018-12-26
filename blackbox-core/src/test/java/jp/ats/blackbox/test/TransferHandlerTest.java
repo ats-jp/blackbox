@@ -3,6 +3,7 @@ package jp.ats.blackbox.test;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.blendee.util.Blendee;
@@ -46,6 +47,9 @@ public class TransferHandlerTest {
 		var transfer = new TransferRegisterRequest();
 		transfer.group_id = 0;
 		transfer.transferred_at = new Timestamp(System.currentTimeMillis());
+
+		transfer.tags = Optional.of(new String[] { "tag1", "tag2" });
+
 		transfer.bundles = new BundleRegisterRequest[] { bundle };
 
 		Blendee.execute(t -> {

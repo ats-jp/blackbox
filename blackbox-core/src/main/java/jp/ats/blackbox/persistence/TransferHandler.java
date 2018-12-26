@@ -19,6 +19,7 @@ import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
 import sqlassist.bb.stocks;
 import sqlassist.bb.transfers;
+import sqlassist.bb.transfers_tags;
 import sqlassist.bb.users;
 
 /**
@@ -57,6 +58,13 @@ public class TransferHandler {
 			transfers.id);
 
 		Arrays.stream(request.bundles).forEach(r -> registerBundle(transferId, request.transferred_at, r));
+
+		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
+			var table = new transfers_tags();
+			tagIds.forEach(tagId -> {
+				table.INSERT().VALUES(transferId, tagId).execute();
+			});
+		}));
 
 		//jobを登録し、別プロセスで現在数量を更新させる
 		new jobs().INSERT(a -> a.id).VALUES(transferId).execute();
