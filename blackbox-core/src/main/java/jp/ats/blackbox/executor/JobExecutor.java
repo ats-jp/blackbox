@@ -7,6 +7,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.blendee.util.Blendee;
+
 import jp.ats.blackbox.persistence.JobHandler;
 
 public class JobExecutor {
@@ -43,13 +45,22 @@ public class JobExecutor {
 			lock.unlock();
 		}
 
-		JobHandler.execute(next);
-
-		lock.lock();
 		try {
-			next = JobHandler.getNextTime();
-		} finally {
-			lock.unlock();
+			Blendee.execute(t -> {
+				JobHandler.execute(next);
+
+				//他の接続からいち早く見えるようにcommit
+				t.commit();
+
+				lock.lock();
+				try {
+					next = JobHandler.getNextTime();
+				} finally {
+					lock.unlock();
+				}
+			});
+		} catch (Exception e) {
+			//TODO 例外をlog
 		}
 	}
 }

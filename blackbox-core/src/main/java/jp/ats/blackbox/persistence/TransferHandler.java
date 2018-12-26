@@ -4,6 +4,7 @@ import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import org.blendee.assist.AnonymousTable;
@@ -11,6 +12,7 @@ import org.blendee.assist.Vargs;
 import org.blendee.dialect.postgresql.ReturningUtilities;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
 
+import jp.ats.blackbox.common.U;
 import sqlassist.bb.bundles;
 import sqlassist.bb.current_stocks;
 import sqlassist.bb.groups;
@@ -30,7 +32,7 @@ public class TransferHandler {
 	/**
 	 * transfer登録処理
 	 */
-	public static void register(TransferComponent.TransferRegisterRequest request) {
+	public static LocalDateTime register(TransferComponent.TransferRegisterRequest request) {
 		long userId = User.currentUserId();
 
 		var group = new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension))
@@ -68,6 +70,8 @@ public class TransferHandler {
 
 		//jobを登録し、別プロセスで現在数量を更新させる
 		new jobs().INSERT(a -> a.id).VALUES(transferId).execute();
+
+		return U.convert(request.transferred_at);
 	}
 
 	/**
@@ -219,8 +223,8 @@ public class TransferHandler {
 			transfers.id);
 
 		new current_stocks().insertStatement(
-			//後でjobから更新されるのでinfinityはとりあえずfalse
-			a -> a.INSERT(a.id, a.infinity, a.total).VALUES(stockId, false, 0))//TODO Jobをこなすプロセスをキックする必要あり
+			//後でjobから更新されるのでinfinityはとりあえずfalse、totalは0
+			a -> a.INSERT(a.id, a.infinity, a.total).VALUES(stockId, false, 0))
 			.execute();
 
 		//関連情報取得のため改めて検索
