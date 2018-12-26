@@ -176,14 +176,15 @@ public class TransferHandler {
 			new snapshots().updateStatement(
 				a -> a.UPDATE(
 					//一度trueになったらずっとそのままtrue
-					a.infinity.set("{0} OR ?", infinity),
+					a.infinity.set("{0} OR ?", Vargs.of(a.infinity), Vargs.of(infinity)),
 					//自身の数に今回の移動数量を正規化してプラス
 					a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of(request.in_out.normalize(request.quantity))))
 					.WHERE(
 						wa -> wa.id.IN(
 							new nodes()
 								.SELECT(sa -> sa.id)
-								.WHERE(swa -> swa.$bundles().$transfers().transferred_at.ge(transferredAt)))));
+								.WHERE(swa -> swa.stock_id.eq(stockId).AND.$bundles().$transfers().transferred_at.ge(transferredAt)))))
+				.execute();
 		} catch (CheckConstraintViolationException e) {
 			//未来のsnapshotで数量がマイナスになった
 			throw new MinusTotalException();
@@ -218,7 +219,7 @@ public class TransferHandler {
 			transfers.id);
 
 		new current_stocks().insertStatement(
-			//後で更新されるのでinfinityはとりあえずfalse
+			//後でjobから更新されるのでinfinityはとりあえずfalse
 			a -> a.INSERT(a.id, a.infinity, a.total).VALUES(stockId, false, 0))//TODO Jobをこなすプロセスをキックする必要あり
 			.execute();
 
