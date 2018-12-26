@@ -18,6 +18,10 @@ public enum InOut {
 	}
 
 	public BigDecimal calcurate(BigDecimal total, BigDecimal quantity) {
-		return total.add(quantity.multiply(coefficient));
+		return total.add(normalize(quantity));
+	}
+
+	public BigDecimal normalize(BigDecimal quantity) {
+		return quantity.multiply(coefficient);
 	}
 }

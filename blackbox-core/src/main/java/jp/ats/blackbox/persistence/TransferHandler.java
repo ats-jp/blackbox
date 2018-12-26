@@ -21,8 +21,14 @@ import sqlassist.bb.stocks;
 import sqlassist.bb.transfers;
 import sqlassist.bb.users;
 
+/**
+ * transfer操作クラス
+ */
 public class TransferHandler {
 
+	/**
+	 * transfer登録処理
+	 */
 	public static void register(TransferComponent.TransferRegisterRequest request) {
 		long userId = User.currentUserId();
 
@@ -52,9 +58,13 @@ public class TransferHandler {
 
 		Arrays.stream(request.bundles).forEach(r -> registerBundle(transferId, request.transferred_at, r));
 
+		//jobを登録し、別プロセスで現在数量を更新させる
 		new jobs().INSERT(a -> a.id).VALUES(transferId).execute();
 	}
 
+	/**
+	 * bundle登録処理
+	 */
 	private static void registerBundle(
 		long transferId,
 		Timestamp transferredAt,
@@ -71,10 +81,15 @@ public class TransferHandler {
 		Arrays.stream(request.nodes).forEach(r -> registerNode(bundleId, transferredAt, r));
 	}
 
+	/**
+	 * node登録処理
+	 */
 	private static void registerNode(
 		long bundleId,
 		Timestamp transferredAt,
 		TransferComponent.NodeRegisterRequest request) {
+		//stockが既に存在すればそれを使う
+		//なければ新たに登録
 		var stock = selectedStocks()
 			.WHERE(a -> a.group_id.eq(request.group_id).AND.item_id.eq(request.item_id).AND.owner_id.eq(request.owner_id).AND.location_id.eq(request.location_id).AND.status_id.eq(request.status_id))
 			.willUnique()
@@ -82,6 +97,7 @@ public class TransferHandler {
 
 		long stockId = stock.getId();
 
+		//nodeではgroup_idを持たないが、requestが持つgroup_idはstockに格納しており、それが在庫の所属グループを表す
 		long nodeId = ReturningUtilities.insertAndReturn(
 			nodes.$TABLE,
 			u -> {
@@ -100,6 +116,7 @@ public class TransferHandler {
 			r -> r.getLong(bundles.id),
 			bundles.id);
 
+		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
 		JustBefore justBefore = new AnonymousTable(
 			new snapshots().SELECT(
 				a -> a.ls(
@@ -129,10 +146,11 @@ public class TransferHandler {
 
 		BigDecimal total = request.in_out.calcurate(justBefore.total, request.quantity);
 
-		//移動した結果数量がマイナスになり無制限でもない場合、エラー
+		//移動した結果数量がマイナスになる場合エラー
+		//ただし無制限設定がされていればOK
 		if (!justBefore.infinity && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
 
-		//直前のsnapshotが無制限の場合、引き継ぐ
+		//直前のsnapshotが無制限の場合、以降すべてのsnapshotが無制限になるので引き継ぐ
 		//そうでなければ今回のリクエストに従う
 		boolean infinity = justBefore.infinity ? true : request.grants_infinity.orElse(false);
 
@@ -145,12 +163,14 @@ public class TransferHandler {
 					User.currentUserId()))
 			.execute();
 
-		//登録以降のsnapshotの数量を更新
+		//登録以降のsnapshotの数量と無制限設定を更新
 		try {
 			new snapshots().updateStatement(
 				a -> a.UPDATE(
+					//一度trueになったらずっとそのままtrue
 					a.infinity.set("{0} OR ?", infinity),
-					a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of(request.quantity)))
+					//自身の数に今回の移動数量を正規化してプラス
+					a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of(request.in_out.normalize(request.quantity))))
 					.WHERE(
 						wa -> wa.id.IN(
 							new nodes()
@@ -162,6 +182,9 @@ public class TransferHandler {
 		}
 	}
 
+	/**
+	 * 直前のsnapshotの情報を保持するコンテナ
+	 */
 	private static class JustBefore {
 
 		private BigDecimal total;
@@ -169,6 +192,9 @@ public class TransferHandler {
 		private boolean infinity;
 	}
 
+	/**
+	 * stock登録処理
+	 */
 	private static stocks.Row registerStock(TransferComponent.NodeRegisterRequest request) {
 		long stockId = ReturningUtilities.insertAndReturn(
 			stocks.$TABLE,

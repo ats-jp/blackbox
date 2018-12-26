@@ -1,11 +1,14 @@
 package jp.ats.blackbox.persistence;
 
+import static org.blendee.util.Placeholder.$B;
+import static org.blendee.util.Placeholder.$BO;
+import static org.blendee.util.Placeholder.$L;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import org.blendee.jdbc.BatchStatement;
 import org.blendee.jdbc.BlendeeManager;
-import org.blendee.util.Placeholder;
 
 import sqlassist.bb.current_stocks;
 import sqlassist.bb.jobs;
@@ -27,8 +30,8 @@ public class JobHandler {
 					.WHERE(sa -> sa.$nodes().$bundles().transfer_id.eq(r.getId()))
 					.aggregate(result -> {
 						var updater = new current_stocks()
-							.UPDATE(a -> a.ls(a.infinity.set(Placeholder.$BO), a.total.set(Placeholder.$B)))
-							.WHERE(a -> a.id.eq(Placeholder.$L));
+							.UPDATE(a -> a.ls(a.infinity.set($BO), a.total.set($B)))
+							.WHERE(a -> a.id.eq($L));
 
 						while (result.next()) {
 							//TODO pluginで個別処理を複数スレッドで行うようにする
