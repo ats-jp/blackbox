@@ -19,6 +19,15 @@ public class TransferHandlerTest {
 	public static void main(String[] args) throws Exception {
 		Common.start();
 
+		var out = new NodeRegisterRequest();
+		out.group_id = 0;
+		out.item_id = 0;
+		out.owner_id = 0;
+		out.location_id = 0;
+		out.status_id = 0;
+		out.in_out = InOut.OUT;
+		out.quantity = BigDecimal.valueOf(100);
+
 		var in = new NodeRegisterRequest();
 		in.group_id = 0;
 		in.item_id = 0;
@@ -28,16 +37,10 @@ public class TransferHandlerTest {
 		in.in_out = InOut.IN;
 		in.quantity = BigDecimal.valueOf(100);
 
-		var out = new NodeRegisterRequest();
-		out.group_id = 0;
-		out.item_id = 0;
-		out.owner_id = 0;
-		out.location_id = 0;
-		out.status_id = 0;
-		out.in_out = InOut.IN;
-		out.quantity = BigDecimal.valueOf(100);
-
 		var bundle = new BundleRegisterRequest();
+
+		//通常はout -> inだがMinusTotalExceptionとなるのでテストではin -> outとする
+		//bundle.nodes = new NodeRegisterRequest[] { out, in };
 		bundle.nodes = new NodeRegisterRequest[] { in, out };
 
 		var transfer = new TransferRegisterRequest();
