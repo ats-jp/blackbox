@@ -654,11 +654,11 @@ INSERT INTO bb.transfers (
 
 --締め済グループチェック
 CREATE FUNCTION bb.closed_check() RETURNS TRIGGER AS $$
-	DECLARE closed_at timestamptz;
+	DECLARE closed_at_local timestamptz;
 	BEGIN
-		SELECT INTO closed_at closed_at FROM bb.last_closings WHERE id = NEW.group_id;
-		IF closed_at IS NOT NULL AND NEW.transferred_at < closed_at THEN
-			RAISE EXCEPTION 'closed_check(): group id=[%] closed at %', NEW.group_id, closed_at;
+		SELECT INTO closed_at_local closed_at FROM bb.last_closings WHERE id = NEW.group_id;
+		IF closed_at_local IS NOT NULL AND NEW.transferred_at < closed_at_local THEN
+			RAISE EXCEPTION 'closed_check(): group id=[%] closed at %', NEW.group_id, closed_at_local;
 		END IF;
 		RETURN NEW;
 	END;
@@ -878,11 +878,11 @@ COMMENT ON COLUMN bb.transient_transfers.updated_by IS '更新ユーザー';
 
 --締め済グループチェック
 CREATE FUNCTION bb.transient_closed_check() RETURNS TRIGGER AS $$
-	DECLARE closed_at timestamptz;
+	DECLARE closed_at_local timestamptz;
 	BEGIN
-		SELECT INTO closed_at closed_at FROM bb.last_closings WHERE id = NEW.group_id;
-		IF closed_at IS NOT NULL AND NEW.transferred_at < closed_at THEN
-			RAISE EXCEPTION 'closed_check(): group id=[%] closed at %', NEW.group_id, closed_at;
+		SELECT INTO closed_at_local closed_at FROM bb.last_closings WHERE id = NEW.group_id;
+		IF closed_at_local IS NOT NULL AND NEW.transferred_at < closed_at_local THEN
+			RAISE EXCEPTION 'closed_check(): group id=[%] closed at %', NEW.group_id, closed_at_local;
 		END IF;
 		RETURN NEW;
 	END;
