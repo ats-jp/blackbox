@@ -21,6 +21,7 @@ public class TransferExecutor {
 			});
 		} catch (Exception e) {
 			//TODO 例外をlog
+			e.printStackTrace();
 		}
 	}
 }

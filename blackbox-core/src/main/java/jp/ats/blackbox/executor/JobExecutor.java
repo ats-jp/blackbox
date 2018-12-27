@@ -61,6 +61,7 @@ public class JobExecutor {
 			});
 		} catch (Exception e) {
 			//TODO 例外をlog
+			e.printStackTrace();
 		}
 	}
 }
