@@ -1,8 +1,6 @@
 package jp.ats.blackbox.web;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.stream.Collectors;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -14,7 +12,6 @@ import javax.servlet.ServletResponse;
 import org.blendee.jdbc.BlendeeManager;
 import org.blendee.jdbc.Transaction;
 import org.blendee.util.Blendee;
-import org.blendee.util.BlendeeConstants;
 
 /**
  * {@link Filter} の範囲でトランザクションを管理するためのクラスです。
@@ -23,8 +20,6 @@ import org.blendee.util.BlendeeConstants;
 public class BlendeeTransactionFilter implements Filter {
 
 	private static final ThreadLocal<Transaction> transaction = new ThreadLocal<>();
-
-	private static boolean blendeeStarted = false;
 
 	/**
 	 * 現在のトランザクションを返します。
@@ -35,25 +30,9 @@ public class BlendeeTransactionFilter implements Filter {
 		return transaction.get();
 	}
 
-	private static synchronized void blendeeStarted() {
-		blendeeStarted = true;
-	}
-
-	public static boolean isBlendeeStarted() {
-		return blendeeStarted;
-	}
-
 	@Override
 	public void init(final FilterConfig config) throws ServletException {
-		Blendee.start(
-			Collections.list(config.getInitParameterNames())
-				.stream()
-				.collect(
-					Collectors.toConcurrentMap(
-						key -> BlendeeConstants.convert(key),
-						key -> BlendeeConstants.convert(key).parse(config.getInitParameter(key)))));
-
-		blendeeStarted();
+		BlendeeStarter.start(config.getServletContext());
 	}
 
 	@Override
