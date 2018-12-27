@@ -28,9 +28,13 @@ public class BlendeeStarter {
 				.stream()
 				.collect(
 					Collectors.toConcurrentMap(
-						key -> BlendeeConstants.convert(key),
-						key -> BlendeeConstants.convert(key).parse(context.getInitParameter(key)))));
+						key -> BlendeeConstants.convert(removePrefix(key)),
+						key -> BlendeeConstants.convert(removePrefix(key)).parse(context.getInitParameter(key)))));
 
 		setStarted();
+	}
+
+	private static String removePrefix(String key) {
+		return key.substring("blendee-".length());
 	}
 }
