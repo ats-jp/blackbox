@@ -14,10 +14,11 @@ public class StockComponetHandlerTest2 {
 		Common.start();
 		Blendee.execute(t -> {
 			var req = new StockComponent.UpdateRequest();
-			req.group_id = 0;
+			req.group_id = Optional.of(0L);
 			req.name = Optional.of("test");
 			req.extension = Optional.of("{}");
 			req.tags = Optional.of(new String[] { "tag1", "tag2" });
+			req.revision = 0;
 
 			StockComponentHandler.update(locations.$TABLE, req);
 

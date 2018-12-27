@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.Optional;
 
 public class StockComponent {
-	
+
 	public static class RegisterRequest {
 
 		public long group_id;
@@ -17,10 +17,10 @@ public class StockComponent {
 	}
 
 	public static class UpdateRequest {
-		
+
 		public long id;
 
-		public long group_id;
+		public Optional<Long> group_id = Optional.empty();
 
 		public Optional<String> name = Optional.empty();
 
@@ -36,7 +36,7 @@ public class StockComponent {
 	public static class Response {
 
 		public String type;
-		
+
 		public long id;
 
 		public long group_id;

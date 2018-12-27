@@ -27,6 +27,7 @@ public class TransferHandlerTest {
 		out.location_id = 0;
 		out.status_id = 0;
 		out.in_out = InOut.OUT;
+		out.grants_infinity = Optional.of(true);
 		out.quantity = BigDecimal.valueOf(100);
 
 		var in = new NodeRegisterRequest();
@@ -41,8 +42,8 @@ public class TransferHandlerTest {
 		var bundle = new BundleRegisterRequest();
 
 		//通常はout -> inだがMinusTotalExceptionとなるのでテストではin -> outとする
-		//bundle.nodes = new NodeRegisterRequest[] { out, in };
-		bundle.nodes = new NodeRegisterRequest[] { in, out };
+		bundle.nodes = new NodeRegisterRequest[] { out, in };
+		//bundle.nodes = new NodeRegisterRequest[] { in, out };
 
 		var transfer = new TransferRegisterRequest();
 		transfer.group_id = 0;
