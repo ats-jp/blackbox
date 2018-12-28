@@ -18,7 +18,7 @@ import jp.ats.blackbox.persistence.TransferHandler;
 public class TransferHandlerTest {
 
 	public static void main(String[] args) throws Exception {
-		Common.start();
+		Common.startWithLog();
 
 		Blendee.execute(t -> {
 			IntStream.range(0, 10).forEach(i -> {

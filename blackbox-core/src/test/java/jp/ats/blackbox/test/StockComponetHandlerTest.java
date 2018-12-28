@@ -11,7 +11,8 @@ import sqlassist.bb.locations;
 public class StockComponetHandlerTest {
 
 	public static void main(String[] args) throws Exception {
-		Common.start();
+		Common.startWithLog();
+
 		Blendee.execute(t -> {
 			var req = new StockComponent.RegisterRequest();
 			req.group_id = 0;

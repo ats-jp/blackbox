@@ -39,15 +39,16 @@ public class JobExecutor {
 
 	private static void execute() {
 		lock.lock();
+		var now = LocalDateTime.now();
 		try {
-			if (!next.isBefore(LocalDateTime.now())) return;
+			if (!next.isBefore(now)) return;
 		} finally {
 			lock.unlock();
 		}
 
 		try {
 			Blendee.execute(t -> {
-				JobHandler.execute(next);
+				JobHandler.execute(now);
 
 				//他の接続からいち早く見えるようにcommit
 				t.commit();

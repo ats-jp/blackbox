@@ -64,10 +64,14 @@ public class JobHandler {
 			.SELECT(a -> a.MIN(a.$transfers().transferred_at))
 			.WHERE(a -> a.completed.eq(false))
 			.aggregateAndGet(r -> {
-				if (r.next()) return U.convert(r.getTimestamp(1));
+				r.next();
+				var next = r.getTimestamp(1);
 
-				//一件もない場合は次にjobが登録されるまで待つために最大値を返す
-				return LocalDateTime.MAX;
+				if (next == null)
+					//一件もない場合は次にjobが登録されるまで待つために最大値を返す
+					return LocalDateTime.MAX;
+
+				return U.convert(r.getTimestamp(1));
 			});
 	}
 

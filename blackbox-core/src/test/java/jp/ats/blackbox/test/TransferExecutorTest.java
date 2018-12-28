@@ -2,6 +2,7 @@ package jp.ats.blackbox.test;
 
 import java.util.stream.IntStream;
 
+import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TransferExecutor;
 
 public class TransferExecutorTest {
@@ -10,9 +11,10 @@ public class TransferExecutorTest {
 		Common.start();
 
 		TransferExecutor.start();
+		JobExecutor.start();
 
 		Runnable r = () -> {
-			IntStream.range(0, 100).forEach(i -> {
+			IntStream.range(0, 10).forEach(i -> {
 				System.out.println(i + " " + Thread.currentThread());
 				var promise = TransferExecutor.register(() -> TransferHandlerTest.createRequest());
 
@@ -31,12 +33,18 @@ public class TransferExecutorTest {
 		new Thread(r).start();
 		new Thread(r).start();
 
-		try {
-			Thread.sleep(1000000000);
-		} catch (Exception e) {
-			return;
+		System.gc();
+
+		while (true) {
+			try {
+				Thread.sleep(1000);
+				System.gc();
+			} catch (Exception e) {
+				break;
+			}
 		}
 
 		TransferExecutor.stop();
+		JobExecutor.stop();
 	}
 }
