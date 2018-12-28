@@ -20,6 +20,17 @@ public class TransferHandlerTest {
 	public static void main(String[] args) throws Exception {
 		Common.start();
 
+		Blendee.execute(t -> {
+			IntStream.range(0, 10).forEach(i -> {
+				TransferHandler.register(createRequest());
+				JobHandler.execute(LocalDateTime.now());
+			});
+
+			t.rollback();
+		});
+	}
+
+	static TransferRegisterRequest createRequest() {
 		var out = new NodeRegisterRequest();
 		out.group_id = 0;
 		out.item_id = 0;
@@ -42,8 +53,8 @@ public class TransferHandlerTest {
 		var bundle = new BundleRegisterRequest();
 
 		//通常はout -> inだがMinusTotalExceptionとなるのでテストではin -> outとする
-		bundle.nodes = new NodeRegisterRequest[] { out, in };
-		//bundle.nodes = new NodeRegisterRequest[] { in, out };
+		//bundle.nodes = new NodeRegisterRequest[] { out, in };
+		bundle.nodes = new NodeRegisterRequest[] { in, out };
 
 		var transfer = new TransferRegisterRequest();
 		transfer.group_id = 0;
@@ -53,13 +64,6 @@ public class TransferHandlerTest {
 
 		transfer.bundles = new BundleRegisterRequest[] { bundle };
 
-		Blendee.execute(t -> {
-			IntStream.range(0, 10).forEach(i -> {
-				TransferHandler.register(transfer);
-				JobHandler.execute(LocalDateTime.now());
-			});
-
-			t.rollback();
-		});
+		return transfer;
 	}
 }

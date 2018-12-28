@@ -13,6 +13,9 @@ import org.blendee.dialect.postgresql.ReturningUtilities;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
+import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import sqlassist.bb.bundles;
 import sqlassist.bb.current_stocks;
 import sqlassist.bb.groups;
@@ -32,7 +35,7 @@ public class TransferHandler {
 	/**
 	 * transfer登録処理
 	 */
-	public static LocalDateTime register(TransferComponent.TransferRegisterRequest request) {
+	public static long register(TransferRegisterRequest request) {
 		long userId = User.currentUserId();
 
 		var group = new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension))
@@ -71,7 +74,7 @@ public class TransferHandler {
 		//jobを登録し、別プロセスで現在数量を更新させる
 		new jobs().INSERT(a -> a.id).VALUES(transferId).execute();
 
-		return U.convert(request.transferred_at);
+		return transferId;
 	}
 
 	/**
@@ -80,7 +83,7 @@ public class TransferHandler {
 	private static void registerBundle(
 		long transferId,
 		Timestamp transferredAt,
-		TransferComponent.BundleRegisterRequest request) {
+		BundleRegisterRequest request) {
 		long bundleId = ReturningUtilities.insertAndReturn(
 			bundles.$TABLE,
 			u -> {
@@ -99,7 +102,7 @@ public class TransferHandler {
 	private static void registerNode(
 		long bundleId,
 		Timestamp transferredAt,
-		TransferComponent.NodeRegisterRequest request) {
+		NodeRegisterRequest request) {
 		//stockが既に存在すればそれを使う
 		//なければ新たに登録
 		var stock = selectedStocks()

@@ -1,27 +1,79 @@
 package jp.ats.blackbox.executor;
 
-import java.time.LocalDateTime;
+import java.util.function.Supplier;
 
 import org.blendee.util.Blendee;
 
-import jp.ats.blackbox.persistence.TransferComponent;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.util.DaemonThreadFactory;
+
+import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler;
 
 public class TransferExecutor {
 
-	public static void execute(TransferComponent.TransferRegisterRequest request) {
+	private static final int bufferSize = 1024;
+
+	private static Disruptor<Event> disruptor;
+
+	private static RingBuffer<Event> ringBuffer;
+
+	public static synchronized void start() {
+		disruptor = new Disruptor<>(Event::new, bufferSize, DaemonThreadFactory.INSTANCE);
+
+		disruptor.handleEventsWith((event, sequence, endOfBatch) -> {
+			execute(event);
+		});
+
+		disruptor.start();
+
+		ringBuffer = disruptor.getRingBuffer();
+	}
+
+	public static synchronized void stop() {
+		disruptor.shutdown();
+	}
+
+	public static synchronized TransferPromise register(Supplier<TransferRegisterRequest> requestSupplier) {
+		TransferPromise promise = new TransferPromise();
+
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(requestSupplier.get(), promise));
+
+		return promise;
+	}
+
+	private static void execute(Event event) {
+		var request = event.request;
 		try {
 			Blendee.execute(t -> {
-				LocalDateTime transferredAt = TransferHandler.register(request);
+				long transferId = TransferHandler.register(request);
 
-				//jobスレッドに更新が見えるようにcommit
+				//他スレッドに更新が見えるようにcommit
 				t.commit();
 
-				JobExecutor.next(transferredAt);
+				//移動時刻を通知
+				JobExecutor.next(U.convert(request.transferred_at));
+
+				//publishスレッドに新IDを通知
+				event.promise.setTransferId(transferId);
 			});
 		} catch (Exception e) {
 			//TODO 例外をlog
 			e.printStackTrace();
+		}
+	}
+
+	private static class Event {
+
+		private TransferRegisterRequest request;
+
+		private TransferPromise promise;
+
+		public void set(TransferRegisterRequest request, TransferPromise promise) {
+			this.request = request;
+			this.promise = promise;
 		}
 	}
 }
