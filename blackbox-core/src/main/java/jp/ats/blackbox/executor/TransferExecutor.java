@@ -36,10 +36,10 @@ public class TransferExecutor {
 		disruptor.shutdown();
 	}
 
-	public static synchronized TransferPromise register(Supplier<TransferRegisterRequest> requestSupplier) {
+	public static synchronized TransferPromise register(long userId, Supplier<TransferRegisterRequest> requestSupplier) {
 		TransferPromise promise = new TransferPromise();
 
-		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(requestSupplier.get(), promise));
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, requestSupplier.get(), promise));
 
 		return promise;
 	}
@@ -48,7 +48,7 @@ public class TransferExecutor {
 		var request = event.request;
 		try {
 			Blendee.execute(t -> {
-				long transferId = TransferHandler.register(request);
+				long transferId = TransferHandler.register(event.userId, request);
 
 				//他スレッドに更新が見えるようにcommit
 				t.commit();
@@ -59,19 +59,24 @@ public class TransferExecutor {
 				//publishスレッドに新IDを通知
 				event.promise.setTransferId(transferId);
 			});
-		} catch (Exception e) {
+		} catch (Throwable t) {
 			//TODO 例外をlog
-			e.printStackTrace();
+			t.printStackTrace();
+
+			event.promise.setError(t);
 		}
 	}
 
 	private static class Event {
 
+		private long userId;
+
 		private TransferRegisterRequest request;
 
 		private TransferPromise promise;
 
-		public void set(TransferRegisterRequest request, TransferPromise promise) {
+		public void set(long userId, TransferRegisterRequest request, TransferPromise promise) {
+			this.userId = userId;
 			this.request = request;
 			this.promise = promise;
 		}

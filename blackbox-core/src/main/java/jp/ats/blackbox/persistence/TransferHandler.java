@@ -33,9 +33,7 @@ public class TransferHandler {
 	/**
 	 * transfer登録処理
 	 */
-	public static long register(TransferRegisterRequest request) {
-		long userId = User.currentUserId();
-
+	public static long register(long userId, TransferRegisterRequest request) {
 		var group = new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension))
 			.fetch(request.group_id)
 			.orElseThrow(() -> new DataNotFoundException());
@@ -55,12 +53,12 @@ public class TransferHandler {
 				u.add(transfers.org_extension, group.$orgs().getExtension());
 				u.add(transfers.user_extension, user.getExtension());
 				request.tags.ifPresent(v -> u.add(transfers.tags, v));
-				u.add(transfers.created_by, User.currentUserId());
+				u.add(transfers.created_by, userId);
 			},
 			r -> r.getLong(transfers.id),
 			transfers.id);
 
-		Arrays.stream(request.bundles).forEach(r -> registerBundle(transferId, request.transferred_at, r));
+		Arrays.stream(request.bundles).forEach(r -> registerBundle(userId, transferId, request.transferred_at, r));
 
 		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
 			var table = new transfers_tags();
@@ -79,6 +77,7 @@ public class TransferHandler {
 	 * bundle登録処理
 	 */
 	private static void registerBundle(
+		long userId,
 		long transferId,
 		Timestamp transferredAt,
 		BundleRegisterRequest request) {
@@ -91,13 +90,14 @@ public class TransferHandler {
 			r -> r.getLong(bundles.id),
 			bundles.id);
 
-		Arrays.stream(request.nodes).forEach(r -> registerNode(bundleId, transferredAt, r));
+		Arrays.stream(request.nodes).forEach(r -> registerNode(userId, bundleId, transferredAt, r));
 	}
 
 	/**
 	 * node登録処理
 	 */
 	private static void registerNode(
+		long userId,
 		long bundleId,
 		Timestamp transferredAt,
 		NodeRegisterRequest request) {
@@ -106,7 +106,7 @@ public class TransferHandler {
 		var stock = selectedStocks()
 			.WHERE(a -> a.group_id.eq(request.group_id).AND.item_id.eq(request.item_id).AND.owner_id.eq(request.owner_id).AND.location_id.eq(request.location_id).AND.status_id.eq(request.status_id))
 			.willUnique()
-			.orElseGet(() -> registerStock(request));
+			.orElseGet(() -> registerStock(userId, request));
 
 		long stockId = stock.getId();
 
@@ -173,7 +173,7 @@ public class TransferHandler {
 					nodeId,
 					infinity,
 					total,
-					User.currentUserId()))
+					userId))
 			.execute();
 
 		//登録以降のsnapshotの数量と無制限設定を更新
@@ -209,7 +209,7 @@ public class TransferHandler {
 	/**
 	 * stock登録処理
 	 */
-	private static stocks.Row registerStock(TransferComponent.NodeRegisterRequest request) {
+	private static stocks.Row registerStock(long userId, TransferComponent.NodeRegisterRequest request) {
 		long stockId = ReturningUtilities.insertAndReturn(
 			stocks.$TABLE,
 			u -> {
@@ -218,7 +218,7 @@ public class TransferHandler {
 				u.add(stocks.owner_id, request.owner_id);
 				u.add(stocks.location_id, request.location_id);
 				u.add(stocks.status_id, request.status_id);
-				u.add(stocks.created_by, User.currentUserId());
+				u.add(stocks.created_by, userId);
 			},
 			r -> r.getLong(transfers.id),
 			transfers.id);

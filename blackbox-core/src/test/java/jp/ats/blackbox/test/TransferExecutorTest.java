@@ -4,6 +4,7 @@ import java.util.stream.IntStream;
 
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TransferExecutor;
+import jp.ats.blackbox.persistence.User;
 
 public class TransferExecutorTest {
 
@@ -16,11 +17,11 @@ public class TransferExecutorTest {
 		Runnable r = () -> {
 			IntStream.range(0, 10).forEach(i -> {
 				System.out.println(i + " " + Thread.currentThread());
-				var promise = TransferExecutor.register(() -> TransferHandlerTest.createRequest());
+				var promise = TransferExecutor.register(User.currentUserId(), () -> TransferHandlerTest.createRequest());
 
 				try {
 					System.out.println("returned: " + promise.getTransferId() + " " + Thread.currentThread());
-				} catch (InterruptedException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 					return;
 				}

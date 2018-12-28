@@ -14,6 +14,7 @@ import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler;
+import jp.ats.blackbox.persistence.User;
 
 public class TransferHandlerTest {
 
@@ -22,7 +23,7 @@ public class TransferHandlerTest {
 
 		Blendee.execute(t -> {
 			IntStream.range(0, 10).forEach(i -> {
-				TransferHandler.register(createRequest());
+				TransferHandler.register(User.currentUserId(), createRequest());
 				JobHandler.execute(LocalDateTime.now());
 			});
 

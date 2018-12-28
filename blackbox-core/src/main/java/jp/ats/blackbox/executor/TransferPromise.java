@@ -13,10 +13,14 @@ public class TransferPromise {
 
 	private long id = undecidedId;
 
-	public long getTransferId() throws InterruptedException {
+	private Throwable error;
+
+	public long getTransferId() throws TransferFailedException, InterruptedException {
 		lock.lock();
 		try {
 			if (id != undecidedId) return id;
+
+			if (error != null) throw new TransferFailedException(error);
 
 			condition.await();
 			return id;
@@ -29,6 +33,16 @@ public class TransferPromise {
 		lock.lock();
 		try {
 			this.id = id;
+			condition.signal();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	void setError(Throwable error) {
+		lock.lock();
+		try {
+			this.error = error;
 			condition.signal();
 		} finally {
 			lock.unlock();
