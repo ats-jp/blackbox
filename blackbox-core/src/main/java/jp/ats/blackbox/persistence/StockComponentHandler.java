@@ -73,6 +73,23 @@ public class StockComponentHandler {
 		if (result != 1) throw Utils.decisionException(table, request.id);
 	}
 
+	public static void updateForcibly(
+		TablePath table,
+		StockComponent.ForcibleUpdateRequest request) {
+		int result = new GenericTable(table).UPDATE(a -> {
+			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
+			request.name.ifPresent(v -> a.col(name).set(v));
+			request.extension.ifPresent(v -> a.col(extension).set(toJson(v)));
+			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
+			request.active.ifPresent(v -> a.col(active).set(v));
+			a.col(updated_by).set(User.currentUserId());
+		}).WHERE(a -> a.col(id).eq(request.id)).execute();
+
+		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, request.id));
+
+		if (result != 1) throw Utils.decisionException(table, request.id);
+	}
+
 	public static void delete(TablePath table, long id, long revision) {
 		int result = new GenericTable(table)
 			.DELETE()

@@ -33,6 +33,21 @@ public class StockComponent {
 		public Optional<Boolean> active = Optional.empty();
 	}
 
+	public static class ForcibleUpdateRequest {
+
+		public long id;
+
+		public Optional<Long> group_id = Optional.empty();
+
+		public Optional<String> name = Optional.empty();
+
+		public Optional<String> extension = Optional.empty();
+
+		public Optional<String[]> tags = Optional.empty();
+
+		public Optional<Boolean> active = Optional.empty();
+	}
+
 	public static class Response {
 
 		public String type;
