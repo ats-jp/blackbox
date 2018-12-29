@@ -916,6 +916,50 @@ public class locking_groups
 	}
 
 	/**
+	 * INTERSECT するクエリを追加します。<br>
+	 * 追加する側のクエリには ORDER BY 句を設定することはできません。
+	 * @param select INTERSECT 対象
+	 * @return この {@link SelectStatement}
+	 */
+	public locking_groups INTERSECT(SelectStatement select) {
+		selectBehavior().INTERSECT(select);
+		return this;
+	}
+
+	/**
+	 * INTERSECT ALL するクエリを追加します。<br>
+	 * 追加する側のクエリには ORDER BY 句を設定することはできません。
+	 * @param select INTERSECT ALL 対象
+	 * @return この {@link SelectStatement}
+	 */
+	public locking_groups INTERSECT_ALL(SelectStatement select) {
+		selectBehavior().INTERSECT_ALL(select);
+		return this;
+	}
+
+	/**
+	 * EXCEPT するクエリを追加します。<br>
+	 * 追加する側のクエリには ORDER BY 句を設定することはできません。
+	 * @param select EXCEPT 対象
+	 * @return この {@link SelectStatement}
+	 */
+	public locking_groups EXCEPT(SelectStatement select) {
+		selectBehavior().INTERSECT(select);
+		return this;
+	}
+
+	/**
+	 * EXCEPT ALL するクエリを追加します。<br>
+	 * 追加する側のクエリには ORDER BY 句を設定することはできません。
+	 * @param select EXCEPT ALL 対象
+	 * @return この {@link SelectStatement}
+	 */
+	public locking_groups EXCEPT_ALL(SelectStatement select) {
+		selectBehavior().EXCEPT_ALL(select);
+		return this;
+	}
+
+	/**
 	 * ORDER BY 句を記述します。
 	 * @param function
 	 * @return この {@link SelectStatement}

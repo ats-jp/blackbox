@@ -11,9 +11,22 @@ import org.blendee.util.BlendeeConstants;
 public class Common {
 
 	public static void start() {
+		var param = param();
+		param.put(BlendeeConstants.LOGGER_CLASS, org.blendee.jdbc.VoidLogger.class);
+
+		Blendee.start(param);
+	}
+
+	public static void startWithLog() {
+		var param = param();
+		param.put(BlendeeConstants.LOGGER_CLASS, org.blendee.jdbc.SystemOutLogger.class);
+
+		Blendee.start(param);
+	}
+
+	private static Map<OptionKey<?>, Object> param() {
 		Map<OptionKey<?>, Object> param = new HashMap<>();
 		param.put(BlendeeConstants.SCHEMA_NAMES, new String[] { "bb" });
-		param.put(BlendeeConstants.LOGGER_CLASS, org.blendee.jdbc.SystemOutLogger.class);
 		param.put(BlendeeConstants.LOG_STACKTRACE_FILTER, "^jp\\.ats\\.blackbox\\.test");
 		param.put(BlendeeConstants.TABLE_FACADE_PACKAGE, "sqlassist");
 		param.put(BlendeeConstants.CAN_ADD_NEW_ENTRIES, true);
@@ -24,6 +37,6 @@ public class Common {
 		param.put(BlendeeConstants.HOME_STORAGE_IDENTIFIER, "blackbox-core");
 		param.put(BlendeeConstants.AUTO_CLOSE_INTERVAL_MILLIS, 300);
 
-		Blendee.start(param);
+		return param;
 	}
 }
