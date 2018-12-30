@@ -10,6 +10,10 @@ import org.blendee.jdbc.Result;
 import org.blendee.jdbc.TablePath;
 import org.blendee.util.GenericTable;
 
+import jp.ats.blackbox.persistence.StockComponent.ForcibleUpdateRequest;
+import jp.ats.blackbox.persistence.StockComponent.RegisterRequest;
+import jp.ats.blackbox.persistence.StockComponent.UpdateRequest;
+
 public class StockComponentHandler {
 
 	private static final String id = "id";
@@ -36,7 +40,7 @@ public class StockComponentHandler {
 
 	public static long register(
 		TablePath table,
-		StockComponent.RegisterRequest request) {
+		RegisterRequest request) {
 		var row = new GenericTable(table).row();
 
 		row.setLong(group_id, request.group_id);
@@ -58,7 +62,7 @@ public class StockComponentHandler {
 
 	public static void update(
 		TablePath table,
-		StockComponent.UpdateRequest request) {
+		UpdateRequest request) {
 		int result = new GenericTable(table).UPDATE(a -> {
 			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
 			request.name.ifPresent(v -> a.col(name).set(v));
@@ -75,7 +79,7 @@ public class StockComponentHandler {
 
 	public static void updateForcibly(
 		TablePath table,
-		StockComponent.ForcibleUpdateRequest request) {
+		ForcibleUpdateRequest request) {
 		int result = new GenericTable(table).UPDATE(a -> {
 			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
 			request.name.ifPresent(v -> a.col(name).set(v));
