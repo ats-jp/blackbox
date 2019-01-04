@@ -26,8 +26,12 @@ public class JobExecutor {
 	public static void next(LocalDateTime time) {
 		lock.lock();
 		try {
-			//より過去のものを採用
-			next = Objects.requireNonNull(time).isBefore(next) ? time : next;
+			if (Objects.requireNonNull(time).isBefore(next)) {
+				//より過去のものを採用
+				next = time;
+
+				executeJob(time);
+			}
 		} finally {
 			lock.unlock();
 		}
@@ -42,13 +46,17 @@ public class JobExecutor {
 		var now = LocalDateTime.now();
 		try {
 			if (!next.isBefore(now)) return;
+
+			executeJob(now);
 		} finally {
 			lock.unlock();
 		}
+	}
 
+	private static void executeJob(LocalDateTime time) {
 		try {
 			Blendee.execute(t -> {
-				JobHandler.execute(now);
+				JobHandler.execute(time);
 
 				//他の接続からいち早く見えるようにcommit
 				t.commit();
