@@ -8,12 +8,14 @@ import jp.ats.blackbox.executor.TransferExecutor;
 
 public class TransferManager implements ServletContextListener {
 
+	private final TransferExecutor executor = new TransferExecutor();
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		var context = sce.getServletContext();
 		BlendeeStarter.start(context);
 
-		TransferExecutor.start();
+		executor.start();
 		JobExecutor.start();
 	}
 
@@ -21,7 +23,7 @@ public class TransferManager implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent sce) {
 		try {
 			//ここでエラーが起きても↓をstopするためにtry catchする
-			TransferExecutor.stop();
+			executor.stop();
 		} catch (Throwable t) {
 			//TODO エラーのログ出力
 			t.printStackTrace();

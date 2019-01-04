@@ -11,20 +11,22 @@ public class TransferExecutorTest {
 	public static void main(String[] args) throws Exception {
 		Common.start();
 
-		TransferExecutor.start();
+		var executor = new TransferExecutor();
+
+		executor.start();
 		JobExecutor.start();
 
 		Runnable r = () -> {
 			IntStream.range(0, 10).forEach(i -> {
 				System.out.println("##### " + i);
 
-				var promise = TransferExecutor.register(SecurityValues.currentUserId(), () -> TransferHandlerTest.createRequest());
+				var promise = executor.register(SecurityValues.currentUserId(), () -> TransferHandlerTest.createRequest());
 
 				try {
 					long newId = promise.getTransferId();
 					System.out.println("returned: " + newId + " " + Thread.currentThread());
 
-					var denyPromise = TransferExecutor.deny(SecurityValues.currentUserId(), newId);
+					var denyPromise = executor.deny(SecurityValues.currentUserId(), newId);
 					System.out.println("denied: " + denyPromise.getTransferId() + " " + Thread.currentThread());
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -50,7 +52,7 @@ public class TransferExecutorTest {
 			}
 		}
 
-		TransferExecutor.stop();
+		executor.stop();
 		JobExecutor.stop();
 	}
 }

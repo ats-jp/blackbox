@@ -17,11 +17,11 @@ public class TransferExecutor {
 
 	private static final int bufferSize = 1024;
 
-	private static Disruptor<Event> disruptor;
+	private Disruptor<Event> disruptor;
 
-	private static RingBuffer<Event> ringBuffer;
+	private RingBuffer<Event> ringBuffer;
 
-	public static synchronized void start() {
+	public void start() {
 		disruptor = new Disruptor<>(Event::new, bufferSize, DaemonThreadFactory.INSTANCE);
 
 		disruptor.handleEventsWith((event, sequence, endOfBatch) -> {
@@ -33,11 +33,11 @@ public class TransferExecutor {
 		ringBuffer = disruptor.getRingBuffer();
 	}
 
-	public static synchronized void stop() {
+	public void stop() {
 		disruptor.shutdown();
 	}
 
-	public static synchronized TransferPromise register(long userId, Supplier<TransferRegisterRequest> requestSupplier) {
+	public TransferPromise register(long userId, Supplier<TransferRegisterRequest> requestSupplier) {
 		TransferPromise promise = new TransferPromise();
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, requestSupplier.get(), promise));
@@ -45,7 +45,7 @@ public class TransferExecutor {
 		return promise;
 	}
 
-	public static synchronized TransferPromise deny(long userId, long transferId) {
+	public TransferPromise deny(long userId, long transferId) {
 		TransferPromise promise = new TransferPromise();
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, transferId, promise));
