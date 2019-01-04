@@ -53,6 +53,7 @@ public class JobHandler {
 
 				//完了済み
 				r.setCompleted(true);
+
 				r.update(batch);
 			});
 
