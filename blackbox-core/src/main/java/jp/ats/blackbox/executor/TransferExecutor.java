@@ -10,6 +10,7 @@ import com.lmax.disruptor.util.DaemonThreadFactory;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
+import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterResult;
 import jp.ats.blackbox.persistence.TransferHandler;
 
 public class TransferExecutor {
@@ -44,20 +45,27 @@ public class TransferExecutor {
 		return promise;
 	}
 
+	public static synchronized TransferPromise deny(long userId, long transferId) {
+		TransferPromise promise = new TransferPromise();
+
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, transferId, promise));
+
+		return promise;
+	}
+
 	private static void execute(Event event) {
-		var request = event.request;
 		try {
 			Blendee.execute(t -> {
-				long transferId = TransferHandler.register(event.userId, request);
+				TransferRegisterResult result = event.execute();
 
 				//他スレッドに更新が見えるようにcommit
 				t.commit();
 
 				//移動時刻を通知
-				JobExecutor.next(U.convert(request.transferred_at));
+				JobExecutor.next(U.convert(result.transferredAt));
 
 				//publishスレッドに新IDを通知
-				event.promise.setTransferId(transferId);
+				event.promise.setTransferId(result.transferId);
 			});
 		} catch (Throwable t) {
 			//TODO 例外をlog
@@ -73,12 +81,31 @@ public class TransferExecutor {
 
 		private TransferRegisterRequest request;
 
+		private long denyTransferId;
+
 		private TransferPromise promise;
 
-		public void set(long userId, TransferRegisterRequest request, TransferPromise promise) {
+		private boolean deny;
+
+		private void set(long userId, TransferRegisterRequest request, TransferPromise promise) {
 			this.userId = userId;
 			this.request = request;
 			this.promise = promise;
+		}
+
+		private void set(long userId, long denyTransferId, TransferPromise promise) {
+			this.userId = userId;
+			this.denyTransferId = denyTransferId;
+			this.promise = promise;
+			deny = true;
+		}
+
+		private TransferRegisterResult execute() {
+			if (deny) {
+				return TransferHandler.deny(userId, denyTransferId);
+			}
+
+			return TransferHandler.register(userId, request);
 		}
 	}
 }

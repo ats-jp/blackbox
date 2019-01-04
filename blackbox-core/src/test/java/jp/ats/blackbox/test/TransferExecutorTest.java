@@ -16,11 +16,14 @@ public class TransferExecutorTest {
 
 		Runnable r = () -> {
 			IntStream.range(0, 10).forEach(i -> {
-				System.out.println(i + " " + Thread.currentThread());
 				var promise = TransferExecutor.register(SecurityValues.currentUserId(), () -> TransferHandlerTest.createRequest());
 
 				try {
-					System.out.println("returned: " + promise.getTransferId() + " " + Thread.currentThread());
+					long newId = promise.getTransferId();
+					System.out.println("returned: " + newId + " " + Thread.currentThread());
+
+					var denyPromise = TransferExecutor.deny(SecurityValues.currentUserId(), newId);
+					System.out.println("denied: " + denyPromise.getTransferId() + " " + Thread.currentThread());
 				} catch (Exception e) {
 					e.printStackTrace();
 					return;

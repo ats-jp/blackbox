@@ -3,6 +3,7 @@ package jp.ats.blackbox.persistence;
 import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -17,6 +18,7 @@ import jp.ats.blackbox.model.InOut;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
+import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterResult;
 import sqlassist.bb.bundles;
 import sqlassist.bb.current_stocks;
 import sqlassist.bb.groups;
@@ -36,7 +38,7 @@ public class TransferHandler {
 	/**
 	 * transfer登録処理
 	 */
-	public static long register(long userId, TransferRegisterRequest request) {
+	public static TransferRegisterResult register(long userId, TransferRegisterRequest request) {
 		var group = new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension))
 			.fetch(request.group_id)
 			.orElseThrow(() -> new DataNotFoundException());
@@ -78,15 +80,41 @@ public class TransferHandler {
 		//jobを登録し、別プロセスで現在数量を更新させる
 		new jobs().INSERT(a -> a.id).VALUES(transferId).execute();
 
-		return transferId;
+		var result = new TransferRegisterResult();
+		result.transferId = transferId;
+		result.transferredAt = request.transferred_at;
+
+		return result;
 	}
 
-	public static long deny(long userId, long transferId) {
+	public static TransferRegisterResult deny(long userId, long transferId) {
 		var request = new TransferRegisterRequest();
 
 		var bundles = new LinkedList<BundleRegisterRequest>();
 
-		new nodes().WHERE(a -> a.$bundles().transfer_id.eq(transferId))
+		new nodes().selectClause(
+			a -> {
+				var bundlesAssist = a.$bundles();
+				var transfersAssist = bundlesAssist.$transfers();
+				var stocksAssist = a.$stocks();
+
+				a.SELECT(
+					transfersAssist.group_id,
+					transfersAssist.transferred_at,
+					transfersAssist.extension,
+					transfersAssist.tags,
+					bundlesAssist.extension,
+					stocksAssist.group_id,
+					stocksAssist.item_id,
+					stocksAssist.owner_id,
+					stocksAssist.location_id,
+					stocksAssist.status_id,
+					a.in_out,
+					a.quantity,
+					a.grants_infinity,
+					a.extension);
+			})
+			.WHERE(a -> a.$bundles().transfer_id.eq(transferId))
 			.assist()
 			.$bundles()
 			.$transfers()
@@ -98,7 +126,12 @@ public class TransferHandler {
 				request.denied_id = Optional.of(transferId);
 				request.transferred_at = transfer.getTransferred_at();
 				request.restoredExtension = Optional.of(transfer.getExtension());
-				request.tags = Optional.of((String[]) transfer.getTags());
+
+				try {
+					request.tags = Optional.of(Utils.restoreTags(transfer.getTags()));
+				} catch (SQLException e) {
+					throw new Error(e);
+				}
 
 				transferOne.many().forEach(bundleOne -> {
 					var nodes = new LinkedList<NodeRegisterRequest>();

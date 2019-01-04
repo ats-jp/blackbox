@@ -140,4 +140,11 @@ public class TransferComponent {
 		 */
 		Optional<Object> restoredExtension = Optional.empty();
 	}
+
+	public static class TransferRegisterResult {
+
+		public long transferId;
+
+		public Timestamp transferredAt;
+	}
 }
