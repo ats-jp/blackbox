@@ -35,11 +35,9 @@ public class TransferExecutorTest {
 			});
 		};
 
-		new Thread(r).start();
-		new Thread(r).start();
-		new Thread(r).start();
-		new Thread(r).start();
-		new Thread(r).start();
+		IntStream.range(0, 5).forEach(i -> {
+			new Thread(r).start();
+		});
 
 		System.gc();
 

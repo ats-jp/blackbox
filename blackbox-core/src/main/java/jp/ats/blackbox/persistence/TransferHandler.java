@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 import org.blendee.assist.AnonymousTable;
@@ -89,11 +88,9 @@ public class TransferHandler {
 	}
 
 	public static TransferRegisterResult deny(long userId, long transferId) {
-		return deny(userId, new Long[] { transferId }).get(0);
-	}
+		var request = new TransferRegisterRequest();
 
-	public static List<TransferRegisterResult> deny(long userId, Long... transferIds) {
-		var list = new LinkedList<TransferRegisterResult>();
+		var bundles = new LinkedList<BundleRegisterRequest>();
 
 		new nodes().selectClause(
 			a -> {
@@ -117,20 +114,16 @@ public class TransferHandler {
 					a.grants_infinity,
 					a.extension);
 			})
-			.WHERE(a -> a.$bundles().transfer_id.IN(transferIds))
+			.WHERE(a -> a.$bundles().transfer_id.eq(transferId))
 			.assist()
 			.$bundles()
 			.$transfers()
 			.intercept()
 			.forEach(transferOne -> {
-				var request = new TransferRegisterRequest();
-
-				var bundles = new LinkedList<BundleRegisterRequest>();
-
 				var transfer = transferOne.get();
 
 				request.group_id = transfer.getGroup_id();
-				request.denied_id = Optional.of(transfer.getId());
+				request.denied_id = Optional.of(transferId);
 				request.transferred_at = transfer.getTransferred_at();
 				request.restoredExtension = Optional.of(transfer.getExtension());
 
@@ -175,11 +168,9 @@ public class TransferHandler {
 				});
 
 				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
-
-				list.add(register(userId, request));
 			});
 
-		return list;
+		return register(userId, request);
 	}
 
 	/**
