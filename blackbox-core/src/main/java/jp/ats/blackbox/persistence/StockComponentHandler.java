@@ -48,7 +48,7 @@ public class StockComponentHandler {
 		request.extension.ifPresent(v -> row.setObject(extension, toJson(v)));
 		request.tags.ifPresent(v -> row.setObject(tags, v));
 
-		long userId = User.currentUserId();
+		long userId = SecurityValues.currentUserId();
 
 		row.setLong(created_by, userId);
 		row.setLong(updated_by, userId);
@@ -69,7 +69,7 @@ public class StockComponentHandler {
 			request.extension.ifPresent(v -> a.col(extension).set(toJson(v)));
 			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
-			a.col(updated_by).set(User.currentUserId());
+			a.col(updated_by).set(SecurityValues.currentUserId());
 		}).WHERE(a -> a.col(id).eq(request.id).AND.col(revision).eq(request.revision)).execute();
 
 		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, request.id));
@@ -86,7 +86,7 @@ public class StockComponentHandler {
 			request.extension.ifPresent(v -> a.col(extension).set(toJson(v)));
 			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
-			a.col(updated_by).set(User.currentUserId());
+			a.col(updated_by).set(SecurityValues.currentUserId());
 		}).WHERE(a -> a.col(id).eq(request.id)).execute();
 
 		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, request.id));

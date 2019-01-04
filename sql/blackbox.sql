@@ -349,6 +349,11 @@ CREATE UNLOGGED TABLE bb.locking_groups (
 --PKの一意制約を利用して他でロック中であればINSERTできないことで排他を行う
 
 COMMENT ON TABLE bb.locking_groups IS 'ロック中グループ';
+COMMENT ON COLUMN bb.locking_groups.id IS 'グループID
+ロック中のグループを表す';
+COMMENT ON COLUMN bb.locking_groups.user_id IS 'ユーザーID
+ロックを行っているユーザーを表す';
+COMMENT ON COLUMN bb.locking_groups.locked_at IS 'ロック開始時刻';
 
 --===========================
 --master tables

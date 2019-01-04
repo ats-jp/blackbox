@@ -36,6 +36,11 @@ public class TransferComponent {
 		public Optional<String> extension = Optional.empty();
 
 		/**
+		 * DBから復元した追加情報JSON
+		 */
+		Optional<Object> restoredExtension = Optional.empty();
+
+		/**
 		 * 検索用タグ
 		 */
 		public Optional<String[]> tags = Optional.empty();
@@ -56,6 +61,11 @@ public class TransferComponent {
 		 * 追加情報JSON
 		 */
 		public Optional<String> extension = Optional.empty();
+
+		/**
+		 * DBから復元した追加情報JSON
+		 */
+		Optional<Object> restoredExtension = Optional.empty();
 
 		/**
 		 * 配下のnode
@@ -124,5 +134,10 @@ public class TransferComponent {
 		 * 移動数量
 		 */
 		public Optional<String> extension = Optional.empty();
+
+		/**
+		 * DBから復元した追加情報JSON
+		 */
+		Optional<Object> restoredExtension = Optional.empty();
 	}
 }

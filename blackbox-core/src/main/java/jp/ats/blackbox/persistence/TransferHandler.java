@@ -5,12 +5,15 @@ import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Optional;
 
 import org.blendee.assist.AnonymousTable;
 import org.blendee.assist.Vargs;
 import org.blendee.dialect.postgresql.ReturningUtilities;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
 
+import jp.ats.blackbox.model.InOut;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
@@ -48,7 +51,12 @@ public class TransferHandler {
 				u.add(transfers.group_id, request.group_id);
 				request.denied_id.ifPresent(v -> u.add(transfers.denied_id, v));
 				u.add(transfers.transferred_at, request.transferred_at);
-				request.extension.ifPresent(v -> u.add(transfers.extension, toJson(v)));
+
+				request.restoredExtension
+					.ifPresentOrElse(
+						v -> u.add(transfers.extension, v),
+						() -> request.extension.ifPresent(v -> u.add(transfers.extension, toJson(v))));
+
 				u.add(transfers.group_extension, group.getExtension());
 				u.add(transfers.org_extension, group.$orgs().getExtension());
 				u.add(transfers.user_extension, user.getExtension());
@@ -73,6 +81,65 @@ public class TransferHandler {
 		return transferId;
 	}
 
+	public static long deny(long userId, long transferId) {
+		var request = new TransferRegisterRequest();
+
+		var bundles = new LinkedList<BundleRegisterRequest>();
+
+		new nodes().WHERE(a -> a.$bundles().transfer_id.eq(transferId))
+			.assist()
+			.$bundles()
+			.$transfers()
+			.intercept()
+			.forEach(transferOne -> {
+				var transfer = transferOne.get();
+
+				request.group_id = transfer.getGroup_id();
+				request.denied_id = Optional.of(transferId);
+				request.transferred_at = transfer.getTransferred_at();
+				request.restoredExtension = Optional.of(transfer.getExtension());
+				request.tags = Optional.of((String[]) transfer.getTags());
+
+				transferOne.many().forEach(bundleOne -> {
+					var nodes = new LinkedList<NodeRegisterRequest>();
+
+					var bundleRequest = new BundleRegisterRequest();
+
+					bundleRequest.restoredExtension = Optional.of(bundleOne.get().getExtension());
+
+					bundles.add(bundleRequest);
+
+					bundleOne.many().forEach(nodeOne -> {
+						var node = nodeOne.get();
+
+						var nodeRequest = new NodeRegisterRequest();
+
+						var stock = node.$stocks();
+
+						nodeRequest.group_id = stock.getGroup_id();
+						nodeRequest.item_id = stock.getItem_id();
+						nodeRequest.owner_id = stock.getOwner_id();
+						nodeRequest.location_id = stock.getLocation_id();
+						nodeRequest.status_id = stock.getStatus_id();
+						nodeRequest.in_out = InOut.of(node.getIn_out()).reverse();
+						nodeRequest.quantity = node.getQuantity();
+						nodeRequest.grants_infinity = Optional.of(node.getGrants_infinity());
+						nodeRequest.restoredExtension = Optional.of(node.getExtension());
+
+						nodes.add(nodeRequest);
+					});
+
+					bundleRequest.nodes = nodes.toArray(new NodeRegisterRequest[nodes.size()]);
+
+					bundles.add(bundleRequest);
+				});
+
+				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
+			});
+
+		return register(userId, request);
+	}
+
 	/**
 	 * bundle登録処理
 	 */
@@ -85,7 +152,11 @@ public class TransferHandler {
 			bundles.$TABLE,
 			u -> {
 				u.add(bundles.transfer_id, transferId);
-				request.extension.ifPresent(v -> u.add(bundles.extension, toJson(v)));
+				request.restoredExtension
+					.ifPresentOrElse(
+						v -> u.add(transfers.extension, v),
+						() -> request.extension.ifPresent(v -> u.add(transfers.extension, toJson(v))));
+
 			},
 			r -> r.getLong(bundles.id),
 			bundles.id);
@@ -119,7 +190,10 @@ public class TransferHandler {
 				u.add(nodes.in_out, request.in_out.value);
 				u.add(nodes.quantity, request.quantity);
 				request.grants_infinity.ifPresent(v -> u.add(nodes.grants_infinity, v));
-				request.extension.ifPresent(v -> u.add(nodes.extension, toJson(v)));
+				request.restoredExtension
+					.ifPresentOrElse(
+						v -> u.add(transfers.extension, v),
+						() -> request.extension.ifPresent(v -> u.add(transfers.extension, toJson(v))));
 				u.add(nodes.group_extension, stock.$groups().getExtension());
 				u.add(nodes.item_extension, stock.$items().getExtension());
 				u.add(nodes.owner_extension, stock.$owners().getExtension());
