@@ -10,20 +10,22 @@ import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.model.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
+import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler;
-import jp.ats.blackbox.persistence.SecurityValues;
 
 public class TransferHandlerTest {
 
 	public static void main(String[] args) throws Exception {
 		Common.startWithLog();
 
+		var handler = new TransferHandler();
+
 		Blendee.execute(t -> {
 			IntStream.range(0, 10).forEach(i -> {
-				TransferHandler.register(SecurityValues.currentUserId(), createRequest());
+				handler.register(SecurityValues.currentUserId(), createRequest());
 				JobHandler.execute(LocalDateTime.now());
 			});
 

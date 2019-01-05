@@ -21,6 +21,8 @@ public class TransferExecutor {
 
 	private RingBuffer<Event> ringBuffer;
 
+	private static final TransferHandler handler = new TransferHandler();
+
 	public void start() {
 		disruptor = new Disruptor<>(Event::new, bufferSize, DaemonThreadFactory.INSTANCE);
 
@@ -102,10 +104,10 @@ public class TransferExecutor {
 
 		private TransferRegisterResult execute() {
 			if (deny) {
-				return TransferHandler.deny(userId, denyTransferId);
+				return handler.deny(userId, denyTransferId);
 			}
 
-			return TransferHandler.register(userId, request);
+			return handler.register(userId, request);
 		}
 	}
 }

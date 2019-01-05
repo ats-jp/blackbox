@@ -1,6 +1,11 @@
 package jp.ats.blackbox.persistence;
 
 import static jp.ats.blackbox.persistence.JsonHelper.toJson;
+import static org.blendee.util.Placeholder.$BIGDECIMAL;
+import static org.blendee.util.Placeholder.$BOOLEAN;
+import static org.blendee.util.Placeholder.$INT;
+import static org.blendee.util.Placeholder.$LONG;
+import static org.blendee.util.Placeholder.$TIMESTAMP;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -13,6 +18,7 @@ import org.blendee.assist.AnonymousTable;
 import org.blendee.assist.Vargs;
 import org.blendee.dialect.postgresql.ReturningUtilities;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
+import org.blendee.util.AsyncRecorder;
 
 import jp.ats.blackbox.model.InOut;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
@@ -35,15 +41,17 @@ import sqlassist.bb.users;
  */
 public class TransferHandler {
 
+	private final AsyncRecorder recorder = new AsyncRecorder();
+
 	/**
 	 * transfer登録処理
 	 */
-	public static TransferRegisterResult register(long userId, TransferRegisterRequest request) {
-		var group = new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension))
+	public TransferRegisterResult register(long userId, TransferRegisterRequest request) {
+		var group = recorder.play(() -> new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension)))
 			.fetch(request.group_id)
 			.orElseThrow(() -> new DataNotFoundException());
 
-		var user = new users().SELECT(r -> r.extension)
+		var user = recorder.play(() -> new users().SELECT(r -> r.extension))
 			.fetch(userId)
 			.orElseThrow(() -> new DataNotFoundException());
 
@@ -73,12 +81,12 @@ public class TransferHandler {
 		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
 			var table = new transfers_tags();
 			tagIds.forEach(tagId -> {
-				table.INSERT().VALUES(transferId, tagId).execute();
+				recorder.play(() -> table.INSERT().VALUES($LONG, $LONG), transferId, tagId).execute();
 			});
 		}));
 
 		//jobを登録し、別プロセスで現在数量を更新させる
-		new jobs().INSERT(a -> a.id).VALUES(transferId).execute();
+		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($LONG), transferId).execute();
 
 		var result = new TransferRegisterResult();
 		result.transferId = transferId;
@@ -87,38 +95,40 @@ public class TransferHandler {
 		return result;
 	}
 
-	public static TransferRegisterResult deny(long userId, long transferId) {
+	public TransferRegisterResult deny(long userId, long transferId) {
 		var request = new TransferRegisterRequest();
 
 		var bundles = new LinkedList<BundleRegisterRequest>();
 
-		new nodes().selectClause(
-			a -> {
-				var bundlesAssist = a.$bundles();
-				var transfersAssist = bundlesAssist.$transfers();
-				var stocksAssist = a.$stocks();
+		recorder.play(
+			() -> new nodes().selectClause(
+				a -> {
+					var bundlesAssist = a.$bundles();
+					var transfersAssist = bundlesAssist.$transfers();
+					var stocksAssist = a.$stocks();
 
-				a.SELECT(
-					transfersAssist.group_id,
-					transfersAssist.transferred_at,
-					transfersAssist.extension,
-					transfersAssist.tags,
-					bundlesAssist.extension,
-					stocksAssist.group_id,
-					stocksAssist.item_id,
-					stocksAssist.owner_id,
-					stocksAssist.location_id,
-					stocksAssist.status_id,
-					a.in_out,
-					a.quantity,
-					a.grants_infinity,
-					a.extension);
-			})
-			.WHERE(a -> a.$bundles().transfer_id.eq(transferId))
-			.assist()
-			.$bundles()
-			.$transfers()
-			.intercept()
+					a.SELECT(
+						transfersAssist.group_id,
+						transfersAssist.transferred_at,
+						transfersAssist.extension,
+						transfersAssist.tags,
+						bundlesAssist.extension,
+						stocksAssist.group_id,
+						stocksAssist.item_id,
+						stocksAssist.owner_id,
+						stocksAssist.location_id,
+						stocksAssist.status_id,
+						a.in_out,
+						a.quantity,
+						a.grants_infinity,
+						a.extension);
+				})
+				.WHERE(a -> a.$bundles().transfer_id.eq($LONG))
+				.assist()
+				.$bundles()
+				.$transfers()
+				.intercept(),
+			transferId)
 			.forEach(transferOne -> {
 				var transfer = transferOne.get();
 
@@ -176,7 +186,7 @@ public class TransferHandler {
 	/**
 	 * bundle登録処理
 	 */
-	private static void registerBundle(
+	private void registerBundle(
 		long userId,
 		long transferId,
 		Timestamp transferredAt,
@@ -200,15 +210,21 @@ public class TransferHandler {
 	/**
 	 * node登録処理
 	 */
-	private static void registerNode(
+	private void registerNode(
 		long userId,
 		long bundleId,
 		Timestamp transferredAt,
 		NodeRegisterRequest request) {
 		//stockが既に存在すればそれを使う
 		//なければ新たに登録
-		var stock = selectedStocks()
-			.WHERE(a -> a.group_id.eq(request.group_id).AND.item_id.eq(request.item_id).AND.owner_id.eq(request.owner_id).AND.location_id.eq(request.location_id).AND.status_id.eq(request.status_id))
+		var stock = recorder.play(
+			() -> selectedStocks()
+				.WHERE(a -> a.group_id.eq($LONG).AND.item_id.eq($LONG).AND.owner_id.eq($LONG).AND.location_id.eq($LONG).AND.status_id.eq($LONG)),
+			request.group_id,
+			request.item_id,
+			request.owner_id,
+			request.location_id,
+			request.status_id)
 			.willUnique()
 			.orElseGet(() -> registerStock(userId, request));
 
@@ -237,32 +253,34 @@ public class TransferHandler {
 			bundles.id);
 
 		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
-		JustBefore justBefore = new AnonymousTable(
-			new snapshots().SELECT(
-				a -> a.ls(
-					a.total,
-					a.infinity,
-					//transferred_atの逆順、登録順の逆順
-					a.any(
-						"RANK() OVER (ORDER BY {0} DESC, {1} DESC)",
-						a.$nodes().$bundles().$transfers().transferred_at,
-						a.$nodes().id).AS("rank")))
-				.WHERE(a -> a.$nodes().stock_id.eq(stockId)),
-			"ordered").SELECT(a -> a.ls(a.col("total"), a.col("infinity")))
-				.WHERE(a -> a.col("rank").eq(1))
-				.aggregateAndGet(r -> {
-					var container = new JustBefore();
-					while (r.next()) {
-						container.total = r.getBigDecimal(1);
-						container.infinity = r.getBoolean(2);
-						return container;
-					}
-
-					container.total = BigDecimal.ZERO;
-					container.infinity = false;
-
+		JustBefore justBefore = recorder.play(
+			() -> new AnonymousTable(
+				new snapshots().SELECT(
+					a -> a.ls(
+						a.total,
+						a.infinity,
+						//transferred_atの逆順、登録順の逆順
+						a.any(
+							"RANK() OVER (ORDER BY {0} DESC, {1} DESC)",
+							a.$nodes().$bundles().$transfers().transferred_at,
+							a.$nodes().id).AS("rank")))
+					.WHERE(a -> a.$nodes().stock_id.eq($LONG)),
+				"ordered").SELECT(a -> a.ls(a.col("total"), a.col("infinity")))
+					.WHERE(a -> a.col("rank").eq($INT)),
+			stockId,
+			1).aggregateAndGet(r -> {
+				var container = new JustBefore();
+				while (r.next()) {
+					container.total = r.getBigDecimal(1);
+					container.infinity = r.getBoolean(2);
 					return container;
-				});
+				}
+
+				container.total = BigDecimal.ZERO;
+				container.infinity = false;
+
+				return container;
+			});
 
 		BigDecimal total = request.in_out.calcurate(justBefore.total, request.quantity);
 
@@ -274,28 +292,38 @@ public class TransferHandler {
 		//そうでなければ今回のリクエストに従う
 		boolean infinity = justBefore.infinity ? true : request.grants_infinity.orElse(false);
 
-		new snapshots().insertStatement(
-			a -> a.INSERT(a.id, a.infinity, a.total, a.updated_by)
-				.VALUES(
-					nodeId,
-					infinity,
-					total,
-					userId))
+		recorder.play(
+			() -> new snapshots().insertStatement(
+				a -> a.INSERT(a.id, a.infinity, a.total, a.updated_by)
+					.VALUES(
+						$LONG,
+						$BOOLEAN,
+						$BIGDECIMAL,
+						$LONG)),
+			nodeId,
+			infinity,
+			total,
+			userId)
 			.execute();
 
 		//登録以降のsnapshotの数量と無制限設定を更新
 		try {
-			new snapshots().updateStatement(
-				a -> a.UPDATE(
-					//一度trueになったらずっとそのままtrue
-					a.infinity.set("{0} OR ?", Vargs.of(a.infinity), Vargs.of(infinity)),
-					//自身の数に今回の移動数量を正規化してプラス
-					a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of(request.in_out.normalize(request.quantity))))
-					.WHERE(
-						wa -> wa.id.IN(
-							new nodes()
-								.SELECT(sa -> sa.id)
-								.WHERE(swa -> swa.stock_id.eq(stockId).AND.$bundles().$transfers().transferred_at.ge(transferredAt)))))
+			recorder.play(
+				() -> new snapshots().updateStatement(
+					a -> a.UPDATE(
+						//一度trueになったらずっとそのままtrue
+						a.infinity.set("{0} OR ?", Vargs.of(a.infinity), Vargs.of($BOOLEAN)),
+						//自身の数に今回の移動数量を正規化してプラス
+						a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of($BIGDECIMAL)))
+						.WHERE(
+							wa -> wa.id.IN(
+								new nodes()
+									.SELECT(sa -> sa.id)
+									.WHERE(swa -> swa.stock_id.eq($LONG).AND.$bundles().$transfers().transferred_at.ge($TIMESTAMP))))),
+				infinity,
+				request.in_out.normalize(request.quantity),
+				stockId,
+				transferredAt)
 				.execute();
 		} catch (CheckConstraintViolationException e) {
 			//未来のsnapshotで数量がマイナスになった
@@ -316,7 +344,7 @@ public class TransferHandler {
 	/**
 	 * stock登録処理
 	 */
-	private static stocks.Row registerStock(long userId, TransferComponent.NodeRegisterRequest request) {
+	private stocks.Row registerStock(long userId, TransferComponent.NodeRegisterRequest request) {
 		long stockId = ReturningUtilities.insertAndReturn(
 			stocks.$TABLE,
 			u -> {
@@ -330,13 +358,16 @@ public class TransferHandler {
 			r -> r.getLong(transfers.id),
 			transfers.id);
 
-		new current_stocks().insertStatement(
-			//後でjobから更新されるのでinfinityはとりあえずfalse、totalは0
-			a -> a.INSERT(a.id, a.infinity, a.total).VALUES(stockId, false, 0))
-			.execute();
+		recorder.play(
+			() -> new current_stocks().insertStatement(
+				//後でjobから更新されるのでinfinityはとりあえずfalse、totalは0
+				a -> a.INSERT(a.id, a.infinity, a.total).VALUES($LONG, $BOOLEAN, $INT)),
+			stockId,
+			false,
+			0).execute();
 
 		//関連情報取得のため改めて検索
-		return selectedStocks().fetch(stockId).get();
+		return recorder.play(() -> selectedStocks()).fetch(stockId).get();
 	}
 
 	private static stocks selectedStocks() {
