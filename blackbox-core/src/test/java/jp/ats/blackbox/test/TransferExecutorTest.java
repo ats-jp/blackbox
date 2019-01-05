@@ -9,8 +9,8 @@ import jp.ats.blackbox.persistence.SecurityValues;
 public class TransferExecutorTest {
 
 	public static void main(String[] args) throws Exception {
-		Common.start();
-		//Common.startWithLog();
+		TransferCommon.start();
+		//TransferCommon.startWithLog();
 
 		var executor = new TransferExecutor();
 
@@ -18,7 +18,7 @@ public class TransferExecutorTest {
 		JobExecutor.start();
 
 		Runnable r = () -> {
-			IntStream.range(0, 3).forEach(i -> {
+			IntStream.range(0, 10).forEach(i -> {
 				System.out.println("##### " + i);
 
 				var promise = executor.register(SecurityValues.currentUserId(), () -> TransferHandlerTest.createRequest());
