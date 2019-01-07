@@ -17,22 +17,27 @@ public class TransferExecutor {
 
 	private static final int bufferSize = 256;
 
-	private Disruptor<Event> disruptor;
+	private final Disruptor<Event> disruptor;
 
-	private RingBuffer<Event> ringBuffer;
+	private final RingBuffer<Event> ringBuffer;
 
-	private static final TransferHandler handler = new TransferHandler();
+	private final TransferHandler handler;
 
-	public void start() {
+	public TransferExecutor() {
 		disruptor = new Disruptor<>(Event::new, bufferSize, DaemonThreadFactory.INSTANCE);
 
 		disruptor.handleEventsWith((event, sequence, endOfBatch) -> {
 			execute(event);
 		});
 
+		ringBuffer = disruptor.getRingBuffer();
+
+		handler = new TransferHandler();
+	}
+
+	public void start() {
 		disruptor.start();
 
-		ringBuffer = disruptor.getRingBuffer();
 	}
 
 	public void stop() {
@@ -77,7 +82,7 @@ public class TransferExecutor {
 		}
 	}
 
-	private static class Event {
+	private class Event {
 
 		private long userId;
 

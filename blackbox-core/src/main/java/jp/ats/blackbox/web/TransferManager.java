@@ -8,7 +8,7 @@ import jp.ats.blackbox.executor.TransferExecutor;
 
 public class TransferManager implements ServletContextListener {
 
-	private final TransferExecutor executor = new TransferExecutor();
+	private static final TransferExecutor executor = new TransferExecutor();
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -17,6 +17,10 @@ public class TransferManager implements ServletContextListener {
 
 		executor.start();
 		JobExecutor.start();
+	}
+
+	public static TransferExecutor getTransferExecutor() {
+		return executor;
 	}
 
 	@Override
