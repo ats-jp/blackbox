@@ -735,12 +735,12 @@ COMMENT ON COLUMN bb.nodes.owner_extension IS '所有者のextension';
 COMMENT ON COLUMN bb.nodes.location_extension IS '置き場のextension';
 COMMENT ON COLUMN bb.nodes.status_extension IS '状態のextension';
 
---transfer系のテーブルはINSERTのみなので、autovacuumは行わない
+--transfer系のテーブルはINSERTのみなので、autovacuumは行わない場合は実行
 --ただし、ANALYZEがかからなくなるので、定期的に実施する必要がある
-ALTER TABLE bb.transfers SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE bb.bundles SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE bb.stocks SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
-ALTER TABLE bb.nodes SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+--ALTER TABLE bb.transfers SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+--ALTER TABLE bb.bundles SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+--ALTER TABLE bb.stocks SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+--ALTER TABLE bb.nodes SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 
 ----------
 
