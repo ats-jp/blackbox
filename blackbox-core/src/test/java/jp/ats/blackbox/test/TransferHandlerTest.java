@@ -29,7 +29,7 @@ public class TransferHandlerTest {
 				JobHandler.execute(LocalDateTime.now());
 			});
 
-			t.rollback();
+			t.commit();
 		});
 	}
 

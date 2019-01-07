@@ -20,7 +20,7 @@ public class JobExecutor {
 	private static LocalDateTime next = LocalDateTime.now();
 
 	public static void start() {
-		service.scheduleWithFixedDelay(JobExecutor::execute, 0, 1, TimeUnit.SECONDS);
+		service.scheduleWithFixedDelay(JobExecutor::execute, 0, 500, TimeUnit.MILLISECONDS);
 	}
 
 	public static void next(LocalDateTime time) {
@@ -29,8 +29,6 @@ public class JobExecutor {
 			if (Objects.requireNonNull(time).isBefore(next)) {
 				//より過去のものを採用
 				next = time;
-
-				executeJob(time);
 			}
 		} finally {
 			lock.unlock();
@@ -42,15 +40,15 @@ public class JobExecutor {
 	}
 
 	private static void execute() {
-		lock.lock();
 		var now = LocalDateTime.now();
+		lock.lock();
 		try {
 			if (!next.isBefore(now)) return;
-
-			executeJob(now);
 		} finally {
 			lock.unlock();
 		}
+
+		executeJob(now);
 	}
 
 	private static void executeJob(LocalDateTime time) {
@@ -61,9 +59,10 @@ public class JobExecutor {
 				//他の接続からいち早く見えるようにcommit
 				t.commit();
 
+				var myNext = JobHandler.getNextTime();
 				lock.lock();
 				try {
-					next = JobHandler.getNextTime();
+					next = myNext;
 				} finally {
 					lock.unlock();
 				}

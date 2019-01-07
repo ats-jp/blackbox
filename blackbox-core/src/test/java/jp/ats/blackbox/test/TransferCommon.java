@@ -35,7 +35,7 @@ public class TransferCommon {
 		param.put(BlendeeConstants.JDBC_USER, "blackbox");
 		param.put(BlendeeConstants.JDBC_PASSWORD, "blackbox");
 		param.put(BlendeeConstants.HOME_STORAGE_IDENTIFIER, "blackbox-core");
-		param.put(BlendeeConstants.AUTO_CLOSE_INTERVAL_MILLIS, 300);
+		//param.put(BlendeeConstants.AUTO_CLOSE_INTERVAL_MILLIS, 300);
 
 		return param;
 	}

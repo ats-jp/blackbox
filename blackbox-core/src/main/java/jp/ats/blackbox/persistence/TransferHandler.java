@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Optional;
 
-import org.blendee.assist.AnonymousTable;
 import org.blendee.assist.Vargs;
 import org.blendee.dialect.postgresql.ReturningUtilities;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
@@ -254,21 +253,16 @@ public class TransferHandler {
 
 		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
 		JustBefore justBefore = recorder.play(
-			() -> new AnonymousTable(
-				new snapshots().SELECT(
-					a -> a.ls(
-						a.total,
-						a.infinity,
-						//transferred_atの逆順、登録順の逆順
-						a.any(
-							"RANK() OVER (ORDER BY {0} DESC, {1} DESC)",
-							a.$nodes().$bundles().$transfers().transferred_at,
-							a.$nodes().id).AS("rank")))
-					.WHERE(a -> a.$nodes().stock_id.eq($LONG)),
-				"ordered").SELECT(a -> a.ls(a.col("total"), a.col("infinity")))
-					.WHERE(a -> a.col("rank").eq($INT)),
+			() -> new snapshots()
+				.SELECT(a -> a.ls(a.total, a.infinity))
+				.WHERE(
+					a -> a.$nodes().$bundles().$transfers().transferred_at.eq(
+						new nodes()
+							.SELECT(sa -> sa.MAX(sa.$bundles().$transfers().transferred_at))
+							.WHERE(sa -> sa.stock_id.eq($LONG).AND.$bundles().$transfers().transferred_at.le($TIMESTAMP))))
+				.ORDER_BY(a -> a.id.DESC), //同一時刻であればidが最新のもの
 			stockId,
-			1).aggregateAndGet(r -> {
+			transferredAt).aggregateAndGet(r -> {
 				var container = new JustBefore();
 				while (r.next()) {
 					container.total = r.getBigDecimal(1);

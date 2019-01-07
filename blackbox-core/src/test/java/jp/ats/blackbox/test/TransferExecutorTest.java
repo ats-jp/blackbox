@@ -25,10 +25,10 @@ public class TransferExecutorTest {
 
 				try {
 					long newId = promise.getTransferId();
-					System.out.println("returned: " + newId + " " + Thread.currentThread());
+					System.out.println("register: " + newId + " " + Thread.currentThread());
 
 					var denyPromise = executor.deny(SecurityValues.currentUserId(), newId);
-					System.out.println("denied: " + denyPromise.getTransferId() + " " + Thread.currentThread());
+					System.out.println("deny    : " + denyPromise.getTransferId() + " " + Thread.currentThread());
 				} catch (Exception e) {
 					e.printStackTrace();
 					return;

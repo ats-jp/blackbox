@@ -15,7 +15,7 @@ import jp.ats.blackbox.persistence.TransferHandler;
 
 public class TransferExecutor {
 
-	private static final int bufferSize = 1024;
+	private static final int bufferSize = 256;
 
 	private Disruptor<Event> disruptor;
 
@@ -90,16 +90,17 @@ public class TransferExecutor {
 		private boolean deny;
 
 		private void set(long userId, TransferRegisterRequest request, TransferPromise promise) {
+			deny = false;
 			this.userId = userId;
 			this.request = request;
 			this.promise = promise;
 		}
 
 		private void set(long userId, long denyTransferId, TransferPromise promise) {
+			deny = true;
 			this.userId = userId;
 			this.denyTransferId = denyTransferId;
 			this.promise = promise;
-			deny = true;
 		}
 
 		private TransferRegisterResult execute() {

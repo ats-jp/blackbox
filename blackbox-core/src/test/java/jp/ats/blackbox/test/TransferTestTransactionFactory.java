@@ -1,7 +1,9 @@
 package jp.ats.blackbox.test;
 
-import org.blendee.jdbc.BConnection;
+import java.sql.Connection;
+
 import org.blendee.jdbc.Transaction;
+import org.blendee.jdbc.impl.JDBCTransaction;
 import org.blendee.util.DriverTransactionFactory;
 
 public class TransferTestTransactionFactory extends DriverTransactionFactory {
@@ -10,36 +12,18 @@ public class TransferTestTransactionFactory extends DriverTransactionFactory {
 		super();
 	}
 
-	private Transaction t;
+	private Connection connection;
 
 	@Override
 	public Transaction createTransaction() {
-		if (t == null)
-			t = new TestTtansaction(super.createTransaction());
-		return t;
+		if (connection == null) connection = super.getJDBCConnection();
+		return new TestTransaction(connection);
 	}
 
-	private static class TestTtansaction extends Transaction {
+	private static class TestTransaction extends JDBCTransaction {
 
-		private final Transaction original;
-
-		private TestTtansaction(Transaction original) {
-			this.original = original;
-		}
-
-		@Override
-		protected BConnection getConnectionInternal() {
-			return original.getConnection();
-		}
-
-		@Override
-		protected void commitInternal() {
-			original.commit();
-		}
-
-		@Override
-		protected void rollbackInternal() {
-			original.rollback();
+		private TestTransaction(Connection connection) {
+			super(connection);
 		}
 
 		@Override
