@@ -24,7 +24,7 @@ public class Common {
 		Blendee.start(param);
 	}
 
-	private static Map<OptionKey<?>, Object> param() {
+	static Map<OptionKey<?>, Object> param() {
 		Map<OptionKey<?>, Object> param = new HashMap<>();
 		param.put(BlendeeConstants.SCHEMA_NAMES, new String[] { "bb" });
 		param.put(BlendeeConstants.LOG_STACKTRACE_FILTER, "^jp\\.ats\\.blackbox\\.test");
