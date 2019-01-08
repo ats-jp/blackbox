@@ -135,29 +135,31 @@ public class locking_groups
 
 	/**
 	 * name: id<br>
-	 * remarks: <br>
+	 * remarks: グループID<br>
+	 * ロック中のグループを表す<br>
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID\nロック中のグループを表す", defaultValue = "null", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
 	 * name: user_id<br>
-	 * remarks: <br>
+	 * remarks: ユーザーID<br>
+	 * ロックを行っているユーザーを表す<br>
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "user_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ユーザーID\nロックを行っているユーザーを表す", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String user_id = "user_id";
 
 	/**
 	 * name: locked_at<br>
-	 * remarks: <br>
-	 * type: timestamptz(35)<br>
+	 * remarks: ロック開始時刻<br>
+	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "locked_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = false, decimalDigits = 6, remarks = "", defaultValue = "now()", ordinalPosition = 3, notNull = true)
+	@Column(name = "locked_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "ロック開始時刻", defaultValue = "now()", ordinalPosition = 3, notNull = true)
 	public static final String locked_at = "locked_at";
 
 	/**
@@ -238,7 +240,8 @@ public class locking_groups
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: <br>
+		* remarks: グループID<br>
+		* ロック中のグループを表す<br>
 		* type: int8(19)<br>
 		* not null: true<br>
 		 * @param value java.lang.Long
@@ -255,7 +258,8 @@ public class locking_groups
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: <br>
+		* remarks: グループID<br>
+		* ロック中のグループを表す<br>
 		* type: int8(19)<br>
 		* not null: true<br>
 		 * @return java.lang.Long
@@ -268,7 +272,8 @@ public class locking_groups
 		/**
 		 * setter
 		 * name: user_id<br>
-		* remarks: <br>
+		* remarks: ユーザーID<br>
+		* ロックを行っているユーザーを表す<br>
 		* type: int8(19)<br>
 		* not null: true<br>
 		 * @param value java.lang.Long
@@ -285,7 +290,8 @@ public class locking_groups
 		/**
 		 * getter
 		 * name: user_id<br>
-		* remarks: <br>
+		* remarks: ユーザーID<br>
+		* ロックを行っているユーザーを表す<br>
 		* type: int8(19)<br>
 		* not null: true<br>
 		 * @return java.lang.Long
@@ -298,8 +304,8 @@ public class locking_groups
 		/**
 		 * setter
 		 * name: locked_at<br>
-		* remarks: <br>
-		* type: timestamptz(35)<br>
+		* remarks: ロック開始時刻<br>
+		* type: timestamptz(35, 6)<br>
 		* not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
@@ -315,8 +321,8 @@ public class locking_groups
 		/**
 		 * getter
 		 * name: locked_at<br>
-		* remarks: <br>
-		* type: timestamptz(35)<br>
+		* remarks: ロック開始時刻<br>
+		* type: timestamptz(35, 6)<br>
 		* not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
@@ -1085,38 +1091,44 @@ public class locking_groups
 
 	@Override
 	public Iterator execute() {
-		selectBehavior().checkRowMode();
-		return wrap(selectBehavior().query().execute());
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return wrap(selectBehavior.query().execute());
 	}
 
 	@Override
 	public Optional<Row> fetch(String... primaryKeyMembers) {
-		selectBehavior().checkRowMode();
-		return selectBehavior().query().fetch(primaryKeyMembers).map(o -> createRow(o));
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return selectBehavior.query().fetch(primaryKeyMembers).map(o -> createRow(o));
 	}
 
 	@Override
 	public Optional<Row> fetch(Number... primaryKeyMembers) {
-		selectBehavior().checkRowMode();
-		return selectBehavior().query().fetch(primaryKeyMembers).map(o -> createRow(o));
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return selectBehavior.query().fetch(primaryKeyMembers).map(o -> createRow(o));
 	}
 
 	@Override
 	public Optional<Row> fetch(Bindable... primaryKeyMembers) {
-		selectBehavior().checkRowMode();
-		return selectBehavior().query().fetch(primaryKeyMembers).map(o -> createRow(o));
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return selectBehavior.query().fetch(primaryKeyMembers).map(o -> createRow(o));
 	}
 
 	@Override
 	public int count() {
-		selectBehavior().checkRowMode();
-		return selectBehavior().query().count();
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return selectBehavior.query().count();
 	}
 
 	@Override
 	public ComposedSQL toCountSQL() {
-		selectBehavior().checkRowMode();
-		return selectBehavior().query().toCountSQL();
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return selectBehavior.query().toCountSQL();
 	}
 
 	@Override
@@ -1298,8 +1310,8 @@ public class locking_groups
 	}
 
 	@Override
-	public Query query() {
-		return new Query(selectBehavior().query());
+	public ComposedSQL composeSQL() {
+		return selectBehavior().composeSQL();
 	}
 
 	@Override

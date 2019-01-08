@@ -1044,38 +1044,44 @@ public class transfers_tags
 
 	@Override
 	public Iterator execute() {
-		selectBehavior().checkRowMode();
-		return wrap(selectBehavior().query().execute());
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return wrap(selectBehavior.query().execute());
 	}
 
 	@Override
 	public Optional<Row> fetch(String... primaryKeyMembers) {
-		selectBehavior().checkRowMode();
-		return selectBehavior().query().fetch(primaryKeyMembers).map(o -> createRow(o));
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return selectBehavior.query().fetch(primaryKeyMembers).map(o -> createRow(o));
 	}
 
 	@Override
 	public Optional<Row> fetch(Number... primaryKeyMembers) {
-		selectBehavior().checkRowMode();
-		return selectBehavior().query().fetch(primaryKeyMembers).map(o -> createRow(o));
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return selectBehavior.query().fetch(primaryKeyMembers).map(o -> createRow(o));
 	}
 
 	@Override
 	public Optional<Row> fetch(Bindable... primaryKeyMembers) {
-		selectBehavior().checkRowMode();
-		return selectBehavior().query().fetch(primaryKeyMembers).map(o -> createRow(o));
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return selectBehavior.query().fetch(primaryKeyMembers).map(o -> createRow(o));
 	}
 
 	@Override
 	public int count() {
-		selectBehavior().checkRowMode();
-		return selectBehavior().query().count();
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return selectBehavior.query().count();
 	}
 
 	@Override
 	public ComposedSQL toCountSQL() {
-		selectBehavior().checkRowMode();
-		return selectBehavior().query().toCountSQL();
+		SelectBehavior selectBehavior = selectBehavior();
+		selectBehavior.checkRowMode();
+		return selectBehavior.query().toCountSQL();
 	}
 
 	@Override
@@ -1257,8 +1263,8 @@ public class transfers_tags
 	}
 
 	@Override
-	public Query query() {
-		return new Query(selectBehavior().query());
+	public ComposedSQL composeSQL() {
+		return selectBehavior().composeSQL();
 	}
 
 	@Override
