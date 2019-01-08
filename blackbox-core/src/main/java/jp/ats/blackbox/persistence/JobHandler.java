@@ -1,15 +1,15 @@
 package jp.ats.blackbox.persistence;
 
-import static org.blendee.util.Placeholder.$BIGDECIMAL;
-import static org.blendee.util.Placeholder.$BOOLEAN;
-import static org.blendee.util.Placeholder.$LONG;
+import static org.blendee.sql.Placeholder.$BIGDECIMAL;
+import static org.blendee.sql.Placeholder.$BOOLEAN;
+import static org.blendee.sql.Placeholder.$LONG;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import org.blendee.jdbc.BatchStatement;
 import org.blendee.jdbc.BlendeeManager;
-import org.blendee.util.Recorder;
+import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.common.U;
 import sqlassist.bb.current_stocks;

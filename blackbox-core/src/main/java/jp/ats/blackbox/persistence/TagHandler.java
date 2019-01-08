@@ -1,6 +1,6 @@
 package jp.ats.blackbox.persistence;
 
-import static org.blendee.util.Placeholder.$STRING;
+import static org.blendee.sql.Placeholder.$STRING;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 
 import org.blendee.dialect.postgresql.ReturningUtilities;
 import org.blendee.jdbc.TablePath;
+import org.blendee.sql.Recorder;
 import org.blendee.util.GenericTable;
-import org.blendee.util.Recorder;
 
 import sqlassist.bb.tags;
 
