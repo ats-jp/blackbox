@@ -27,6 +27,9 @@ database
 DROP SCHEMA IF EXISTS bb_log CASCADE; --logはblackboxに依存しているのでDROP
 DROP SCHEMA IF EXISTS bb CASCADE;
 
+--UUID生成用
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 --===========================
 --security tables
 --===========================
@@ -81,7 +84,7 @@ SET default_tablespace = 'blackbox';
 
 --組織
 CREATE TABLE bb.orgs (
-	id bigserial PRIMARY KEY,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
@@ -113,7 +116,7 @@ INSERT INTO bb.orgs (
 	extension,
 	created_by,
 	updated_by
-) VALUES (0, 'NULL', 0, '{}', 0, 0);
+) VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', 0, '{}', 0, 0);
 
 --システム用
 INSERT INTO bb.orgs (
