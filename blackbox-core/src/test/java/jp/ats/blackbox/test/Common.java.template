@@ -27,7 +27,7 @@ public class Common {
 	static Map<OptionKey<?>, Object> param() {
 		Map<OptionKey<?>, Object> param = new HashMap<>();
 		param.put(BlendeeConstants.SCHEMA_NAMES, new String[] { "bb" });
-		param.put(BlendeeConstants.LOG_STACKTRACE_FILTER, "^jp\\.ats\\.blackbox\\.test");
+		param.put(BlendeeConstants.LOG_STACKTRACE_FILTER, "^jp\\.ats\\.blackbox");
 		param.put(BlendeeConstants.TABLE_FACADE_PACKAGE, "sqlassist");
 		param.put(BlendeeConstants.CAN_ADD_NEW_ENTRIES, true);
 		param.put(BlendeeConstants.JDBC_DRIVER_CLASS_NAME, "org.postgresql.Driver");
