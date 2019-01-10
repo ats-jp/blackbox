@@ -137,20 +137,20 @@ public class locking_groups
 	 * name: id<br>
 	 * remarks: グループID<br>
 	 * ロック中のグループを表す<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID\nロック中のグループを表す", defaultValue = "null", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID\nロック中のグループを表す", defaultValue = "null", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
 	 * name: user_id<br>
 	 * remarks: ユーザーID<br>
 	 * ロックを行っているユーザーを表す<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ユーザーID\nロックを行っているユーザーを表す", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ユーザーID\nロックを行っているユーザーを表す", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String user_id = "user_id";
 
 	/**
@@ -242,11 +242,11 @@ public class locking_groups
 		 * name: id<br>
 		* remarks: グループID<br>
 		* ロック中のグループを表す<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setId(java.lang.Long value) {
+		public void setId(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -260,13 +260,13 @@ public class locking_groups
 		 * name: id<br>
 		* remarks: グループID<br>
 		* ロック中のグループを表す<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getId() {
+		public java.util.UUID getId() {
 			Binder binder = data$.getValue("id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -274,11 +274,11 @@ public class locking_groups
 		 * name: user_id<br>
 		* remarks: ユーザーID<br>
 		* ロックを行っているユーザーを表す<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setUser_id(java.lang.Long value) {
+		public void setUser_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -292,13 +292,13 @@ public class locking_groups
 		 * name: user_id<br>
 		* remarks: ユーザーID<br>
 		* ロックを行っているユーザーを表す<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getUser_id() {
+		public java.util.UUID getUser_id() {
 			Binder binder = data$.getValue("user_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**

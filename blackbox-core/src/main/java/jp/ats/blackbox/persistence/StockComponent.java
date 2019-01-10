@@ -2,12 +2,13 @@ package jp.ats.blackbox.persistence;
 
 import java.sql.Timestamp;
 import java.util.Optional;
+import java.util.UUID;
 
 public class StockComponent {
 
 	public static class RegisterRequest {
 
-		public long group_id;
+		public UUID group_id;
 
 		public String name;
 
@@ -18,9 +19,9 @@ public class StockComponent {
 
 	public static class UpdateRequest {
 
-		public long id;
+		public UUID id;
 
-		public Optional<Long> group_id = Optional.empty();
+		public Optional<UUID> group_id = Optional.empty();
 
 		public Optional<String> name = Optional.empty();
 
@@ -35,9 +36,9 @@ public class StockComponent {
 
 	public static class ForcibleUpdateRequest {
 
-		public long id;
+		public UUID id;
 
-		public Optional<Long> group_id = Optional.empty();
+		public Optional<UUID> group_id = Optional.empty();
 
 		public Optional<String> name = Optional.empty();
 
@@ -52,9 +53,9 @@ public class StockComponent {
 
 		public String type;
 
-		public long id;
+		public UUID id;
 
-		public long group_id;
+		public UUID group_id;
 
 		public String name;
 
@@ -68,10 +69,10 @@ public class StockComponent {
 
 		public Timestamp created_at;
 
-		public long created_by;
+		public UUID created_by;
 
 		public Timestamp updated_at;
 
-		public long updated_by;
+		public UUID updated_by;
 	}
 }

@@ -1,5 +1,6 @@
 package jp.ats.blackbox.executor;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.blendee.util.Blendee;
@@ -44,7 +45,7 @@ public class TransferExecutor {
 		disruptor.shutdown();
 	}
 
-	public TransferPromise register(long userId, Supplier<TransferRegisterRequest> requestSupplier) {
+	public TransferPromise register(UUID userId, Supplier<TransferRegisterRequest> requestSupplier) {
 		TransferPromise promise = new TransferPromise();
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, requestSupplier.get(), promise));
@@ -52,7 +53,7 @@ public class TransferExecutor {
 		return promise;
 	}
 
-	public TransferPromise deny(long userId, long transferId) {
+	public TransferPromise deny(UUID userId, UUID transferId) {
 		TransferPromise promise = new TransferPromise();
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, transferId, promise));
@@ -72,37 +73,43 @@ public class TransferExecutor {
 				JobExecutor.next(U.convert(result.transferredAt));
 
 				//publishスレッドに新IDを通知
-				event.promise.setTransferId(result.transferId);
+				event.promise.notify(null);
 			});
 		} catch (Throwable t) {
 			//TODO 例外をlog
 			t.printStackTrace();
 
-			event.promise.setError(t);
+			event.promise.notify(t);
 		}
 	}
 
 	private class Event {
 
-		private long userId;
+		private UUID transferId;
+
+		private UUID userId;
 
 		private TransferRegisterRequest request;
 
-		private long denyTransferId;
+		private UUID denyTransferId;
 
 		private TransferPromise promise;
 
 		private boolean deny;
 
-		private void set(long userId, TransferRegisterRequest request, TransferPromise promise) {
+		private void set(UUID userId, TransferRegisterRequest request, TransferPromise promise) {
 			deny = false;
+
+			transferId = promise.getTransferId();
 			this.userId = userId;
 			this.request = request;
 			this.promise = promise;
 		}
 
-		private void set(long userId, long denyTransferId, TransferPromise promise) {
+		private void set(UUID userId, UUID denyTransferId, TransferPromise promise) {
 			deny = true;
+
+			transferId = promise.getTransferId();
 			this.userId = userId;
 			this.denyTransferId = denyTransferId;
 			this.promise = promise;
@@ -110,10 +117,10 @@ public class TransferExecutor {
 
 		private TransferRegisterResult execute() {
 			if (deny) {
-				return handler.deny(userId, denyTransferId);
+				return handler.deny(transferId, userId, denyTransferId);
 			}
 
-			return handler.register(userId, request);
+			return handler.register(transferId, userId, request);
 		}
 	}
 }

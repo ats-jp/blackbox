@@ -137,19 +137,19 @@ public class transient_current_stocks
 	 * name: id<br>
 	 * remarks: ID<br>
 	 * stocks.stock_idに従属<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID\nstocks.stock_idに従属", defaultValue = "null", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID\nstocks.stock_idに従属", defaultValue = "null", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
 	 * name: transient_id<br>
 	 * remarks: 一時作業ID<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "transient_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "一時作業ID", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "transient_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "一時作業ID", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String transient_id = "transient_id";
 
 	/**
@@ -183,10 +183,10 @@ public class transient_current_stocks
 	/**
 	 * name: created_by<br>
 	 * remarks: 作成ユーザー<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -201,10 +201,10 @@ public class transient_current_stocks
 	/**
 	 * name: updated_by<br>
 	 * remarks: 更新ユーザー<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 8, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 8, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -303,11 +303,11 @@ public class transient_current_stocks
 		 * name: id<br>
 		* remarks: ID<br>
 		* stocks.stock_idに従属<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setId(java.lang.Long value) {
+		public void setId(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -321,24 +321,24 @@ public class transient_current_stocks
 		 * name: id<br>
 		* remarks: ID<br>
 		* stocks.stock_idに従属<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getId() {
+		public java.util.UUID getId() {
 			Binder binder = data$.getValue("id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
 		 * name: transient_id<br>
 		* remarks: 一時作業ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setTransient_id(java.lang.Long value) {
+		public void setTransient_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -351,13 +351,13 @@ public class transient_current_stocks
 		 * getter
 		 * name: transient_id<br>
 		* remarks: 一時作業ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getTransient_id() {
+		public java.util.UUID getTransient_id() {
 			Binder binder = data$.getValue("transient_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -456,11 +456,11 @@ public class transient_current_stocks
 		 * setter
 		 * name: created_by<br>
 		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setCreated_by(java.lang.Long value) {
+		public void setCreated_by(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -473,13 +473,13 @@ public class transient_current_stocks
 		 * getter
 		 * name: created_by<br>
 		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getCreated_by() {
+		public java.util.UUID getCreated_by() {
 			Binder binder = data$.getValue("created_by");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -516,11 +516,11 @@ public class transient_current_stocks
 		 * setter
 		 * name: updated_by<br>
 		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setUpdated_by(java.lang.Long value) {
+		public void setUpdated_by(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -533,13 +533,13 @@ public class transient_current_stocks
 		 * getter
 		 * name: updated_by<br>
 		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getUpdated_by() {
+		public java.util.UUID getUpdated_by() {
 			Binder binder = data$.getValue("updated_by");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**

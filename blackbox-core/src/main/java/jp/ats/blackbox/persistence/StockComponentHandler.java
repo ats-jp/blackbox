@@ -2,6 +2,7 @@ package jp.ats.blackbox.persistence;
 
 import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.blendee.assist.Vargs;
@@ -38,26 +39,30 @@ public class StockComponentHandler {
 
 	private static final String updated_by = "updated_by";
 
-	public static long register(
+	public static UUID register(
 		TablePath table,
 		RegisterRequest request) {
 		var row = new GenericTable(table).row();
 
-		row.setLong(group_id, request.group_id);
+		UUID uuid = UUID.randomUUID();
+
+		row.setUUID(id, uuid);
+
+		row.setUUID(group_id, request.group_id);
 		row.setString(name, request.name);
 		request.extension.ifPresent(v -> row.setObject(extension, toJson(v)));
 		request.tags.ifPresent(v -> row.setObject(tags, v));
 
-		long userId = SecurityValues.currentUserId();
+		UUID userId = SecurityValues.currentUserId();
 
-		row.setLong(created_by, userId);
-		row.setLong(updated_by, userId);
+		row.setUUID(created_by, userId);
+		row.setUUID(updated_by, userId);
 
-		long id = CommonHandler.register(row);
+		row.insert();
 
-		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, id));
+		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, uuid));
 
-		return id;
+		return uuid;
 	}
 
 	public static void update(
@@ -94,7 +99,7 @@ public class StockComponentHandler {
 		if (result != 1) throw Utils.decisionException(table, request.id);
 	}
 
-	public static void delete(TablePath table, long id, long revision) {
+	public static void delete(TablePath table, UUID id, long revision) {
 		int result = new GenericTable(table)
 			.DELETE()
 			.WHERE(a -> a.col(StockComponentHandler.id).eq(id).AND.col(StockComponentHandler.revision).eq(revision))

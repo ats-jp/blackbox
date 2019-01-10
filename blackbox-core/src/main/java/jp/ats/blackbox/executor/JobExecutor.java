@@ -67,9 +67,9 @@ public class JobExecutor {
 					lock.unlock();
 				}
 			});
-		} catch (Exception e) {
+		} catch (Throwable t) {
 			//TODO 例外をlog
-			e.printStackTrace();
+			t.printStackTrace();
 		}
 	}
 }

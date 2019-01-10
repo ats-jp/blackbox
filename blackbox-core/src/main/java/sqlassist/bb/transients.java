@@ -136,30 +136,30 @@ public class transients
 	/**
 	 * name: id<br>
 	 * remarks: ID<br>
-	 * type: bigserial(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "nextval('bb.transients_id_seq'::regclass)", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "gen_random_uuid()", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
 	 * name: group_id<br>
 	 * remarks: この一時作業のオーナーグループ<br>
 	 * 0の場合、オーナーグループはいない<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "この一時作業のオーナーグループ\n0の場合、オーナーグループはいない", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "この一時作業のオーナーグループ\n0の場合、オーナーグループはいない", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String group_id = "group_id";
 
 	/**
 	 * name: user_id<br>
 	 * remarks: この一時作業のオーナーユーザー<br>
 	 * 0の場合、オーナーユーザーはいない<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "この一時作業のオーナーユーザー\n0の場合、オーナーユーザーはいない", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "この一時作業のオーナーユーザー\n0の場合、オーナーユーザーはいない", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String user_id = "user_id";
 
 	/**
@@ -183,10 +183,10 @@ public class transients
 	/**
 	 * name: created_by<br>
 	 * remarks: 作成ユーザー<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -201,10 +201,10 @@ public class transients
 	/**
 	 * name: updated_by<br>
 	 * remarks: 更新ユーザー<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 8, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 8, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -302,11 +302,11 @@ public class transients
 		 * setter
 		 * name: id<br>
 		* remarks: ID<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setId(java.lang.Long value) {
+		public void setId(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -319,13 +319,13 @@ public class transients
 		 * getter
 		 * name: id<br>
 		* remarks: ID<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getId() {
+		public java.util.UUID getId() {
 			Binder binder = data$.getValue("id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -333,11 +333,11 @@ public class transients
 		 * name: group_id<br>
 		* remarks: この一時作業のオーナーグループ<br>
 		* 0の場合、オーナーグループはいない<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setGroup_id(java.lang.Long value) {
+		public void setGroup_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -351,13 +351,13 @@ public class transients
 		 * name: group_id<br>
 		* remarks: この一時作業のオーナーグループ<br>
 		* 0の場合、オーナーグループはいない<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getGroup_id() {
+		public java.util.UUID getGroup_id() {
 			Binder binder = data$.getValue("group_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -365,11 +365,11 @@ public class transients
 		 * name: user_id<br>
 		* remarks: この一時作業のオーナーユーザー<br>
 		* 0の場合、オーナーユーザーはいない<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setUser_id(java.lang.Long value) {
+		public void setUser_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -383,13 +383,13 @@ public class transients
 		 * name: user_id<br>
 		* remarks: この一時作業のオーナーユーザー<br>
 		* 0の場合、オーナーユーザーはいない<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getUser_id() {
+		public java.util.UUID getUser_id() {
 			Binder binder = data$.getValue("user_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -456,11 +456,11 @@ public class transients
 		 * setter
 		 * name: created_by<br>
 		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setCreated_by(java.lang.Long value) {
+		public void setCreated_by(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -473,13 +473,13 @@ public class transients
 		 * getter
 		 * name: created_by<br>
 		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getCreated_by() {
+		public java.util.UUID getCreated_by() {
 			Binder binder = data$.getValue("created_by");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -516,11 +516,11 @@ public class transients
 		 * setter
 		 * name: updated_by<br>
 		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setUpdated_by(java.lang.Long value) {
+		public void setUpdated_by(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -533,13 +533,13 @@ public class transients
 		 * getter
 		 * name: updated_by<br>
 		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getUpdated_by() {
+		public java.util.UUID getUpdated_by() {
 			Binder binder = data$.getValue("updated_by");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**

@@ -2,7 +2,7 @@ package jp.ats.blackbox.persistence;
 
 import static org.blendee.sql.Placeholder.$BIGDECIMAL;
 import static org.blendee.sql.Placeholder.$BOOLEAN;
-import static org.blendee.sql.Placeholder.$LONG;
+import static org.blendee.sql.Placeholder.$UUID;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -45,10 +45,10 @@ public class JobHandler {
 							recorder.play(
 								() -> new current_stocks()
 									.UPDATE(a -> a.ls(a.infinity.set($BOOLEAN), a.total.set($BIGDECIMAL)))
-									.WHERE(a -> a.id.eq($LONG)),
+									.WHERE(a -> a.id.eq($UUID)),
 								result.getBoolean(snapshots.infinity),
 								result.getBigDecimal(snapshots.total),
-								result.getLong(nodes.stock_id))
+								U.uuid(result, nodes.stock_id))
 								.execute(batch);
 						}
 					});

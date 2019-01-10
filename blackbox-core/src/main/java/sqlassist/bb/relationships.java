@@ -146,20 +146,20 @@ public class relationships
 	/**
 	 * name: parent_id<br>
 	 * remarks: 親グループID<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "parent_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "親グループID", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "parent_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "親グループID", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String parent_id = "parent_id";
 
 	/**
 	 * name: child_id<br>
 	 * remarks: 子グループID<br>
 	 * 親グループIDに対して、親自身と親から辿れるすべての子が登録されている<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "child_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "子グループID\n親グループIDに対して、親自身と親から辿れるすべての子が登録されている", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "child_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "子グループID\n親グループIDに対して、親自身と親から辿れるすべての子が登録されている", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String child_id = "child_id";
 
 	/**
@@ -289,11 +289,11 @@ public class relationships
 		 * setter
 		 * name: parent_id<br>
 		* remarks: 親グループID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setParent_id(java.lang.Long value) {
+		public void setParent_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -306,13 +306,13 @@ public class relationships
 		 * getter
 		 * name: parent_id<br>
 		* remarks: 親グループID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getParent_id() {
+		public java.util.UUID getParent_id() {
 			Binder binder = data$.getValue("parent_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -320,11 +320,11 @@ public class relationships
 		 * name: child_id<br>
 		* remarks: 子グループID<br>
 		* 親グループIDに対して、親自身と親から辿れるすべての子が登録されている<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setChild_id(java.lang.Long value) {
+		public void setChild_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -338,13 +338,13 @@ public class relationships
 		 * name: child_id<br>
 		* remarks: 子グループID<br>
 		* 親グループIDに対して、親自身と親から辿れるすべての子が登録されている<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getChild_id() {
+		public java.util.UUID getChild_id() {
 			Binder binder = data$.getValue("child_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**

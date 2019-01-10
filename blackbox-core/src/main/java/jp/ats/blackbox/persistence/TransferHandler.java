@@ -4,8 +4,8 @@ import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 import static org.blendee.sql.Placeholder.$BIGDECIMAL;
 import static org.blendee.sql.Placeholder.$BOOLEAN;
 import static org.blendee.sql.Placeholder.$INT;
-import static org.blendee.sql.Placeholder.$LONG;
 import static org.blendee.sql.Placeholder.$TIMESTAMP;
+import static org.blendee.sql.Placeholder.$UUID;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -13,9 +13,9 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.blendee.assist.Vargs;
-import org.blendee.dialect.postgresql.ReturningUtilities;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
 import org.blendee.sql.AsyncRecorder;
 
@@ -42,10 +42,12 @@ public class TransferHandler {
 
 	private final AsyncRecorder recorder = new AsyncRecorder();
 
+	private final UUID dbId = SecurityValues.currentDBId();
+
 	/**
 	 * transfer登録処理
 	 */
-	public TransferRegisterResult register(long userId, TransferRegisterRequest request) {
+	public TransferRegisterResult register(UUID transferId, UUID userId, TransferRegisterRequest request) {
 		var group = recorder.play(() -> new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension)))
 			.fetch(request.group_id)
 			.orElseThrow(() -> new DataNotFoundException());
@@ -54,38 +56,42 @@ public class TransferHandler {
 			.fetch(userId)
 			.orElseThrow(() -> new DataNotFoundException());
 
-		long transferId = ReturningUtilities.insertAndReturn(
-			transfers.$TABLE,
-			u -> {
-				u.add(transfers.group_id, request.group_id);
-				request.denied_id.ifPresent(v -> u.add(transfers.denied_id, v));
-				u.add(transfers.transferred_at, request.transferred_at);
+		var transfer = transfers.row();
 
-				request.restoredExtension
-					.ifPresentOrElse(
-						v -> u.add(transfers.extension, v),
-						() -> request.extension.ifPresent(v -> u.add(transfers.extension, toJson(v))));
+		transfer.setId(transferId);
+		transfer.setGroup_id(request.group_id);
 
-				u.add(transfers.group_extension, group.getExtension());
-				u.add(transfers.org_extension, group.$orgs().getExtension());
-				u.add(transfers.user_extension, user.getExtension());
-				request.tags.ifPresent(v -> u.add(transfers.tags, v));
-				u.add(transfers.created_by, userId);
-			},
-			r -> r.getLong(transfers.id),
-			transfers.id);
+		request.denied_id.ifPresent(v -> transfer.setDenied_id(v));
+
+		transfer.setTransferred_at(request.transferred_at);
+
+		request.restoredExtension.ifPresentOrElse(
+			v -> transfer.setExtension(v),
+			() -> request.extension.ifPresent(v -> transfer.setExtension(toJson(v))));
+
+		transfer.setGroup_extension(group.getExtension());
+		transfer.setOrg_extension(group.$orgs().getExtension());
+		transfer.setUser_extension(user.getExtension());
+
+		request.tags.ifPresent(v -> transfer.setTags(v));
+
+		transfer.setDb_id(dbId);
+
+		transfer.setCreated_by(userId);
+
+		transfer.insert();
 
 		Arrays.stream(request.bundles).forEach(r -> registerBundle(userId, transferId, request.transferred_at, r));
 
 		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
 			var table = new transfers_tags();
 			tagIds.forEach(tagId -> {
-				recorder.play(() -> table.INSERT().VALUES($LONG, $LONG), transferId, tagId).execute();
+				recorder.play(() -> table.INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
 			});
 		}));
 
 		//jobを登録し、別プロセスで現在数量を更新させる
-		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($LONG), transferId).execute();
+		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($UUID), transferId).execute();
 
 		var result = new TransferRegisterResult();
 		result.transferId = transferId;
@@ -94,7 +100,7 @@ public class TransferHandler {
 		return result;
 	}
 
-	public TransferRegisterResult deny(long userId, long transferId) {
+	public TransferRegisterResult deny(UUID transferId, UUID userId, UUID denyTransferId) {
 		var request = new TransferRegisterRequest();
 
 		var bundles = new LinkedList<BundleRegisterRequest>();
@@ -122,17 +128,17 @@ public class TransferHandler {
 						a.grants_infinity,
 						a.extension);
 				})
-				.WHERE(a -> a.$bundles().transfer_id.eq($LONG))
+				.WHERE(a -> a.$bundles().transfer_id.eq($UUID))
 				.assist()
 				.$bundles()
 				.$transfers()
 				.intercept(),
-			transferId)
+			denyTransferId)
 			.forEach(transferOne -> {
 				var transfer = transferOne.get();
 
 				request.group_id = transfer.getGroup_id();
-				request.denied_id = Optional.of(transferId);
+				request.denied_id = Optional.of(denyTransferId);
 				request.transferred_at = transfer.getTransferred_at();
 				request.restoredExtension = Optional.of(transfer.getExtension());
 
@@ -179,29 +185,29 @@ public class TransferHandler {
 				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
 			});
 
-		return register(userId, request);
+		return register(transferId, userId, request);
 	}
 
 	/**
 	 * bundle登録処理
 	 */
 	private void registerBundle(
-		long userId,
-		long transferId,
+		UUID userId,
+		UUID transferId,
 		Timestamp transferredAt,
 		BundleRegisterRequest request) {
-		long bundleId = ReturningUtilities.insertAndReturn(
-			bundles.$TABLE,
-			u -> {
-				u.add(bundles.transfer_id, transferId);
-				request.restoredExtension
-					.ifPresentOrElse(
-						v -> u.add(transfers.extension, v),
-						() -> request.extension.ifPresent(v -> u.add(transfers.extension, toJson(v))));
+		var bundle = bundles.row();
 
-			},
-			r -> r.getLong(bundles.id),
-			bundles.id);
+		UUID bundleId = UUID.randomUUID();
+
+		bundle.setId(bundleId);
+		bundle.setTransfer_id(transferId);
+		request.restoredExtension
+			.ifPresentOrElse(
+				v -> bundle.setExtension(v),
+				() -> request.extension.ifPresent(v -> bundle.setExtension(toJson(v))));
+
+		bundle.insert();
 
 		Arrays.stream(request.nodes).forEach(r -> registerNode(userId, bundleId, transferredAt, r));
 	}
@@ -210,15 +216,15 @@ public class TransferHandler {
 	 * node登録処理
 	 */
 	private void registerNode(
-		long userId,
-		long bundleId,
+		UUID userId,
+		UUID bundleId,
 		Timestamp transferredAt,
 		NodeRegisterRequest request) {
 		//stockが既に存在すればそれを使う
 		//なければ新たに登録
 		var stock = recorder.play(
 			() -> selectedStocks()
-				.WHERE(a -> a.group_id.eq($LONG).AND.item_id.eq($LONG).AND.owner_id.eq($LONG).AND.location_id.eq($LONG).AND.status_id.eq($LONG)),
+				.WHERE(a -> a.group_id.eq($UUID).AND.item_id.eq($UUID).AND.owner_id.eq($UUID).AND.location_id.eq($UUID).AND.status_id.eq($UUID)),
 			request.group_id,
 			request.item_id,
 			request.owner_id,
@@ -227,29 +233,33 @@ public class TransferHandler {
 			.willUnique()
 			.orElseGet(() -> registerStock(userId, request));
 
-		long stockId = stock.getId();
+		UUID stockId = stock.getId();
 
+		var node = nodes.row();
+
+		UUID nodeId = UUID.randomUUID();
+
+		node.setId(nodeId);
+		node.setBundle_id(bundleId);
 		//nodeではgroup_idを持たないが、requestが持つgroup_idはstockに格納しており、それが在庫の所属グループを表す
-		long nodeId = ReturningUtilities.insertAndReturn(
-			nodes.$TABLE,
-			u -> {
-				u.add(nodes.bundle_id, bundleId);
-				u.add(nodes.stock_id, stockId);
-				u.add(nodes.in_out, request.in_out.value);
-				u.add(nodes.quantity, request.quantity);
-				request.grants_infinity.ifPresent(v -> u.add(nodes.grants_infinity, v));
-				request.restoredExtension
-					.ifPresentOrElse(
-						v -> u.add(transfers.extension, v),
-						() -> request.extension.ifPresent(v -> u.add(transfers.extension, toJson(v))));
-				u.add(nodes.group_extension, stock.$groups().getExtension());
-				u.add(nodes.item_extension, stock.$items().getExtension());
-				u.add(nodes.owner_extension, stock.$owners().getExtension());
-				u.add(nodes.location_extension, stock.$locations().getExtension());
-				u.add(nodes.status_extension, stock.$statuses().getExtension());
-			},
-			r -> r.getLong(bundles.id),
-			bundles.id);
+		node.setStock_id(stockId);
+		node.setIn_out(request.in_out.value);
+		node.setQuantity(request.quantity);
+
+		request.grants_infinity.ifPresent(v -> node.setGrants_infinity(v));
+
+		request.restoredExtension
+			.ifPresentOrElse(
+				v -> node.setExtension(v),
+				() -> request.extension.ifPresent(v -> node.setExtension(toJson(v))));
+
+		node.setGroup_extension(stock.$groups().getExtension());
+		node.setItem_extension(stock.$items().getExtension());
+		node.setOwner_extension(stock.$owners().getExtension());
+		node.setLocation_extension(stock.$locations().getExtension());
+		node.setStatus_extension(stock.$statuses().getExtension());
+
+		node.insert();
 
 		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
 		JustBefore justBefore = recorder.play(
@@ -259,8 +269,8 @@ public class TransferHandler {
 					a -> a.$nodes().$bundles().$transfers().transferred_at.eq(
 						new nodes()
 							.SELECT(sa -> sa.MAX(sa.$bundles().$transfers().transferred_at))
-							.WHERE(sa -> sa.stock_id.eq($LONG).AND.$bundles().$transfers().transferred_at.le($TIMESTAMP))))
-				.ORDER_BY(a -> a.id.DESC), //同一時刻であればidが最新のもの
+							.WHERE(sa -> sa.stock_id.eq($UUID).AND.$bundles().$transfers().transferred_at.le($TIMESTAMP))))
+				.ORDER_BY(a -> a.$nodes().$bundles().$transfers().created_at.DESC), //同一時刻であればtransfers.created_atが最近のもの
 			stockId,
 			transferredAt).aggregateAndGet(r -> {
 				var container = new JustBefore();
@@ -290,10 +300,10 @@ public class TransferHandler {
 			() -> new snapshots().insertStatement(
 				a -> a.INSERT(a.id, a.infinity, a.total, a.updated_by)
 					.VALUES(
-						$LONG,
+						$UUID,
 						$BOOLEAN,
 						$BIGDECIMAL,
-						$LONG)),
+						$UUID)),
 			nodeId,
 			infinity,
 			total,
@@ -313,7 +323,7 @@ public class TransferHandler {
 							wa -> wa.id.IN(
 								new nodes()
 									.SELECT(sa -> sa.id)
-									.WHERE(swa -> swa.stock_id.eq($LONG).AND.$bundles().$transfers().transferred_at.ge($TIMESTAMP))))),
+									.WHERE(swa -> swa.stock_id.eq($UUID).AND.$bundles().$transfers().transferred_at.ge($TIMESTAMP))))),
 				infinity,
 				request.in_out.normalize(request.quantity),
 				stockId,
@@ -338,24 +348,41 @@ public class TransferHandler {
 	/**
 	 * stock登録処理
 	 */
-	private stocks.Row registerStock(long userId, TransferComponent.NodeRegisterRequest request) {
-		long stockId = ReturningUtilities.insertAndReturn(
-			stocks.$TABLE,
-			u -> {
-				u.add(stocks.group_id, request.group_id);
-				u.add(stocks.item_id, request.item_id);
-				u.add(stocks.owner_id, request.owner_id);
-				u.add(stocks.location_id, request.location_id);
-				u.add(stocks.status_id, request.status_id);
-				u.add(stocks.created_by, userId);
-			},
-			r -> r.getLong(transfers.id),
-			transfers.id);
+	private stocks.Row registerStock(UUID userId, TransferComponent.NodeRegisterRequest request) {
+		UUID stockId = UUID.randomUUID();
+
+		recorder.play(
+			() -> new stocks().insertStatement(
+				a -> a
+					.INSERT(
+						a.id,
+						a.group_id,
+						a.item_id,
+						a.owner_id,
+						a.location_id,
+						a.status_id,
+						a.created_by)
+					.VALUES(
+						$UUID,
+						$UUID,
+						$UUID,
+						$UUID,
+						$UUID,
+						$UUID,
+						$UUID)),
+			stockId,
+			request.group_id,
+			request.item_id,
+			request.owner_id,
+			request.location_id,
+			request.status_id,
+			userId)
+			.execute();
 
 		recorder.play(
 			() -> new current_stocks().insertStatement(
 				//後でjobから更新されるのでinfinityはとりあえずfalse、totalは0
-				a -> a.INSERT(a.id, a.infinity, a.total).VALUES($LONG, $BOOLEAN, $INT)),
+				a -> a.INSERT(a.id, a.infinity, a.total).VALUES($UUID, $BOOLEAN, $INT)),
 			stockId,
 			false,
 			0).execute();

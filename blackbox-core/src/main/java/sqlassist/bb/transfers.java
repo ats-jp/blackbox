@@ -136,20 +136,20 @@ public class transfers
 	/**
 	 * name: id<br>
 	 * remarks: ID<br>
-	 * type: bigserial(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "nextval('bb.transfers_id_seq'::regclass)", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "gen_random_uuid()", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
 	 * name: group_id<br>
 	 * remarks: グループID<br>
 	 * この伝票の属するグループ<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID\nこの伝票の属するグループ", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID\nこの伝票の属するグループ", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String group_id = "group_id";
 
 	/**
@@ -157,10 +157,10 @@ public class transfers
 	 * remarks: 取消元伝票ID<br>
 	 * 訂正後の伝票が訂正前の伝票のIDを持つ<br>
 	 * ここに入っているIDが指す伝票は、取り消されたものとなる<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "denied_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消元伝票ID\n訂正後の伝票が訂正前の伝票のIDを持つ\nここに入っているIDが指す伝票は、取り消されたものとなる", defaultValue = "0", ordinalPosition = 3, notNull = true)
+	@Column(name = "denied_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消元伝票ID\n訂正後の伝票が訂正前の伝票のIDを持つ\nここに入っているIDが指す伝票は、取り消されたものとなる", defaultValue = "'00000000-0000-0000-0000-000000000000'::uuid", ordinalPosition = 3, notNull = true)
 	public static final String denied_id = "denied_id";
 
 	/**
@@ -218,22 +218,39 @@ public class transfers
 	public static final String tags = "tags";
 
 	/**
+	 * name: db_id<br>
+	 * remarks: <br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "db_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 10, notNull = true)
+	public static final String db_id = "db_id";
+
+	/**
 	 * name: created_at<br>
 	 * remarks: 作成時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 10, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 11, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
 	 * name: created_by<br>
 	 * remarks: 作成ユーザー<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 11, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 12, notNull = true)
 	public static final String created_by = "created_by";
+
+	/**
+	 * name: transfers_db_id_fkey<br>
+	 * references: dbs<br>
+	 * columns: db_id
+	 */
+	@ForeignKey(name = "transfers_db_id_fkey", references = "bb.dbs", columns = { "db_id" }, refColumns = { "id" })
+	public static final String bb$dbs$transfers_db_id_fkey = "transfers_db_id_fkey";
 
 	/**
 	 * name: transfers_group_id_fkey<br>
@@ -322,11 +339,11 @@ public class transfers
 		 * setter
 		 * name: id<br>
 		* remarks: ID<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setId(java.lang.Long value) {
+		public void setId(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -339,13 +356,13 @@ public class transfers
 		 * getter
 		 * name: id<br>
 		* remarks: ID<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getId() {
+		public java.util.UUID getId() {
 			Binder binder = data$.getValue("id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -353,11 +370,11 @@ public class transfers
 		 * name: group_id<br>
 		* remarks: グループID<br>
 		* この伝票の属するグループ<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setGroup_id(java.lang.Long value) {
+		public void setGroup_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -371,13 +388,13 @@ public class transfers
 		 * name: group_id<br>
 		* remarks: グループID<br>
 		* この伝票の属するグループ<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getGroup_id() {
+		public java.util.UUID getGroup_id() {
 			Binder binder = data$.getValue("group_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -386,11 +403,11 @@ public class transfers
 		* remarks: 取消元伝票ID<br>
 		* 訂正後の伝票が訂正前の伝票のIDを持つ<br>
 		* ここに入っているIDが指す伝票は、取り消されたものとなる<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setDenied_id(java.lang.Long value) {
+		public void setDenied_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -405,13 +422,13 @@ public class transfers
 		* remarks: 取消元伝票ID<br>
 		* 訂正後の伝票が訂正前の伝票のIDを持つ<br>
 		* ここに入っているIDが指す伝票は、取り消されたものとなる<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getDenied_id() {
+		public java.util.UUID getDenied_id() {
 			Binder binder = data$.getValue("denied_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -596,6 +613,36 @@ public class transfers
 
 		/**
 		 * setter
+		 * name: db_id<br>
+		* remarks: <br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setDb_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("db_id").getType());
+			data$.setValue("db_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: db_id<br>
+		* remarks: <br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getDb_id() {
+			Binder binder = data$.getValue("db_id");
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
 		 * name: created_at<br>
 		* remarks: 作成時刻<br>
 		* type: timestamptz(35, 6)<br>
@@ -628,11 +675,11 @@ public class transfers
 		 * setter
 		 * name: created_by<br>
 		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setCreated_by(java.lang.Long value) {
+		public void setCreated_by(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -645,13 +692,25 @@ public class transfers
 		 * getter
 		 * name: created_by<br>
 		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getCreated_by() {
+		public java.util.UUID getCreated_by() {
 			Binder binder = data$.getValue("created_by");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 dbs<br>
+		 * 外部キー名 transfers_db_id_fkey<br>
+		 * 項目名 db_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.dbs.Row $dbs() {
+			return sqlassist.bb.dbs.row(
+				data$.getDataObject(bb$dbs$transfers_db_id_fkey));
 		}
 
 		/**
@@ -1815,6 +1874,11 @@ public class transfers
 		public final T tags;
 
 		/**
+		 * 項目名 db_id
+		 */
+		public final T db_id;
+
+		/**
 		 * 項目名 created_at
 		 */
 		public final T created_at;
@@ -1862,6 +1926,9 @@ public class transfers
 			this.tags = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfers.tags);
+			this.db_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.transfers.db_id);
 			this.created_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfers.created_at);
@@ -1981,6 +2048,19 @@ public class transfers
 			if (super.table$ != null) throw new IllegalStateException("このインスタンスでは直接使用することはできません");
 			if (!getSelectStatement().rowMode()) throw new IllegalStateException("集計モードでは実行できない処理です");
 			return new InstantOneToManyQuery<>(this, getSelectStatement().decorators());
+		}
+
+		/**
+		 * 参照先テーブル名 dbs<br>
+		 * 外部キー名 transfers_db_id_fkey<br>
+		 * 項目名 db_id
+		 * @return dbs relationship
+		 */
+		public sqlassist.bb.dbs.ExtAssist<T, Many<sqlassist.bb.transfers.Row, M>> $dbs() {
+			return new sqlassist.bb.dbs.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb.transfers.bb$dbs$transfers_db_id_fkey);
 		}
 
 		/**

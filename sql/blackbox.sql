@@ -45,6 +45,8 @@ blackbox Blackbox利用者 一般権限
 
 /*
 共通仕様
+id
+	org単位でデータベース間の移行が可能なようにUUIDを使用
 name
 	各オブジェクトの名称
 	システム的には特別な意味を持たない
@@ -68,8 +70,8 @@ updated_at
 updated_by
 	データ更新ユーザー
 	新規登録時はデータ作成ユーザーと同じ値がセットされる
-id=0のデータ
-	マスタでid=0のデータは、いわゆるNULLデータとして扱う
+id='00000000-0000-0000-0000-000000000000'のデータ
+	マスタでid='00000000-0000-0000-0000-000000000000'のデータは、いわゆるNULLデータとして扱う
 */
 
 CREATE SCHEMA bb;
@@ -82,17 +84,29 @@ COMMENT ON SCHEMA bb IS 'Blackbox Main Schema';
 SET default_tablespace = 'blackbox';
 */
 
+CREATE TABLE bb.dbs (
+	id uuid PRIMARY KEY,
+	name text NOT NULL,
+	principal boolean NOT NULL);
+
+INSERT INTO bb.dbs VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', false);
+INSERT INTO bb.dbs VALUES (
+	gen_random_uuid(),
+	current_database() || ' [' || inet_server_addr() || ':' || inet_server_port() || ']',
+	true);
+
 --組織
 CREATE TABLE bb.orgs (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	name text NOT NULL,
+	db_id uuid REFERENCES bb.dbs NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint NOT NULL, --あとでREFERENCES usersに
+	created_by uuid NOT NULL, --あとでREFERENCES usersに
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint NOT NULL); --あとでREFERENCES usersに
+	updated_by uuid NOT NULL); --あとでREFERENCES usersに
 --システム利用者最大単位
 --log対象
 
@@ -112,41 +126,58 @@ COMMENT ON COLUMN bb.orgs.updated_by IS '更新ユーザー';
 INSERT INTO bb.orgs (
 	id,
 	name,
+	db_id,
 	revision,
 	extension,
 	created_by,
 	updated_by
-) VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', 0, '{}', 0, 0);
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'NULL',
+	'00000000-0000-0000-0000-000000000000',
+	0,
+	'{}',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
 
 --システム用
 INSERT INTO bb.orgs (
+	id,
 	name,
+	db_id,
 	revision,
 	extension,
 	created_by,
 	updated_by
-) VALUES ('Blackbox', 0, '{}', 1, 1);
+) VALUES (
+	'11111111-1111-1111-1111-111111111111',
+	'Blackbox',
+	'00000000-0000-0000-0000-000000000000',
+	0,
+	'{}',
+	'11111111-1111-1111-1111-111111111111',
+	'11111111-1111-1111-1111-111111111111');
 
 ----------
 
 CREATE TABLE bb.tags (
-	id bigserial PRIMARY KEY,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	tag text UNIQUE NOT NULL);
 
 --グループ
 CREATE TABLE bb.groups (
-	id bigserial PRIMARY KEY,
-	org_id bigint REFERENCES bb.orgs NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	org_id uuid REFERENCES bb.orgs NOT NULL,
 	name text NOT NULL,
-	parent_id bigint REFERENCES bb.groups NOT NULL,
+	parent_id uuid REFERENCES bb.groups NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint NOT NULL, --あとでREFERENCES userに
+	created_by uuid NOT NULL, --あとでREFERENCES userに
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint NOT NULL); --あとでREFERENCES userに
+	updated_by uuid NOT NULL); --あとでREFERENCES userに
 --組織配下の中でのまとまり
 --権限コントロールのためのテーブル
 --全てのオブジェクトは何らかのgroupに属するように
@@ -178,10 +209,19 @@ INSERT INTO bb.groups (
 	extension,
 	created_by,
 	updated_by
-) VALUES (0, 0, 'NULL', 0, 0, '{}', 0, 0);
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'NULL',
+	'00000000-0000-0000-0000-000000000000',
+	0,
+	'{}',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
 
 --システム用
 INSERT INTO bb.groups (
+	id,
 	org_id,
 	name,
 	parent_id,
@@ -189,11 +229,19 @@ INSERT INTO bb.groups (
 	extension,
 	created_by,
 	updated_by
-) VALUES (1, 'Superusers', 0, 0, '{}', 1, 1);
+) VALUES (
+	'11111111-1111-1111-1111-111111111111',
+	'11111111-1111-1111-1111-111111111111',
+	'Superusers',
+	'00000000-0000-0000-0000-000000000000',
+	0,
+	'{}',
+	'11111111-1111-1111-1111-111111111111',
+	'11111111-1111-1111-1111-111111111111');
 
 CREATE TABLE bb.groups_tags (
-	id bigint REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
@@ -201,12 +249,13 @@ CREATE TABLE bb.groups_tags (
 --グループ親子関係
 CREATE TABLE bb.relationships (
 	id bigserial PRIMARY KEY,
-	parent_id bigint REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
-	child_id bigint REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
+	parent_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
+	child_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
 	cascade_id bigint NOT NULL, --あとでREFERENCES relationshipsに
 	UNIQUE (parent_id, child_id));
 --log対象外
 --groupsから復元できるデータであるが、更新頻度は高くないと思われるのでWAL対象
+--groupsから再生できるため、IDはbigserial
 --親IDが指定されたら子も対象とするための補助テーブル
 --groupの親子関係を物理的に展開し、検索を高速化することが目的
 --子グループから辿れるすべての親(0を除く)と自分自身にこのエントリを作成する
@@ -266,7 +315,11 @@ INSERT INTO bb.relationships (
 	parent_id,
 	child_id,
 	cascade_id
-) VALUES (0, 0, 0, 0);
+) VALUES (
+	0,
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	0);
 
 ALTER TABLE bb.relationships ADD CONSTRAINT relationships_cascade_id_fkey FOREIGN KEY (cascade_id) REFERENCES bb.relationships ON DELETE CASCADE;
 
@@ -274,8 +327,8 @@ ALTER TABLE bb.relationships ADD CONSTRAINT relationships_cascade_id_fkey FOREIG
 
 --ユーザー
 CREATE TABLE bb.users (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
 	name text NOT NULL,
 	role smallint CHECK (role IN (0, 1, 2, 3, 9)) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
@@ -283,9 +336,9 @@ CREATE TABLE bb.users (
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint NOT NULL, --あとでREFERENCES usersに
+	created_by uuid NOT NULL, --あとでREFERENCES usersに
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint NOT NULL); --あとでREFERENCES usersに
+	updated_by uuid NOT NULL); --あとでREFERENCES usersに
 --log対象
 
 COMMENT ON TABLE bb.users IS 'ユーザー
@@ -314,10 +367,19 @@ INSERT INTO bb.users (
 	extension,
 	created_by,
 	updated_by
-) VALUES (0, 0, 'NULL', 9, 0, '{}', 0, 0);
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'NULL',
+	9,
+	0,
+	'{}',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
 
 --Superuser
 INSERT INTO bb.users (
+	id,
 	group_id,
 	name,
 	role,
@@ -325,7 +387,15 @@ INSERT INTO bb.users (
 	extension,
 	created_by,
 	updated_by
-) VALUES (1, 'superuser', 0, 0, '{}', 1, 1);
+) VALUES (
+	'11111111-1111-1111-1111-111111111111',
+	'11111111-1111-1111-1111-111111111111',
+	'superuser',
+	0,
+	0,
+	'{}',
+	'11111111-1111-1111-1111-111111111111',
+	'11111111-1111-1111-1111-111111111111');
 
 ALTER TABLE bb.orgs ADD FOREIGN KEY (created_by) REFERENCES bb.users;
 ALTER TABLE bb.orgs ADD FOREIGN KEY (updated_by) REFERENCES bb.users;
@@ -335,16 +405,16 @@ ALTER TABLE bb.users ADD FOREIGN KEY (created_by) REFERENCES bb.users;
 ALTER TABLE bb.users ADD FOREIGN KEY (updated_by) REFERENCES bb.users;
 
 CREATE TABLE bb.users_tags (
-	id bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	id uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
 
 --ロック中グループ
 CREATE UNLOGGED TABLE bb.locking_groups (
-	id bigint PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,
-	user_id bigint REFERENCES bb.users NOT NULL,
+	id uuid PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,
+	user_id uuid REFERENCES bb.users NOT NULL,
 	locked_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
 --WAL対象外
@@ -364,19 +434,18 @@ COMMENT ON COLUMN bb.locking_groups.locked_at IS 'ロック開始時刻';
 
 --もの
 CREATE TABLE bb.items (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL);
 --log対象
---infinityは変更不可
 
 COMMENT ON TABLE bb.items IS 'アイテム
 在庫管理する対象となる「もの」';
@@ -401,30 +470,36 @@ INSERT INTO bb.items (
 	extension,
 	created_by,
 	updated_by
-) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'NULL',
+	0,
+	'{}',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
 
 CREATE TABLE bb.items_tags (
-	id bigint REFERENCES bb.items ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	id uuid REFERENCES bb.items ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
 
 --所有者
 CREATE TABLE bb.owners (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL);
 --log対象
---infinityは変更不可
 
 COMMENT ON TABLE bb.owners IS '所有者
 アイテムの所有者';
@@ -449,28 +524,35 @@ INSERT INTO bb.owners (
 	extension,
 	created_by,
 	updated_by
-) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'NULL',
+	0,
+	'{}',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
 
 CREATE TABLE bb.owners_tags (
-	id bigint REFERENCES bb.owners ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	id uuid REFERENCES bb.owners ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
 
 --置き場
 CREATE TABLE bb.locations (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL);
 --log対象
 --infinityは変更不可
 
@@ -497,28 +579,35 @@ INSERT INTO bb.locations (
 	extension,
 	created_by,
 	updated_by
-) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'NULL',
+	0,
+	'{}',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
 
 CREATE TABLE bb.locations_tags (
-	id bigint REFERENCES bb.locations ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	id uuid REFERENCES bb.locations ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
 
 --状態
 CREATE TABLE bb.statuses (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL);
 --log対象
 --infinityは変更不可
 
@@ -545,23 +634,30 @@ INSERT INTO bb.statuses (
 	extension,
 	created_by,
 	updated_by
-) VALUES (0, 0, 'NULL', 0, '{}', 0, 0);
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'NULL',
+	0,
+	'{}',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
 
 CREATE TABLE bb.statuses_tags (
-	id bigint REFERENCES bb.statuses ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	id uuid REFERENCES bb.statuses ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
 
 --締め
 CREATE TABLE bb.closings (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
 	closed_at timestamptz NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL);
+	created_by uuid REFERENCES bb.users NOT NULL);
 --更新不可
 
 COMMENT ON TABLE bb.closings IS '締め';
@@ -574,8 +670,8 @@ COMMENT ON COLUMN bb.closings.created_by IS '作成ユーザー';
 
 --締め済グループ
 CREATE UNLOGGED TABLE bb.last_closings (
-	id bigint PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,
-	closing_id bigint REFERENCES bb.closings ON DELETE CASCADE NOT NULL,
+	id uuid PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,
+	closing_id uuid REFERENCES bb.closings ON DELETE CASCADE NOT NULL,
 	closed_at timestamptz NOT NULL);
 --log対象外
 --WAL対象外
@@ -593,14 +689,14 @@ COMMENT ON COLUMN bb.last_closings.closed_at IS '締め時刻';
 
 --在庫
 CREATE TABLE bb.stocks (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
-	item_id bigint REFERENCES bb.items NOT NULL,
-	owner_id bigint REFERENCES bb.owners NOT NULL,
-	location_id bigint REFERENCES bb.locations NOT NULL,
-	status_id bigint REFERENCES bb.statuses NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
+	item_id uuid REFERENCES bb.items NOT NULL,
+	owner_id uuid REFERENCES bb.owners NOT NULL,
+	location_id uuid REFERENCES bb.locations NOT NULL,
+	status_id uuid REFERENCES bb.statuses NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, item_id, owner_id, location_id, status_id));
 --log対象外
 --infinity=trueの場合、在庫計算を行わない
@@ -624,18 +720,20 @@ COMMENT ON COLUMN bb.stocks.created_by IS '作成ユーザー';
 
 --移動伝票
 CREATE TABLE bb.transfers (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
-	denied_id bigint REFERENCES bb.transfers DEFAULT 0 NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
+	denied_id uuid REFERENCES bb.transfers DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,
 	transferred_at timestamptz NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	org_extension jsonb NOT NULL,
 	group_extension jsonb NOT NULL,
 	user_extension jsonb NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL);
+	db_id uuid REFERENCES bb.dbs NOT NULL,
+	created_at timestamptz DEFAULT now() UNIQUE NOT NULL, --順序を一意付けするためにUNIQUE
+	created_by uuid REFERENCES bb.users NOT NULL);
 --log対象外
+--created_atをUNIQUEにするために一件毎にcommitすること
 
 COMMENT ON TABLE bb.transfers IS '移動伝票';
 COMMENT ON COLUMN bb.transfers.id IS 'ID';
@@ -657,14 +755,23 @@ COMMENT ON COLUMN bb.transfers.created_by IS '作成ユーザー';
 INSERT INTO bb.transfers (
 	id,
 	group_id,
-	denied_id,
 	transferred_at,
 	extension,
 	org_extension,
 	group_extension,
 	user_extension,
+	db_id,
 	created_by
-) VALUES (0, 0, 0, '1900-1-1'::timestamptz, '{}', '{}', '{}', '{}', 0);
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'1900-1-1'::timestamptz,
+	'{}',
+	'{}',
+	'{}',
+	'{}',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
 
 --締め済グループチェック
 CREATE FUNCTION bb.closed_check() RETURNS TRIGGER AS $$
@@ -682,16 +789,16 @@ CREATE TRIGGER closed_checktrigger BEFORE INSERT ON bb.transfers
 FOR EACH ROW EXECUTE PROCEDURE bb.closed_check();
 
 CREATE TABLE bb.transfers_tags (
-	id bigint REFERENCES bb.transfers ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	id uuid REFERENCES bb.transfers ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
 
 --移動伝票明細
 CREATE TABLE bb.bundles (
-	id bigserial PRIMARY KEY,
-	transfer_id bigint REFERENCES bb.transfers NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	transfer_id uuid REFERENCES bb.transfers NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL);
 --log対象外
 
@@ -707,9 +814,9 @@ COMMENT ON COLUMN bb.bundles.extension IS '外部アプリケーション情報J
 
 --移動ノード
 CREATE TABLE bb.nodes (
-	id bigserial PRIMARY KEY,
-	bundle_id bigint REFERENCES bb.bundles NOT NULL,
-	stock_id bigint REFERENCES bb.stocks NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	bundle_id uuid REFERENCES bb.bundles NOT NULL,
+	stock_id uuid REFERENCES bb.stocks NOT NULL,
 	in_out "char" CHECK (in_out IN ('I', 'O')) NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_infinity boolean DEFAULT false NOT NULL,
@@ -749,11 +856,11 @@ COMMENT ON COLUMN bb.nodes.status_extension IS '状態のextension';
 
 --移動ノード状態
 CREATE UNLOGGED TABLE bb.snapshots (
-	id bigint PRIMARY KEY REFERENCES bb.nodes,
+	id uuid PRIMARY KEY REFERENCES bb.nodes,
 	infinity boolean NOT NULL,
 	total numeric CHECK (infinity OR total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL);
+	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時transfersから復元する必要あり
 --頻繁に参照、更新されることが予想されるので締め済のデータは削除する
@@ -772,7 +879,7 @@ COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
 
 --現在在庫
 CREATE UNLOGGED TABLE bb.current_stocks (
-	id bigserial PRIMARY KEY REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
+	id uuid PRIMARY KEY REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
 	infinity boolean NOT NULL,
 	total numeric CHECK (infinity OR total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL);
@@ -793,12 +900,12 @@ COMMENT ON COLUMN bb.current_stocks.updated_at IS '更新時刻';
 
 --締め在庫
 CREATE TABLE bb.closed_stocks (
-	id bigint REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
-	closing_id bigint REFERENCES bb.closings ON DELETE CASCADE NOT NULL,
+	id uuid REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
+	closing_id uuid REFERENCES bb.closings ON DELETE CASCADE NOT NULL,
 	infinity boolean NOT NULL,
 	total numeric CHECK (infinity OR total >= 0) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users ON DELETE CASCADE NOT NULL);
+	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
 --締め完了後の在庫数を保持
 --クラッシュ時、ここからsnapshotsとcurrent_stocksを復元する
@@ -815,7 +922,7 @@ COMMENT ON COLUMN bb.closed_stocks.updated_by IS '更新ユーザー';
 
 --現在在庫数量反映ジョブ
 CREATE TABLE bb.jobs (
-	id bigserial PRIMARY KEY REFERENCES bb.transfers,
+	id uuid PRIMARY KEY REFERENCES bb.transfers,
 	completed boolean DEFAULT false NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL);
 --transfer毎に作成
@@ -835,14 +942,14 @@ COMMENT ON COLUMN bb.jobs.updated_at IS '更新時刻';
 
 --一時作業
 CREATE TABLE bb.transients (
-	id bigserial PRIMARY KEY,
-	group_id bigint REFERENCES bb.groups NOT NULL,
-	user_id bigint REFERENCES bb.users NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
+	user_id uuid REFERENCES bb.users NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL);
 
 COMMENT ON TABLE bb.transients IS '一時作業';
 COMMENT ON COLUMN bb.transients.id IS 'ID';
@@ -857,26 +964,26 @@ COMMENT ON COLUMN bb.transients.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transients.updated_by IS '更新ユーザー';
 
 CREATE TABLE bb.transients_tags (
-	id bigint REFERENCES bb.transients ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	id uuid REFERENCES bb.transients ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
 
 --一時作業移動伝票
 CREATE TABLE bb.transient_transfers (
-	id bigserial PRIMARY KEY,
-	transient_id bigint REFERENCES bb.transients NOT NULL,
-	group_id bigint REFERENCES bb.groups NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	transient_id uuid REFERENCES bb.transients NOT NULL,
+	group_id uuid REFERENCES bb.groups NOT NULL,
 	transferred_at timestamptz NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	completed boolean DEFAULT false NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL);
 
 COMMENT ON TABLE bb.transient_transfers IS '一時作業移動伝票';
 COMMENT ON COLUMN bb.transient_transfers.id IS 'ID';
@@ -908,20 +1015,20 @@ CREATE TRIGGER transient_closed_checktrigger BEFORE INSERT ON bb.transient_trans
 FOR EACH ROW EXECUTE PROCEDURE bb.transient_closed_check();
 
 CREATE TABLE bb.transient_transfers_tags (
-	id bigint REFERENCES bb.transient_transfers ON DELETE CASCADE NOT NULL,
-	tag_id bigint REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	id uuid REFERENCES bb.transient_transfers ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
 
 --一時作業移動伝票明細
 CREATE TABLE bb.transient_bundles (
-	id bigserial PRIMARY KEY,
-	transient_transfer_id bigint REFERENCES bb.transient_transfers NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	transient_transfer_id uuid REFERENCES bb.transient_transfers NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,-- 編集でtransient_bundlesだけ追加することもあるので必要
-	created_by bigint REFERENCES bb.users NOT NULL);
+	created_by uuid REFERENCES bb.users NOT NULL);
 
 COMMENT ON TABLE bb.transient_bundles IS '一時作業移動伝票明細';
 COMMENT ON COLUMN bb.transient_bundles.id IS 'ID';
@@ -935,17 +1042,17 @@ COMMENT ON COLUMN bb.transient_bundles.created_by IS '作成ユーザー';
 
 --一時作業移動ノード
 CREATE TABLE bb.transient_nodes (
-	id bigserial PRIMARY KEY,
-	transient_bundle_id bigint REFERENCES bb.transient_bundles NOT NULL,
-	stock_id bigint REFERENCES bb.stocks NOT NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	transient_bundle_id uuid REFERENCES bb.transient_bundles NOT NULL,
+	stock_id uuid REFERENCES bb.stocks NOT NULL,
 	in_out "char" CHECK (in_out IN ('I', 'O')) NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL);
 
 COMMENT ON TABLE bb.transient_nodes IS '一時作業移動ノード';
 COMMENT ON COLUMN bb.transient_nodes.id IS 'ID';
@@ -964,13 +1071,13 @@ COMMENT ON COLUMN bb.transient_nodes.updated_by IS '更新ユーザー';
 
 --一時作業移動ノード状態
 CREATE TABLE bb.transient_snapshots (
-	id bigint PRIMARY KEY REFERENCES bb.transient_nodes,
+	id uuid PRIMARY KEY REFERENCES bb.transient_nodes,
 	infinity boolean NOT NULL,
 	total numeric CHECK (infinity OR total >= 0) NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL);
 
 COMMENT ON TABLE bb.transient_snapshots IS '一時作業移動ノード状態';
 COMMENT ON COLUMN bb.transient_snapshots.id IS 'ID';
@@ -986,14 +1093,14 @@ COMMENT ON COLUMN bb.transient_snapshots.updated_by IS '更新ユーザー';
 
 --一時作業現在在庫
 CREATE TABLE bb.transient_current_stocks (
-	id bigint PRIMARY KEY REFERENCES bb.stocks, --先にstocksにデータを作成してからこのテーブルにデータ作成
-	transient_id bigint REFERENCES bb.transients NOT NULL,
+	id uuid PRIMARY KEY REFERENCES bb.stocks, --先にstocksにデータを作成してからこのテーブルにデータ作成
+	transient_id uuid REFERENCES bb.transients NOT NULL,
 	infinity boolean NOT NULL,
 	total numeric CHECK (infinity OR total >= 0) NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by bigint REFERENCES bb.users NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by bigint REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL);
 
 COMMENT ON TABLE bb.transient_current_stocks IS '一時作業現在在庫';
 COMMENT ON COLUMN bb.transient_current_stocks.id IS 'ID

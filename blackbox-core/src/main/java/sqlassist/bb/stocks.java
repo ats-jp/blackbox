@@ -137,56 +137,56 @@ public class stocks
 	/**
 	 * name: id<br>
 	 * remarks: ID<br>
-	 * type: bigserial(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "nextval('bb.stocks_id_seq'::regclass)", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "gen_random_uuid()", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
 	 * name: group_id<br>
 	 * remarks: グループID<br>
 	 * この在庫の属するグループ<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID\nこの在庫の属するグループ", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID\nこの在庫の属するグループ", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String group_id = "group_id";
 
 	/**
 	 * name: item_id<br>
 	 * remarks: アイテムID<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "item_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムID", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "item_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムID", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String item_id = "item_id";
 
 	/**
 	 * name: owner_id<br>
 	 * remarks: 所有者ID<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "owner_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者ID", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "owner_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者ID", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String owner_id = "owner_id";
 
 	/**
 	 * name: location_id<br>
 	 * remarks: 置き場ID<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "location_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場ID", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "location_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場ID", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String location_id = "location_id";
 
 	/**
 	 * name: status_id<br>
 	 * remarks: 状態ID<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "status_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態ID", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "status_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態ID", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String status_id = "status_id";
 
 	/**
@@ -201,10 +201,10 @@ public class stocks
 	/**
 	 * name: created_by<br>
 	 * remarks: 作成ユーザー<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 8, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 8, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -318,11 +318,11 @@ public class stocks
 		 * setter
 		 * name: id<br>
 		* remarks: ID<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setId(java.lang.Long value) {
+		public void setId(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -335,13 +335,13 @@ public class stocks
 		 * getter
 		 * name: id<br>
 		* remarks: ID<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getId() {
+		public java.util.UUID getId() {
 			Binder binder = data$.getValue("id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -349,11 +349,11 @@ public class stocks
 		 * name: group_id<br>
 		* remarks: グループID<br>
 		* この在庫の属するグループ<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setGroup_id(java.lang.Long value) {
+		public void setGroup_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -367,24 +367,24 @@ public class stocks
 		 * name: group_id<br>
 		* remarks: グループID<br>
 		* この在庫の属するグループ<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getGroup_id() {
+		public java.util.UUID getGroup_id() {
 			Binder binder = data$.getValue("group_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
 		 * name: item_id<br>
 		* remarks: アイテムID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setItem_id(java.lang.Long value) {
+		public void setItem_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -397,24 +397,24 @@ public class stocks
 		 * getter
 		 * name: item_id<br>
 		* remarks: アイテムID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getItem_id() {
+		public java.util.UUID getItem_id() {
 			Binder binder = data$.getValue("item_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
 		 * name: owner_id<br>
 		* remarks: 所有者ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setOwner_id(java.lang.Long value) {
+		public void setOwner_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -427,24 +427,24 @@ public class stocks
 		 * getter
 		 * name: owner_id<br>
 		* remarks: 所有者ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getOwner_id() {
+		public java.util.UUID getOwner_id() {
 			Binder binder = data$.getValue("owner_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
 		 * name: location_id<br>
 		* remarks: 置き場ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setLocation_id(java.lang.Long value) {
+		public void setLocation_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -457,24 +457,24 @@ public class stocks
 		 * getter
 		 * name: location_id<br>
 		* remarks: 置き場ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getLocation_id() {
+		public java.util.UUID getLocation_id() {
 			Binder binder = data$.getValue("location_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
 		 * name: status_id<br>
 		* remarks: 状態ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setStatus_id(java.lang.Long value) {
+		public void setStatus_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -487,13 +487,13 @@ public class stocks
 		 * getter
 		 * name: status_id<br>
 		* remarks: 状態ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getStatus_id() {
+		public java.util.UUID getStatus_id() {
 			Binder binder = data$.getValue("status_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -530,11 +530,11 @@ public class stocks
 		 * setter
 		 * name: created_by<br>
 		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setCreated_by(java.lang.Long value) {
+		public void setCreated_by(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -547,13 +547,13 @@ public class stocks
 		 * getter
 		 * name: created_by<br>
 		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getCreated_by() {
+		public java.util.UUID getCreated_by() {
 			Binder binder = data$.getValue("created_by");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**

@@ -137,28 +137,28 @@ public class nodes
 	/**
 	 * name: id<br>
 	 * remarks: ID<br>
-	 * type: bigserial(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "nextval('bb.nodes_id_seq'::regclass)", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "gen_random_uuid()", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
 	 * name: bundle_id<br>
 	 * remarks: 移動ID<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "bundle_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ID", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "bundle_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ID", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String bundle_id = "bundle_id";
 
 	/**
 	 * name: stock_id<br>
 	 * remarks: 在庫ID<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "stock_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫ID", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "stock_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫ID", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String stock_id = "stock_id";
 
 	/**
@@ -322,11 +322,11 @@ public class nodes
 		 * setter
 		 * name: id<br>
 		* remarks: ID<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setId(java.lang.Long value) {
+		public void setId(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -339,24 +339,24 @@ public class nodes
 		 * getter
 		 * name: id<br>
 		* remarks: ID<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getId() {
+		public java.util.UUID getId() {
 			Binder binder = data$.getValue("id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
 		 * name: bundle_id<br>
 		* remarks: 移動ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setBundle_id(java.lang.Long value) {
+		public void setBundle_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -369,24 +369,24 @@ public class nodes
 		 * getter
 		 * name: bundle_id<br>
 		* remarks: 移動ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getBundle_id() {
+		public java.util.UUID getBundle_id() {
 			Binder binder = data$.getValue("bundle_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
 		 * name: stock_id<br>
 		* remarks: 在庫ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setStock_id(java.lang.Long value) {
+		public void setStock_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -399,13 +399,13 @@ public class nodes
 		 * getter
 		 * name: stock_id<br>
 		* remarks: 在庫ID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getStock_id() {
+		public java.util.UUID getStock_id() {
 			Binder binder = data$.getValue("stock_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**

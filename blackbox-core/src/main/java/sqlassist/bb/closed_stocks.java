@@ -135,19 +135,19 @@ public class closed_stocks
 	 * name: id<br>
 	 * remarks: ID<br>
 	 * 在庫IDに従属<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: false<br>
 	 */
-	@Column(name = "id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID\n在庫IDに従属", defaultValue = "null", ordinalPosition = 1, notNull = false)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID\n在庫IDに従属", defaultValue = "null", ordinalPosition = 1, notNull = false)
 	public static final String id = "id";
 
 	/**
 	 * name: closing_id<br>
 	 * remarks: 締めID<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "closing_id", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "締めID", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "closing_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "締めID", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String closing_id = "closing_id";
 
 	/**
@@ -181,10 +181,10 @@ public class closed_stocks
 	/**
 	 * name: updated_by<br>
 	 * remarks: 更新ユーザー<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -275,11 +275,11 @@ public class closed_stocks
 		 * name: id<br>
 		* remarks: ID<br>
 		* 在庫IDに従属<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: false<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setId(java.lang.Long value) {
+		public void setId(java.util.UUID value) {
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
@@ -292,24 +292,24 @@ public class closed_stocks
 		 * name: id<br>
 		* remarks: ID<br>
 		* 在庫IDに従属<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: false<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public Optional<java.lang.Long> getId() {
+		public Optional<java.util.UUID> getId() {
 			Binder binder = data$.getValue("id");
-			return Optional.ofNullable((java.lang.Long) binder.getValue());
+			return Optional.ofNullable((java.util.UUID) binder.getValue());
 		}
 
 		/**
 		 * setter
 		 * name: closing_id<br>
 		* remarks: 締めID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setClosing_id(java.lang.Long value) {
+		public void setClosing_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -322,13 +322,13 @@ public class closed_stocks
 		 * getter
 		 * name: closing_id<br>
 		* remarks: 締めID<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getClosing_id() {
+		public java.util.UUID getClosing_id() {
 			Binder binder = data$.getValue("closing_id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -427,11 +427,11 @@ public class closed_stocks
 		 * setter
 		 * name: updated_by<br>
 		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setUpdated_by(java.lang.Long value) {
+		public void setUpdated_by(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -444,13 +444,13 @@ public class closed_stocks
 		 * getter
 		 * name: updated_by<br>
 		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getUpdated_by() {
+		public java.util.UUID getUpdated_by() {
 			Binder binder = data$.getValue("updated_by");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**

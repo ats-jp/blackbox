@@ -3,6 +3,7 @@ package jp.ats.blackbox.persistence;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Optional;
+import java.util.UUID;
 
 import jp.ats.blackbox.model.InOut;
 
@@ -17,12 +18,12 @@ public class TransferComponent {
 		 * このtransferが属するグループ
 		 * 必須
 		 */
-		public long group_id;
+		public UUID group_id;
 
 		/**
 		 * 打消し元のtransfer_id
 		 */
-		public Optional<Long> denied_id = Optional.empty();
+		public Optional<UUID> denied_id = Optional.empty();
 
 		/**
 		 * 移動時刻
@@ -84,35 +85,35 @@ public class TransferComponent {
 		 * stockに格納される
 		 * 必須
 		 */
-		public long group_id;
+		public UUID group_id;
 
 		/**
 		 * stockのitem
 		 * stockに格納される
 		 * 必須
 		 */
-		public long item_id;
+		public UUID item_id;
 
 		/**
 		 * stockのowner
 		 * stockに格納される
 		 * 必須
 		 */
-		public long owner_id;
+		public UUID owner_id;
 
 		/**
 		 * stockのlocation
 		 * stockに格納される
 		 * 必須
 		 */
-		public long location_id;
+		public UUID location_id;
 
 		/**
 		 * stockのstatus
 		 * stockに格納される
 		 * 必須
 		 */
-		public long status_id;
+		public UUID status_id;
 
 		/**
 		 * 入出庫タイプ
@@ -143,7 +144,7 @@ public class TransferComponent {
 
 	public static class TransferRegisterResult {
 
-		public long transferId;
+		public UUID transferId;
 
 		public Timestamp transferredAt;
 	}

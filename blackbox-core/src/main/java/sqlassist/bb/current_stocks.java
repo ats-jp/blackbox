@@ -138,10 +138,10 @@ public class current_stocks
 	 * name: id<br>
 	 * remarks: ID<br>
 	 * stocks.stock_idに従属<br>
-	 * type: bigserial(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID\nstocks.stock_idに従属", defaultValue = "nextval('bb.current_stocks_id_seq'::regclass)", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID\nstocks.stock_idに従属", defaultValue = "null", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
@@ -244,11 +244,11 @@ public class current_stocks
 		 * name: id<br>
 		* remarks: ID<br>
 		* stocks.stock_idに従属<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setId(java.lang.Long value) {
+		public void setId(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -262,13 +262,13 @@ public class current_stocks
 		 * name: id<br>
 		* remarks: ID<br>
 		* stocks.stock_idに従属<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getId() {
+		public java.util.UUID getId() {
 			Binder binder = data$.getValue("id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**

@@ -137,10 +137,10 @@ public class orgs
 	/**
 	 * name: id<br>
 	 * remarks: ID<br>
-	 * type: bigserial(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "nextval('bb.orgs_id_seq'::regclass)", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "gen_random_uuid()", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
@@ -153,12 +153,21 @@ public class orgs
 	public static final String name = "name";
 
 	/**
+	 * name: db_id<br>
+	 * remarks: <br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "db_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String db_id = "db_id";
+
+	/**
 	 * name: revision<br>
 	 * remarks: リビジョン番号<br>
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 3, notNull = true)
+	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 4, notNull = true)
 	public static final String revision = "revision";
 
 	/**
@@ -167,7 +176,7 @@ public class orgs
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 4, notNull = true)
+	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 5, notNull = true)
 	public static final String extension = "extension";
 
 	/**
@@ -176,7 +185,7 @@ public class orgs
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "active", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "アクティブフラグ", defaultValue = "true", ordinalPosition = 5, notNull = true)
+	@Column(name = "active", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "アクティブフラグ", defaultValue = "true", ordinalPosition = 6, notNull = true)
 	public static final String active = "active";
 
 	/**
@@ -185,16 +194,16 @@ public class orgs
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 6, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 7, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
 	 * name: created_by<br>
 	 * remarks: 作成ユーザー<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 7, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 8, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -203,17 +212,25 @@ public class orgs
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 9, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
 	 * name: updated_by<br>
 	 * remarks: 更新ユーザー<br>
-	 * type: int8(19)<br>
+	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 9, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 10, notNull = true)
 	public static final String updated_by = "updated_by";
+
+	/**
+	 * name: orgs_db_id_fkey<br>
+	 * references: dbs<br>
+	 * columns: db_id
+	 */
+	@ForeignKey(name = "orgs_db_id_fkey", references = "bb.dbs", columns = { "db_id" }, refColumns = { "id" })
+	public static final String bb$dbs$orgs_db_id_fkey = "orgs_db_id_fkey";
 
 	/**
 	 * name: orgs_created_by_fkey<br>
@@ -294,11 +311,11 @@ public class orgs
 		 * setter
 		 * name: id<br>
 		* remarks: ID<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setId(java.lang.Long value) {
+		public void setId(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -311,13 +328,13 @@ public class orgs
 		 * getter
 		 * name: id<br>
 		* remarks: ID<br>
-		* type: bigserial(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getId() {
+		public java.util.UUID getId() {
 			Binder binder = data$.getValue("id");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -348,6 +365,36 @@ public class orgs
 		public java.lang.String getName() {
 			Binder binder = data$.getValue("name");
 			return (java.lang.String) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: db_id<br>
+		* remarks: <br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setDb_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("db_id").getType());
+			data$.setValue("db_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: db_id<br>
+		* remarks: <br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getDb_id() {
+			Binder binder = data$.getValue("db_id");
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -474,11 +521,11 @@ public class orgs
 		 * setter
 		 * name: created_by<br>
 		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setCreated_by(java.lang.Long value) {
+		public void setCreated_by(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -491,13 +538,13 @@ public class orgs
 		 * getter
 		 * name: created_by<br>
 		* remarks: 作成ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getCreated_by() {
+		public java.util.UUID getCreated_by() {
 			Binder binder = data$.getValue("created_by");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -534,11 +581,11 @@ public class orgs
 		 * setter
 		 * name: updated_by<br>
 		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.util.UUID
 		 */
-		public void setUpdated_by(java.lang.Long value) {
+		public void setUpdated_by(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -551,13 +598,25 @@ public class orgs
 		 * getter
 		 * name: updated_by<br>
 		* remarks: 更新ユーザー<br>
-		* type: int8(19)<br>
+		* type: uuid(2147483647)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.util.UUID
 		 */
-		public java.lang.Long getUpdated_by() {
+		public java.util.UUID getUpdated_by() {
 			Binder binder = data$.getValue("updated_by");
-			return (java.lang.Long) binder.getValue();
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 dbs<br>
+		 * 外部キー名 orgs_db_id_fkey<br>
+		 * 項目名 db_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.dbs.Row $dbs() {
+			return sqlassist.bb.dbs.row(
+				data$.getDataObject(bb$dbs$orgs_db_id_fkey));
 		}
 
 		/**
@@ -1674,6 +1733,11 @@ public class orgs
 		public final T name;
 
 		/**
+		 * 項目名 db_id
+		 */
+		public final T db_id;
+
+		/**
 		 * 項目名 revision
 		 */
 		public final T revision;
@@ -1725,6 +1789,9 @@ public class orgs
 			this.name = builder$.buildColumn(
 				this,
 				sqlassist.bb.orgs.name);
+			this.db_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.orgs.db_id);
 			this.revision = builder$.buildColumn(
 				this,
 				sqlassist.bb.orgs.revision);
@@ -1859,6 +1926,19 @@ public class orgs
 			if (super.table$ != null) throw new IllegalStateException("このインスタンスでは直接使用することはできません");
 			if (!getSelectStatement().rowMode()) throw new IllegalStateException("集計モードでは実行できない処理です");
 			return new InstantOneToManyQuery<>(this, getSelectStatement().decorators());
+		}
+
+		/**
+		 * 参照先テーブル名 dbs<br>
+		 * 外部キー名 orgs_db_id_fkey<br>
+		 * 項目名 db_id
+		 * @return dbs relationship
+		 */
+		public sqlassist.bb.dbs.ExtAssist<T, Many<sqlassist.bb.orgs.Row, M>> $dbs() {
+			return new sqlassist.bb.dbs.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb.orgs.bb$dbs$orgs_db_id_fkey);
 		}
 
 		/**

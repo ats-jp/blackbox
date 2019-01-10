@@ -1,5 +1,6 @@
 package jp.ats.blackbox.test;
 
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 import jp.ats.blackbox.executor.JobExecutor;
@@ -24,11 +25,15 @@ public class TransferExecutorTest {
 				var promise = executor.register(SecurityValues.currentUserId(), () -> TransferHandlerTest.createRequest());
 
 				try {
-					long newId = promise.getTransferId();
+					UUID newId = promise.getTransferId();
 					System.out.println("register: " + newId + " " + Thread.currentThread());
+
+					promise.waitUntilFinished();
 
 					var denyPromise = executor.deny(SecurityValues.currentUserId(), newId);
 					System.out.println("deny    : " + denyPromise.getTransferId() + " " + Thread.currentThread());
+
+					denyPromise.waitUntilFinished();
 				} catch (Exception e) {
 					e.printStackTrace();
 					return;
