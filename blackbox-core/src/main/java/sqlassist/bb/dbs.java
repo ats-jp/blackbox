@@ -99,9 +99,10 @@ import org.blendee.assist.annotation.Table;
  * schema: bb<br>
  * name: dbs<br>
  * type: TABLE<br>
- * remarks: <br>
+ * remarks: 運用DB<br>
+ * org単位でデータを移行する際の発生元を表す<br>
  */
-@Table(name = "dbs", schema = "bb", type = "TABLE", remarks = "")
+@Table(name = "dbs", schema = "bb", type = "TABLE", remarks = "運用DB\norg単位でデータを移行する際の発生元を表す")
 @PrimaryKey(name = "dbs_pkey", columns = { "id" })
 public class dbs
 	extends java.lang.Object
@@ -133,30 +134,40 @@ public class dbs
 
 	/**
 	 * name: id<br>
-	 * remarks: <br>
+	 * remarks: ID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "null", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
 	 * name: name<br>
-	 * remarks: <br>
+	 * remarks: 名称<br>
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "name", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "name", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "名称", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String name = "name";
 
 	/**
 	 * name: principal<br>
-	 * remarks: <br>
+	 * remarks: このDBを表す行<br>
+	 * 一行のみtrueでなければならず、他から移設してきたDBデータはfalse<br>
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "principal", type = -7, typeName = "bool", size = 1, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "principal", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "このDBを表す行\n一行のみtrueでなければならず、他から移設してきたDBデータはfalse", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String principal = "principal";
+
+	/**
+	 * name: description<br>
+	 * remarks: <br>
+	 * type: text(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	public static final String description = "description";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -220,7 +231,7 @@ public class dbs
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: <br>
+		* remarks: ID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
@@ -237,7 +248,7 @@ public class dbs
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: <br>
+		* remarks: ID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
@@ -250,7 +261,7 @@ public class dbs
 		/**
 		 * setter
 		 * name: name<br>
-		* remarks: <br>
+		* remarks: 名称<br>
 		* type: text(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.String
@@ -267,7 +278,7 @@ public class dbs
 		/**
 		 * getter
 		 * name: name<br>
-		* remarks: <br>
+		* remarks: 名称<br>
 		* type: text(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.String
@@ -280,7 +291,8 @@ public class dbs
 		/**
 		 * setter
 		 * name: principal<br>
-		* remarks: <br>
+		* remarks: このDBを表す行<br>
+		* 一行のみtrueでなければならず、他から移設してきたDBデータはfalse<br>
 		* type: bool(1)<br>
 		* not null: true<br>
 		 * @param value java.lang.Boolean
@@ -297,7 +309,8 @@ public class dbs
 		/**
 		 * getter
 		 * name: principal<br>
-		* remarks: <br>
+		* remarks: このDBを表す行<br>
+		* 一行のみtrueでなければならず、他から移設してきたDBデータはfalse<br>
 		* type: bool(1)<br>
 		* not null: true<br>
 		 * @return java.lang.Boolean
@@ -305,6 +318,36 @@ public class dbs
 		public java.lang.Boolean getPrincipal() {
 			Binder binder = data$.getValue("principal");
 			return (java.lang.Boolean) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: description<br>
+		* remarks: <br>
+		* type: text(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.lang.String
+		 */
+		public void setDescription(java.lang.String value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("description").getType());
+			data$.setValue("description", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: description<br>
+		* remarks: <br>
+		* type: text(2147483647)<br>
+		* not null: true<br>
+		 * @return java.lang.String
+		 */
+		public java.lang.String getDescription() {
+			Binder binder = data$.getValue("description");
+			return (java.lang.String) binder.getValue();
 		}
 
 	}
@@ -1401,6 +1444,11 @@ public class dbs
 		 */
 		public final T principal;
 
+		/**
+		 * 項目名 description
+		 */
+		public final T description;
+
 		private Assist(
 			dbs table$,
 			TableFacadeContext<T> builder$,
@@ -1421,6 +1469,9 @@ public class dbs
 			this.principal = builder$.buildColumn(
 				this,
 				sqlassist.bb.dbs.principal);
+			this.description = builder$.buildColumn(
+				this,
+				sqlassist.bb.dbs.description);
 
 		}
 

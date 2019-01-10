@@ -84,16 +84,26 @@ COMMENT ON SCHEMA bb IS 'Blackbox Main Schema';
 SET default_tablespace = 'blackbox';
 */
 
+--運用DB
 CREATE TABLE bb.dbs (
 	id uuid PRIMARY KEY,
 	name text NOT NULL,
-	principal boolean NOT NULL);
+	principal boolean NOT NULL,
+	description text NOT NULL);
 
-INSERT INTO bb.dbs VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', false);
+COMMENT ON TABLE bb.dbs IS '運用DB
+org単位でデータを移行する際の発生元を表す';
+COMMENT ON COLUMN bb.dbs.id IS 'ID';
+COMMENT ON COLUMN bb.dbs.name IS '名称';
+COMMENT ON COLUMN bb.dbs.principal IS 'このDBを表す行
+一行のみtrueでなければならず、他から移設してきたDBデータはfalse';
+
+INSERT INTO bb.dbs VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', false, 'nullの代用、移行不可');
 INSERT INTO bb.dbs VALUES (
 	gen_random_uuid(),
 	current_database() || ' [' || inet_server_addr() || ':' || inet_server_port() || ']',
-	true);
+	true,
+	'');
 
 --組織
 CREATE TABLE bb.orgs (
@@ -114,6 +124,7 @@ COMMENT ON TABLE bb.orgs IS '組織
 Blackboxを使用する組織';
 COMMENT ON COLUMN bb.orgs.id IS 'ID';
 COMMENT ON COLUMN bb.orgs.name IS '名称';
+COMMENT ON COLUMN bb.orgs.db_id IS '発生元DBのID';
 COMMENT ON COLUMN bb.orgs.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.orgs.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.orgs.active IS 'アクティブフラグ';
@@ -122,7 +133,7 @@ COMMENT ON COLUMN bb.orgs.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.orgs.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.orgs.updated_by IS '更新ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.orgs (
 	id,
 	name,
@@ -730,10 +741,12 @@ CREATE TABLE bb.transfers (
 	user_extension jsonb NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	db_id uuid REFERENCES bb.dbs NOT NULL,
-	created_at timestamptz DEFAULT now() UNIQUE NOT NULL, --順序を一意付けするためにUNIQUE
-	created_by uuid REFERENCES bb.users NOT NULL);
+	created_at timestamptz DEFAULT now() NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
+	UNIQUE (group_id, created_at)); 
 --log対象外
 --created_atをUNIQUEにするために一件毎にcommitすること
+--順序を一意付けするためにcreated_atをUNIQUE化、他DBから移行してきたtransferのcreated_atと重複しないようにgroup_idも含める
 
 COMMENT ON TABLE bb.transfers IS '移動伝票';
 COMMENT ON COLUMN bb.transfers.id IS 'ID';
@@ -748,6 +761,7 @@ COMMENT ON COLUMN bb.transfers.org_extension IS '組織のextension';
 COMMENT ON COLUMN bb.transfers.group_extension IS 'グループのextension';
 COMMENT ON COLUMN bb.transfers.user_extension IS '作成ユーザーのextension';
 COMMENT ON COLUMN bb.transfers.tags IS '保存用タグ';
+COMMENT ON COLUMN bb.transfers.db_id IS '発生元DBのID';
 COMMENT ON COLUMN bb.transfers.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transfers.created_by IS '作成ユーザー';
 
