@@ -153,13 +153,13 @@ public class orgs
 	public static final String name = "name";
 
 	/**
-	 * name: db_id<br>
-	 * remarks: <br>
+	 * name: instance_id<br>
+	 * remarks: 発生元インスタンスのID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "db_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 3, notNull = true)
-	public static final String db_id = "db_id";
+	@Column(name = "instance_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "発生元インスタンスのID", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String instance_id = "instance_id";
 
 	/**
 	 * name: revision<br>
@@ -225,12 +225,12 @@ public class orgs
 	public static final String updated_by = "updated_by";
 
 	/**
-	 * name: orgs_db_id_fkey<br>
-	 * references: dbs<br>
-	 * columns: db_id
+	 * name: orgs_instance_id_fkey<br>
+	 * references: instances<br>
+	 * columns: instance_id
 	 */
-	@ForeignKey(name = "orgs_db_id_fkey", references = "bb.dbs", columns = { "db_id" }, refColumns = { "id" })
-	public static final String bb$dbs$orgs_db_id_fkey = "orgs_db_id_fkey";
+	@ForeignKey(name = "orgs_instance_id_fkey", references = "bb.instances", columns = { "instance_id" }, refColumns = { "id" })
+	public static final String bb$instances$orgs_instance_id_fkey = "orgs_instance_id_fkey";
 
 	/**
 	 * name: orgs_created_by_fkey<br>
@@ -369,31 +369,31 @@ public class orgs
 
 		/**
 		 * setter
-		 * name: db_id<br>
-		* remarks: <br>
+		 * name: instance_id<br>
+		* remarks: 発生元インスタンスのID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setDb_id(java.util.UUID value) {
+		public void setInstance_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("db_id").getType());
-			data$.setValue("db_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("instance_id").getType());
+			data$.setValue("instance_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: db_id<br>
-		* remarks: <br>
+		 * name: instance_id<br>
+		* remarks: 発生元インスタンスのID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getDb_id() {
-			Binder binder = data$.getValue("db_id");
+		public java.util.UUID getInstance_id() {
+			Binder binder = data$.getValue("instance_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
@@ -609,14 +609,14 @@ public class orgs
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 dbs<br>
-		 * 外部キー名 orgs_db_id_fkey<br>
-		 * 項目名 db_id
+		 * 参照先テーブル名 instances<br>
+		 * 外部キー名 orgs_instance_id_fkey<br>
+		 * 項目名 instance_id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.dbs.Row $dbs() {
-			return sqlassist.bb.dbs.row(
-				data$.getDataObject(bb$dbs$orgs_db_id_fkey));
+		public sqlassist.bb.instances.Row $instances() {
+			return sqlassist.bb.instances.row(
+				data$.getDataObject(bb$instances$orgs_instance_id_fkey));
 		}
 
 		/**
@@ -1733,9 +1733,9 @@ public class orgs
 		public final T name;
 
 		/**
-		 * 項目名 db_id
+		 * 項目名 instance_id
 		 */
-		public final T db_id;
+		public final T instance_id;
 
 		/**
 		 * 項目名 revision
@@ -1789,9 +1789,9 @@ public class orgs
 			this.name = builder$.buildColumn(
 				this,
 				sqlassist.bb.orgs.name);
-			this.db_id = builder$.buildColumn(
+			this.instance_id = builder$.buildColumn(
 				this,
-				sqlassist.bb.orgs.db_id);
+				sqlassist.bb.orgs.instance_id);
 			this.revision = builder$.buildColumn(
 				this,
 				sqlassist.bb.orgs.revision);
@@ -1929,16 +1929,16 @@ public class orgs
 		}
 
 		/**
-		 * 参照先テーブル名 dbs<br>
-		 * 外部キー名 orgs_db_id_fkey<br>
-		 * 項目名 db_id
-		 * @return dbs relationship
+		 * 参照先テーブル名 instances<br>
+		 * 外部キー名 orgs_instance_id_fkey<br>
+		 * 項目名 instance_id
+		 * @return instances relationship
 		 */
-		public sqlassist.bb.dbs.ExtAssist<T, Many<sqlassist.bb.orgs.Row, M>> $dbs() {
-			return new sqlassist.bb.dbs.ExtAssist<>(
+		public sqlassist.bb.instances.ExtAssist<T, Many<sqlassist.bb.orgs.Row, M>> $instances() {
+			return new sqlassist.bb.instances.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb.orgs.bb$dbs$orgs_db_id_fkey);
+				sqlassist.bb.orgs.bb$instances$orgs_instance_id_fkey);
 		}
 
 		/**

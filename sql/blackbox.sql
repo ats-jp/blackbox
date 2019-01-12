@@ -84,22 +84,22 @@ COMMENT ON SCHEMA bb IS 'Blackbox Main Schema';
 SET default_tablespace = 'blackbox';
 */
 
---運用DB
-CREATE TABLE bb.dbs (
+--Blackboxインスタンス
+CREATE TABLE bb.instances (
 	id uuid PRIMARY KEY,
 	name text NOT NULL,
 	principal boolean NOT NULL,
 	description text NOT NULL);
 
-COMMENT ON TABLE bb.dbs IS '運用DB
+COMMENT ON TABLE bb.instances IS 'Blackbox運用インスタンス
 org単位でデータを移行する際の発生元を表す';
-COMMENT ON COLUMN bb.dbs.id IS 'ID';
-COMMENT ON COLUMN bb.dbs.name IS '名称';
-COMMENT ON COLUMN bb.dbs.principal IS 'このDBを表す行
-一行のみtrueでなければならず、他から移設してきたDBデータはfalse';
+COMMENT ON COLUMN bb.instances.id IS 'ID';
+COMMENT ON COLUMN bb.instances.name IS '名称';
+COMMENT ON COLUMN bb.instances.principal IS 'この実行インスタンスを表す行
+一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse';
 
-INSERT INTO bb.dbs VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', false, 'nullの代用、移行不可');
-INSERT INTO bb.dbs VALUES (
+INSERT INTO bb.instances VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', false, 'nullの代用、移行不可');
+INSERT INTO bb.instances VALUES (
 	gen_random_uuid(),
 	current_database() || ' [' || inet_server_addr() || ':' || inet_server_port() || ']',
 	true,
@@ -109,7 +109,7 @@ INSERT INTO bb.dbs VALUES (
 CREATE TABLE bb.orgs (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	name text NOT NULL,
-	db_id uuid REFERENCES bb.dbs NOT NULL,
+	instance_id uuid REFERENCES bb.instances NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
@@ -124,7 +124,7 @@ COMMENT ON TABLE bb.orgs IS '組織
 Blackboxを使用する組織';
 COMMENT ON COLUMN bb.orgs.id IS 'ID';
 COMMENT ON COLUMN bb.orgs.name IS '名称';
-COMMENT ON COLUMN bb.orgs.db_id IS '発生元DBのID';
+COMMENT ON COLUMN bb.orgs.instance_id IS '発生元インスタンスのID';
 COMMENT ON COLUMN bb.orgs.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.orgs.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.orgs.active IS 'アクティブフラグ';
@@ -137,7 +137,7 @@ COMMENT ON COLUMN bb.orgs.updated_by IS '更新ユーザー';
 INSERT INTO bb.orgs (
 	id,
 	name,
-	db_id,
+	instance_id,
 	revision,
 	extension,
 	created_by,
@@ -155,7 +155,7 @@ INSERT INTO bb.orgs (
 INSERT INTO bb.orgs (
 	id,
 	name,
-	db_id,
+	instance_id,
 	revision,
 	extension,
 	created_by,
@@ -740,7 +740,7 @@ CREATE TABLE bb.transfers (
 	group_extension jsonb NOT NULL,
 	user_extension jsonb NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
-	db_id uuid REFERENCES bb.dbs NOT NULL,
+	instance_id uuid REFERENCES bb.instances NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, created_at)); 
@@ -761,7 +761,7 @@ COMMENT ON COLUMN bb.transfers.org_extension IS '組織のextension';
 COMMENT ON COLUMN bb.transfers.group_extension IS 'グループのextension';
 COMMENT ON COLUMN bb.transfers.user_extension IS '作成ユーザーのextension';
 COMMENT ON COLUMN bb.transfers.tags IS '保存用タグ';
-COMMENT ON COLUMN bb.transfers.db_id IS '発生元DBのID';
+COMMENT ON COLUMN bb.transfers.instance_id IS '発生元インスタンスのID';
 COMMENT ON COLUMN bb.transfers.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transfers.created_by IS '作成ユーザー';
 
@@ -774,7 +774,7 @@ INSERT INTO bb.transfers (
 	org_extension,
 	group_extension,
 	user_extension,
-	db_id,
+	instance_id,
 	created_by
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
@@ -949,6 +949,29 @@ COMMENT ON COLUMN bb.jobs.id IS 'ID
 transfers.transfers_idに従属';
 COMMENT ON COLUMN bb.jobs.completed IS '実施済フラグ';
 COMMENT ON COLUMN bb.jobs.updated_at IS '更新時刻';
+
+----------
+
+--transfer登録時に発生したエラー
+CREATE TABLE bb.transfer_errors (
+	transfer_id uuid NOT NULL,
+	message text NOT NULL,
+	stack_trace text,
+	user_id uuid REFERENCES bb.users NOT NULL,
+	request jsonb DEFAULT '{}' NOT NULL,
+	deny_id uuid REFERENCES bb.transfers DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,
+	created_at timestamptz DEFAULT now() NOT NULL);
+
+COMMENT ON TABLE bb.transfer_errors IS 'transfer登録時に発生したエラー';
+COMMENT ON COLUMN bb.transfer_errors.transfer_id IS 'transferに使用される予定だったID';
+COMMENT ON COLUMN bb.transfer_errors.message IS 'エラーメッセージ';
+COMMENT ON COLUMN bb.transfer_errors.stack_trace IS 'スタックトレース';
+COMMENT ON COLUMN bb.transfer_errors.user_id IS '登録ユーザー';
+COMMENT ON COLUMN bb.transfer_errors.request IS '登録リクエスト内容
+打消し処理の場合、{}';
+COMMENT ON COLUMN bb.transfer_errors.deny_id IS '打消対象ID
+打消処理だった場合、その対象';
+COMMENT ON COLUMN bb.transfer_errors.created_at IS '登録時刻';
 
 --===========================
 --transient tables
@@ -1282,5 +1305,6 @@ GRANT INSERT ON TABLE
 	bb.stocks,
 	bb.transfers,
 	bb.bundles,
-	bb.nodes
+	bb.nodes,
+	bb.transfer_errors
 TO blackbox;

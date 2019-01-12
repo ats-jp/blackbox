@@ -35,7 +35,17 @@ public class TransferPromise {
 		}
 	}
 
-	void notify(Throwable error) {
+	void notifyFinished() {
+		lock.lock();
+		try {
+			finished = true;
+			condition.signal();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	void notifyError(Throwable error) {
 		lock.lock();
 		try {
 			finished = true;

@@ -19,7 +19,7 @@ public class TransferExecutorTest {
 		JobExecutor.start();
 
 		Runnable r = () -> {
-			IntStream.range(0, 10).forEach(i -> {
+			IntStream.range(0, 1000).forEach(i -> {
 				System.out.println("##### " + i);
 
 				var promise = executor.register(SecurityValues.currentUserId(), () -> TransferHandlerTest.createRequest());

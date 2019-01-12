@@ -5,14 +5,17 @@ import java.util.function.Supplier;
 
 import org.blendee.util.Blendee;
 
+import com.google.gson.Gson;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterResult;
 import jp.ats.blackbox.persistence.TransferHandler;
+import sqlassist.bb.transfer_errors;
 
 public class TransferExecutor {
 
@@ -73,13 +76,22 @@ public class TransferExecutor {
 				JobExecutor.next(U.convert(result.transferredAt));
 
 				//publishスレッドに新IDを通知
-				event.promise.notify(null);
+				event.promise.notifyFinished();
 			});
-		} catch (Throwable t) {
+		} catch (Throwable error) {
 			//TODO 例外をlog
-			t.printStackTrace();
+			error.printStackTrace();
 
-			event.promise.notify(t);
+			try {
+				Blendee.execute(t -> {
+					event.insertErrorLog(error);
+				});
+			} catch (Throwable errorsError) {
+				//TODO 例外をlog
+				errorsError.printStackTrace();
+			}
+
+			event.promise.notifyError(error);
 		}
 	}
 
@@ -103,6 +115,7 @@ public class TransferExecutor {
 			transferId = promise.getTransferId();
 			this.userId = userId;
 			this.request = request;
+			this.denyTransferId = null;
 			this.promise = promise;
 		}
 
@@ -111,6 +124,7 @@ public class TransferExecutor {
 
 			transferId = promise.getTransferId();
 			this.userId = userId;
+			this.request = null;
 			this.denyTransferId = denyTransferId;
 			this.promise = promise;
 		}
@@ -121,6 +135,44 @@ public class TransferExecutor {
 			}
 
 			return handler.register(transferId, userId, request);
+		}
+
+		private void insertErrorLog(Throwable error) {
+			Blendee.execute(t -> {
+				if (deny) {
+					new transfer_errors().insertStatement(
+						a -> a
+							.INSERT(
+								a.transfer_id,
+								a.message,
+								a.stack_trace,
+								a.user_id,
+								a.deny_id)
+							.VALUES(
+								transferId,
+								error.getMessage(),
+								U.getStackTrace(error),
+								userId,
+								denyTransferId))
+						.execute();
+				} else {
+					new transfer_errors().insertStatement(
+						a -> a
+							.INSERT(
+								a.transfer_id,
+								a.message,
+								a.stack_trace,
+								a.user_id,
+								a.request)
+							.VALUES(
+								transferId,
+								error.getMessage(),
+								U.getStackTrace(error),
+								userId,
+								JsonHelper.toJson(new Gson().toJson(request))))
+						.execute();
+				}
+			});
 		}
 	}
 }

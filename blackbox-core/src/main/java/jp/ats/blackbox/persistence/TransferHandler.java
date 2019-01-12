@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.blendee.assist.Vargs;
+import org.blendee.jdbc.BSQLException;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
 import org.blendee.sql.AsyncRecorder;
 
@@ -42,7 +43,7 @@ public class TransferHandler {
 
 	private final AsyncRecorder recorder = new AsyncRecorder();
 
-	private final UUID dbId = SecurityValues.currentDBId();
+	private final UUID instanceId = SecurityValues.currentInstanceId();
 
 	/**
 	 * transfer登録処理
@@ -50,11 +51,11 @@ public class TransferHandler {
 	public TransferRegisterResult register(UUID transferId, UUID userId, TransferRegisterRequest request) {
 		var group = recorder.play(() -> new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension)))
 			.fetch(request.group_id)
-			.orElseThrow(() -> new DataNotFoundException());
+			.orElseThrow(() -> new DataNotFoundException(groups.$TABLE, request.group_id));
 
 		var user = recorder.play(() -> new users().SELECT(r -> r.extension))
 			.fetch(userId)
-			.orElseThrow(() -> new DataNotFoundException());
+			.orElseThrow(() -> new DataNotFoundException(users.$TABLE, userId));
 
 		var transfer = transfers.row();
 
@@ -75,7 +76,7 @@ public class TransferHandler {
 
 		request.tags.ifPresent(v -> transfer.setTags(v));
 
-		transfer.setDb_id(dbId);
+		transfer.setInstance_id(instanceId);
 
 		transfer.setCreated_by(userId);
 
@@ -145,7 +146,7 @@ public class TransferHandler {
 				try {
 					request.tags = Optional.of(Utils.restoreTags(transfer.getTags()));
 				} catch (SQLException e) {
-					throw new Error(e);
+					throw new BSQLException(e);
 				}
 
 				transferOne.many().forEach(bundleOne -> {
