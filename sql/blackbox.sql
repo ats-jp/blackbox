@@ -856,7 +856,7 @@ CREATE TABLE bb.nodes (
 	bundle_id uuid REFERENCES bb.bundles NOT NULL,
 	stock_id uuid REFERENCES bb.stocks NOT NULL,
 	in_out "char" CHECK (in_out IN ('I', 'O')) NOT NULL,
-	seq bigserial NOT NULL,
+	seq integer NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
@@ -897,12 +897,14 @@ INSERT INTO bb.nodes (
 	bundle_id,
 	stock_id,
 	in_out,
+	seq,
 	quantity
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'I',
+	0,
 	0);
 
 ----------
