@@ -151,14 +151,14 @@ public class closed_stocks
 	public static final String closing_id = "closing_id";
 
 	/**
-	 * name: infinity<br>
+	 * name: unlimited<br>
 	 * remarks: 在庫無制限<br>
 	 * trueの場合、totalがマイナスでもエラーとならない<br>
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "infinity", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫無制限\ntrueの場合、totalがマイナスでもエラーとならない", defaultValue = "null", ordinalPosition = 3, notNull = true)
-	public static final String infinity = "infinity";
+	@Column(name = "unlimited", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫無制限\ntrueの場合、totalがマイナスでもエラーとならない", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String unlimited = "unlimited";
 
 	/**
 	 * name: total<br>
@@ -333,33 +333,33 @@ public class closed_stocks
 
 		/**
 		 * setter
-		 * name: infinity<br>
+		 * name: unlimited<br>
 		* remarks: 在庫無制限<br>
 		* trueの場合、totalがマイナスでもエラーとならない<br>
 		* type: bool(1)<br>
 		* not null: true<br>
 		 * @param value java.lang.Boolean
 		 */
-		public void setInfinity(java.lang.Boolean value) {
+		public void setUnlimited(java.lang.Boolean value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("infinity").getType());
-			data$.setValue("infinity", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("unlimited").getType());
+			data$.setValue("unlimited", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: infinity<br>
+		 * name: unlimited<br>
 		* remarks: 在庫無制限<br>
 		* trueの場合、totalがマイナスでもエラーとならない<br>
 		* type: bool(1)<br>
 		* not null: true<br>
 		 * @return java.lang.Boolean
 		 */
-		public java.lang.Boolean getInfinity() {
-			Binder binder = data$.getValue("infinity");
+		public java.lang.Boolean getUnlimited() {
+			Binder binder = data$.getValue("unlimited");
 			return (java.lang.Boolean) binder.getValue();
 		}
 
@@ -1579,9 +1579,9 @@ public class closed_stocks
 		public final T closing_id;
 
 		/**
-		 * 項目名 infinity
+		 * 項目名 unlimited
 		 */
-		public final T infinity;
+		public final T unlimited;
 
 		/**
 		 * 項目名 total
@@ -1615,9 +1615,9 @@ public class closed_stocks
 			this.closing_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.closed_stocks.closing_id);
-			this.infinity = builder$.buildColumn(
+			this.unlimited = builder$.buildColumn(
 				this,
-				sqlassist.bb.closed_stocks.infinity);
+				sqlassist.bb.closed_stocks.unlimited);
 			this.total = builder$.buildColumn(
 				this,
 				sqlassist.bb.closed_stocks.total);

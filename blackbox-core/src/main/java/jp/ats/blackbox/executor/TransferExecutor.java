@@ -12,6 +12,7 @@ import com.lmax.disruptor.util.DaemonThreadFactory;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.JsonHelper;
+import jp.ats.blackbox.persistence.Retry;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterResult;
 import jp.ats.blackbox.persistence.TransferHandler;
@@ -53,6 +54,9 @@ public class TransferExecutor {
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, requestSupplier.get(), promise));
 
+		//バッチなど、単一の処理が大量に登録しても、他のスレッドが割り込めるように
+		Thread.yield();
+
 		return promise;
 	}
 
@@ -67,7 +71,20 @@ public class TransferExecutor {
 	private static void execute(Event event) {
 		try {
 			Blendee.execute(t -> {
-				TransferRegisterResult result = event.execute();
+				TransferRegisterResult result = null;
+				while (true) {
+					try {
+						result = event.execute();
+					} catch (Retry r) {
+						//TODO log
+						r.printStackTrace();
+
+						t.rollback();
+						continue;
+					}
+
+					break;
+				}
 
 				//他スレッドに更新が見えるようにcommit
 				t.commit();
@@ -146,12 +163,14 @@ public class TransferExecutor {
 								a.transfer_id,
 								a.message,
 								a.stack_trace,
+								a.sql_state,
 								a.user_id,
 								a.deny_id)
 							.VALUES(
 								transferId,
 								error.getMessage(),
 								U.getStackTrace(error),
+								U.getSQLState(error).orElse(""),
 								userId,
 								denyTransferId))
 						.execute();
@@ -162,12 +181,14 @@ public class TransferExecutor {
 								a.transfer_id,
 								a.message,
 								a.stack_trace,
+								a.sql_state,
 								a.user_id,
 								a.request)
 							.VALUES(
 								transferId,
 								error.getMessage(),
 								U.getStackTrace(error),
+								U.getSQLState(error).orElse(""),
 								userId,
 								JsonHelper.toJson(new Gson().toJson(request))))
 						.execute();

@@ -153,10 +153,19 @@ public class transfer_errors
 	 * name: stack_trace<br>
 	 * remarks: スタックトレース<br>
 	 * type: text(2147483647)<br>
-	 * not null: false<br>
+	 * not null: true<br>
 	 */
-	@Column(name = "stack_trace", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "スタックトレース", defaultValue = "null", ordinalPosition = 3, notNull = false)
+	@Column(name = "stack_trace", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "スタックトレース", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String stack_trace = "stack_trace";
+
+	/**
+	 * name: sql_state<br>
+	 * remarks: DBエラーコード<br>
+	 * type: text(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "sql_state", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "DBエラーコード", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	public static final String sql_state = "sql_state";
 
 	/**
 	 * name: user_id<br>
@@ -164,7 +173,7 @@ public class transfer_errors
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録ユーザー", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録ユーザー", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String user_id = "user_id";
 
 	/**
@@ -174,7 +183,7 @@ public class transfer_errors
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "request", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録リクエスト内容\n打消し処理の場合、{}", defaultValue = "'{}'::jsonb", ordinalPosition = 5, notNull = true)
+	@Column(name = "request", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録リクエスト内容\n打消し処理の場合、{}", defaultValue = "'{}'::jsonb", ordinalPosition = 6, notNull = true)
 	public static final String request = "request";
 
 	/**
@@ -184,7 +193,7 @@ public class transfer_errors
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "deny_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "打消対象ID\n打消処理だった場合、その対象", defaultValue = "'00000000-0000-0000-0000-000000000000'::uuid", ordinalPosition = 6, notNull = true)
+	@Column(name = "deny_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "打消対象ID\n打消処理だった場合、その対象", defaultValue = "'00000000-0000-0000-0000-000000000000'::uuid", ordinalPosition = 7, notNull = true)
 	public static final String deny_id = "deny_id";
 
 	/**
@@ -193,7 +202,7 @@ public class transfer_errors
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻", defaultValue = "now()", ordinalPosition = 7, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -336,10 +345,11 @@ public class transfer_errors
 		 * name: stack_trace<br>
 		* remarks: スタックトレース<br>
 		* type: text(2147483647)<br>
-		* not null: false<br>
+		* not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setStack_trace(java.lang.String value) {
+			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
@@ -352,12 +362,42 @@ public class transfer_errors
 		 * name: stack_trace<br>
 		* remarks: スタックトレース<br>
 		* type: text(2147483647)<br>
-		* not null: false<br>
+		* not null: true<br>
 		 * @return java.lang.String
 		 */
-		public Optional<java.lang.String> getStack_trace() {
+		public java.lang.String getStack_trace() {
 			Binder binder = data$.getValue("stack_trace");
-			return Optional.ofNullable((java.lang.String) binder.getValue());
+			return (java.lang.String) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: sql_state<br>
+		* remarks: DBエラーコード<br>
+		* type: text(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.lang.String
+		 */
+		public void setSql_state(java.lang.String value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("sql_state").getType());
+			data$.setValue("sql_state", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: sql_state<br>
+		* remarks: DBエラーコード<br>
+		* type: text(2147483647)<br>
+		* not null: true<br>
+		 * @return java.lang.String
+		 */
+		public java.lang.String getSql_state() {
+			Binder binder = data$.getValue("sql_state");
+			return (java.lang.String) binder.getValue();
 		}
 
 		/**
@@ -1603,6 +1643,11 @@ public class transfer_errors
 		public final T stack_trace;
 
 		/**
+		 * 項目名 sql_state
+		 */
+		public final T sql_state;
+
+		/**
 		 * 項目名 user_id
 		 */
 		public final T user_id;
@@ -1642,6 +1687,9 @@ public class transfer_errors
 			this.stack_trace = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfer_errors.stack_trace);
+			this.sql_state = builder$.buildColumn(
+				this,
+				sqlassist.bb.transfer_errors.sql_state);
 			this.user_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfer_errors.user_id);

@@ -17,7 +17,7 @@ public class StockComponetHandlerTest {
 
 		Blendee.execute(t -> {
 			var req = new StockComponent.RegisterRequest();
-			req.group_id = U.NULL;
+			req.group_id = U.NULL_ID;
 			req.name = "test";
 			req.extension = Optional.of("{}");
 			req.tags = Optional.of(new String[] { "tag1", "tag2" });
@@ -28,7 +28,7 @@ public class StockComponetHandlerTest {
 
 			var updateReq = new StockComponent.UpdateRequest();
 			updateReq.id = registered;
-			updateReq.group_id = Optional.of(U.NULL);
+			updateReq.group_id = Optional.of(U.NULL_ID);
 			updateReq.name = Optional.of("test");
 			updateReq.extension = Optional.of("{}");
 			updateReq.tags = Optional.of(new String[] { "tag1", "tag2" });

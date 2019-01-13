@@ -19,10 +19,10 @@ public class SecurityValues {
 	}
 
 	public static UUID currentOrgId() {
-		return U.NULL;
+		return U.NULL_ID;
 	}
 
 	public static UUID currentUserId() {
-		return U.NULL;
+		return U.NULL_ID;
 	}
 }

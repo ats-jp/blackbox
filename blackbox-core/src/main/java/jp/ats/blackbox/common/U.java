@@ -4,9 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.blendee.jdbc.Result;
@@ -16,7 +18,9 @@ public class U {
 
 	public static final Charset defaultCharset = StandardCharsets.UTF_8;
 
-	public static final UUID NULL = UUID.fromString("00000000-0000-0000-0000-000000000000");
+	public static final UUID NULL_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
+	public static final UUID PRIVILEGE_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
 	public static final Recorder recorder = new Recorder();
 
@@ -38,6 +42,17 @@ public class U {
 		t.printStackTrace(writer);
 		writer.flush();
 		return new String(out.toByteArray(), defaultCharset);
+	}
 
+	public static Optional<String> getSQLState(Throwable t) {
+		if (t instanceof SQLException) {
+			return Optional.of(((SQLException) t).getSQLState());
+		}
+
+		var cause = t.getCause();
+
+		if (cause == null) return Optional.empty();
+
+		return getSQLState(cause);
 	}
 }

@@ -12,12 +12,12 @@ public class TransferTestTransactionFactory extends DriverTransactionFactory {
 		super();
 	}
 
-	private Connection connection;
+	private ThreadLocal<Connection> connection = new ThreadLocal<>();
 
 	@Override
 	public Transaction createTransaction() {
-		if (connection == null) connection = super.getJDBCConnection();
-		return new TestTransaction(connection);
+		if (connection.get() == null) connection.set(super.getJDBCConnection());
+		return new TestTransaction(connection.get());
 	}
 
 	private static class TestTransaction extends JDBCTransaction {

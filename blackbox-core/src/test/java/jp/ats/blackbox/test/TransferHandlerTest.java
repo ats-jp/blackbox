@@ -26,7 +26,7 @@ public class TransferHandlerTest {
 		Blendee.execute(t -> {
 			var handler = new TransferHandler();
 			IntStream.range(0, 10).forEach(i -> {
-				handler.register(UUID.randomUUID(), SecurityValues.currentUserId(), createRequest());
+				handler.register(UUID.randomUUID(), SecurityValues.currentUserId(), createRequest(U.NULL_ID));
 				JobHandler.execute(LocalDateTime.now());
 
 				t.commit(); //created_atを確定するために一件毎commit
@@ -34,23 +34,23 @@ public class TransferHandlerTest {
 		});
 	}
 
-	static TransferRegisterRequest createRequest() {
+	static TransferRegisterRequest createRequest(UUID groupId) {
 		var out = new NodeRegisterRequest();
-		out.group_id = U.NULL;
-		out.item_id = U.NULL;
-		out.owner_id = U.NULL;
-		out.location_id = U.NULL;
-		out.status_id = U.NULL;
+		out.group_id = groupId;
+		out.item_id = U.NULL_ID;
+		out.owner_id = U.NULL_ID;
+		out.location_id = U.NULL_ID;
+		out.status_id = U.NULL_ID;
 		out.in_out = InOut.OUT;
 		out.grants_infinity = Optional.of(true);
 		out.quantity = BigDecimal.valueOf(100);
 
 		var in = new NodeRegisterRequest();
-		in.group_id = U.NULL;
-		in.item_id = U.NULL;
-		in.owner_id = U.NULL;
-		in.location_id = U.NULL;
-		in.status_id = U.NULL;
+		in.group_id = groupId;
+		in.item_id = U.NULL_ID;
+		in.owner_id = U.NULL_ID;
+		in.location_id = U.NULL_ID;
+		in.status_id = U.NULL_ID;
 		in.in_out = InOut.IN;
 		in.quantity = BigDecimal.valueOf(100);
 
@@ -61,7 +61,7 @@ public class TransferHandlerTest {
 		bundle.nodes = new NodeRegisterRequest[] { in, out };
 
 		var transfer = new TransferRegisterRequest();
-		transfer.group_id = U.NULL;
+		transfer.group_id = groupId;
 		transfer.transferred_at = new Timestamp(System.currentTimeMillis());
 
 		transfer.tags = Optional.of(new String[] { "tag1", "tag2" });

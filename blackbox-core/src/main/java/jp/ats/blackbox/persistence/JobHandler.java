@@ -37,16 +37,16 @@ public class JobHandler {
 			.ORDER_BY(a -> a.ls(a.$transfers().transferred_at, a.id))
 			.forEach(r -> {
 				new snapshots()
-					.SELECT(a -> a.ls(a.infinity, a.total, a.$nodes().stock_id))
+					.SELECT(a -> a.ls(a.unlimited, a.total, a.$nodes().stock_id))
 					.WHERE(sa -> sa.$nodes().$bundles().transfer_id.eq(r.getId()))
 					.aggregate(result -> {
 						while (result.next()) {
 							//TODO pluginで個別処理を複数スレッドで行うようにする
 							recorder.play(
 								() -> new current_stocks()
-									.UPDATE(a -> a.ls(a.infinity.set($BOOLEAN), a.total.set($BIGDECIMAL)))
+									.UPDATE(a -> a.ls(a.unlimited.set($BOOLEAN), a.total.set($BIGDECIMAL)))
 									.WHERE(a -> a.id.eq($UUID)),
-								result.getBoolean(snapshots.infinity),
+								result.getBoolean(snapshots.unlimited),
 								result.getBigDecimal(snapshots.total),
 								U.uuid(result, nodes.stock_id))
 								.execute(batch);

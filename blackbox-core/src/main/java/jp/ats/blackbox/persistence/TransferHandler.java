@@ -18,6 +18,7 @@ import java.util.UUID;
 import org.blendee.assist.Vargs;
 import org.blendee.jdbc.BSQLException;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
+import org.blendee.jdbc.exception.UniqueConstraintViolationException;
 import org.blendee.sql.AsyncRecorder;
 
 import jp.ats.blackbox.model.InOut;
@@ -84,12 +85,17 @@ public class TransferHandler {
 
 		Arrays.stream(request.bundles).forEach(r -> registerBundle(userId, transferId, request.transferred_at, r));
 
-		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
-			var table = new transfers_tags();
-			tagIds.forEach(tagId -> {
-				recorder.play(() -> table.INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
-			});
-		}));
+		try {
+			request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
+				var table = new transfers_tags();
+				tagIds.forEach(tagId -> {
+					recorder.play(() -> table.INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
+				});
+			}));
+		} catch (UniqueConstraintViolationException e) {
+			//他のorg, groupのtransfer登録処理が僅差で同じtagを登録した場合エラーとなるので再登録対象
+			throw new Retry(e);
+		}
 
 		//jobを登録し、別プロセスで現在数量を更新させる
 		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($UUID), transferId).execute();
@@ -126,7 +132,7 @@ public class TransferHandler {
 						stocksAssist.status_id,
 						a.in_out,
 						a.quantity,
-						a.grants_infinity,
+						a.grants_unlimited,
 						a.extension);
 				})
 				.WHERE(a -> a.$bundles().transfer_id.eq($UUID))
@@ -172,7 +178,7 @@ public class TransferHandler {
 						nodeRequest.status_id = stock.getStatus_id();
 						nodeRequest.in_out = InOut.of(node.getIn_out()).reverse();
 						nodeRequest.quantity = node.getQuantity();
-						nodeRequest.grants_infinity = Optional.of(node.getGrants_infinity());
+						nodeRequest.grants_infinity = Optional.of(node.getGrants_unlimited());
 						nodeRequest.restoredExtension = Optional.of(node.getExtension());
 
 						nodes.add(nodeRequest);
@@ -247,7 +253,7 @@ public class TransferHandler {
 		node.setIn_out(request.in_out.value);
 		node.setQuantity(request.quantity);
 
-		request.grants_infinity.ifPresent(v -> node.setGrants_infinity(v));
+		request.grants_infinity.ifPresent(v -> node.setGrants_unlimited(v));
 
 		request.restoredExtension
 			.ifPresentOrElse(
@@ -265,7 +271,7 @@ public class TransferHandler {
 		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
 		JustBefore justBefore = recorder.play(
 			() -> new snapshots()
-				.SELECT(a -> a.ls(a.total, a.infinity))
+				.SELECT(a -> a.ls(a.total, a.unlimited))
 				.WHERE(
 					a -> a.$nodes().$bundles().$transfers().transferred_at.eq(
 						new nodes()
@@ -299,7 +305,7 @@ public class TransferHandler {
 
 		recorder.play(
 			() -> new snapshots().insertStatement(
-				a -> a.INSERT(a.id, a.infinity, a.total, a.updated_by)
+				a -> a.INSERT(a.id, a.unlimited, a.total, a.updated_by)
 					.VALUES(
 						$UUID,
 						$BOOLEAN,
@@ -317,7 +323,7 @@ public class TransferHandler {
 				() -> new snapshots().updateStatement(
 					a -> a.UPDATE(
 						//一度trueになったらずっとそのままtrue
-						a.infinity.set("{0} OR ?", Vargs.of(a.infinity), Vargs.of($BOOLEAN)),
+						a.unlimited.set("{0} OR ?", Vargs.of(a.unlimited), Vargs.of($BOOLEAN)),
 						//自身の数に今回の移動数量を正規化してプラス
 						a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of($BIGDECIMAL)))
 						.WHERE(
@@ -383,7 +389,7 @@ public class TransferHandler {
 		recorder.play(
 			() -> new current_stocks().insertStatement(
 				//後でjobから更新されるのでinfinityはとりあえずfalse、totalは0
-				a -> a.INSERT(a.id, a.infinity, a.total).VALUES($UUID, $BOOLEAN, $INT)),
+				a -> a.INSERT(a.id, a.unlimited, a.total).VALUES($UUID, $BOOLEAN, $INT)),
 			stockId,
 			false,
 			0).execute();
