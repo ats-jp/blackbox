@@ -722,6 +722,24 @@ COMMENT ON COLUMN bb.stocks.status_id IS '状態ID';
 COMMENT ON COLUMN bb.stocks.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.stocks.created_by IS '作成ユーザー';
 
+--NULLの代用(id=0)
+INSERT INTO bb.stocks (
+	id,
+	group_id,
+	item_id,
+	owner_id,
+	location_id,
+	status_id,
+	created_by
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
+
 --===========================
 --transfer tables
 --===========================
@@ -822,6 +840,14 @@ COMMENT ON COLUMN bb.bundles.id IS 'ID';
 COMMENT ON COLUMN bb.bundles.transfer_id IS '移動伝票ID';
 COMMENT ON COLUMN bb.bundles.extension IS '外部アプリケーション情報JSON';
 
+--NULLの代用(id=0)
+INSERT INTO bb.bundles (
+	id,
+	transfer_id
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
+
 ----------
 
 --移動ノード
@@ -830,6 +856,7 @@ CREATE TABLE bb.nodes (
 	bundle_id uuid REFERENCES bb.bundles NOT NULL,
 	stock_id uuid REFERENCES bb.stocks NOT NULL,
 	in_out "char" CHECK (in_out IN ('I', 'O')) NOT NULL,
+	seq bigserial NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
@@ -864,13 +891,29 @@ COMMENT ON COLUMN bb.nodes.status_extension IS '状態のextension';
 --ALTER TABLE bb.stocks SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 --ALTER TABLE bb.nodes SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 
+--NULLの代用(id=0)
+INSERT INTO bb.nodes (
+	id,
+	bundle_id,
+	stock_id,
+	in_out,
+	quantity
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	'I',
+	0);
+
 ----------
 
 --移動ノード状態
 CREATE UNLOGGED TABLE bb.snapshots (
 	id uuid PRIMARY KEY REFERENCES bb.nodes,
 	unlimited boolean NOT NULL,
+	in_search_scope boolean DEFAULT true NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
+	transferred_at timestamptz NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
@@ -883,9 +926,29 @@ COMMENT ON COLUMN bb.snapshots.id IS 'ID
 nodes.node_idに従属';
 COMMENT ON COLUMN bb.snapshots.unlimited IS '在庫無制限
 trueの場合、totalがマイナスでもエラーとならない';
+COMMENT ON COLUMN bb.snapshots.in_search_scope IS '在庫数量検索対象
+締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる';
 COMMENT ON COLUMN bb.snapshots.total IS 'この時点の在庫総数';
+COMMENT ON COLUMN bb.snapshots.transferred_at IS '移動時刻
+検索高速化のためtransfers.transferred_atをここに持つ';
 COMMENT ON COLUMN bb.snapshots.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
+
+--NULLの代用(id=0)
+INSERT INTO bb.snapshots (
+	id,
+	unlimited,
+	in_search_scope,
+	total,
+	transferred_at,
+	updated_by
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	false,
+	false,
+	0,
+	'1900-1-1'::timestamptz,
+	'00000000-0000-0000-0000-000000000000');
 
 ----------
 
@@ -894,6 +957,7 @@ CREATE UNLOGGED TABLE bb.current_stocks (
 	id uuid PRIMARY KEY REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
 	unlimited boolean NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
+	snapshot_id uuid REFERENCES bb.snapshots NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時transfersから復元する必要あり
@@ -906,6 +970,8 @@ stocks.stock_idに従属';
 COMMENT ON COLUMN bb.current_stocks.unlimited IS '在庫無制限
 trueの場合、totalがマイナスでもエラーとならない';
 COMMENT ON COLUMN bb.current_stocks.total IS '現時点の在庫総数';
+COMMENT ON COLUMN bb.current_stocks.snapshot_id IS 'スナップショットID
+現時点の数量を変更した伝票';
 COMMENT ON COLUMN bb.current_stocks.updated_at IS '更新時刻';
 
 ----------
@@ -1214,6 +1280,8 @@ CREATE INDEX ON bb.nodes (bundle_id);
 CREATE INDEX ON bb.nodes (stock_id);
 
 --snapshots
+CREATE INDEX ON bb.snapshots (in_search_scope);
+CREATE INDEX ON bb.snapshots (transferred_at);
 
 --jobs
 CREATE INDEX ON bb.jobs (completed);
