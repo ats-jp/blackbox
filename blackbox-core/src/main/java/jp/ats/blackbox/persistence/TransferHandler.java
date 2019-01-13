@@ -81,7 +81,12 @@ public class TransferHandler {
 
 		transfer.setCreated_by(userId);
 
-		transfer.insert();
+		try {
+			transfer.insert();
+		} catch (UniqueConstraintViolationException e) {
+			//同一groupで全く同一時刻に登録した場合、UNIQUE違反エラーとなるので再登録対象
+			throw new Retry(e);
+		}
 
 		Arrays.stream(request.bundles).forEach(r -> registerBundle(userId, transferId, request.transferred_at, r));
 
