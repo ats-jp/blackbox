@@ -47,10 +47,15 @@ public class TransferHandler {
 
 	private final UUID instanceId = SecurityValues.currentInstanceId();
 
+	private int nodeSeq;
+
 	/**
 	 * transfer登録処理
 	 */
 	public TransferRegisterResult register(UUID transferId, UUID userId, TransferRegisterRequest request) {
+		//初期化
+		nodeSeq = 0;
+
 		var group = recorder.play(() -> new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension)))
 			.fetch(request.group_id)
 			.orElseThrow(() -> new DataNotFoundException(groups.$TABLE, request.group_id));
@@ -255,6 +260,7 @@ public class TransferHandler {
 		//nodeではgroup_idを持たないが、requestが持つgroup_idはstockに格納しており、それが在庫の所属グループを表す
 		node.setStock_id(stockId);
 		node.setIn_out(request.in_out.value);
+		node.setSeq((long) nodeSeq++);
 		node.setQuantity(request.quantity);
 
 		request.grants_infinity.ifPresent(v -> node.setGrants_unlimited(v));
