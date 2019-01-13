@@ -171,12 +171,21 @@ public class nodes
 	public static final String in_out = "in_out";
 
 	/**
+	 * name: seq<br>
+	 * remarks: <br>
+	 * type: bigserial(19)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "seq", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "nextval('bb.nodes_seq_seq'::regclass)", ordinalPosition = 5, notNull = true)
+	public static final String seq = "seq";
+
+	/**
 	 * name: quantity<br>
 	 * remarks: 移動数量<br>
 	 * type: numeric(131089)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "quantity", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動数量", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "quantity", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動数量", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String quantity = "quantity";
 
 	/**
@@ -186,7 +195,7 @@ public class nodes
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "grants_unlimited", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "数量無制限の許可\ntrueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない", defaultValue = "false", ordinalPosition = 6, notNull = true)
+	@Column(name = "grants_unlimited", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "数量無制限の許可\ntrueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない", defaultValue = "false", ordinalPosition = 7, notNull = true)
 	public static final String grants_unlimited = "grants_unlimited";
 
 	/**
@@ -195,7 +204,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 7, notNull = true)
+	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
 	public static final String extension = "extension";
 
 	/**
@@ -204,7 +213,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
+	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
 	public static final String group_extension = "group_extension";
 
 	/**
@@ -213,7 +222,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "item_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
+	@Column(name = "item_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 10, notNull = true)
 	public static final String item_extension = "item_extension";
 
 	/**
@@ -222,7 +231,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "owner_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 10, notNull = true)
+	@Column(name = "owner_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 11, notNull = true)
 	public static final String owner_extension = "owner_extension";
 
 	/**
@@ -231,7 +240,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "location_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 11, notNull = true)
+	@Column(name = "location_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 12, notNull = true)
 	public static final String location_extension = "location_extension";
 
 	/**
@@ -240,7 +249,7 @@ public class nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "status_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 12, notNull = true)
+	@Column(name = "status_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 13, notNull = true)
 	public static final String status_extension = "status_extension";
 
 	/**
@@ -436,6 +445,36 @@ public class nodes
 		public java.lang.String getIn_out() {
 			Binder binder = data$.getValue("in_out");
 			return (java.lang.String) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: seq<br>
+		* remarks: <br>
+		* type: bigserial(19)<br>
+		* not null: true<br>
+		 * @param value java.lang.Long
+		 */
+		public void setSeq(java.lang.Long value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("seq").getType());
+			data$.setValue("seq", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: seq<br>
+		* remarks: <br>
+		* type: bigserial(19)<br>
+		* not null: true<br>
+		 * @return java.lang.Long
+		 */
+		public java.lang.Long getSeq() {
+			Binder binder = data$.getValue("seq");
+			return (java.lang.Long) binder.getValue();
 		}
 
 		/**
@@ -1804,6 +1843,11 @@ public class nodes
 		public final T in_out;
 
 		/**
+		 * 項目名 seq
+		 */
+		public final T seq;
+
+		/**
 		 * 項目名 quantity
 		 */
 		public final T quantity;
@@ -1866,6 +1910,9 @@ public class nodes
 			this.in_out = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.in_out);
+			this.seq = builder$.buildColumn(
+				this,
+				sqlassist.bb.nodes.seq);
 			this.quantity = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.quantity);

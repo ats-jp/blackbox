@@ -15,6 +15,7 @@ public class GroupHandler {
 		row.setId(id);
 		row.setOrg_id(SecurityValues.currentOrgId());
 		row.setParent_id(request.parent_id);
+		row.setName(request.name);
 		request.extension.ifPresent(v -> row.setExtension(v));
 		request.tags.ifPresent(v -> row.setTags(v));
 

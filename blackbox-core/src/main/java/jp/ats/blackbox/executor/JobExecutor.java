@@ -20,7 +20,7 @@ public class JobExecutor {
 	private static LocalDateTime next = LocalDateTime.now();
 
 	public static void start() {
-		service.scheduleWithFixedDelay(JobExecutor::execute, 0, 500, TimeUnit.MILLISECONDS);
+		service.scheduleWithFixedDelay(JobExecutor::execute, 0, 100, TimeUnit.MILLISECONDS);
 	}
 
 	public static void next(LocalDateTime time) {

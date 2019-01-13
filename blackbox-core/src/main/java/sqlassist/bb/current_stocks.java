@@ -164,13 +164,31 @@ public class current_stocks
 	public static final String total = "total";
 
 	/**
+	 * name: snapshot_id<br>
+	 * remarks: スナップショットID<br>
+	 * 現時点の数量を変更した伝票<br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "snapshot_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "スナップショットID\n現時点の数量を変更した伝票", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	public static final String snapshot_id = "snapshot_id";
+
+	/**
 	 * name: updated_at<br>
 	 * remarks: 更新時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 4, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 5, notNull = true)
 	public static final String updated_at = "updated_at";
+
+	/**
+	 * name: current_stocks_snapshot_id_fkey<br>
+	 * references: snapshots<br>
+	 * columns: snapshot_id
+	 */
+	@ForeignKey(name = "current_stocks_snapshot_id_fkey", references = "bb.snapshots", columns = { "snapshot_id" }, refColumns = { "id" })
+	public static final String bb$snapshots$current_stocks_snapshot_id_fkey = "current_stocks_snapshot_id_fkey";
 
 	/**
 	 * name: current_stocks_id_fkey<br>
@@ -335,6 +353,38 @@ public class current_stocks
 
 		/**
 		 * setter
+		 * name: snapshot_id<br>
+		* remarks: スナップショットID<br>
+		* 現時点の数量を変更した伝票<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setSnapshot_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("snapshot_id").getType());
+			data$.setValue("snapshot_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: snapshot_id<br>
+		* remarks: スナップショットID<br>
+		* 現時点の数量を変更した伝票<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getSnapshot_id() {
+			Binder binder = data$.getValue("snapshot_id");
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
 		 * name: updated_at<br>
 		* remarks: 更新時刻<br>
 		* type: timestamptz(35, 6)<br>
@@ -361,6 +411,18 @@ public class current_stocks
 		public java.sql.Timestamp getUpdated_at() {
 			Binder binder = data$.getValue("updated_at");
 			return (java.sql.Timestamp) binder.getValue();
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 snapshots<br>
+		 * 外部キー名 current_stocks_snapshot_id_fkey<br>
+		 * 項目名 snapshot_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.snapshots.Row $snapshots() {
+			return sqlassist.bb.snapshots.row(
+				data$.getDataObject(bb$snapshots$current_stocks_snapshot_id_fkey));
 		}
 
 		/**
@@ -1470,6 +1532,11 @@ public class current_stocks
 		public final T total;
 
 		/**
+		 * 項目名 snapshot_id
+		 */
+		public final T snapshot_id;
+
+		/**
 		 * 項目名 updated_at
 		 */
 		public final T updated_at;
@@ -1494,6 +1561,9 @@ public class current_stocks
 			this.total = builder$.buildColumn(
 				this,
 				sqlassist.bb.current_stocks.total);
+			this.snapshot_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.current_stocks.snapshot_id);
 			this.updated_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.current_stocks.updated_at);
@@ -1610,6 +1680,19 @@ public class current_stocks
 			if (super.table$ != null) throw new IllegalStateException("このインスタンスでは直接使用することはできません");
 			if (!getSelectStatement().rowMode()) throw new IllegalStateException("集計モードでは実行できない処理です");
 			return new InstantOneToManyQuery<>(this, getSelectStatement().decorators());
+		}
+
+		/**
+		 * 参照先テーブル名 snapshots<br>
+		 * 外部キー名 current_stocks_snapshot_id_fkey<br>
+		 * 項目名 snapshot_id
+		 * @return snapshots relationship
+		 */
+		public sqlassist.bb.snapshots.ExtAssist<T, Many<sqlassist.bb.current_stocks.Row, M>> $snapshots() {
+			return new sqlassist.bb.snapshots.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb.current_stocks.bb$snapshots$current_stocks_snapshot_id_fkey);
 		}
 
 		/**

@@ -3,7 +3,6 @@ package jp.ats.blackbox.test;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
-import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TransferExecutor;
 import jp.ats.blackbox.persistence.SecurityValues;
@@ -14,7 +13,7 @@ public class TransferExecutorTest {
 		TransferCommon.start();
 		//TransferCommon.startWithLog();
 
-		execute(U.NULL_ID, 10, 5);
+		execute(GroupHandlerTest.register(), 10, 5);
 	}
 
 	static void execute(UUID group, int transfers, int threads) {

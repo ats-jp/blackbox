@@ -155,13 +155,33 @@ public class snapshots
 	public static final String unlimited = "unlimited";
 
 	/**
+	 * name: in_search_scope<br>
+	 * remarks: 在庫数量検索対象<br>
+	 * 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
+	 * type: bool(1)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "in_search_scope", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫数量検索対象\n締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる", defaultValue = "true", ordinalPosition = 3, notNull = true)
+	public static final String in_search_scope = "in_search_scope";
+
+	/**
 	 * name: total<br>
 	 * remarks: この時点の在庫総数<br>
 	 * type: numeric(131089)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "total", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "この時点の在庫総数", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "total", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "この時点の在庫総数", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String total = "total";
+
+	/**
+	 * name: transferred_at<br>
+	 * remarks: 移動時刻<br>
+	 * 検索高速化のためtransfers.transferred_atをここに持つ<br>
+	 * type: timestamptz(35, 6)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "transferred_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "移動時刻\n検索高速化のためtransfers.transferred_atをここに持つ", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	public static final String transferred_at = "transferred_at";
 
 	/**
 	 * name: updated_at<br>
@@ -169,7 +189,7 @@ public class snapshots
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 4, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 6, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -178,7 +198,7 @@ public class snapshots
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 7, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -322,6 +342,38 @@ public class snapshots
 
 		/**
 		 * setter
+		 * name: in_search_scope<br>
+		* remarks: 在庫数量検索対象<br>
+		* 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
+		* type: bool(1)<br>
+		* not null: true<br>
+		 * @param value java.lang.Boolean
+		 */
+		public void setIn_search_scope(java.lang.Boolean value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("in_search_scope").getType());
+			data$.setValue("in_search_scope", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: in_search_scope<br>
+		* remarks: 在庫数量検索対象<br>
+		* 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
+		* type: bool(1)<br>
+		* not null: true<br>
+		 * @return java.lang.Boolean
+		 */
+		public java.lang.Boolean getIn_search_scope() {
+			Binder binder = data$.getValue("in_search_scope");
+			return (java.lang.Boolean) binder.getValue();
+		}
+
+		/**
+		 * setter
 		 * name: total<br>
 		* remarks: この時点の在庫総数<br>
 		* type: numeric(131089)<br>
@@ -348,6 +400,38 @@ public class snapshots
 		public java.math.BigDecimal getTotal() {
 			Binder binder = data$.getValue("total");
 			return (java.math.BigDecimal) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: transferred_at<br>
+		* remarks: 移動時刻<br>
+		* 検索高速化のためtransfers.transferred_atをここに持つ<br>
+		* type: timestamptz(35, 6)<br>
+		* not null: true<br>
+		 * @param value java.sql.Timestamp
+		 */
+		public void setTransferred_at(java.sql.Timestamp value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("transferred_at").getType());
+			data$.setValue("transferred_at", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: transferred_at<br>
+		* remarks: 移動時刻<br>
+		* 検索高速化のためtransfers.transferred_atをここに持つ<br>
+		* type: timestamptz(35, 6)<br>
+		* not null: true<br>
+		 * @return java.sql.Timestamp
+		 */
+		public java.sql.Timestamp getTransferred_at() {
+			Binder binder = data$.getValue("transferred_at");
+			return (java.sql.Timestamp) binder.getValue();
 		}
 
 		/**
@@ -1524,9 +1608,19 @@ public class snapshots
 		public final T unlimited;
 
 		/**
+		 * 項目名 in_search_scope
+		 */
+		public final T in_search_scope;
+
+		/**
 		 * 項目名 total
 		 */
 		public final T total;
+
+		/**
+		 * 項目名 transferred_at
+		 */
+		public final T transferred_at;
 
 		/**
 		 * 項目名 updated_at
@@ -1555,9 +1649,15 @@ public class snapshots
 			this.unlimited = builder$.buildColumn(
 				this,
 				sqlassist.bb.snapshots.unlimited);
+			this.in_search_scope = builder$.buildColumn(
+				this,
+				sqlassist.bb.snapshots.in_search_scope);
 			this.total = builder$.buildColumn(
 				this,
 				sqlassist.bb.snapshots.total);
+			this.transferred_at = builder$.buildColumn(
+				this,
+				sqlassist.bb.snapshots.transferred_at);
 			this.updated_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.snapshots.updated_at);

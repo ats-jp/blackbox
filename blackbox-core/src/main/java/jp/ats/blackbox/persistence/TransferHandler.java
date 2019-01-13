@@ -21,6 +21,7 @@ import org.blendee.jdbc.exception.CheckConstraintViolationException;
 import org.blendee.jdbc.exception.UniqueConstraintViolationException;
 import org.blendee.sql.AsyncRecorder;
 
+import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.model.InOut;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
@@ -190,8 +191,6 @@ public class TransferHandler {
 					});
 
 					bundleRequest.nodes = nodes.toArray(new NodeRegisterRequest[nodes.size()]);
-
-					bundles.add(bundleRequest);
 				});
 
 				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
@@ -279,10 +278,13 @@ public class TransferHandler {
 				.SELECT(a -> a.ls(a.total, a.unlimited))
 				.WHERE(
 					a -> a.$nodes().$bundles().$transfers().transferred_at.eq(
-						new nodes()
-							.SELECT(sa -> sa.MAX(sa.$bundles().$transfers().transferred_at))
-							.WHERE(sa -> sa.stock_id.eq($UUID).AND.$bundles().$transfers().transferred_at.le($TIMESTAMP))))
-				.ORDER_BY(a -> a.$nodes().$bundles().$transfers().created_at.DESC), //同一時刻であればtransfers.created_atが最近のもの
+						new snapshots()
+							.SELECT(sa -> sa.MAX(sa.transferred_at))
+							.WHERE(sa -> sa.$nodes().stock_id.eq($UUID).AND.in_search_scope.eq(true).AND.transferred_at.le($TIMESTAMP))))
+				.ORDER_BY(
+					a -> a.ls(
+						a.$nodes().$bundles().$transfers().created_at.DESC, //同一時刻であればtransfers.created_atが最近のもの
+						a.$nodes().seq.DESC)), //同一伝票内であれば生成順
 			stockId,
 			transferredAt).aggregateAndGet(r -> {
 				var container = new JustBefore();
@@ -310,15 +312,17 @@ public class TransferHandler {
 
 		recorder.play(
 			() -> new snapshots().insertStatement(
-				a -> a.INSERT(a.id, a.unlimited, a.total, a.updated_by)
+				a -> a.INSERT(a.id, a.unlimited, a.total, a.transferred_at, a.updated_by)
 					.VALUES(
 						$UUID,
 						$BOOLEAN,
 						$BIGDECIMAL,
+						$TIMESTAMP,
 						$UUID)),
 			nodeId,
 			infinity,
 			total,
+			transferredAt,
 			userId)
 			.execute();
 
@@ -333,9 +337,9 @@ public class TransferHandler {
 						a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of($BIGDECIMAL)))
 						.WHERE(
 							wa -> wa.id.IN(
-								new nodes()
+								new snapshots()
 									.SELECT(sa -> sa.id)
-									.WHERE(swa -> swa.stock_id.eq($UUID).AND.$bundles().$transfers().transferred_at.ge($TIMESTAMP))))),
+									.WHERE(swa -> swa.$nodes().stock_id.eq($UUID).AND.transferred_at.ge($TIMESTAMP))))),
 				infinity,
 				request.in_out.normalize(request.quantity),
 				stockId,
@@ -394,10 +398,11 @@ public class TransferHandler {
 		recorder.play(
 			() -> new current_stocks().insertStatement(
 				//後でjobから更新されるのでinfinityはとりあえずfalse、totalは0
-				a -> a.INSERT(a.id, a.unlimited, a.total).VALUES($UUID, $BOOLEAN, $INT)),
+				a -> a.INSERT(a.id, a.unlimited, a.total, a.snapshot_id).VALUES($UUID, $BOOLEAN, $INT, $UUID)),
 			stockId,
 			false,
-			0).execute();
+			0,
+			U.NULL_ID).execute();
 
 		//関連情報取得のため改めて検索
 		return recorder.play(() -> selectedStocks()).fetch(stockId).get();
