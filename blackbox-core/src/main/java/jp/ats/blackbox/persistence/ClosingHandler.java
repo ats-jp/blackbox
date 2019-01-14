@@ -51,7 +51,7 @@ public class ClosingHandler {
 				a -> a
 					.UPDATE(a.in_search_scope.set(false))
 					.WHERE(
-						wa -> wa.id.IN(
+						wa -> wa.in_search_scope.eq(true).AND.id.IN(
 							new AnonymousTable(
 								new snapshots()
 									.SELECT(
