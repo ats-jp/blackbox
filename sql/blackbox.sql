@@ -934,6 +934,7 @@ nodes.node_idに従属';
 COMMENT ON COLUMN bb.snapshots.unlimited IS '在庫無制限
 trueの場合、totalがマイナスでもエラーとならない';
 COMMENT ON COLUMN bb.snapshots.in_search_scope IS '在庫数量検索対象
+snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する
 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる';
 COMMENT ON COLUMN bb.snapshots.total IS 'この時点の在庫総数';
 COMMENT ON COLUMN bb.snapshots.stock_id IS '在庫ID
