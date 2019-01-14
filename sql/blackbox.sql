@@ -748,14 +748,15 @@ INSERT INTO bb.stocks (
 CREATE TABLE bb.transfers (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
-	denied_id uuid REFERENCES bb.transfers DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,
 	transferred_at timestamptz NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
+	instance_id uuid REFERENCES bb.instances NOT NULL,
+	denied_id uuid REFERENCES bb.transfers DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,
+	deny_reason text DEFAULT '' NOT NULL,
 	org_extension jsonb NOT NULL,
 	group_extension jsonb NOT NULL,
 	user_extension jsonb NOT NULL,
-	tags text[] DEFAULT '{}' NOT NULL,
-	instance_id uuid REFERENCES bb.instances NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, created_at)); 
@@ -768,16 +769,17 @@ COMMENT ON TABLE bb.transfers IS '移動伝票';
 COMMENT ON COLUMN bb.transfers.id IS 'ID';
 COMMENT ON COLUMN bb.transfers.group_id IS 'グループID
 この伝票の属するグループ';
+COMMENT ON COLUMN bb.transfers.transferred_at IS '移動時刻';
+COMMENT ON COLUMN bb.transfers.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.transfers.tags IS '保存用タグ';
+COMMENT ON COLUMN bb.transfers.instance_id IS '発生元インスタンスのID';
 COMMENT ON COLUMN bb.transfers.denied_id IS '取消元伝票ID
 訂正後の伝票が訂正前の伝票のIDを持つ
 ここに入っているIDが指す伝票は、取り消されたものとなる';
-COMMENT ON COLUMN bb.transfers.transferred_at IS '移動時刻';
-COMMENT ON COLUMN bb.transfers.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.transfers.deny_reason IS '取消理由';
 COMMENT ON COLUMN bb.transfers.org_extension IS '組織のextension';
 COMMENT ON COLUMN bb.transfers.group_extension IS 'グループのextension';
 COMMENT ON COLUMN bb.transfers.user_extension IS '作成ユーザーのextension';
-COMMENT ON COLUMN bb.transfers.tags IS '保存用タグ';
-COMMENT ON COLUMN bb.transfers.instance_id IS '発生元インスタンスのID';
 COMMENT ON COLUMN bb.transfers.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transfers.created_by IS '作成ユーザー';
 
@@ -787,20 +789,20 @@ INSERT INTO bb.transfers (
 	group_id,
 	transferred_at,
 	extension,
+	instance_id,
 	org_extension,
 	group_extension,
 	user_extension,
-	instance_id,
 	created_by
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'1900-1-1'::timestamptz,
 	'{}',
-	'{}',
-	'{}',
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
+	'{}',
+	'{}',
+	'{}',
 	'00000000-0000-0000-0000-000000000000');
 
 --締め済グループチェック
@@ -1039,7 +1041,6 @@ CREATE TABLE bb.transfer_errors (
 	sql_state text NOT NULL,
 	user_id uuid REFERENCES bb.users NOT NULL,
 	request jsonb DEFAULT '{}' NOT NULL,
-	deny_id uuid REFERENCES bb.transfers DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL);
 
 COMMENT ON TABLE bb.transfer_errors IS 'transfer登録時に発生したエラー';
@@ -1049,9 +1050,7 @@ COMMENT ON COLUMN bb.transfer_errors.stack_trace IS 'スタックトレース';
 COMMENT ON COLUMN bb.transfer_errors.sql_state IS 'DBエラーコード';
 COMMENT ON COLUMN bb.transfer_errors.user_id IS '登録ユーザー';
 COMMENT ON COLUMN bb.transfer_errors.request IS '登録リクエスト内容
-打消し処理の場合、{}';
-COMMENT ON COLUMN bb.transfer_errors.deny_id IS '打消対象ID
-打消処理だった場合、その対象';
+取消処理の場合、{}';
 COMMENT ON COLUMN bb.transfer_errors.created_at IS '登録時刻';
 
 --===========================
