@@ -174,14 +174,44 @@ public class snapshots
 	public static final String total = "total";
 
 	/**
+	 * name: stock_id<br>
+	 * remarks: 在庫ID<br>
+	 * 検索高速化のためnodes.stock_idをここに持つ<br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "stock_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫ID\n検索高速化のためnodes.stock_idをここに持つ", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	public static final String stock_id = "stock_id";
+
+	/**
 	 * name: transferred_at<br>
 	 * remarks: 移動時刻<br>
 	 * 検索高速化のためtransfers.transferred_atをここに持つ<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "transferred_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "移動時刻\n検索高速化のためtransfers.transferred_atをここに持つ", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "transferred_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "移動時刻\n検索高速化のためtransfers.transferred_atをここに持つ", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String transferred_at = "transferred_at";
+
+	/**
+	 * name: created_at<br>
+	 * remarks: 登録時刻<br>
+	 * 検索高速化のためtransfers.created_atをここに持つ<br>
+	 * type: timestamptz(35, 6)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻\n検索高速化のためtransfers.created_atをここに持つ", defaultValue = "now()", ordinalPosition = 7, notNull = true)
+	public static final String created_at = "created_at";
+
+	/**
+	 * name: node_seq<br>
+	 * remarks: 移動ノードの登録順<br>
+	 * 検索高速化のためnodes.seqをここに持つ<br>
+	 * type: int4(10)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "node_seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ノードの登録順\n検索高速化のためnodes.seqをここに持つ", defaultValue = "null", ordinalPosition = 8, notNull = true)
+	public static final String node_seq = "node_seq";
 
 	/**
 	 * name: updated_at<br>
@@ -189,7 +219,7 @@ public class snapshots
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 6, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 9, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -198,7 +228,7 @@ public class snapshots
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 7, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 10, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -208,6 +238,14 @@ public class snapshots
 	 */
 	@ForeignKey(name = "snapshots_id_fkey", references = "bb.nodes", columns = { "id" }, refColumns = { "id" })
 	public static final String bb$nodes$snapshots_id_fkey = "snapshots_id_fkey";
+
+	/**
+	 * name: snapshots_stock_id_fkey<br>
+	 * references: stocks<br>
+	 * columns: stock_id
+	 */
+	@ForeignKey(name = "snapshots_stock_id_fkey", references = "bb.stocks", columns = { "stock_id" }, refColumns = { "id" })
+	public static final String bb$stocks$snapshots_stock_id_fkey = "snapshots_stock_id_fkey";
 
 	/**
 	 * name: snapshots_updated_by_fkey<br>
@@ -404,6 +442,38 @@ public class snapshots
 
 		/**
 		 * setter
+		 * name: stock_id<br>
+		* remarks: 在庫ID<br>
+		* 検索高速化のためnodes.stock_idをここに持つ<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setStock_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("stock_id").getType());
+			data$.setValue("stock_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: stock_id<br>
+		* remarks: 在庫ID<br>
+		* 検索高速化のためnodes.stock_idをここに持つ<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getStock_id() {
+			Binder binder = data$.getValue("stock_id");
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
 		 * name: transferred_at<br>
 		* remarks: 移動時刻<br>
 		* 検索高速化のためtransfers.transferred_atをここに持つ<br>
@@ -432,6 +502,70 @@ public class snapshots
 		public java.sql.Timestamp getTransferred_at() {
 			Binder binder = data$.getValue("transferred_at");
 			return (java.sql.Timestamp) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: created_at<br>
+		* remarks: 登録時刻<br>
+		* 検索高速化のためtransfers.created_atをここに持つ<br>
+		* type: timestamptz(35, 6)<br>
+		* not null: true<br>
+		 * @param value java.sql.Timestamp
+		 */
+		public void setCreated_at(java.sql.Timestamp value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("created_at").getType());
+			data$.setValue("created_at", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: created_at<br>
+		* remarks: 登録時刻<br>
+		* 検索高速化のためtransfers.created_atをここに持つ<br>
+		* type: timestamptz(35, 6)<br>
+		* not null: true<br>
+		 * @return java.sql.Timestamp
+		 */
+		public java.sql.Timestamp getCreated_at() {
+			Binder binder = data$.getValue("created_at");
+			return (java.sql.Timestamp) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: node_seq<br>
+		* remarks: 移動ノードの登録順<br>
+		* 検索高速化のためnodes.seqをここに持つ<br>
+		* type: int4(10)<br>
+		* not null: true<br>
+		 * @param value java.lang.Integer
+		 */
+		public void setNode_seq(java.lang.Integer value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("node_seq").getType());
+			data$.setValue("node_seq", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: node_seq<br>
+		* remarks: 移動ノードの登録順<br>
+		* 検索高速化のためnodes.seqをここに持つ<br>
+		* type: int4(10)<br>
+		* not null: true<br>
+		 * @return java.lang.Integer
+		 */
+		public java.lang.Integer getNode_seq() {
+			Binder binder = data$.getValue("node_seq");
+			return (java.lang.Integer) binder.getValue();
 		}
 
 		/**
@@ -504,6 +638,18 @@ public class snapshots
 		public sqlassist.bb.nodes.Row $nodes() {
 			return sqlassist.bb.nodes.row(
 				data$.getDataObject(bb$nodes$snapshots_id_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 stocks<br>
+		 * 外部キー名 snapshots_stock_id_fkey<br>
+		 * 項目名 stock_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.stocks.Row $stocks() {
+			return sqlassist.bb.stocks.row(
+				data$.getDataObject(bb$stocks$snapshots_stock_id_fkey));
 		}
 
 		/**
@@ -1618,9 +1764,24 @@ public class snapshots
 		public final T total;
 
 		/**
+		 * 項目名 stock_id
+		 */
+		public final T stock_id;
+
+		/**
 		 * 項目名 transferred_at
 		 */
 		public final T transferred_at;
+
+		/**
+		 * 項目名 created_at
+		 */
+		public final T created_at;
+
+		/**
+		 * 項目名 node_seq
+		 */
+		public final T node_seq;
 
 		/**
 		 * 項目名 updated_at
@@ -1655,9 +1816,18 @@ public class snapshots
 			this.total = builder$.buildColumn(
 				this,
 				sqlassist.bb.snapshots.total);
+			this.stock_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.snapshots.stock_id);
 			this.transferred_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.snapshots.transferred_at);
+			this.created_at = builder$.buildColumn(
+				this,
+				sqlassist.bb.snapshots.created_at);
+			this.node_seq = builder$.buildColumn(
+				this,
+				sqlassist.bb.snapshots.node_seq);
 			this.updated_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.snapshots.updated_at);
@@ -1790,6 +1960,19 @@ public class snapshots
 				builder$,
 				this,
 				sqlassist.bb.snapshots.bb$nodes$snapshots_id_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 stocks<br>
+		 * 外部キー名 snapshots_stock_id_fkey<br>
+		 * 項目名 stock_id
+		 * @return stocks relationship
+		 */
+		public sqlassist.bb.stocks.ExtAssist<T, Many<sqlassist.bb.snapshots.Row, M>> $stocks() {
+			return new sqlassist.bb.stocks.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb.snapshots.bb$stocks$snapshots_stock_id_fkey);
 		}
 
 		/**

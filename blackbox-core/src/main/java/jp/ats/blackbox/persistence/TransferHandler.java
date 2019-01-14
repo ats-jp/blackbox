@@ -260,7 +260,7 @@ public class TransferHandler {
 		//nodeではgroup_idを持たないが、requestが持つgroup_idはstockに格納しており、それが在庫の所属グループを表す
 		node.setStock_id(stockId);
 		node.setIn_out(request.in_out.value);
-		node.setSeq((long) nodeSeq++);
+		node.setSeq(++nodeSeq);
 		node.setQuantity(request.quantity);
 
 		request.grants_infinity.ifPresent(v -> node.setGrants_unlimited(v));
@@ -283,14 +283,15 @@ public class TransferHandler {
 			() -> new snapshots()
 				.SELECT(a -> a.ls(a.total, a.unlimited))
 				.WHERE(
-					a -> a.$nodes().$bundles().$transfers().transferred_at.eq(
+					a -> a.stock_id.eq($UUID).AND.transferred_at.eq(
 						new snapshots()
 							.SELECT(sa -> sa.MAX(sa.transferred_at))
-							.WHERE(sa -> sa.$nodes().stock_id.eq($UUID).AND.in_search_scope.eq(true).AND.transferred_at.le($TIMESTAMP))))
+							.WHERE(sa -> sa.stock_id.eq($UUID).AND.in_search_scope.eq(true).AND.transferred_at.le($TIMESTAMP))))
 				.ORDER_BY(
 					a -> a.ls(
-						a.$nodes().$bundles().$transfers().created_at.DESC, //同一時刻であればtransfers.created_atが最近のもの
-						a.$nodes().seq.DESC)), //同一伝票内であれば生成順
+						a.created_at.DESC, //同一時刻であればtransfers.created_atが最近のもの
+						a.node_seq.DESC)), //同一伝票内であれば生成順
+			stockId,
 			stockId,
 			transferredAt).aggregateAndGet(r -> {
 				var container = new JustBefore();
@@ -318,17 +319,21 @@ public class TransferHandler {
 
 		recorder.play(
 			() -> new snapshots().insertStatement(
-				a -> a.INSERT(a.id, a.unlimited, a.total, a.transferred_at, a.updated_by)
+				a -> a.INSERT(a.id, a.unlimited, a.total, a.stock_id, a.transferred_at, a.node_seq, a.updated_by)
 					.VALUES(
 						$UUID,
 						$BOOLEAN,
 						$BIGDECIMAL,
+						$UUID,
 						$TIMESTAMP,
+						$INT,
 						$UUID)),
 			nodeId,
 			infinity,
 			total,
+			stockId,
 			transferredAt,
+			nodeSeq,
 			userId)
 			.execute();
 
@@ -345,7 +350,7 @@ public class TransferHandler {
 							wa -> wa.id.IN(
 								new snapshots()
 									.SELECT(sa -> sa.id)
-									.WHERE(swa -> swa.$nodes().stock_id.eq($UUID).AND.transferred_at.ge($TIMESTAMP))))),
+									.WHERE(swa -> swa.stock_id.eq($UUID).AND.transferred_at.ge($TIMESTAMP))))),
 				infinity,
 				request.in_out.normalize(request.quantity),
 				stockId,

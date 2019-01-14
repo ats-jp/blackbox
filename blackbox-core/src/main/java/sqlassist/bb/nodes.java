@@ -173,10 +173,10 @@ public class nodes
 	/**
 	 * name: seq<br>
 	 * remarks: <br>
-	 * type: bigserial(19)<br>
+	 * type: int4(10)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "nextval('bb.nodes_seq_seq'::regclass)", ordinalPosition = 5, notNull = true)
+	@Column(name = "seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String seq = "seq";
 
 	/**
@@ -451,11 +451,11 @@ public class nodes
 		 * setter
 		 * name: seq<br>
 		* remarks: <br>
-		* type: bigserial(19)<br>
+		* type: int4(10)<br>
 		* not null: true<br>
-		 * @param value java.lang.Long
+		 * @param value java.lang.Integer
 		 */
-		public void setSeq(java.lang.Long value) {
+		public void setSeq(java.lang.Integer value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -468,13 +468,13 @@ public class nodes
 		 * getter
 		 * name: seq<br>
 		* remarks: <br>
-		* type: bigserial(19)<br>
+		* type: int4(10)<br>
 		* not null: true<br>
-		 * @return java.lang.Long
+		 * @return java.lang.Integer
 		 */
-		public java.lang.Long getSeq() {
+		public java.lang.Integer getSeq() {
 			Binder binder = data$.getValue("seq");
-			return (java.lang.Long) binder.getValue();
+			return (java.lang.Integer) binder.getValue();
 		}
 
 		/**

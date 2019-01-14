@@ -915,7 +915,10 @@ CREATE UNLOGGED TABLE bb.snapshots (
 	unlimited boolean NOT NULL,
 	in_search_scope boolean DEFAULT true NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
+	stock_id uuid REFERENCES bb.stocks NOT NULL,
 	transferred_at timestamptz NOT NULL,
+	created_at timestamptz DEFAULT now() NOT NULL, --now()はトランザクション開始時刻を返すのでtransfers.created_atと同一となるので、transfers.created_atを参照する必要がなくなる
+	node_seq integer NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
@@ -931,8 +934,14 @@ trueの場合、totalがマイナスでもエラーとならない';
 COMMENT ON COLUMN bb.snapshots.in_search_scope IS '在庫数量検索対象
 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる';
 COMMENT ON COLUMN bb.snapshots.total IS 'この時点の在庫総数';
+COMMENT ON COLUMN bb.snapshots.stock_id IS '在庫ID
+検索高速化のためnodes.stock_idをここに持つ';
 COMMENT ON COLUMN bb.snapshots.transferred_at IS '移動時刻
 検索高速化のためtransfers.transferred_atをここに持つ';
+COMMENT ON COLUMN bb.snapshots.created_at IS '登録時刻
+検索高速化のためtransfers.created_atをここに持つ';
+COMMENT ON COLUMN bb.snapshots.node_seq IS '移動ノードの登録順
+検索高速化のためnodes.seqをここに持つ';
 COMMENT ON COLUMN bb.snapshots.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
 
@@ -942,14 +951,18 @@ INSERT INTO bb.snapshots (
 	unlimited,
 	in_search_scope,
 	total,
+	stock_id,
 	transferred_at,
+	node_seq,
 	updated_by
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	false,
 	false,
 	0,
+	'00000000-0000-0000-0000-000000000000',
 	'1900-1-1'::timestamptz,
+	0,
 	'00000000-0000-0000-0000-000000000000');
 
 ----------
@@ -1283,6 +1296,7 @@ CREATE INDEX ON bb.nodes (stock_id);
 
 --snapshots
 CREATE INDEX ON bb.snapshots (in_search_scope);
+CREATE INDEX ON bb.snapshots (stock_id);
 CREATE INDEX ON bb.snapshots (transferred_at);
 
 --jobs
