@@ -157,11 +157,12 @@ public class snapshots
 	/**
 	 * name: in_search_scope<br>
 	 * remarks: 在庫数量検索対象<br>
+	 * snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する<br>
 	 * 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "in_search_scope", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫数量検索対象\n締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる", defaultValue = "true", ordinalPosition = 3, notNull = true)
+	@Column(name = "in_search_scope", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫数量検索対象\nsnapshotの検索対象を少なくすることで直近数量の取得検索を高速化する\n締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる", defaultValue = "true", ordinalPosition = 3, notNull = true)
 	public static final String in_search_scope = "in_search_scope";
 
 	/**
@@ -174,13 +175,23 @@ public class snapshots
 	public static final String total = "total";
 
 	/**
+	 * name: transfer_group_id<br>
+	 * remarks: 移動伝票のグループID<br>
+	 * 検索高速化のためtransfers.group_idをここに持つ<br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "transfer_group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動伝票のグループID\n検索高速化のためtransfers.group_idをここに持つ", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	public static final String transfer_group_id = "transfer_group_id";
+
+	/**
 	 * name: stock_id<br>
 	 * remarks: 在庫ID<br>
 	 * 検索高速化のためnodes.stock_idをここに持つ<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "stock_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫ID\n検索高速化のためnodes.stock_idをここに持つ", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "stock_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫ID\n検索高速化のためnodes.stock_idをここに持つ", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String stock_id = "stock_id";
 
 	/**
@@ -190,7 +201,7 @@ public class snapshots
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "transferred_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "移動時刻\n検索高速化のためtransfers.transferred_atをここに持つ", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "transferred_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "移動時刻\n検索高速化のためtransfers.transferred_atをここに持つ", defaultValue = "null", ordinalPosition = 7, notNull = true)
 	public static final String transferred_at = "transferred_at";
 
 	/**
@@ -200,7 +211,7 @@ public class snapshots
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻\n検索高速化のためtransfers.created_atをここに持つ", defaultValue = "now()", ordinalPosition = 7, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻\n検索高速化のためtransfers.created_atをここに持つ", defaultValue = "now()", ordinalPosition = 8, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -210,7 +221,7 @@ public class snapshots
 	 * type: int4(10)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "node_seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ノードの登録順\n検索高速化のためnodes.seqをここに持つ", defaultValue = "null", ordinalPosition = 8, notNull = true)
+	@Column(name = "node_seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ノードの登録順\n検索高速化のためnodes.seqをここに持つ", defaultValue = "null", ordinalPosition = 9, notNull = true)
 	public static final String node_seq = "node_seq";
 
 	/**
@@ -219,7 +230,7 @@ public class snapshots
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 9, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 10, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -228,8 +239,16 @@ public class snapshots
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 10, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 11, notNull = true)
 	public static final String updated_by = "updated_by";
+
+	/**
+	 * name: snapshots_transfer_group_id_fkey<br>
+	 * references: groups<br>
+	 * columns: transfer_group_id
+	 */
+	@ForeignKey(name = "snapshots_transfer_group_id_fkey", references = "bb.groups", columns = { "transfer_group_id" }, refColumns = { "id" })
+	public static final String bb$groups$snapshots_transfer_group_id_fkey = "snapshots_transfer_group_id_fkey";
 
 	/**
 	 * name: snapshots_id_fkey<br>
@@ -382,6 +401,7 @@ public class snapshots
 		 * setter
 		 * name: in_search_scope<br>
 		* remarks: 在庫数量検索対象<br>
+		* snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する<br>
 		* 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
 		* type: bool(1)<br>
 		* not null: true<br>
@@ -400,6 +420,7 @@ public class snapshots
 		 * getter
 		 * name: in_search_scope<br>
 		* remarks: 在庫数量検索対象<br>
+		* snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する<br>
 		* 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
 		* type: bool(1)<br>
 		* not null: true<br>
@@ -438,6 +459,38 @@ public class snapshots
 		public java.math.BigDecimal getTotal() {
 			Binder binder = data$.getValue("total");
 			return (java.math.BigDecimal) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: transfer_group_id<br>
+		* remarks: 移動伝票のグループID<br>
+		* 検索高速化のためtransfers.group_idをここに持つ<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setTransfer_group_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("transfer_group_id").getType());
+			data$.setValue("transfer_group_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: transfer_group_id<br>
+		* remarks: 移動伝票のグループID<br>
+		* 検索高速化のためtransfers.group_idをここに持つ<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getTransfer_group_id() {
+			Binder binder = data$.getValue("transfer_group_id");
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -626,6 +679,18 @@ public class snapshots
 		public java.util.UUID getUpdated_by() {
 			Binder binder = data$.getValue("updated_by");
 			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 groups<br>
+		 * 外部キー名 snapshots_transfer_group_id_fkey<br>
+		 * 項目名 transfer_group_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.groups.Row $groups() {
+			return sqlassist.bb.groups.row(
+				data$.getDataObject(bb$groups$snapshots_transfer_group_id_fkey));
 		}
 
 		/**
@@ -1764,6 +1829,11 @@ public class snapshots
 		public final T total;
 
 		/**
+		 * 項目名 transfer_group_id
+		 */
+		public final T transfer_group_id;
+
+		/**
 		 * 項目名 stock_id
 		 */
 		public final T stock_id;
@@ -1816,6 +1886,9 @@ public class snapshots
 			this.total = builder$.buildColumn(
 				this,
 				sqlassist.bb.snapshots.total);
+			this.transfer_group_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.snapshots.transfer_group_id);
 			this.stock_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.snapshots.stock_id);
@@ -1947,6 +2020,19 @@ public class snapshots
 			if (super.table$ != null) throw new IllegalStateException("このインスタンスでは直接使用することはできません");
 			if (!getSelectStatement().rowMode()) throw new IllegalStateException("集計モードでは実行できない処理です");
 			return new InstantOneToManyQuery<>(this, getSelectStatement().decorators());
+		}
+
+		/**
+		 * 参照先テーブル名 groups<br>
+		 * 外部キー名 snapshots_transfer_group_id_fkey<br>
+		 * 項目名 transfer_group_id
+		 * @return groups relationship
+		 */
+		public sqlassist.bb.groups.ExtAssist<T, Many<sqlassist.bb.snapshots.Row, M>> $groups() {
+			return new sqlassist.bb.groups.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb.snapshots.bb$groups$snapshots_transfer_group_id_fkey);
 		}
 
 		/**

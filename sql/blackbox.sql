@@ -917,6 +917,7 @@ CREATE UNLOGGED TABLE bb.snapshots (
 	unlimited boolean NOT NULL,
 	in_search_scope boolean DEFAULT true NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
+	transfer_group_id uuid REFERENCES bb.groups NOT NULL,
 	stock_id uuid REFERENCES bb.stocks NOT NULL,
 	transferred_at timestamptz NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL, --now()はトランザクション開始時刻を返すのでtransfers.created_atと同一となるので、transfers.created_atを参照する必要がなくなる
@@ -937,6 +938,8 @@ COMMENT ON COLUMN bb.snapshots.in_search_scope IS '在庫数量検索対象
 snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する
 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる';
 COMMENT ON COLUMN bb.snapshots.total IS 'この時点の在庫総数';
+COMMENT ON COLUMN bb.snapshots.transfer_group_id IS '移動伝票のグループID
+検索高速化のためtransfers.group_idをここに持つ';
 COMMENT ON COLUMN bb.snapshots.stock_id IS '在庫ID
 検索高速化のためnodes.stock_idをここに持つ';
 COMMENT ON COLUMN bb.snapshots.transferred_at IS '移動時刻
@@ -954,6 +957,7 @@ INSERT INTO bb.snapshots (
 	unlimited,
 	in_search_scope,
 	total,
+	transfer_group_id,
 	stock_id,
 	transferred_at,
 	node_seq,
@@ -963,6 +967,7 @@ INSERT INTO bb.snapshots (
 	false,
 	false,
 	0,
+	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'1900-1-1'::timestamptz,
 	0,
@@ -1358,6 +1363,7 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb.owners,
 	bb.locations,
 	bb.statuses,
+	bb.last_closings,
 	bb.current_stocks,
 	bb.snapshots,
 	bb.jobs,

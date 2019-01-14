@@ -96,7 +96,7 @@ public class TransferHandler {
 			throw new Retry(e);
 		}
 
-		Arrays.stream(request.bundles).forEach(r -> registerBundle(userId, transferId, request.transferred_at, r));
+		Arrays.stream(request.bundles).forEach(r -> registerBundle(userId, transferId, request.group_id, request.transferred_at, r));
 
 		try {
 			request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
@@ -213,6 +213,7 @@ public class TransferHandler {
 	private void registerBundle(
 		UUID userId,
 		UUID transferId,
+		UUID groupId,
 		Timestamp transferredAt,
 		BundleRegisterRequest request) {
 		var bundle = bundles.row();
@@ -228,7 +229,7 @@ public class TransferHandler {
 
 		bundle.insert();
 
-		Arrays.stream(request.nodes).forEach(r -> registerNode(userId, bundleId, transferredAt, r));
+		Arrays.stream(request.nodes).forEach(r -> registerNode(userId, bundleId, groupId, transferredAt, r));
 	}
 
 	/**
@@ -237,6 +238,7 @@ public class TransferHandler {
 	private void registerNode(
 		UUID userId,
 		UUID bundleId,
+		UUID groupId,
 		Timestamp transferredAt,
 		NodeRegisterRequest request) {
 		//stockが既に存在すればそれを使う
@@ -292,7 +294,7 @@ public class TransferHandler {
 							.WHERE(sa -> sa.stock_id.eq($UUID).AND.in_search_scope.eq(true).AND.transferred_at.le($TIMESTAMP))))
 				.ORDER_BY(
 					a -> a.ls(
-						a.created_at.DESC, //同一時刻であればtransfers.created_atが最近のもの
+						a.created_at.DESC, //同一時刻であればcreated_atが最近のもの
 						a.node_seq.DESC)), //同一伝票内であれば生成順
 			stockId,
 			stockId,
@@ -322,11 +324,21 @@ public class TransferHandler {
 
 		recorder.play(
 			() -> new snapshots().insertStatement(
-				a -> a.INSERT(a.id, a.unlimited, a.total, a.stock_id, a.transferred_at, a.node_seq, a.updated_by)
+				a -> a
+					.INSERT(
+						a.id,
+						a.unlimited,
+						a.total,
+						a.stock_id,
+						a.transfer_group_id,
+						a.transferred_at,
+						a.node_seq,
+						a.updated_by)
 					.VALUES(
 						$UUID,
 						$BOOLEAN,
 						$BIGDECIMAL,
+						$UUID,
 						$UUID,
 						$TIMESTAMP,
 						$INT,
@@ -335,6 +347,7 @@ public class TransferHandler {
 			infinity,
 			total,
 			stockId,
+			groupId,
 			transferredAt,
 			nodeSeq,
 			userId)
