@@ -21,15 +21,17 @@ public class TransferComponent {
 		public UUID group_id;
 
 		/**
-		 * 打消し元のtransfer_id
-		 */
-		public Optional<UUID> denied_id = Optional.empty();
-
-		/**
 		 * 移動時刻
 		 * 必須
 		 */
 		public Timestamp transferred_at;
+
+		/**
+		 * 打消し元のtransfer_id
+		 */
+		public Optional<UUID> denied_id = Optional.empty();
+
+		public Optional<String> deny_reason = Optional.empty();
 
 		/**
 		 * 追加情報JSON
@@ -140,6 +142,17 @@ public class TransferComponent {
 		 * DBから復元した追加情報JSON
 		 */
 		Optional<Object> restoredExtension = Optional.empty();
+	}
+
+	/**
+	 * transfer打消し
+	 *
+	 */
+	public static class TransferDenyRequest {
+
+		public UUID denyId;
+
+		public Optional<String> denyReason = Optional.empty();
 	}
 
 	public static class TransferRegisterResult {

@@ -25,6 +25,7 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.model.InOut;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterResult;
 import sqlassist.bb.bundles;
@@ -70,6 +71,7 @@ public class TransferHandler {
 		transfer.setGroup_id(request.group_id);
 
 		request.denied_id.ifPresent(v -> transfer.setDenied_id(v));
+		request.deny_reason.ifPresent(v -> transfer.setDeny_reason(v));
 
 		transfer.setTransferred_at(request.transferred_at);
 
@@ -118,7 +120,7 @@ public class TransferHandler {
 		return result;
 	}
 
-	public TransferRegisterResult deny(UUID transferId, UUID userId, UUID denyTransferId) {
+	public TransferRegisterResult deny(UUID transferId, UUID userId, TransferDenyRequest denyRequest) {
 		var request = new TransferRegisterRequest();
 
 		var bundles = new LinkedList<BundleRegisterRequest>();
@@ -151,12 +153,13 @@ public class TransferHandler {
 				.$bundles()
 				.$transfers()
 				.intercept(),
-			denyTransferId)
+			denyRequest.denyId)
 			.forEach(transferOne -> {
 				var transfer = transferOne.get();
 
 				request.group_id = transfer.getGroup_id();
-				request.denied_id = Optional.of(denyTransferId);
+				request.denied_id = Optional.of(denyRequest.denyId);
+				request.deny_reason = denyRequest.denyReason;
 				request.transferred_at = transfer.getTransferred_at();
 				request.restoredExtension = Optional.of(transfer.getExtension());
 

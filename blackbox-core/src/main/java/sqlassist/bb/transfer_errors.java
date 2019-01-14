@@ -179,22 +179,12 @@ public class transfer_errors
 	/**
 	 * name: request<br>
 	 * remarks: 登録リクエスト内容<br>
-	 * 打消し処理の場合、{}<br>
+	 * 取消処理の場合、{}<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "request", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録リクエスト内容\n打消し処理の場合、{}", defaultValue = "'{}'::jsonb", ordinalPosition = 6, notNull = true)
+	@Column(name = "request", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録リクエスト内容\n取消処理の場合、{}", defaultValue = "'{}'::jsonb", ordinalPosition = 6, notNull = true)
 	public static final String request = "request";
-
-	/**
-	 * name: deny_id<br>
-	 * remarks: 打消対象ID<br>
-	 * 打消処理だった場合、その対象<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "deny_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "打消対象ID\n打消処理だった場合、その対象", defaultValue = "'00000000-0000-0000-0000-000000000000'::uuid", ordinalPosition = 7, notNull = true)
-	public static final String deny_id = "deny_id";
 
 	/**
 	 * name: created_at<br>
@@ -202,16 +192,8 @@ public class transfer_errors
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻", defaultValue = "now()", ordinalPosition = 7, notNull = true)
 	public static final String created_at = "created_at";
-
-	/**
-	 * name: transfer_errors_deny_id_fkey<br>
-	 * references: transfers<br>
-	 * columns: deny_id
-	 */
-	@ForeignKey(name = "transfer_errors_deny_id_fkey", references = "bb.transfers", columns = { "deny_id" }, refColumns = { "id" })
-	public static final String bb$transfers$transfer_errors_deny_id_fkey = "transfer_errors_deny_id_fkey";
 
 	/**
 	 * name: transfer_errors_user_id_fkey<br>
@@ -434,7 +416,7 @@ public class transfer_errors
 		 * setter
 		 * name: request<br>
 		* remarks: 登録リクエスト内容<br>
-		* 打消し処理の場合、{}<br>
+		* 取消処理の場合、{}<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
@@ -452,7 +434,7 @@ public class transfer_errors
 		 * getter
 		 * name: request<br>
 		* remarks: 登録リクエスト内容<br>
-		* 打消し処理の場合、{}<br>
+		* 取消処理の場合、{}<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
@@ -460,38 +442,6 @@ public class transfer_errors
 		public java.lang.Object getRequest() {
 			Binder binder = data$.getValue("request");
 			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: deny_id<br>
-		* remarks: 打消対象ID<br>
-		* 打消処理だった場合、その対象<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setDeny_id(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("deny_id").getType());
-			data$.setValue("deny_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: deny_id<br>
-		* remarks: 打消対象ID<br>
-		* 打消処理だった場合、その対象<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getDeny_id() {
-			Binder binder = data$.getValue("deny_id");
-			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -522,18 +472,6 @@ public class transfer_errors
 		public java.sql.Timestamp getCreated_at() {
 			Binder binder = data$.getValue("created_at");
 			return (java.sql.Timestamp) binder.getValue();
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 transfers<br>
-		 * 外部キー名 transfer_errors_deny_id_fkey<br>
-		 * 項目名 deny_id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.transfers.Row $transfers() {
-			return sqlassist.bb.transfers.row(
-				data$.getDataObject(bb$transfers$transfer_errors_deny_id_fkey));
 		}
 
 		/**
@@ -1658,11 +1596,6 @@ public class transfer_errors
 		public final T request;
 
 		/**
-		 * 項目名 deny_id
-		 */
-		public final T deny_id;
-
-		/**
 		 * 項目名 created_at
 		 */
 		public final T created_at;
@@ -1696,9 +1629,6 @@ public class transfer_errors
 			this.request = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfer_errors.request);
-			this.deny_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transfer_errors.deny_id);
 			this.created_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfer_errors.created_at);
@@ -1815,19 +1745,6 @@ public class transfer_errors
 			if (super.table$ != null) throw new IllegalStateException("このインスタンスでは直接使用することはできません");
 			if (!getSelectStatement().rowMode()) throw new IllegalStateException("集計モードでは実行できない処理です");
 			return new InstantOneToManyQuery<>(this, getSelectStatement().decorators());
-		}
-
-		/**
-		 * 参照先テーブル名 transfers<br>
-		 * 外部キー名 transfer_errors_deny_id_fkey<br>
-		 * 項目名 deny_id
-		 * @return transfers relationship
-		 */
-		public sqlassist.bb.transfers.ExtAssist<T, Many<sqlassist.bb.transfer_errors.Row, M>> $transfers() {
-			return new sqlassist.bb.transfers.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb.transfer_errors.bb$transfers$transfer_errors_deny_id_fkey);
 		}
 
 		/**

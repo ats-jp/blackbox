@@ -6,6 +6,7 @@ import java.util.stream.IntStream;
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TransferExecutor;
 import jp.ats.blackbox.persistence.SecurityValues;
+import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 
 public class TransferExecutorTest {
 
@@ -13,11 +14,10 @@ public class TransferExecutorTest {
 		TransferCommon.start();
 		//TransferCommon.startWithLog();
 
-		execute(GroupHandlerTest.register(), 10, 5);
+		execute(GroupHandlerTest.register(), 100, 5);
 	}
 
 	static void execute(UUID group, int transfers, int threads) {
-
 		var executor = new TransferExecutor();
 
 		executor.start();
@@ -35,7 +35,12 @@ public class TransferExecutorTest {
 
 					promise.waitUntilFinished();
 
-					var denyPromise = executor.deny(SecurityValues.currentUserId(), newId);
+					var denyPromise = executor.deny(SecurityValues.currentUserId(), () -> {
+						var req = new TransferDenyRequest();
+						req.denyId = newId;
+						return req;
+					});
+
 					System.out.println("deny    : " + denyPromise.getTransferId() + " " + Thread.currentThread());
 
 					denyPromise.waitUntilFinished();

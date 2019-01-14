@@ -153,23 +153,12 @@ public class transfers
 	public static final String group_id = "group_id";
 
 	/**
-	 * name: denied_id<br>
-	 * remarks: 取消元伝票ID<br>
-	 * 訂正後の伝票が訂正前の伝票のIDを持つ<br>
-	 * ここに入っているIDが指す伝票は、取り消されたものとなる<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "denied_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消元伝票ID\n訂正後の伝票が訂正前の伝票のIDを持つ\nここに入っているIDが指す伝票は、取り消されたものとなる", defaultValue = "'00000000-0000-0000-0000-000000000000'::uuid", ordinalPosition = 3, notNull = true)
-	public static final String denied_id = "denied_id";
-
-	/**
 	 * name: transferred_at<br>
 	 * remarks: 移動時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "transferred_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "移動時刻", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "transferred_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "移動時刻", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String transferred_at = "transferred_at";
 
 	/**
@@ -178,35 +167,8 @@ public class transfers
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 5, notNull = true)
+	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 4, notNull = true)
 	public static final String extension = "extension";
-
-	/**
-	 * name: org_extension<br>
-	 * remarks: 組織のextension<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "org_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "組織のextension", defaultValue = "null", ordinalPosition = 6, notNull = true)
-	public static final String org_extension = "org_extension";
-
-	/**
-	 * name: group_extension<br>
-	 * remarks: グループのextension<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "null", ordinalPosition = 7, notNull = true)
-	public static final String group_extension = "group_extension";
-
-	/**
-	 * name: user_extension<br>
-	 * remarks: 作成ユーザーのextension<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "user_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザーのextension", defaultValue = "null", ordinalPosition = 8, notNull = true)
-	public static final String user_extension = "user_extension";
 
 	/**
 	 * name: tags<br>
@@ -214,7 +176,7 @@ public class transfers
 	 * type: _text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 9, notNull = true)
+	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 5, notNull = true)
 	public static final String tags = "tags";
 
 	/**
@@ -223,8 +185,55 @@ public class transfers
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "instance_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "発生元インスタンスのID", defaultValue = "null", ordinalPosition = 10, notNull = true)
+	@Column(name = "instance_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "発生元インスタンスのID", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String instance_id = "instance_id";
+
+	/**
+	 * name: denied_id<br>
+	 * remarks: 取消元伝票ID<br>
+	 * 訂正後の伝票が訂正前の伝票のIDを持つ<br>
+	 * ここに入っているIDが指す伝票は、取り消されたものとなる<br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "denied_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消元伝票ID\n訂正後の伝票が訂正前の伝票のIDを持つ\nここに入っているIDが指す伝票は、取り消されたものとなる", defaultValue = "'00000000-0000-0000-0000-000000000000'::uuid", ordinalPosition = 7, notNull = true)
+	public static final String denied_id = "denied_id";
+
+	/**
+	 * name: deny_reason<br>
+	 * remarks: 取消理由<br>
+	 * type: text(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "deny_reason", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消理由", defaultValue = "''::text", ordinalPosition = 8, notNull = true)
+	public static final String deny_reason = "deny_reason";
+
+	/**
+	 * name: org_extension<br>
+	 * remarks: 組織のextension<br>
+	 * type: jsonb(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "org_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "組織のextension", defaultValue = "null", ordinalPosition = 9, notNull = true)
+	public static final String org_extension = "org_extension";
+
+	/**
+	 * name: group_extension<br>
+	 * remarks: グループのextension<br>
+	 * type: jsonb(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "null", ordinalPosition = 10, notNull = true)
+	public static final String group_extension = "group_extension";
+
+	/**
+	 * name: user_extension<br>
+	 * remarks: 作成ユーザーのextension<br>
+	 * type: jsonb(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "user_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザーのextension", defaultValue = "null", ordinalPosition = 11, notNull = true)
+	public static final String user_extension = "user_extension";
 
 	/**
 	 * name: created_at<br>
@@ -232,7 +241,7 @@ public class transfers
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 11, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 12, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -241,7 +250,7 @@ public class transfers
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 12, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 13, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -399,40 +408,6 @@ public class transfers
 
 		/**
 		 * setter
-		 * name: denied_id<br>
-		* remarks: 取消元伝票ID<br>
-		* 訂正後の伝票が訂正前の伝票のIDを持つ<br>
-		* ここに入っているIDが指す伝票は、取り消されたものとなる<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setDenied_id(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("denied_id").getType());
-			data$.setValue("denied_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: denied_id<br>
-		* remarks: 取消元伝票ID<br>
-		* 訂正後の伝票が訂正前の伝票のIDを持つ<br>
-		* ここに入っているIDが指す伝票は、取り消されたものとなる<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getDenied_id() {
-			Binder binder = data$.getValue("denied_id");
-			return (java.util.UUID) binder.getValue();
-		}
-
-		/**
-		 * setter
 		 * name: transferred_at<br>
 		* remarks: 移動時刻<br>
 		* type: timestamptz(35, 6)<br>
@@ -489,6 +464,130 @@ public class transfers
 		public java.lang.Object getExtension() {
 			Binder binder = data$.getValue("extension");
 			return binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: tags<br>
+		* remarks: 保存用タグ<br>
+		* type: _text(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.lang.Object
+		 */
+		public void setTags(java.lang.Object value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("tags").getType());
+			data$.setValue("tags", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: tags<br>
+		* remarks: 保存用タグ<br>
+		* type: _text(2147483647)<br>
+		* not null: true<br>
+		 * @return java.lang.Object
+		 */
+		public java.lang.Object getTags() {
+			Binder binder = data$.getValue("tags");
+			return binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: instance_id<br>
+		* remarks: 発生元インスタンスのID<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setInstance_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("instance_id").getType());
+			data$.setValue("instance_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: instance_id<br>
+		* remarks: 発生元インスタンスのID<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getInstance_id() {
+			Binder binder = data$.getValue("instance_id");
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: denied_id<br>
+		* remarks: 取消元伝票ID<br>
+		* 訂正後の伝票が訂正前の伝票のIDを持つ<br>
+		* ここに入っているIDが指す伝票は、取り消されたものとなる<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setDenied_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("denied_id").getType());
+			data$.setValue("denied_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: denied_id<br>
+		* remarks: 取消元伝票ID<br>
+		* 訂正後の伝票が訂正前の伝票のIDを持つ<br>
+		* ここに入っているIDが指す伝票は、取り消されたものとなる<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getDenied_id() {
+			Binder binder = data$.getValue("denied_id");
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: deny_reason<br>
+		* remarks: 取消理由<br>
+		* type: text(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.lang.String
+		 */
+		public void setDeny_reason(java.lang.String value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("deny_reason").getType());
+			data$.setValue("deny_reason", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: deny_reason<br>
+		* remarks: 取消理由<br>
+		* type: text(2147483647)<br>
+		* not null: true<br>
+		 * @return java.lang.String
+		 */
+		public java.lang.String getDeny_reason() {
+			Binder binder = data$.getValue("deny_reason");
+			return (java.lang.String) binder.getValue();
 		}
 
 		/**
@@ -579,66 +678,6 @@ public class transfers
 		public java.lang.Object getUser_extension() {
 			Binder binder = data$.getValue("user_extension");
 			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: tags<br>
-		* remarks: 保存用タグ<br>
-		* type: _text(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.lang.Object
-		 */
-		public void setTags(java.lang.Object value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("tags").getType());
-			data$.setValue("tags", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: tags<br>
-		* remarks: 保存用タグ<br>
-		* type: _text(2147483647)<br>
-		* not null: true<br>
-		 * @return java.lang.Object
-		 */
-		public java.lang.Object getTags() {
-			Binder binder = data$.getValue("tags");
-			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: instance_id<br>
-		* remarks: 発生元インスタンスのID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setInstance_id(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("instance_id").getType());
-			data$.setValue("instance_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: instance_id<br>
-		* remarks: 発生元インスタンスのID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getInstance_id() {
-			Binder binder = data$.getValue("instance_id");
-			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -1839,11 +1878,6 @@ public class transfers
 		public final T group_id;
 
 		/**
-		 * 項目名 denied_id
-		 */
-		public final T denied_id;
-
-		/**
 		 * 項目名 transferred_at
 		 */
 		public final T transferred_at;
@@ -1852,6 +1886,26 @@ public class transfers
 		 * 項目名 extension
 		 */
 		public final T extension;
+
+		/**
+		 * 項目名 tags
+		 */
+		public final T tags;
+
+		/**
+		 * 項目名 instance_id
+		 */
+		public final T instance_id;
+
+		/**
+		 * 項目名 denied_id
+		 */
+		public final T denied_id;
+
+		/**
+		 * 項目名 deny_reason
+		 */
+		public final T deny_reason;
 
 		/**
 		 * 項目名 org_extension
@@ -1867,16 +1921,6 @@ public class transfers
 		 * 項目名 user_extension
 		 */
 		public final T user_extension;
-
-		/**
-		 * 項目名 tags
-		 */
-		public final T tags;
-
-		/**
-		 * 項目名 instance_id
-		 */
-		public final T instance_id;
 
 		/**
 		 * 項目名 created_at
@@ -1905,15 +1949,24 @@ public class transfers
 			this.group_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfers.group_id);
-			this.denied_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transfers.denied_id);
 			this.transferred_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfers.transferred_at);
 			this.extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfers.extension);
+			this.tags = builder$.buildColumn(
+				this,
+				sqlassist.bb.transfers.tags);
+			this.instance_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.transfers.instance_id);
+			this.denied_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.transfers.denied_id);
+			this.deny_reason = builder$.buildColumn(
+				this,
+				sqlassist.bb.transfers.deny_reason);
 			this.org_extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfers.org_extension);
@@ -1923,12 +1976,6 @@ public class transfers
 			this.user_extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfers.user_extension);
-			this.tags = builder$.buildColumn(
-				this,
-				sqlassist.bb.transfers.tags);
-			this.instance_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transfers.instance_id);
 			this.created_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfers.created_at);

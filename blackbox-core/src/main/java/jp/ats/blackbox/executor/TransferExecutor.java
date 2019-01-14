@@ -13,6 +13,7 @@ import com.lmax.disruptor.util.DaemonThreadFactory;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.Retry;
+import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterResult;
 import jp.ats.blackbox.persistence.TransferHandler;
@@ -60,10 +61,10 @@ public class TransferExecutor {
 		return promise;
 	}
 
-	public TransferPromise deny(UUID userId, UUID transferId) {
+	public TransferPromise deny(UUID userId, Supplier<TransferDenyRequest> requestSupplier) {
 		TransferPromise promise = new TransferPromise();
 
-		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, transferId, promise));
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, requestSupplier.get(), promise));
 
 		return promise;
 	}
@@ -118,9 +119,9 @@ public class TransferExecutor {
 
 		private UUID userId;
 
-		private TransferRegisterRequest request;
+		private TransferRegisterRequest registerRequest;
 
-		private UUID denyTransferId;
+		private TransferDenyRequest denyRequest;
 
 		private TransferPromise promise;
 
@@ -131,69 +132,47 @@ public class TransferExecutor {
 
 			transferId = promise.getTransferId();
 			this.userId = userId;
-			this.request = request;
-			this.denyTransferId = null;
+			registerRequest = request;
+			denyRequest = null;
 			this.promise = promise;
 		}
 
-		private void set(UUID userId, UUID denyTransferId, TransferPromise promise) {
+		private void set(UUID userId, TransferDenyRequest request, TransferPromise promise) {
 			deny = true;
 
 			transferId = promise.getTransferId();
 			this.userId = userId;
-			this.request = null;
-			this.denyTransferId = denyTransferId;
+			registerRequest = null;
+			denyRequest = request;
 			this.promise = promise;
 		}
 
 		private TransferRegisterResult execute() {
 			if (deny) {
-				return handler.deny(transferId, userId, denyTransferId);
+				return handler.deny(transferId, userId, denyRequest);
 			}
 
-			return handler.register(transferId, userId, request);
+			return handler.register(transferId, userId, registerRequest);
 		}
 
 		private void insertErrorLog(Throwable error) {
-			Blendee.execute(t -> {
-				if (deny) {
-					new transfer_errors().insertStatement(
-						a -> a
-							.INSERT(
-								a.transfer_id,
-								a.message,
-								a.stack_trace,
-								a.sql_state,
-								a.user_id,
-								a.deny_id)
-							.VALUES(
-								transferId,
-								error.getMessage(),
-								U.getStackTrace(error),
-								U.getSQLState(error).orElse(""),
-								userId,
-								denyTransferId))
-						.execute();
-				} else {
-					new transfer_errors().insertStatement(
-						a -> a
-							.INSERT(
-								a.transfer_id,
-								a.message,
-								a.stack_trace,
-								a.sql_state,
-								a.user_id,
-								a.request)
-							.VALUES(
-								transferId,
-								error.getMessage(),
-								U.getStackTrace(error),
-								U.getSQLState(error).orElse(""),
-								userId,
-								JsonHelper.toJson(new Gson().toJson(request))))
-						.execute();
-				}
-			});
+			new transfer_errors().insertStatement(
+				a -> a
+					.INSERT(
+						a.transfer_id,
+						a.message,
+						a.stack_trace,
+						a.sql_state,
+						a.user_id,
+						a.request)
+					.VALUES(
+						transferId,
+						error.getMessage(),
+						U.getStackTrace(error),
+						U.getSQLState(error).orElse(""),
+						userId,
+						JsonHelper.toJson(new Gson().toJson(deny ? denyRequest : registerRequest))))
+				.execute();
 		}
 	}
 }
