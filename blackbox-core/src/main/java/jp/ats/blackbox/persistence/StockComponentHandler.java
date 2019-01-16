@@ -31,11 +31,7 @@ public class StockComponentHandler {
 
 	private static final String active = "active";
 
-	private static final String created_at = "created_at";
-
 	private static final String created_by = "created_by";
-
-	private static final String updated_at = "updated_at";
 
 	private static final String updated_by = "updated_by";
 
