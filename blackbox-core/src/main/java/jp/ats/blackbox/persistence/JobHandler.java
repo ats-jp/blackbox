@@ -35,11 +35,12 @@ public class JobHandler {
 		new jobs()
 			.SELECT(a -> a.id)
 			.WHERE(a -> a.completed.eq(false).AND.$transfers().transferred_at.le(Timestamp.valueOf(time)))
-			.ORDER_BY(a -> a.ls(a.$transfers().transferred_at, a.id))
+			.ORDER_BY(a -> a.ls(a.$transfers().transferred_at, a.$transfers().created_at))
 			.forEach(r -> {
 				new snapshots()
 					.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().stock_id))
 					.WHERE(sa -> sa.$nodes().$bundles().transfer_id.eq(r.getId()))
+					.ORDER_BY(a -> a.node_seq)
 					.aggregate(result -> {
 						while (result.next()) {
 							//TODO pluginで個別処理を複数スレッドで行うようにする
