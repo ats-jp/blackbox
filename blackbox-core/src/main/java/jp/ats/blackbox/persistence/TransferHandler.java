@@ -46,7 +46,12 @@ public class TransferHandler {
 
 	private final AsyncRecorder recorder = new AsyncRecorder();
 
-	private final UUID instanceId = SecurityValues.currentInstanceId();
+	private UUID instanceId;
+
+	private UUID instanceId() {
+		if (instanceId == null) instanceId = SecurityValues.currentInstanceId();
+		return instanceId;
+	}
 
 	private int nodeSeq;
 
@@ -85,7 +90,7 @@ public class TransferHandler {
 
 		request.tags.ifPresent(v -> transfer.setTags(v));
 
-		transfer.setInstance_id(instanceId);
+		transfer.setInstance_id(instanceId());
 
 		transfer.setCreated_by(userId);
 

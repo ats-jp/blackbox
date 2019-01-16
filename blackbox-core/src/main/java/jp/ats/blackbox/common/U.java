@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +27,11 @@ public class U {
 
 	public static LocalDateTime convert(Timestamp timestamp) {
 		return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+	}
+
+	public static Timestamp convert(LocalDateTime dateTime) {
+		var zonedDateTime = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+		return Timestamp.from(zonedDateTime.toInstant());
 	}
 
 	public static UUID uuid(Result result, int parameterIndex) {
