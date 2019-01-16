@@ -371,7 +371,8 @@ public class TransferHandler {
 							wa -> wa.id.IN(
 								new snapshots()
 									.SELECT(sa -> sa.id)
-									.WHERE(swa -> swa.stock_id.eq($UUID).AND.transferred_at.ge($TIMESTAMP))))),
+									//transferred_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
+									.WHERE(swa -> swa.stock_id.eq($UUID).AND.transferred_at.gt($TIMESTAMP))))),
 				infinity,
 				request.in_out.normalize(request.quantity),
 				stockId,
