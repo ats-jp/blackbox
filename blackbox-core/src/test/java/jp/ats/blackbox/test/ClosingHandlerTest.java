@@ -1,8 +1,10 @@
 package jp.ats.blackbox.test;
 
 import java.sql.Timestamp;
-import java.util.stream.IntStream;
+import java.util.Arrays;
+import java.util.UUID;
 
+import org.blendee.jdbc.Transaction;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
@@ -16,15 +18,20 @@ public class ClosingHandlerTest {
 		Common.startWithLog();
 
 		Blendee.execute(t -> {
+			exec(t, U.NULL_ID);
+		});
+	}
+
+	private static void exec(Transaction t, UUID... ids) {
+		Arrays.stream(ids).forEach(id -> {
 			var req = new ClosingRequest();
-			req.group_id = U.NULL_ID;
+
+			req.group_id = id;
 			req.closed_at = new Timestamp(System.currentTimeMillis());
 
-			IntStream.range(0, 10).forEach(i -> {
-				ClosingHandler.close(SecurityValues.currentUserId(), req);
-			});
+			ClosingHandler.close(SecurityValues.currentUserId(), req);
 
-			t.rollback();
+			t.commit();
 		});
 	}
 }
