@@ -241,7 +241,7 @@ public class transfers
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 12, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "transaction_timestamp()", ordinalPosition = 12, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
