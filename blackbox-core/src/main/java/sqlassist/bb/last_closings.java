@@ -1028,7 +1028,7 @@ public class last_closings
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public last_closings apply(SQLDecorator... decorators) {
+	public last_closings accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

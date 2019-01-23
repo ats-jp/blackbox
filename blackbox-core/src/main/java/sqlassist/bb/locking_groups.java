@@ -1031,7 +1031,7 @@ public class locking_groups
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public locking_groups apply(SQLDecorator... decorators) {
+	public locking_groups accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

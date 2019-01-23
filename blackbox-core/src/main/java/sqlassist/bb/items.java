@@ -1358,7 +1358,7 @@ public class items
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public items apply(SQLDecorator... decorators) {
+	public items accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

@@ -1008,7 +1008,7 @@ public class jobs
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public jobs apply(SQLDecorator... decorators) {
+	public jobs accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

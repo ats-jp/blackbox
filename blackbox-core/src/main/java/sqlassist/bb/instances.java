@@ -1026,7 +1026,7 @@ public class instances
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public instances apply(SQLDecorator... decorators) {
+	public instances accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

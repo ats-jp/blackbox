@@ -1358,7 +1358,7 @@ public class statuses
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public statuses apply(SQLDecorator... decorators) {
+	public statuses accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

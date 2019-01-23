@@ -1008,7 +1008,7 @@ public class bundles
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public bundles apply(SQLDecorator... decorators) {
+	public bundles accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

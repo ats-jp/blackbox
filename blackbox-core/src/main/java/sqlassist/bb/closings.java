@@ -1142,7 +1142,7 @@ public class closings
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public closings apply(SQLDecorator... decorators) {
+	public closings accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

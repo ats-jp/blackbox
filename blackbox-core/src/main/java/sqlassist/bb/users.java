@@ -1400,7 +1400,7 @@ public class users
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public users apply(SQLDecorator... decorators) {
+	public users accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

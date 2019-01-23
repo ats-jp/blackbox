@@ -1358,7 +1358,7 @@ public class locations
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public locations apply(SQLDecorator... decorators) {
+	public locations accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

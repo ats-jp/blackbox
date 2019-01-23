@@ -1464,7 +1464,7 @@ public class transfers
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public transfers apply(SQLDecorator... decorators) {
+	public transfers accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

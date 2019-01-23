@@ -1091,7 +1091,7 @@ public class relationships
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public relationships apply(SQLDecorator... decorators) {
+	public relationships accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

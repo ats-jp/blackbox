@@ -1304,7 +1304,7 @@ public class stocks
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public stocks apply(SQLDecorator... decorators) {
+	public stocks accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

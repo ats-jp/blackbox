@@ -984,7 +984,7 @@ public class groups_tags
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public groups_tags apply(SQLDecorator... decorators) {
+	public groups_tags accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

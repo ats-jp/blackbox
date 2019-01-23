@@ -1319,7 +1319,7 @@ public class orgs
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public orgs apply(SQLDecorator... decorators) {
+	public orgs accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

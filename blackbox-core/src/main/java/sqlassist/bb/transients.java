@@ -1266,7 +1266,7 @@ public class transients
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public transients apply(SQLDecorator... decorators) {
+	public transients accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

@@ -1162,7 +1162,7 @@ public class transfer_errors
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public transfer_errors apply(SQLDecorator... decorators) {
+	public transfer_errors accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

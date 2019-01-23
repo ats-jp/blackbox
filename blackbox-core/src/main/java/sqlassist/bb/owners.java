@@ -1358,7 +1358,7 @@ public class owners
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public owners apply(SQLDecorator... decorators) {
+	public owners accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

@@ -1405,7 +1405,7 @@ public class snapshots
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public snapshots apply(SQLDecorator... decorators) {
+	public snapshots accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

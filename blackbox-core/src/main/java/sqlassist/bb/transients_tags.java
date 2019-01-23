@@ -984,7 +984,7 @@ public class transients_tags
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public transients_tags apply(SQLDecorator... decorators) {
+	public transients_tags accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

@@ -1417,7 +1417,7 @@ public class groups
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public groups apply(SQLDecorator... decorators) {
+	public groups accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

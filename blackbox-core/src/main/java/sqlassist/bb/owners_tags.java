@@ -984,7 +984,7 @@ public class owners_tags
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public owners_tags apply(SQLDecorator... decorators) {
+	public owners_tags accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

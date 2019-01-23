@@ -1419,7 +1419,7 @@ public class nodes
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public nodes apply(SQLDecorator... decorators) {
+	public nodes accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

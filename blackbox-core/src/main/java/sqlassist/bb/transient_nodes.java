@@ -1377,7 +1377,7 @@ public class transient_nodes
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public transient_nodes apply(SQLDecorator... decorators) {
+	public transient_nodes accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

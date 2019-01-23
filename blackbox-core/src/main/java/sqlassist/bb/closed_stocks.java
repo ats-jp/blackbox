@@ -1165,7 +1165,7 @@ public class closed_stocks
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public closed_stocks apply(SQLDecorator... decorators) {
+	public closed_stocks accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

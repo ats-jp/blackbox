@@ -1204,7 +1204,7 @@ public class transient_snapshots
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public transient_snapshots apply(SQLDecorator... decorators) {
+	public transient_snapshots accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

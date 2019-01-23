@@ -984,7 +984,7 @@ public class items_tags
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public items_tags apply(SQLDecorator... decorators) {
+	public items_tags accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}

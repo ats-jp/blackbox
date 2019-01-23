@@ -1266,7 +1266,7 @@ public class transient_current_stocks
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public transient_current_stocks apply(SQLDecorator... decorators) {
+	public transient_current_stocks accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}
