@@ -3,12 +3,17 @@ package jp.ats.blackbox.test;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TransferExecutor;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 
 public class TransferExecutorTest {
+
+	private static final Logger logger = LogManager.getLogger(TransferExecutorTest.class);
 
 	public static void main(String[] args) throws Exception {
 		TransferCommon.start();
@@ -25,13 +30,13 @@ public class TransferExecutorTest {
 
 		Runnable r = () -> {
 			IntStream.range(0, transfers).forEach(i -> {
-				System.out.println("##### " + i);
+				logger.trace("##### " + i);
 
 				var promise = executor.register(SecurityValues.currentUserId(), () -> TransferHandlerTest.createRequest(group));
 
 				try {
 					UUID newId = promise.getTransferId();
-					System.out.println("register: " + newId + " " + Thread.currentThread());
+					logger.trace("register: " + newId + " " + Thread.currentThread());
 
 					promise.waitUntilFinished();
 
@@ -41,7 +46,7 @@ public class TransferExecutorTest {
 						return req;
 					});
 
-					System.out.println("deny    : " + denyPromise.getTransferId() + " " + Thread.currentThread());
+					logger.trace("deny    : " + denyPromise.getTransferId() + " " + Thread.currentThread());
 
 					denyPromise.waitUntilFinished();
 				} catch (Exception e) {

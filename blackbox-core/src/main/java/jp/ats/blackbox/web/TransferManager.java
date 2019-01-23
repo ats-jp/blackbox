@@ -3,10 +3,15 @@ package jp.ats.blackbox.web;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TransferExecutor;
 
 public class TransferManager implements ServletContextListener {
+
+	private static final Logger logger = LogManager.getLogger(TransferManager.class);
 
 	private static final TransferExecutor executor = new TransferExecutor();
 
@@ -29,15 +34,13 @@ public class TransferManager implements ServletContextListener {
 			//ここでエラーが起きても↓をstopするためにtry catchする
 			executor.stop();
 		} catch (Throwable t) {
-			//TODO エラーのログ出力
-			t.printStackTrace();
+			logger.fatal(t);
 		}
 
 		try {
 			JobExecutor.stop();
 		} catch (Throwable t) {
-			//TODO エラーのログ出力
-			t.printStackTrace();
+			logger.fatal(t);
 		}
 	}
 }

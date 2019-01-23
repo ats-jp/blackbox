@@ -3,6 +3,8 @@ package jp.ats.blackbox.executor;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.blendee.util.Blendee;
 
 import com.google.gson.Gson;
@@ -20,6 +22,8 @@ import jp.ats.blackbox.persistence.TransferHandler;
 import sqlassist.bb.transfer_errors;
 
 public class TransferExecutor {
+
+	private static final Logger logger = LogManager.getLogger(TransferExecutor.class);
 
 	private static final int bufferSize = 256;
 
@@ -77,8 +81,7 @@ public class TransferExecutor {
 					try {
 						result = event.execute();
 					} catch (Retry r) {
-						//TODO log
-						r.printStackTrace();
+						logger.warn(r);
 
 						t.rollback();
 						continue;
@@ -97,16 +100,14 @@ public class TransferExecutor {
 				event.promise.notifyFinished();
 			});
 		} catch (Throwable error) {
-			//TODO 例外をlog
-			error.printStackTrace();
+			logger.fatal(error);
 
 			try {
 				Blendee.execute(t -> {
 					event.insertErrorLog(error);
 				});
 			} catch (Throwable errorsError) {
-				//TODO 例外をlog
-				errorsError.printStackTrace();
+				logger.fatal(errorsError);
 			}
 
 			event.promise.notifyError(error);

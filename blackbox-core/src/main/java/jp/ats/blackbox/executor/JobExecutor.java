@@ -7,11 +7,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.persistence.JobHandler;
 
 public class JobExecutor {
+
+	private static final Logger logger = LogManager.getLogger(JobExecutor.class);
 
 	private static final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 
@@ -68,8 +72,7 @@ public class JobExecutor {
 				}
 			});
 		} catch (Throwable t) {
-			//TODO 例外をlog
-			t.printStackTrace();
+			logger.fatal(t);
 		}
 	}
 }
