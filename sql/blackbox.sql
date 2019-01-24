@@ -101,7 +101,7 @@ COMMENT ON COLUMN bb.instances.principal IS 'この実行インスタンスを�
 INSERT INTO bb.instances VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', false, 'nullの代用、移行不可');
 INSERT INTO bb.instances VALUES (
 	gen_random_uuid(),
-	current_database() || ' [' || inet_server_addr() || ':' || inet_server_port() || ']',
+	COALESCE(current_database(), 'unknown_database') || ' [' || COALESCE(inet_server_addr()::text, 'unknown_addr') || ':' || COALESCE(inet_server_port()::text, 'unknown_port') || ']',
 	true,
 	'');
 
