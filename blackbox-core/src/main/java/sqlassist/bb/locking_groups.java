@@ -144,13 +144,23 @@ public class locking_groups
 	public static final String id = "id";
 
 	/**
+	 * name: cascade_id<br>
+	 * remarks: カスケード削除用ID<br>
+	 * 登録更新処理の起点となったgroupのIDとなる<br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "cascade_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "カスケード削除用ID\n登録更新処理の起点となったgroupのIDとなる", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	public static final String cascade_id = "cascade_id";
+
+	/**
 	 * name: user_id<br>
 	 * remarks: ユーザーID<br>
 	 * ロックを行っているユーザーを表す<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ユーザーID\nロックを行っているユーザーを表す", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ユーザーID\nロックを行っているユーザーを表す", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String user_id = "user_id";
 
 	/**
@@ -159,7 +169,7 @@ public class locking_groups
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "locked_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "ロック開始時刻", defaultValue = "now()", ordinalPosition = 3, notNull = true)
+	@Column(name = "locked_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "ロック開始時刻", defaultValue = "now()", ordinalPosition = 4, notNull = true)
 	public static final String locked_at = "locked_at";
 
 	/**
@@ -169,6 +179,14 @@ public class locking_groups
 	 */
 	@ForeignKey(name = "locking_groups_id_fkey", references = "bb.groups", columns = { "id" }, refColumns = { "id" })
 	public static final String bb$groups$locking_groups_id_fkey = "locking_groups_id_fkey";
+
+	/**
+	 * name: locking_groups_cascade_id_fkey<br>
+	 * references: locking_groups<br>
+	 * columns: cascade_id
+	 */
+	@ForeignKey(name = "locking_groups_cascade_id_fkey", references = "bb.locking_groups", columns = { "cascade_id" }, refColumns = { "id" })
+	public static final String bb$locking_groups$locking_groups_cascade_id_fkey = "locking_groups_cascade_id_fkey";
 
 	/**
 	 * name: locking_groups_user_id_fkey<br>
@@ -271,6 +289,38 @@ public class locking_groups
 
 		/**
 		 * setter
+		 * name: cascade_id<br>
+		* remarks: カスケード削除用ID<br>
+		* 登録更新処理の起点となったgroupのIDとなる<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setCascade_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("cascade_id").getType());
+			data$.setValue("cascade_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: cascade_id<br>
+		* remarks: カスケード削除用ID<br>
+		* 登録更新処理の起点となったgroupのIDとなる<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getCascade_id() {
+			Binder binder = data$.getValue("cascade_id");
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
 		 * name: user_id<br>
 		* remarks: ユーザーID<br>
 		* ロックを行っているユーザーを表す<br>
@@ -341,6 +391,18 @@ public class locking_groups
 		public sqlassist.bb.groups.Row $groups() {
 			return sqlassist.bb.groups.row(
 				data$.getDataObject(bb$groups$locking_groups_id_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 locking_groups<br>
+		 * 外部キー名 locking_groups_cascade_id_fkey<br>
+		 * 項目名 cascade_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.locking_groups.Row $locking_groups() {
+			return sqlassist.bb.locking_groups.row(
+				data$.getDataObject(bb$locking_groups$locking_groups_cascade_id_fkey));
 		}
 
 		/**
@@ -1440,6 +1502,11 @@ public class locking_groups
 		public final T id;
 
 		/**
+		 * 項目名 cascade_id
+		 */
+		public final T cascade_id;
+
+		/**
 		 * 項目名 user_id
 		 */
 		public final T user_id;
@@ -1463,6 +1530,9 @@ public class locking_groups
 			this.id = builder$.buildColumn(
 				this,
 				sqlassist.bb.locking_groups.id);
+			this.cascade_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.locking_groups.cascade_id);
 			this.user_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.locking_groups.user_id);
@@ -1595,6 +1665,19 @@ public class locking_groups
 				builder$,
 				this,
 				sqlassist.bb.locking_groups.bb$groups$locking_groups_id_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 locking_groups<br>
+		 * 外部キー名 locking_groups_cascade_id_fkey<br>
+		 * 項目名 cascade_id
+		 * @return locking_groups relationship
+		 */
+		public sqlassist.bb.locking_groups.ExtAssist<T, Many<sqlassist.bb.locking_groups.Row, M>> $locking_groups() {
+			return new sqlassist.bb.locking_groups.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb.locking_groups.bb$locking_groups$locking_groups_cascade_id_fkey);
 		}
 
 		/**

@@ -21,6 +21,8 @@ public class U {
 
 	public static final UUID NULL_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
+	public static final long LONG_NULL_ID = 0L;
+
 	public static final UUID PRIVILEGE_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
 	public static final Recorder recorder = new Recorder();

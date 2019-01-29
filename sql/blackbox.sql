@@ -289,18 +289,18 @@ cascade_idの用途は、世代が離れた連携を削除するために、一�
 	(1, 親, 親, 0)
 子を登録
 	(2, 子, 子, 0)
-	(3, 親, 子, 0)
+	(3, 親, 子, 2)
 孫を登録
 	(4, 孫, 孫, 0)
-	(5, 子, 孫, 0)
+	(5, 子, 孫, 4)
 	(6, 親, 孫, 5)
 曾孫を登録
 	(7, 曾孫, 曾孫, 0)
-	(8, 孫, 曾孫, 0)
+	(8, 孫, 曾孫, 7)
 	(9, 子, 曾孫, 8)
 	(10, 親, 曾孫, 9)
 親 <- 子の連携を変更する場合、一旦子の関係する連携を削除し、その後再度子以下の連携を登録することで実現する
-削除のフェーズにおいて、子のIDを持つ全行を削除すると
+削除のフェーズにおいて、relationshipsのid、parent_idに子のIDを持つ全行を削除すると
 2, 3, 5, 9が削除される
 5が削除された際、カスケードで6も削除
 9が削除された際、カスケードで10も削除される
@@ -425,6 +425,7 @@ CREATE TABLE bb.users_tags (
 --ロック中グループ
 CREATE UNLOGGED TABLE bb.locking_groups (
 	id uuid PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,
+	cascade_id uuid NOT NULL, --あとでREFERENCES locking_groupsに
 	user_id uuid REFERENCES bb.users NOT NULL,
 	locked_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
@@ -435,9 +436,13 @@ CREATE UNLOGGED TABLE bb.locking_groups (
 COMMENT ON TABLE bb.locking_groups IS 'ロック中グループ';
 COMMENT ON COLUMN bb.locking_groups.id IS 'グループID
 ロック中のグループを表す';
+COMMENT ON COLUMN bb.locking_groups.cascade_id IS 'カスケード削除用ID
+登録更新処理の起点となったgroupのIDとなる';
 COMMENT ON COLUMN bb.locking_groups.user_id IS 'ユーザーID
 ロックを行っているユーザーを表す';
 COMMENT ON COLUMN bb.locking_groups.locked_at IS 'ロック開始時刻';
+
+ALTER TABLE bb.locking_groups ADD CONSTRAINT locking_groups_cascade_id_fkey FOREIGN KEY (cascade_id) REFERENCES bb.locking_groups ON DELETE CASCADE;
 
 --===========================
 --master tables
@@ -1382,6 +1387,7 @@ TO blackbox;
 GRANT INSERT, DELETE ON TABLE
 	bb.tags,
 	bb.closings,
+	bb.locking_groups,
 	bb.groups_tags,
 	bb.users_tags,
 	bb.items_tags,
