@@ -1009,7 +1009,7 @@ COMMENT ON COLUMN bb.current_stocks.updated_at IS '更新時刻';
 
 --締め在庫
 CREATE TABLE bb.closed_stocks (
-	id uuid REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
+	id uuid PRIMARY KEY REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
 	closing_id uuid REFERENCES bb.closings ON DELETE CASCADE NOT NULL,
 	unlimited boolean NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
