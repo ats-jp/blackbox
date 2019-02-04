@@ -34,13 +34,13 @@ public class TransferManager implements ServletContextListener {
 			//ここでエラーが起きても↓をstopするためにtry catchする
 			executor.stop();
 		} catch (Throwable t) {
-			logger.fatal(t);
+			logger.fatal(t.getMessage(), t);
 		}
 
 		try {
 			JobExecutor.stop();
 		} catch (Throwable t) {
-			logger.fatal(t);
+			logger.fatal(t.getMessage(), t);
 		}
 	}
 }

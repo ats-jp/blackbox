@@ -81,7 +81,7 @@ public class TransferExecutor {
 					try {
 						result = event.execute();
 					} catch (Retry r) {
-						logger.warn(r);
+						logger.warn(r.getMessage(), r);
 
 						t.rollback();
 						continue;
@@ -100,14 +100,14 @@ public class TransferExecutor {
 				event.promise.notifyFinished();
 			});
 		} catch (Throwable error) {
-			logger.fatal(error);
+			logger.fatal(error.getMessage(), error);
 
 			try {
 				Blendee.execute(t -> {
 					event.insertErrorLog(error);
 				});
 			} catch (Throwable errorsError) {
-				logger.fatal(errorsError);
+				logger.fatal(errorsError.getMessage(), errorsError);
 			}
 
 			event.promise.notifyError(error);
