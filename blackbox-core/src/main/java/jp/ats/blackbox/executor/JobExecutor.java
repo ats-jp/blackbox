@@ -72,7 +72,7 @@ public class JobExecutor {
 				}
 			});
 		} catch (Throwable t) {
-			logger.fatal(t);
+			logger.fatal(t.getMessage(), t);
 		}
 	}
 }
