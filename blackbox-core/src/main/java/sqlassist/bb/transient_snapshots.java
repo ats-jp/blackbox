@@ -34,7 +34,9 @@ import org.blendee.sql.ValueExtractor;
 import org.blendee.sql.ValueExtractorsConfigure;
 import org.blendee.sql.RuntimeId;
 import org.blendee.sql.RuntimeIdFactory;
-import org.blendee.assist.CriteriaColumn;
+import org.blendee.assist.CriteriaAnyColumn;
+import org.blendee.assist.AssistColumn;
+import org.blendee.assist.CriteriaAssistColumn;
 import org.blendee.assist.CriteriaContext;
 import org.blendee.assist.DataManipulationStatement;
 import org.blendee.assist.DataManipulationStatementBehavior;
@@ -1878,6 +1880,25 @@ public class transient_snapshots
 			OR = or$ == null ? this : or$;
 		}
 
+		/**
+		 * 任意のカラムを生成します。
+		 * @param expression SQL 内のカラムを構成する文字列
+		 * @param values プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<WhereLogicalOperators> expr(String expression, Object... values) {
+			return new CriteriaAnyColumn<>(statement(), expression, values);
+		}
+
+		/**
+		 * 任意のカラムを生成します。
+		 * @param value プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<WhereLogicalOperators> expr(Object value) {
+			return new CriteriaAnyColumn<>(statement(), value);
+		}
+
 		@Override
 		public WhereLogicalOperators EXISTS(SelectStatement subquery) {
 			SelectStatement statement = getSelectStatement();
@@ -1893,13 +1914,13 @@ public class transient_snapshots
 		}
 
 		@Override
-		public WhereLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public WhereLogicalOperators IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, false, mainColumns, subquery);
 			return (WhereLogicalOperators) getSelectStatement().getWhereLogicalOperators();
 		}
 
 		@Override
-		public WhereLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public WhereLogicalOperators NOT_IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, true, mainColumns, subquery);
 			return (WhereLogicalOperators) getSelectStatement().getWhereLogicalOperators();
 		}
@@ -1930,7 +1951,7 @@ public class transient_snapshots
 		}
 
 		@Override
-		public Statement getStatement() {
+		public Statement statement() {
 			return getSelectStatement();
 		}
 	}
@@ -1944,6 +1965,11 @@ public class transient_snapshots
 			transient_snapshots table$,
 			TableFacadeContext<GroupByCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
+		}
+
+		@Override
+		public GroupByClause getGroupByClause() {
+			return getSelectStatement().getGroupByClause();
 		}
 	}
 
@@ -1983,6 +2009,25 @@ public class transient_snapshots
 			OR = or$ == null ? this : or$;
 		}
 
+		/**
+		 * 任意のカラムを生成します。
+		 * @param expression SQL 内のカラムを構成する文字列
+		 * @param values プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<HavingLogicalOperators> expr(String expression, Object... values) {
+			return new CriteriaAnyColumn<>(statement(), expression, values);
+		}
+
+		/**
+		 * 任意のカラムを生成します。
+		 * @param value プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<HavingLogicalOperators> expr(Object value) {
+			return new CriteriaAnyColumn<>(statement(), value);
+		}
+
 		@Override
 		public HavingLogicalOperators EXISTS(SelectStatement subquery) {
 			SelectStatement statement = getSelectStatement();
@@ -1998,13 +2043,13 @@ public class transient_snapshots
 		}
 
 		@Override
-		public HavingLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public HavingLogicalOperators IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, false, mainColumns, subquery);
 			return (HavingLogicalOperators) getSelectStatement().getHavingLogicalOperators();
 		}
 
 		@Override
-		public HavingLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public HavingLogicalOperators NOT_IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, true, mainColumns, subquery);
 			return (HavingLogicalOperators) getSelectStatement().getHavingLogicalOperators();
 		}
@@ -2088,6 +2133,25 @@ public class transient_snapshots
 			OR = or$ == null ? this : or$;
 		}
 
+		/**
+		 * 任意のカラムを生成します。
+		 * @param expression SQL 内のカラムを構成する文字列
+		 * @param values プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<OnLeftLogicalOperators> expr(String expression, Object... values) {
+			return new CriteriaAnyColumn<>(statement(), expression, values);
+		}
+
+		/**
+		 * 任意のカラムを生成します。
+		 * @param value プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<OnLeftLogicalOperators> expr(Object value) {
+			return new CriteriaAnyColumn<>(statement(), value);
+		}
+
 		@Override
 		public OnLeftLogicalOperators EXISTS(SelectStatement subquery) {
 			SelectStatement statement = getSelectStatement();
@@ -2103,13 +2167,13 @@ public class transient_snapshots
 		}
 
 		@Override
-		public OnLeftLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public OnLeftLogicalOperators IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, false, mainColumns, subquery);
 			return (OnLeftLogicalOperators) getSelectStatement().getOnLeftLogicalOperators();
 		}
 
 		@Override
-		public OnLeftLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public OnLeftLogicalOperators NOT_IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, true, mainColumns, subquery);
 			return (OnLeftLogicalOperators) getSelectStatement().getOnLeftLogicalOperators();
 		}
@@ -2159,6 +2223,25 @@ public class transient_snapshots
 			OR = or$ == null ? this : or$;
 		}
 
+		/**
+		 * 任意のカラムを生成します。
+		 * @param expression SQL 内のカラムを構成する文字列
+		 * @param values プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<OnRightLogicalOperators> expr(String expression, Object... values) {
+			return new CriteriaAnyColumn<>(statement(), expression, values);
+		}
+
+		/**
+		 * 任意のカラムを生成します。
+		 * @param value プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<OnRightLogicalOperators> expr(Object value) {
+			return new CriteriaAnyColumn<>(statement(), value);
+		}
+
 		@Override
 		public OnRightLogicalOperators EXISTS(SelectStatement subquery) {
 			SelectStatement statement = getSelectStatement();
@@ -2174,13 +2257,13 @@ public class transient_snapshots
 		}
 
 		@Override
-		public OnRightLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public OnRightLogicalOperators IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, false, mainColumns, subquery);
 			return (OnRightLogicalOperators) getSelectStatement().getOnRightLogicalOperators();
 		}
 
 		@Override
-		public OnRightLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public OnRightLogicalOperators NOT_IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, true, mainColumns, subquery);
 			return (OnRightLogicalOperators) getSelectStatement().getOnRightLogicalOperators();
 		}
@@ -2288,6 +2371,25 @@ public class transient_snapshots
 			OR = or$ == null ? this : or$;
 		}
 
+		/**
+		 * 任意のカラムを生成します。
+		 * @param expression SQL 内のカラムを構成する文字列
+		 * @param values プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<DMSWhereLogicalOperators> expr(String expression, Object... values) {
+			return new CriteriaAnyColumn<>(statement(), expression, values);
+		}
+
+		/**
+		 * 任意のカラムを生成します。
+		 * @param value プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<DMSWhereLogicalOperators> expr(Object value) {
+			return new CriteriaAnyColumn<>(statement(), value);
+		}
+
 		@Override
 		public DMSWhereLogicalOperators EXISTS(SelectStatement subquery) {
 			DataManipulationStatement statement = getDataManipulationStatement();
@@ -2303,13 +2405,13 @@ public class transient_snapshots
 		}
 
 		@Override
-		public DMSWhereLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public DMSWhereLogicalOperators IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, false, mainColumns, subquery);
 			return (DMSWhereLogicalOperators) getDataManipulationStatement().getWhereLogicalOperators();
 		}
 
 		@Override
-		public DMSWhereLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public DMSWhereLogicalOperators NOT_IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, true, mainColumns, subquery);
 			return (DMSWhereLogicalOperators) getDataManipulationStatement().getWhereLogicalOperators();
 		}
@@ -2340,7 +2442,7 @@ public class transient_snapshots
 		}
 
 		@Override
-		public Statement getStatement() {
+		public Statement statement() {
 			return getDataManipulationStatement();
 		}
 	}

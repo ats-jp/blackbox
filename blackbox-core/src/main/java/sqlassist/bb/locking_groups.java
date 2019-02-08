@@ -34,7 +34,9 @@ import org.blendee.sql.ValueExtractor;
 import org.blendee.sql.ValueExtractorsConfigure;
 import org.blendee.sql.RuntimeId;
 import org.blendee.sql.RuntimeIdFactory;
-import org.blendee.assist.CriteriaColumn;
+import org.blendee.assist.CriteriaAnyColumn;
+import org.blendee.assist.AssistColumn;
+import org.blendee.assist.CriteriaAssistColumn;
 import org.blendee.assist.CriteriaContext;
 import org.blendee.assist.DataManipulationStatement;
 import org.blendee.assist.DataManipulationStatementBehavior;
@@ -164,12 +166,22 @@ public class locking_groups
 	public static final String user_id = "user_id";
 
 	/**
+	 * name: locking_transaction_id<br>
+	 * remarks: ロック処理ID<br>
+	 * ロック処理を一意で表すID<br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "locking_transaction_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ロック処理ID\nロック処理を一意で表すID", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	public static final String locking_transaction_id = "locking_transaction_id";
+
+	/**
 	 * name: locked_at<br>
 	 * remarks: ロック開始時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "locked_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "ロック開始時刻", defaultValue = "now()", ordinalPosition = 4, notNull = true)
+	@Column(name = "locked_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "ロック開始時刻", defaultValue = "now()", ordinalPosition = 5, notNull = true)
 	public static final String locked_at = "locked_at";
 
 	/**
@@ -348,6 +360,38 @@ public class locking_groups
 		 */
 		public java.util.UUID getUser_id() {
 			Binder binder = data$.getValue("user_id");
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: locking_transaction_id<br>
+		* remarks: ロック処理ID<br>
+		* ロック処理を一意で表すID<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setLocking_transaction_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("locking_transaction_id").getType());
+			data$.setValue("locking_transaction_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: locking_transaction_id<br>
+		* remarks: ロック処理ID<br>
+		* ロック処理を一意で表すID<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getLocking_transaction_id() {
+			Binder binder = data$.getValue("locking_transaction_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
@@ -1512,6 +1556,11 @@ public class locking_groups
 		public final T user_id;
 
 		/**
+		 * 項目名 locking_transaction_id
+		 */
+		public final T locking_transaction_id;
+
+		/**
 		 * 項目名 locked_at
 		 */
 		public final T locked_at;
@@ -1536,6 +1585,9 @@ public class locking_groups
 			this.user_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.locking_groups.user_id);
+			this.locking_transaction_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.locking_groups.locking_transaction_id);
 			this.locked_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.locking_groups.locked_at);
@@ -1743,6 +1795,25 @@ public class locking_groups
 			OR = or$ == null ? this : or$;
 		}
 
+		/**
+		 * 任意のカラムを生成します。
+		 * @param expression SQL 内のカラムを構成する文字列
+		 * @param values プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<WhereLogicalOperators> expr(String expression, Object... values) {
+			return new CriteriaAnyColumn<>(statement(), expression, values);
+		}
+
+		/**
+		 * 任意のカラムを生成します。
+		 * @param value プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<WhereLogicalOperators> expr(Object value) {
+			return new CriteriaAnyColumn<>(statement(), value);
+		}
+
 		@Override
 		public WhereLogicalOperators EXISTS(SelectStatement subquery) {
 			SelectStatement statement = getSelectStatement();
@@ -1758,13 +1829,13 @@ public class locking_groups
 		}
 
 		@Override
-		public WhereLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public WhereLogicalOperators IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, false, mainColumns, subquery);
 			return (WhereLogicalOperators) getSelectStatement().getWhereLogicalOperators();
 		}
 
 		@Override
-		public WhereLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public WhereLogicalOperators NOT_IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, true, mainColumns, subquery);
 			return (WhereLogicalOperators) getSelectStatement().getWhereLogicalOperators();
 		}
@@ -1795,7 +1866,7 @@ public class locking_groups
 		}
 
 		@Override
-		public Statement getStatement() {
+		public Statement statement() {
 			return getSelectStatement();
 		}
 	}
@@ -1809,6 +1880,11 @@ public class locking_groups
 			locking_groups table$,
 			TableFacadeContext<GroupByCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
+		}
+
+		@Override
+		public GroupByClause getGroupByClause() {
+			return getSelectStatement().getGroupByClause();
 		}
 	}
 
@@ -1848,6 +1924,25 @@ public class locking_groups
 			OR = or$ == null ? this : or$;
 		}
 
+		/**
+		 * 任意のカラムを生成します。
+		 * @param expression SQL 内のカラムを構成する文字列
+		 * @param values プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<HavingLogicalOperators> expr(String expression, Object... values) {
+			return new CriteriaAnyColumn<>(statement(), expression, values);
+		}
+
+		/**
+		 * 任意のカラムを生成します。
+		 * @param value プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<HavingLogicalOperators> expr(Object value) {
+			return new CriteriaAnyColumn<>(statement(), value);
+		}
+
 		@Override
 		public HavingLogicalOperators EXISTS(SelectStatement subquery) {
 			SelectStatement statement = getSelectStatement();
@@ -1863,13 +1958,13 @@ public class locking_groups
 		}
 
 		@Override
-		public HavingLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public HavingLogicalOperators IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, false, mainColumns, subquery);
 			return (HavingLogicalOperators) getSelectStatement().getHavingLogicalOperators();
 		}
 
 		@Override
-		public HavingLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public HavingLogicalOperators NOT_IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, true, mainColumns, subquery);
 			return (HavingLogicalOperators) getSelectStatement().getHavingLogicalOperators();
 		}
@@ -1953,6 +2048,25 @@ public class locking_groups
 			OR = or$ == null ? this : or$;
 		}
 
+		/**
+		 * 任意のカラムを生成します。
+		 * @param expression SQL 内のカラムを構成する文字列
+		 * @param values プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<OnLeftLogicalOperators> expr(String expression, Object... values) {
+			return new CriteriaAnyColumn<>(statement(), expression, values);
+		}
+
+		/**
+		 * 任意のカラムを生成します。
+		 * @param value プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<OnLeftLogicalOperators> expr(Object value) {
+			return new CriteriaAnyColumn<>(statement(), value);
+		}
+
 		@Override
 		public OnLeftLogicalOperators EXISTS(SelectStatement subquery) {
 			SelectStatement statement = getSelectStatement();
@@ -1968,13 +2082,13 @@ public class locking_groups
 		}
 
 		@Override
-		public OnLeftLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public OnLeftLogicalOperators IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, false, mainColumns, subquery);
 			return (OnLeftLogicalOperators) getSelectStatement().getOnLeftLogicalOperators();
 		}
 
 		@Override
-		public OnLeftLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public OnLeftLogicalOperators NOT_IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, true, mainColumns, subquery);
 			return (OnLeftLogicalOperators) getSelectStatement().getOnLeftLogicalOperators();
 		}
@@ -2024,6 +2138,25 @@ public class locking_groups
 			OR = or$ == null ? this : or$;
 		}
 
+		/**
+		 * 任意のカラムを生成します。
+		 * @param expression SQL 内のカラムを構成する文字列
+		 * @param values プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<OnRightLogicalOperators> expr(String expression, Object... values) {
+			return new CriteriaAnyColumn<>(statement(), expression, values);
+		}
+
+		/**
+		 * 任意のカラムを生成します。
+		 * @param value プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<OnRightLogicalOperators> expr(Object value) {
+			return new CriteriaAnyColumn<>(statement(), value);
+		}
+
 		@Override
 		public OnRightLogicalOperators EXISTS(SelectStatement subquery) {
 			SelectStatement statement = getSelectStatement();
@@ -2039,13 +2172,13 @@ public class locking_groups
 		}
 
 		@Override
-		public OnRightLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public OnRightLogicalOperators IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, false, mainColumns, subquery);
 			return (OnRightLogicalOperators) getSelectStatement().getOnRightLogicalOperators();
 		}
 
 		@Override
-		public OnRightLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public OnRightLogicalOperators NOT_IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, true, mainColumns, subquery);
 			return (OnRightLogicalOperators) getSelectStatement().getOnRightLogicalOperators();
 		}
@@ -2153,6 +2286,25 @@ public class locking_groups
 			OR = or$ == null ? this : or$;
 		}
 
+		/**
+		 * 任意のカラムを生成します。
+		 * @param expression SQL 内のカラムを構成する文字列
+		 * @param values プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<DMSWhereLogicalOperators> expr(String expression, Object... values) {
+			return new CriteriaAnyColumn<>(statement(), expression, values);
+		}
+
+		/**
+		 * 任意のカラムを生成します。
+		 * @param value プレースホルダの値
+		 * @return {@link CriteriaAssistColumn}
+		 */
+		public CriteriaAssistColumn<DMSWhereLogicalOperators> expr(Object value) {
+			return new CriteriaAnyColumn<>(statement(), value);
+		}
+
 		@Override
 		public DMSWhereLogicalOperators EXISTS(SelectStatement subquery) {
 			DataManipulationStatement statement = getDataManipulationStatement();
@@ -2168,13 +2320,13 @@ public class locking_groups
 		}
 
 		@Override
-		public DMSWhereLogicalOperators IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public DMSWhereLogicalOperators IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, false, mainColumns, subquery);
 			return (DMSWhereLogicalOperators) getDataManipulationStatement().getWhereLogicalOperators();
 		}
 
 		@Override
-		public DMSWhereLogicalOperators NOT_IN(Vargs<CriteriaColumn<?>> mainColumns, SelectStatement subquery) {
+		public DMSWhereLogicalOperators NOT_IN(Vargs<AssistColumn> mainColumns, SelectStatement subquery) {
 			Helper.addInCriteria(this, true, mainColumns, subquery);
 			return (DMSWhereLogicalOperators) getDataManipulationStatement().getWhereLogicalOperators();
 		}
@@ -2205,7 +2357,7 @@ public class locking_groups
 		}
 
 		@Override
-		public Statement getStatement() {
+		public Statement statement() {
 			return getDataManipulationStatement();
 		}
 	}

@@ -2,7 +2,6 @@ package jp.ats.blackbox.persistence;
 
 import static org.blendee.sql.Placeholder.$UUID;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,16 +24,24 @@ public class GroupHandler {
 	private static final Recorder recorder = new Recorder();
 
 	public static void lockParents(UUID groupId) {
-		if (groupId.equals(U.NULL_ID)) return;
-		Set<UUID> parents = new LinkedHashSet<>();
-		collectParents(groupId, parents);
-		lock(groupId, parents);
+		lockParentsInternal(UUID.randomUUID(), groupId);
 	}
 
 	public static void lockChildren(UUID groupId) {
+		lockChildrenInternal(UUID.randomUUID(), groupId);
+	}
+
+	private static void lockParentsInternal(UUID transactionId, UUID groupId) {
+		if (groupId.equals(U.NULL_ID)) return;
+		Set<UUID> parents = new LinkedHashSet<>();
+		collectParents(groupId, parents);
+		lock(transactionId, groupId, parents);
+	}
+
+	private static void lockChildrenInternal(UUID transactionId, UUID groupId) {
 		Set<UUID> children = new LinkedHashSet<>();
 		collectChildren(groupId, children);
-		lock(groupId, children);
+		lock(transactionId, groupId, children);
 	}
 
 	public static void unlock(UUID groupId) {
@@ -62,24 +69,37 @@ public class GroupHandler {
 			});
 	}
 
-	private static void lock(UUID groupId, Set<UUID> groups) {
+	private static void lock(UUID transactionId, UUID groupId, Set<UUID> groups) {
 		try {
 			UUID userId = SecurityValues.currentUserId();
 			var player = recorder.play(
 				() -> new locking_groups().insertStatement(
-					a -> a.INSERT(a.id, a.cascade_id, a.user_id).VALUES($UUID, $UUID, $UUID)),
+					a -> a
+						.INSERT(
+							a.id,
+							a.cascade_id,
+							a.locking_transaction_id,
+							a.user_id)
+						.VALUES(
+							$UUID,
+							$UUID,
+							$UUID,
+							$UUID)),
 				groupId,
 				groupId,
+				transactionId,
 				userId);
 
 			player.execute();
 
 			var batch = BlendeeManager.getConnection().getBatchStatement();
 
-			groups.forEach(id -> player.reproduce(id, groupId, userId).execute(batch));
+			groups.forEach(id -> player.reproduce(id, groupId, transactionId, userId).execute(batch));
 
 			batch.executeBatch();
 		} catch (UniqueConstraintViolationException e) {
+			groups.forEach(id -> {});//TODO groupIdがぶつかったtransactionId探し
+
 			throw new GroupLockingException(groupId);
 		}
 	}
@@ -138,7 +158,21 @@ public class GroupHandler {
 	}
 
 	public static void update(UpdateRequest request) {
-		lockChildren(request.id);
+		var transactionId = UUID.randomUUID();
+		try {
+			request.parent_id.ifPresent(v -> lockParentsInternal(transactionId, v));
+			lockChildrenInternal(transactionId, request.id);
+		} catch (GroupLockingException e) {
+			//循環のチェック
+			//登録時は、存在しているIDのみparentとして指定するため、循環は発生しないが、
+			//更新時はparent_idを自信を参照するgroupに書き換えることで循環が発生するため
+			//ロックを利用して循環を検出する
+
+			//TODO transactionIdをチェックしてロックがぶつかったか循環化を検出すること
+
+			throw new CycleGroupException(request.id);
+		}
+
 		try {
 			int result = new groups()
 				.UPDATE(a -> {
@@ -172,15 +206,8 @@ public class GroupHandler {
 			groupId,
 			groupId).execute();
 
-		//循環のチェック用Set
-		//登録時は、存在しているIDのみparentとして指定するため、循環は発生しないが、
-		//更新時はparent_idを自信を参照するgroupに書き換えることで循環が発生するため
-		//ここではチェックを行う
-		Set<UUID> cycleChecker = new HashSet<>();
-		cycleChecker.add(groupId);
-
 		//末端を収集
-		walkAndCollectRelationships(groupId, groups, cycleChecker);
+		walkAndCollectRelationships(groupId, groups);
 
 		//末端から再登録
 		groups.forEach(id -> registerRelationships(id, id, U.LONG_NULL_ID));
@@ -189,7 +216,7 @@ public class GroupHandler {
 	/**
 	 * 末端のグループのみを再帰的に収集する
 	 */
-	private static void walkAndCollectRelationships(UUID groupId, List<UUID> groups, Set<UUID> cycleChecker) {
+	private static void walkAndCollectRelationships(UUID groupId, List<UUID> groups) {
 		//active=falseでも一応relationshipは構築しておくために除外しない
 		recorder.play(
 			() -> new groups().SELECT(a -> a.ls(a.id, a.parent_id)).WHERE(a -> a.parent_id.eq($UUID)),
@@ -198,10 +225,8 @@ public class GroupHandler {
 
 				groups.add(id);
 
-				if (!cycleChecker.add(id)) throw new CycleGroupException(id);
-
 				//再帰
-				walkAndCollectRelationships(id, groups, cycleChecker);
+				walkAndCollectRelationships(id, groups);
 			});
 	}
 

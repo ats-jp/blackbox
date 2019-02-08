@@ -427,6 +427,7 @@ CREATE UNLOGGED TABLE bb.locking_groups (
 	id uuid PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,
 	cascade_id uuid NOT NULL, --あとでREFERENCES locking_groupsに
 	user_id uuid REFERENCES bb.users NOT NULL,
+	locking_transaction_id uuid NOT NULL,
 	locked_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
 --WAL対象外
@@ -440,6 +441,9 @@ COMMENT ON COLUMN bb.locking_groups.cascade_id IS 'カスケード削除用ID
 登録更新処理の起点となったgroupのIDとなる';
 COMMENT ON COLUMN bb.locking_groups.user_id IS 'ユーザーID
 ロックを行っているユーザーを表す';
+COMMENT ON COLUMN bb.locking_groups.locking_transaction_id IS 'ロック処理ID
+ロック処理を一意で表すID
+循環を検出する際に使用する';
 COMMENT ON COLUMN bb.locking_groups.locked_at IS 'ロック開始時刻';
 
 ALTER TABLE bb.locking_groups ADD CONSTRAINT locking_groups_cascade_id_fkey FOREIGN KEY (cascade_id) REFERENCES bb.locking_groups ON DELETE CASCADE;
@@ -691,7 +695,6 @@ CREATE UNLOGGED TABLE bb.last_closings (
 --WAL対象外
 --締め済のグループを、親子関係を展開して登録し、締済みかどうかを高速に判定できるようにする
 --先に子が締めを行い、その後親で締めを行った場合、親側で上書きするためclosing_idは親側に変更する
---具体的には、指定されたグループIDの子すべてをこのテーブルから一旦削除し、全部の子分を追加することで実現する
 
 COMMENT ON TABLE bb.last_closings IS 'グループ最終締め情報';
 COMMENT ON COLUMN bb.last_closings.id IS 'ID
@@ -1371,10 +1374,6 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb.owners,
 	bb.locations,
 	bb.statuses,
-	bb.last_closings,
-	bb.current_stocks,
-	bb.snapshots,
-	bb.jobs,
 	bb.transients,
 	bb.transient_current_stocks,
 	bb.transient_transfers,
@@ -1383,10 +1382,17 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb.transient_snapshots
 TO blackbox;
 
---closings, tag関連はINSERT, DELETEのみ
+GRANT INSERT, UPDATE ON TABLE
+	bb.last_closings,
+	bb.current_stocks,
+	bb.snapshots,
+	bb.closed_stocks,
+	bb.jobs
+TO blackbox;
+
+--tag関連はINSERT, DELETEのみ
 GRANT INSERT, DELETE ON TABLE
 	bb.tags,
-	bb.closings,
 	bb.locking_groups,
 	bb.groups_tags,
 	bb.users_tags,
@@ -1399,8 +1405,9 @@ GRANT INSERT, DELETE ON TABLE
 	bb.transient_transfers_tags
 TO blackbox;
 
---transfers関連はINSERTのみ
+--closings, transfers関連はINSERTのみ
 GRANT INSERT ON TABLE
+	bb.closings,
 	bb.stocks,
 	bb.transfers,
 	bb.bundles,
