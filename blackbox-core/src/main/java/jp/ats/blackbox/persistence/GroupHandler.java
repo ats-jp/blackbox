@@ -23,29 +23,29 @@ public class GroupHandler {
 
 	private static final Recorder recorder = new Recorder();
 
-	public static void lockParents(UUID groupId) {
-		lockParentsInternal(UUID.randomUUID(), groupId);
+	public static void lock(UUID groupId) {
+		lockRelatingGroupsInternal(groupId, getParentId(groupId));
+		BlendeeManager.get().getCurrentTransaction().commit();
 	}
 
-	public static void lockChildren(UUID groupId) {
-		lockChildrenInternal(UUID.randomUUID(), groupId);
-	}
-
-	private static void lockParentsInternal(UUID transactionId, UUID groupId) {
+	private static void lockParents(UUID groupId) {
 		if (groupId.equals(U.NULL_ID)) return;
 		Set<UUID> parents = new LinkedHashSet<>();
 		collectParents(groupId, parents);
-		lock(transactionId, groupId, parents);
+		lock(groupId, parents);
+		BlendeeManager.get().getCurrentTransaction().commit();
 	}
 
-	private static void lockChildrenInternal(UUID transactionId, UUID groupId) {
-		Set<UUID> children = new LinkedHashSet<>();
-		collectChildren(groupId, children);
-		lock(transactionId, groupId, children);
+	private static void lockRelatingGroupsInternal(UUID groupId, UUID parentId) {
+		Set<UUID> groups = new LinkedHashSet<>();
+		collectChildren(groupId, groups);
+		collectParents(parentId, groups);
+		lock(groupId, groups);
 	}
 
 	public static void unlock(UUID groupId) {
 		recorder.play(() -> new locking_groups().DELETE().WHERE(a -> a.cascade_id.eq($UUID)), groupId).execute();
+		BlendeeManager.get().getCurrentTransaction().commit();
 	}
 
 	private static void collectParents(UUID groupId, Set<UUID> parents) {
@@ -55,7 +55,10 @@ public class GroupHandler {
 			.willUnique()
 			.ifPresent(r -> {
 				var parent = r.getParent_id();
-				parents.add(parent);
+				if (!parents.add(parent)) {
+					throw new CycleGroupException(parent);
+				}
+
 				collectParents(parent, parents);
 			});
 	}
@@ -64,12 +67,15 @@ public class GroupHandler {
 		recorder.play(() -> new groups().SELECT(a -> a.id).WHERE(a -> a.parent_id.eq($UUID)), groupId)
 			.forEach(r -> {
 				var child = r.getId();
-				children.add(child);
+				if (!children.add(child)) {
+					throw new CycleGroupException(child);
+				}
+
 				collectChildren(child, children);
 			});
 	}
 
-	private static void lock(UUID transactionId, UUID groupId, Set<UUID> groups) {
+	private static void lock(UUID groupId, Set<UUID> groups) {
 		try {
 			UUID userId = SecurityValues.currentUserId();
 			var player = recorder.play(
@@ -78,28 +84,23 @@ public class GroupHandler {
 						.INSERT(
 							a.id,
 							a.cascade_id,
-							a.locking_transaction_id,
 							a.user_id)
 						.VALUES(
-							$UUID,
 							$UUID,
 							$UUID,
 							$UUID)),
 				groupId,
 				groupId,
-				transactionId,
 				userId);
 
 			player.execute();
 
 			var batch = BlendeeManager.getConnection().getBatchStatement();
 
-			groups.forEach(id -> player.reproduce(id, groupId, transactionId, userId).execute(batch));
+			groups.forEach(id -> player.reproduce(id, groupId, userId).execute(batch));
 
 			batch.executeBatch();
 		} catch (UniqueConstraintViolationException e) {
-			groups.forEach(id -> {});//TODO groupIdがぶつかったtransactionId探し
-
 			throw new GroupLockingException(groupId);
 		}
 	}
@@ -157,21 +158,14 @@ public class GroupHandler {
 			});
 	}
 
+	private static UUID getParentId(UUID id) {
+		return recorder.play(() -> new groups().SELECT(a -> a.parent_id)).fetch(id).get().getParent_id();
+	}
+
 	public static void update(UpdateRequest request) {
-		var transactionId = UUID.randomUUID();
-		try {
-			request.parent_id.ifPresent(v -> lockParentsInternal(transactionId, v));
-			lockChildrenInternal(transactionId, request.id);
-		} catch (GroupLockingException e) {
-			//循環のチェック
-			//登録時は、存在しているIDのみparentとして指定するため、循環は発生しないが、
-			//更新時はparent_idを自信を参照するgroupに書き換えることで循環が発生するため
-			//ロックを利用して循環を検出する
-
-			//TODO transactionIdをチェックしてロックがぶつかったか循環化を検出すること
-
-			throw new CycleGroupException(request.id);
-		}
+		var parentId = request.parent_id.orElseGet(
+			() -> getParentId(request.id));
+		lockRelatingGroupsInternal(request.id, parentId);
 
 		try {
 			int result = new groups()

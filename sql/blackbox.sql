@@ -427,7 +427,6 @@ CREATE UNLOGGED TABLE bb.locking_groups (
 	id uuid PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,
 	cascade_id uuid NOT NULL, --あとでREFERENCES locking_groupsに
 	user_id uuid REFERENCES bb.users NOT NULL,
-	locking_transaction_id uuid NOT NULL,
 	locked_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
 --WAL対象外
@@ -441,9 +440,6 @@ COMMENT ON COLUMN bb.locking_groups.cascade_id IS 'カスケード削除用ID
 登録更新処理の起点となったgroupのIDとなる';
 COMMENT ON COLUMN bb.locking_groups.user_id IS 'ユーザーID
 ロックを行っているユーザーを表す';
-COMMENT ON COLUMN bb.locking_groups.locking_transaction_id IS 'ロック処理ID
-ロック処理を一意で表すID
-循環を検出する際に使用する';
 COMMENT ON COLUMN bb.locking_groups.locked_at IS 'ロック開始時刻';
 
 ALTER TABLE bb.locking_groups ADD CONSTRAINT locking_groups_cascade_id_fkey FOREIGN KEY (cascade_id) REFERENCES bb.locking_groups ON DELETE CASCADE;

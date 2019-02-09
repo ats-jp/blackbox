@@ -166,22 +166,12 @@ public class locking_groups
 	public static final String user_id = "user_id";
 
 	/**
-	 * name: locking_transaction_id<br>
-	 * remarks: ロック処理ID<br>
-	 * ロック処理を一意で表すID<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "locking_transaction_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ロック処理ID\nロック処理を一意で表すID", defaultValue = "null", ordinalPosition = 4, notNull = true)
-	public static final String locking_transaction_id = "locking_transaction_id";
-
-	/**
 	 * name: locked_at<br>
 	 * remarks: ロック開始時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "locked_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "ロック開始時刻", defaultValue = "now()", ordinalPosition = 5, notNull = true)
+	@Column(name = "locked_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "ロック開始時刻", defaultValue = "now()", ordinalPosition = 4, notNull = true)
 	public static final String locked_at = "locked_at";
 
 	/**
@@ -360,38 +350,6 @@ public class locking_groups
 		 */
 		public java.util.UUID getUser_id() {
 			Binder binder = data$.getValue("user_id");
-			return (java.util.UUID) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: locking_transaction_id<br>
-		* remarks: ロック処理ID<br>
-		* ロック処理を一意で表すID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setLocking_transaction_id(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("locking_transaction_id").getType());
-			data$.setValue("locking_transaction_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: locking_transaction_id<br>
-		* remarks: ロック処理ID<br>
-		* ロック処理を一意で表すID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getLocking_transaction_id() {
-			Binder binder = data$.getValue("locking_transaction_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
@@ -1556,11 +1514,6 @@ public class locking_groups
 		public final T user_id;
 
 		/**
-		 * 項目名 locking_transaction_id
-		 */
-		public final T locking_transaction_id;
-
-		/**
 		 * 項目名 locked_at
 		 */
 		public final T locked_at;
@@ -1585,9 +1538,6 @@ public class locking_groups
 			this.user_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.locking_groups.user_id);
-			this.locking_transaction_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.locking_groups.locking_transaction_id);
 			this.locked_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.locking_groups.locked_at);
