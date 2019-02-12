@@ -8,6 +8,7 @@ import org.blendee.util.Blendee;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.GroupHandler;
 import jp.ats.blackbox.persistence.GroupHandler.RegisterRequest;
+import jp.ats.blackbox.persistence.SecurityValues;
 
 public class GroupHandlerTest {
 
@@ -15,13 +16,16 @@ public class GroupHandlerTest {
 
 	public static void main(String[] args) {
 		TransferCommon.start();
+		SecurityValues.start(U.NULL_ID);
 		register();
+		SecurityValues.end();
 	}
 
 	static UUID register() {
 		var req = new RegisterRequest();
 		req.name = name();
 		req.parent_id = U.NULL_ID;
+		req.org_id = U.NULL_ID;
 
 		UUID[] id = { null };
 
@@ -36,6 +40,7 @@ public class GroupHandlerTest {
 		var req = new RegisterRequest();
 		req.name = name();
 		req.parent_id = parentId;
+		req.org_id = U.NULL_ID;
 
 		UUID[] id = { null };
 

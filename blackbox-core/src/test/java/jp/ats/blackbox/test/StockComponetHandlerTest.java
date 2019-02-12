@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.StockComponent;
 import jp.ats.blackbox.persistence.StockComponentHandler;
 import sqlassist.bb.locations;
@@ -14,6 +15,8 @@ public class StockComponetHandlerTest {
 
 	public static void main(String[] args) {
 		Common.startWithLog();
+
+		SecurityValues.start(U.NULL_ID);
 
 		Blendee.execute(t -> {
 			var req = new StockComponent.RegisterRequest();
@@ -38,5 +41,7 @@ public class StockComponetHandlerTest {
 
 			t.rollback();
 		});
+
+		SecurityValues.end();
 	}
 }

@@ -12,7 +12,6 @@ import org.blendee.util.Blendee;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.model.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
-import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
@@ -26,7 +25,7 @@ public class TransferHandlerTest {
 		Blendee.execute(t -> {
 			var handler = new TransferHandler();
 			IntStream.range(0, 10).forEach(i -> {
-				handler.register(UUID.randomUUID(), SecurityValues.currentUserId(), createRequest(U.NULL_ID));
+				handler.register(UUID.randomUUID(), U.NULL_ID, createRequest(U.NULL_ID));
 				JobHandler.execute(LocalDateTime.now());
 
 				t.commit(); //created_atを確定するために一件毎commit

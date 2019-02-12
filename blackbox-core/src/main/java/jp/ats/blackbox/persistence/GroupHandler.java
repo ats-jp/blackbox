@@ -113,7 +113,7 @@ public class GroupHandler {
 			UUID id = UUID.randomUUID();
 
 			row.setId(id);
-			row.setOrg_id(SecurityValues.currentOrgId());
+			row.setOrg_id(request.org_id);
 			row.setParent_id(request.parent_id);
 			row.setName(request.name);
 			request.extension.ifPresent(v -> row.setExtension(v));
@@ -227,6 +227,8 @@ public class GroupHandler {
 	public static class RegisterRequest {
 
 		public String name;
+
+		public UUID org_id;
 
 		public UUID parent_id;
 

@@ -7,11 +7,14 @@ import org.blendee.util.Blendee;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.CycleGroupException;
 import jp.ats.blackbox.persistence.GroupHandler;
+import jp.ats.blackbox.persistence.SecurityValues;
 
 public class RelationshipTest {
 
 	public static void main(String[] args) {
 		Common.startWithLog();
+
+		SecurityValues.start(U.NULL_ID);
 
 		register();
 
@@ -20,6 +23,8 @@ public class RelationshipTest {
 		cycleTest1();
 
 		cycleTest2();
+
+		SecurityValues.end();
 	}
 
 	private static void register() {

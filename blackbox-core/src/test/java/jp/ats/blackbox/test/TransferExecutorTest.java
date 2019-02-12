@@ -6,6 +6,7 @@ import java.util.stream.IntStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TransferExecutor;
 import jp.ats.blackbox.persistence.SecurityValues;
@@ -19,7 +20,9 @@ public class TransferExecutorTest {
 		TransferCommon.start();
 		//TransferCommon.startWithLog();
 
+		SecurityValues.start(U.NULL_ID);
 		execute(GroupHandlerTest.register(), 100, 5);
+		SecurityValues.end();
 	}
 
 	static void execute(UUID group, int transfers, int threads) {
@@ -32,7 +35,7 @@ public class TransferExecutorTest {
 			IntStream.range(0, transfers).forEach(i -> {
 				logger.trace("##### " + i);
 
-				var promise = executor.register(SecurityValues.currentUserId(), () -> TransferHandlerTest.createRequest(group));
+				var promise = executor.register(U.NULL_ID, () -> TransferHandlerTest.createRequest(group));
 
 				try {
 					UUID newId = promise.getTransferId();
@@ -40,7 +43,7 @@ public class TransferExecutorTest {
 
 					promise.waitUntilFinished();
 
-					var denyPromise = executor.deny(SecurityValues.currentUserId(), () -> {
+					var denyPromise = executor.deny(U.NULL_ID, () -> {
 						var req = new TransferDenyRequest();
 						req.denyId = newId;
 						return req;

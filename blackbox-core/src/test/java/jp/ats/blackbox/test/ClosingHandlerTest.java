@@ -10,7 +10,6 @@ import org.blendee.util.Blendee;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.ClosingHandler;
 import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
-import jp.ats.blackbox.persistence.SecurityValues;
 
 public class ClosingHandlerTest {
 
@@ -29,7 +28,7 @@ public class ClosingHandlerTest {
 			req.group_id = id;
 			req.closed_at = new Timestamp(System.currentTimeMillis());
 
-			ClosingHandler.close(SecurityValues.currentUserId(), req);
+			ClosingHandler.close(U.NULL_ID, req);
 
 			t.commit();
 		});

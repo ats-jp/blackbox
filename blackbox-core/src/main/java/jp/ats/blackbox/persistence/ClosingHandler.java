@@ -51,7 +51,7 @@ public class ClosingHandler {
 			request.group_id)
 			.aggregate(r -> {
 				while (r.next()) {
-					UUID groupId = UUID.fromString(r.getString(1));
+					UUID groupId = UUID.fromString(r.getString(relationships.child_id));
 
 					closeGroup(groupId, request.closed_at, id, userId, now, batch);
 				}

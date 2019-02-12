@@ -2,9 +2,6 @@ package jp.ats.blackbox.persistence;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
-
-import org.blendee.jdbc.Result;
 
 import sqlassist.bb.orgs;
 
@@ -44,7 +41,7 @@ public class OrgHandler {
 		if (result != 1) throw Utils.decisionException(orgs.$TABLE, id);
 	}
 
-	public static void fetch(UUID id, Consumer<Result> consumer) {
-		new orgs().fetch(id);
+	public static orgs.Row fetch(UUID id) {
+		return new orgs().fetch(id).get();
 	}
 }
