@@ -12,9 +12,15 @@ public class OrgHandler {
 
 		UUID id = UUID.randomUUID();
 
+		UUID userId = SecurityValues.currentUserId();
+
 		row.setId(id);
 		row.setName(name);
 		row.setExtension(extension);
+		row.setCreated_by(userId);
+		row.setUpdated_by(userId);
+
+		row.insert();
 
 		return id;
 	}
@@ -30,6 +36,8 @@ public class OrgHandler {
 			name.ifPresent(v -> a.name.set(v));
 			extension.ifPresent(v -> a.extension.set(v));
 			active.ifPresent(v -> a.active.set(v));
+			a.updated_by.set(SecurityValues.currentUserId());
+			a.updated_at.setAny("now()");
 		}).WHERE(a -> a.id.eq(id).AND.revision.eq(revision)).execute();
 
 		if (result != 1) throw Utils.decisionException(orgs.$TABLE, id);

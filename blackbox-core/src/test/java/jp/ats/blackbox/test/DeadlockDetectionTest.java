@@ -49,7 +49,7 @@ public class DeadlockDetectionTest {
 
 	private static void exec() {
 		SecurityValues.start(U.NULL_ID);
-		TransferExecutorTest.execute(GroupHandlerTest.register(), 1000, 1);
+		TransferAndClosingTest.execute(GroupHandlerTest.register(), 1000, 1);
 		SecurityValues.end();
 	}
 }

@@ -28,7 +28,7 @@ public class ClosingHandlerTest {
 			req.group_id = id;
 			req.closed_at = new Timestamp(System.currentTimeMillis());
 
-			ClosingHandler.close(U.NULL_ID, req);
+			ClosingHandler.close(UUID.randomUUID(), U.NULL_ID, req);
 
 			t.commit();
 		});

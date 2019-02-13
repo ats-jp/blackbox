@@ -26,12 +26,10 @@ public class ClosingHandler {
 
 	private static final Recorder recorder = new Recorder();
 
-	public static UUID close(UUID userId, ClosingRequest request) {
+	public static void close(UUID closingId, UUID userId, ClosingRequest request) {
 		var closing = closings.row();
 
-		var id = UUID.randomUUID();
-
-		closing.setId(id);
+		closing.setId(closingId);
 		closing.setGroup_id(request.group_id);
 		closing.setClosed_at(request.closed_at);
 		request.extension.ifPresent(v -> closing.setExtension(toJson(v)));
@@ -40,8 +38,6 @@ public class ClosingHandler {
 		closing.insert();
 
 		var batch = BlendeeManager.getConnection().getBatchStatement();
-
-		Timestamp now = new Timestamp(System.currentTimeMillis());
 
 		//全ての子グループも対象
 		recorder.play(
@@ -53,13 +49,11 @@ public class ClosingHandler {
 				while (r.next()) {
 					UUID groupId = UUID.fromString(r.getString(relationships.child_id));
 
-					closeGroup(groupId, request.closed_at, id, userId, now, batch);
+					closeGroup(groupId, request.closed_at, closingId, userId, batch);
 				}
 			});
 
 		batch.executeBatch();
-
-		return id;
 	}
 
 	private static void closeGroup(
@@ -67,7 +61,6 @@ public class ClosingHandler {
 		Timestamp closedAt,
 		UUID closingId,
 		UUID userId,
-		Timestamp now,
 		BatchStatement batch) {
 		var lastClosing = recorder.play(() -> new last_closings())
 			.fetch(groupId)
@@ -98,7 +91,7 @@ public class ClosingHandler {
 
 		//closed_stocksの更新
 
-		//close_stocksに存在するものを更新
+		//closed_stocksに存在するものを更新
 		recorder.play(
 			() -> createRankedQuery(
 				base -> base.SELECT(
@@ -122,13 +115,12 @@ public class ClosingHandler {
 								a.closing_id.set($UUID),
 								a.unlimited.set($BOOLEAN),
 								a.total.set($BIGDECIMAL),
-								a.updated_at.set($TIMESTAMP),
+								a.updated_at.setAny("now()"),
 								a.updated_by.set($UUID))
 								.WHERE(sa -> sa.id.eq($UUID))),
 						closingId,
 						r.getBoolean(snapshots.unlimited),
 						r.getBigDecimal(snapshots.total),
-						now,
 						userId,
 						UUID.fromString(r.getString(snapshots.stock_id)))
 						.execute(batch);

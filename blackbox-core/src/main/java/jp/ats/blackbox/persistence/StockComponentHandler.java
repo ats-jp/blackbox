@@ -35,6 +35,8 @@ public class StockComponentHandler {
 
 	private static final String updated_by = "updated_by";
 
+	private static final String updated_at = "updated_at";
+
 	public static UUID register(
 		TablePath table,
 		RegisterRequest request) {
@@ -71,6 +73,7 @@ public class StockComponentHandler {
 			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
 			a.col(updated_by).set(SecurityValues.currentUserId());
+			a.col(updated_at).setAny("now()");
 		}).WHERE(a -> a.col(id).eq(request.id).AND.col(revision).eq(request.revision)).execute();
 
 		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, request.id));
@@ -88,6 +91,7 @@ public class StockComponentHandler {
 			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
 			a.col(updated_by).set(SecurityValues.currentUserId());
+			a.col(updated_at).setAny("now()");
 		}).WHERE(a -> a.col(id).eq(request.id)).execute();
 
 		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, request.id));

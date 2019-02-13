@@ -144,22 +144,13 @@ public class transient_current_stocks
 	public static final String id = "id";
 
 	/**
-	 * name: transient_id<br>
-	 * remarks: 一時作業ID<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "transient_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "一時作業ID", defaultValue = "null", ordinalPosition = 2, notNull = true)
-	public static final String transient_id = "transient_id";
-
-	/**
 	 * name: unlimited<br>
 	 * remarks: 在庫無制限<br>
 	 * trueの場合、totalがマイナスでもエラーとならない<br>
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "unlimited", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫無制限\ntrueの場合、totalがマイナスでもエラーとならない", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "unlimited", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫無制限\ntrueの場合、totalがマイナスでもエラーとならない", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String unlimited = "unlimited";
 
 	/**
@@ -168,8 +159,18 @@ public class transient_current_stocks
 	 * type: numeric(131089)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "total", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "現時点の在庫総数", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "total", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "現時点の在庫総数", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String total = "total";
+
+	/**
+	 * name: transient_snapshot_id<br>
+	 * remarks: 一時作業移動ノード状態ID<br>
+	 * 現時点の数量を変更した伝票<br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "transient_snapshot_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "一時作業移動ノード状態ID\n現時点の数量を変更した伝票", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	public static final String transient_snapshot_id = "transient_snapshot_id";
 
 	/**
 	 * name: created_at<br>
@@ -216,12 +217,12 @@ public class transient_current_stocks
 	public static final String bb$stocks$transient_current_stocks_id_fkey = "transient_current_stocks_id_fkey";
 
 	/**
-	 * name: transient_current_stocks_transient_id_fkey<br>
-	 * references: transients<br>
-	 * columns: transient_id
+	 * name: transient_current_stocks_transient_snapshot_id_fkey<br>
+	 * references: transient_snapshots<br>
+	 * columns: transient_snapshot_id
 	 */
-	@ForeignKey(name = "transient_current_stocks_transient_id_fkey", references = "bb.transients", columns = { "transient_id" }, refColumns = { "id" })
-	public static final String bb$transients$transient_current_stocks_transient_id_fkey = "transient_current_stocks_transient_id_fkey";
+	@ForeignKey(name = "transient_current_stocks_transient_snapshot_id_fkey", references = "bb.transient_snapshots", columns = { "transient_snapshot_id" }, refColumns = { "id" })
+	public static final String bb$transient_snapshots$transient_current_stocks_transient_snapshot_id_fkey = "transient_current_stocks_transient_snapshot_id_fkey";
 
 	/**
 	 * name: transient_current_stocks_created_by_fkey<br>
@@ -238,6 +239,14 @@ public class transient_current_stocks
 	 */
 	@ForeignKey(name = "transient_current_stocks_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
 	public static final String bb$users$transient_current_stocks_updated_by_fkey = "transient_current_stocks_updated_by_fkey";
+
+	/**
+	 * name: transient_current_stocks_transient_id_fkey<br>
+	 * references: transients<br>
+	 * columns: transient_id
+	 */
+	@ForeignKey(name = "transient_current_stocks_transient_id_fkey", references = "bb.transients", columns = { "transient_id" }, refColumns = { "id" }, pseudo = true)
+	public static final String bb$transients$transient_current_stocks_transient_id_fkey = "transient_current_stocks_transient_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -332,36 +341,6 @@ public class transient_current_stocks
 
 		/**
 		 * setter
-		 * name: transient_id<br>
-		* remarks: 一時作業ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setTransient_id(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("transient_id").getType());
-			data$.setValue("transient_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: transient_id<br>
-		* remarks: 一時作業ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getTransient_id() {
-			Binder binder = data$.getValue("transient_id");
-			return (java.util.UUID) binder.getValue();
-		}
-
-		/**
-		 * setter
 		 * name: unlimited<br>
 		* remarks: 在庫無制限<br>
 		* trueの場合、totalがマイナスでもエラーとならない<br>
@@ -420,6 +399,38 @@ public class transient_current_stocks
 		public java.math.BigDecimal getTotal() {
 			Binder binder = data$.getValue("total");
 			return (java.math.BigDecimal) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: transient_snapshot_id<br>
+		* remarks: 一時作業移動ノード状態ID<br>
+		* 現時点の数量を変更した伝票<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setTransient_snapshot_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("transient_snapshot_id").getType());
+			data$.setValue("transient_snapshot_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: transient_snapshot_id<br>
+		* remarks: 一時作業移動ノード状態ID<br>
+		* 現時点の数量を変更した伝票<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getTransient_snapshot_id() {
+			Binder binder = data$.getValue("transient_snapshot_id");
+			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -556,14 +567,14 @@ public class transient_current_stocks
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 transients<br>
-		 * 外部キー名 transient_current_stocks_transient_id_fkey<br>
-		 * 項目名 transient_id
+		 * 参照先テーブル名 transient_snapshots<br>
+		 * 外部キー名 transient_current_stocks_transient_snapshot_id_fkey<br>
+		 * 項目名 transient_snapshot_id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.transients.Row $transients() {
-			return sqlassist.bb.transients.row(
-				data$.getDataObject(bb$transients$transient_current_stocks_transient_id_fkey));
+		public sqlassist.bb.transient_snapshots.Row $transient_snapshots() {
+			return sqlassist.bb.transient_snapshots.row(
+				data$.getDataObject(bb$transient_snapshots$transient_current_stocks_transient_snapshot_id_fkey));
 		}
 
 		/**
@@ -588,6 +599,18 @@ public class transient_current_stocks
 		public sqlassist.bb.users.Row $users$transient_current_stocks_updated_by_fkey() {
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$transient_current_stocks_updated_by_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 transients<br>
+		 * 外部キー名 transient_current_stocks_transient_id_fkey<br>
+		 * 項目名 transient_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.transients.Row $transients() {
+			return sqlassist.bb.transients.row(
+				data$.getDataObject(bb$transients$transient_current_stocks_transient_id_fkey));
 		}
 
 	}
@@ -1663,11 +1686,6 @@ public class transient_current_stocks
 		public final T id;
 
 		/**
-		 * 項目名 transient_id
-		 */
-		public final T transient_id;
-
-		/**
 		 * 項目名 unlimited
 		 */
 		public final T unlimited;
@@ -1676,6 +1694,11 @@ public class transient_current_stocks
 		 * 項目名 total
 		 */
 		public final T total;
+
+		/**
+		 * 項目名 transient_snapshot_id
+		 */
+		public final T transient_snapshot_id;
 
 		/**
 		 * 項目名 created_at
@@ -1711,15 +1734,15 @@ public class transient_current_stocks
 			this.id = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_current_stocks.id);
-			this.transient_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_current_stocks.transient_id);
 			this.unlimited = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_current_stocks.unlimited);
 			this.total = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_current_stocks.total);
+			this.transient_snapshot_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.transient_current_stocks.transient_snapshot_id);
 			this.created_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_current_stocks.created_at);
@@ -1861,16 +1884,16 @@ public class transient_current_stocks
 		}
 
 		/**
-		 * 参照先テーブル名 transients<br>
-		 * 外部キー名 transient_current_stocks_transient_id_fkey<br>
-		 * 項目名 transient_id
-		 * @return transients relationship
+		 * 参照先テーブル名 transient_snapshots<br>
+		 * 外部キー名 transient_current_stocks_transient_snapshot_id_fkey<br>
+		 * 項目名 transient_snapshot_id
+		 * @return transient_snapshots relationship
 		 */
-		public sqlassist.bb.transients.ExtAssist<T, Many<sqlassist.bb.transient_current_stocks.Row, M>> $transients() {
-			return new sqlassist.bb.transients.ExtAssist<>(
+		public sqlassist.bb.transient_snapshots.ExtAssist<T, Many<sqlassist.bb.transient_current_stocks.Row, M>> $transient_snapshots() {
+			return new sqlassist.bb.transient_snapshots.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb.transient_current_stocks.bb$transients$transient_current_stocks_transient_id_fkey);
+				sqlassist.bb.transient_current_stocks.bb$transient_snapshots$transient_current_stocks_transient_snapshot_id_fkey);
 		}
 
 		/**
@@ -1897,6 +1920,19 @@ public class transient_current_stocks
 				builder$,
 				this,
 				sqlassist.bb.transient_current_stocks.bb$users$transient_current_stocks_updated_by_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 transients<br>
+		 * 外部キー名 transient_current_stocks_transient_id_fkey<br>
+		 * 項目名 transient_id
+		 * @return transients relationship
+		 */
+		public sqlassist.bb.transients.ExtAssist<T, Many<sqlassist.bb.transient_current_stocks.Row, M>> $transients() {
+			return new sqlassist.bb.transients.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb.transient_current_stocks.bb$transients$transient_current_stocks_transient_id_fkey);
 		}
 
 	}

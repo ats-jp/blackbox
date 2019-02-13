@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.model.InOut;
+import jp.ats.blackbox.persistence.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
@@ -41,7 +41,7 @@ public class TransferHandlerTest {
 		out.location_id = U.NULL_ID;
 		out.status_id = U.NULL_ID;
 		out.in_out = InOut.OUT;
-		out.grants_infinity = Optional.of(true);
+		out.grants_unlimited = Optional.of(true);
 		out.quantity = BigDecimal.valueOf(100);
 
 		var in = new NodeRegisterRequest();

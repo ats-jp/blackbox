@@ -5,8 +5,6 @@ import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
 
-import jp.ats.blackbox.model.InOut;
-
 public class TransferComponent {
 
 	/**
@@ -41,7 +39,7 @@ public class TransferComponent {
 		/**
 		 * DBから復元した追加情報JSON
 		 */
-		Optional<Object> restoredExtension = Optional.empty();
+		Optional<Object> restored_extension = Optional.empty();
 
 		/**
 		 * 検索用タグ
@@ -68,7 +66,7 @@ public class TransferComponent {
 		/**
 		 * DBから復元した追加情報JSON
 		 */
-		Optional<Object> restoredExtension = Optional.empty();
+		Optional<Object> restored_extension = Optional.empty();
 
 		/**
 		 * 配下のnode
@@ -131,7 +129,7 @@ public class TransferComponent {
 		 * これ以降在庫無制限を設定するか
 		 * 在庫無制限の場合、通常はstock登録時からtrueにしておく
 		 */
-		public Optional<Boolean> grants_infinity = Optional.empty();
+		public Optional<Boolean> grants_unlimited = Optional.empty();
 
 		/**
 		 * 移動数量
@@ -141,7 +139,7 @@ public class TransferComponent {
 		/**
 		 * DBから復元した追加情報JSON
 		 */
-		Optional<Object> restoredExtension = Optional.empty();
+		Optional<Object> restored_extension = Optional.empty();
 	}
 
 	/**
@@ -153,12 +151,5 @@ public class TransferComponent {
 		public UUID denyId;
 
 		public Optional<String> denyReason = Optional.empty();
-	}
-
-	public static class TransferRegisterResult {
-
-		public UUID transferId;
-
-		public Timestamp transferredAt;
 	}
 }

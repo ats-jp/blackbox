@@ -167,6 +167,8 @@ public class GroupHandler {
 			() -> getParentId(request.id));
 		lockRelatingGroupsInternal(request.id, parentId);
 
+		UUID userId = SecurityValues.currentUserId();
+
 		try {
 			int result = new groups()
 				.UPDATE(a -> {
@@ -175,6 +177,8 @@ public class GroupHandler {
 					request.extension.ifPresent(v -> a.extension.set(JsonHelper.toJson(v)));
 					request.tags.ifPresent(v -> a.tags.set((Object) v));
 					request.active.ifPresent(v -> a.active.set(v));
+					a.updated_by.set(userId);
+					a.updated_at.setAny("now()");
 				})
 				.WHERE(a -> a.id.eq(request.id).AND.revision.eq(request.revision))
 				.execute();

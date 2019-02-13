@@ -22,12 +22,10 @@ import org.blendee.jdbc.exception.UniqueConstraintViolationException;
 import org.blendee.sql.AsyncRecorder;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.model.InOut;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
-import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterResult;
 import sqlassist.bb.bundles;
 import sqlassist.bb.current_stocks;
 import sqlassist.bb.groups;
@@ -58,7 +56,7 @@ public class TransferHandler {
 	/**
 	 * transfer登録処理
 	 */
-	public TransferRegisterResult register(UUID transferId, UUID userId, TransferRegisterRequest request) {
+	public void register(UUID transferId, UUID userId, TransferRegisterRequest request) {
 		//初期化
 		nodeSeq = 0;
 
@@ -80,7 +78,7 @@ public class TransferHandler {
 
 		transfer.setTransferred_at(request.transferred_at);
 
-		request.restoredExtension.ifPresentOrElse(
+		request.restored_extension.ifPresentOrElse(
 			v -> transfer.setExtension(v),
 			() -> request.extension.ifPresent(v -> transfer.setExtension(toJson(v))));
 
@@ -117,15 +115,9 @@ public class TransferHandler {
 
 		//jobを登録し、別プロセスで現在数量を更新させる
 		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($UUID), transferId).execute();
-
-		var result = new TransferRegisterResult();
-		result.transferId = transferId;
-		result.transferredAt = request.transferred_at;
-
-		return result;
 	}
 
-	public TransferRegisterResult deny(UUID transferId, UUID userId, TransferDenyRequest denyRequest) {
+	public Timestamp deny(UUID transferId, UUID userId, TransferDenyRequest denyRequest) {
 		var request = new TransferRegisterRequest();
 
 		var bundles = new LinkedList<BundleRegisterRequest>();
@@ -166,7 +158,7 @@ public class TransferHandler {
 				request.denied_id = Optional.of(denyRequest.denyId);
 				request.deny_reason = denyRequest.denyReason;
 				request.transferred_at = transfer.getTransferred_at();
-				request.restoredExtension = Optional.of(transfer.getExtension());
+				request.restored_extension = Optional.of(transfer.getExtension());
 
 				try {
 					request.tags = Optional.of(Utils.restoreTags(transfer.getTags()));
@@ -179,7 +171,7 @@ public class TransferHandler {
 
 					var bundleRequest = new BundleRegisterRequest();
 
-					bundleRequest.restoredExtension = Optional.of(bundleOne.get().getExtension());
+					bundleRequest.restored_extension = Optional.of(bundleOne.get().getExtension());
 
 					bundles.add(bundleRequest);
 
@@ -197,8 +189,8 @@ public class TransferHandler {
 						nodeRequest.status_id = stock.getStatus_id();
 						nodeRequest.in_out = InOut.of(node.getIn_out()).reverse();
 						nodeRequest.quantity = node.getQuantity();
-						nodeRequest.grants_infinity = Optional.of(node.getGrants_unlimited());
-						nodeRequest.restoredExtension = Optional.of(node.getExtension());
+						nodeRequest.grants_unlimited = Optional.of(node.getGrants_unlimited());
+						nodeRequest.restored_extension = Optional.of(node.getExtension());
 
 						nodes.add(nodeRequest);
 					});
@@ -209,7 +201,9 @@ public class TransferHandler {
 				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
 			});
 
-		return register(transferId, userId, request);
+		register(transferId, userId, request);
+
+		return request.transferred_at;
 	}
 
 	/**
@@ -227,7 +221,7 @@ public class TransferHandler {
 
 		bundle.setId(bundleId);
 		bundle.setTransfer_id(transferId);
-		request.restoredExtension
+		request.restored_extension
 			.ifPresentOrElse(
 				v -> bundle.setExtension(v),
 				() -> request.extension.ifPresent(v -> bundle.setExtension(toJson(v))));
@@ -273,9 +267,9 @@ public class TransferHandler {
 		node.setSeq(++nodeSeq);
 		node.setQuantity(request.quantity);
 
-		request.grants_infinity.ifPresent(v -> node.setGrants_unlimited(v));
+		request.grants_unlimited.ifPresent(v -> node.setGrants_unlimited(v));
 
-		request.restoredExtension
+		request.restored_extension
 			.ifPresentOrElse(
 				v -> node.setExtension(v),
 				() -> request.extension.ifPresent(v -> node.setExtension(toJson(v))));
@@ -307,12 +301,12 @@ public class TransferHandler {
 				var container = new JustBefore();
 				while (r.next()) {
 					container.total = r.getBigDecimal(1);
-					container.infinity = r.getBoolean(2);
+					container.unlimited = r.getBoolean(2);
 					return container;
 				}
 
 				container.total = BigDecimal.ZERO;
-				container.infinity = false;
+				container.unlimited = false;
 
 				return container;
 			});
@@ -321,11 +315,11 @@ public class TransferHandler {
 
 		//移動した結果数量がマイナスになる場合エラー
 		//ただし無制限設定がされていればOK
-		if (!justBefore.infinity && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
+		if (!justBefore.unlimited && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
 
 		//直前のsnapshotが無制限の場合、以降すべてのsnapshotが無制限になるので引き継ぐ
 		//そうでなければ今回のリクエストに従う
-		boolean infinity = justBefore.infinity ? true : request.grants_infinity.orElse(false);
+		boolean unlimited = justBefore.unlimited ? true : request.grants_unlimited.orElse(false);
 
 		recorder.play(
 			() -> new snapshots().insertStatement(
@@ -349,7 +343,7 @@ public class TransferHandler {
 						$INT,
 						$UUID)),
 			nodeId,
-			infinity,
+			unlimited,
 			total,
 			stockId,
 			groupId,
@@ -373,7 +367,7 @@ public class TransferHandler {
 									.SELECT(sa -> sa.id)
 									//transferred_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
 									.WHERE(swa -> swa.stock_id.eq($UUID).AND.transferred_at.gt($TIMESTAMP))))),
-				infinity,
+				unlimited,
 				request.in_out.normalize(request.quantity),
 				stockId,
 				transferredAt)
@@ -391,7 +385,7 @@ public class TransferHandler {
 
 		private BigDecimal total;
 
-		private boolean infinity;
+		private boolean unlimited;
 	}
 
 	/**
@@ -430,7 +424,7 @@ public class TransferHandler {
 
 		recorder.play(
 			() -> new current_stocks().insertStatement(
-				//後でjobから更新されるのでinfinityはとりあえずfalse、totalは0
+				//後でjobから更新されるのでunlimitedはとりあえずfalse、totalは0
 				a -> a.INSERT(a.id, a.unlimited, a.total, a.snapshot_id).VALUES($UUID, $BOOLEAN, $INT, $UUID)),
 			stockId,
 			false,

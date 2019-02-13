@@ -132,13 +132,23 @@ public class transfer_errors
 	private final List<SQLDecorator> decorators$ = new LinkedList<SQLDecorator>();
 
 	/**
-	 * name: transfer_id<br>
-	 * remarks: transferに使用される予定だったID<br>
+	 * name: abandoned_id<br>
+	 * remarks: transferもしくはclosingに使用される予定だったID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "transfer_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "transferに使用される予定だったID", defaultValue = "null", ordinalPosition = 1, notNull = true)
-	public static final String transfer_id = "transfer_id";
+	@Column(name = "abandoned_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "transferもしくはclosingに使用される予定だったID", defaultValue = "null", ordinalPosition = 1, notNull = true)
+	public static final String abandoned_id = "abandoned_id";
+
+	/**
+	 * name: command_type<br>
+	 * remarks: 処理のタイプ<br>
+	 * 0=transfer登録, 1=transfer取消, 2=closing<br>
+	 * type: int2(5)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "command_type", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "処理のタイプ\n0=transfer登録, 1=transfer取消, 2=closing", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	public static final String command_type = "command_type";
 
 	/**
 	 * name: message<br>
@@ -146,7 +156,7 @@ public class transfer_errors
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "message", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "エラーメッセージ", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "message", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "エラーメッセージ", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String message = "message";
 
 	/**
@@ -155,7 +165,7 @@ public class transfer_errors
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "stack_trace", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "スタックトレース", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "stack_trace", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "スタックトレース", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String stack_trace = "stack_trace";
 
 	/**
@@ -164,7 +174,7 @@ public class transfer_errors
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "sql_state", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "DBエラーコード", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "sql_state", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "DBエラーコード", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String sql_state = "sql_state";
 
 	/**
@@ -173,7 +183,7 @@ public class transfer_errors
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録ユーザー", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String user_id = "user_id";
 
 	/**
@@ -183,7 +193,7 @@ public class transfer_errors
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "request", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録リクエスト内容\n取消処理の場合、{}", defaultValue = "'{}'::jsonb", ordinalPosition = 6, notNull = true)
+	@Column(name = "request", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録リクエスト内容\n取消処理の場合、{}", defaultValue = "'{}'::jsonb", ordinalPosition = 7, notNull = true)
 	public static final String request = "request";
 
 	/**
@@ -192,7 +202,7 @@ public class transfer_errors
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻", defaultValue = "now()", ordinalPosition = 7, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -264,32 +274,64 @@ public class transfer_errors
 
 		/**
 		 * setter
-		 * name: transfer_id<br>
-		* remarks: transferに使用される予定だったID<br>
+		 * name: abandoned_id<br>
+		* remarks: transferもしくはclosingに使用される予定だったID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setTransfer_id(java.util.UUID value) {
+		public void setAbandoned_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("transfer_id").getType());
-			data$.setValue("transfer_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("abandoned_id").getType());
+			data$.setValue("abandoned_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: transfer_id<br>
-		* remarks: transferに使用される予定だったID<br>
+		 * name: abandoned_id<br>
+		* remarks: transferもしくはclosingに使用される予定だったID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getTransfer_id() {
-			Binder binder = data$.getValue("transfer_id");
+		public java.util.UUID getAbandoned_id() {
+			Binder binder = data$.getValue("abandoned_id");
 			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: command_type<br>
+		* remarks: 処理のタイプ<br>
+		* 0=transfer登録, 1=transfer取消, 2=closing<br>
+		* type: int2(5)<br>
+		* not null: true<br>
+		 * @param value java.lang.Integer
+		 */
+		public void setCommand_type(java.lang.Integer value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("command_type").getType());
+			data$.setValue("command_type", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: command_type<br>
+		* remarks: 処理のタイプ<br>
+		* 0=transfer登録, 1=transfer取消, 2=closing<br>
+		* type: int2(5)<br>
+		* not null: true<br>
+		 * @return java.lang.Integer
+		 */
+		public java.lang.Integer getCommand_type() {
+			Binder binder = data$.getValue("command_type");
+			return (java.lang.Integer) binder.getValue();
 		}
 
 		/**
@@ -1554,9 +1596,14 @@ public class transfer_errors
 		private final String fkName$;
 
 		/**
-		 * 項目名 transfer_id
+		 * 項目名 abandoned_id
 		 */
-		public final T transfer_id;
+		public final T abandoned_id;
+
+		/**
+		 * 項目名 command_type
+		 */
+		public final T command_type;
 
 		/**
 		 * 項目名 message
@@ -1599,9 +1646,12 @@ public class transfer_errors
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.transfer_id = builder$.buildColumn(
+			this.abandoned_id = builder$.buildColumn(
 				this,
-				sqlassist.bb.transfer_errors.transfer_id);
+				sqlassist.bb.transfer_errors.abandoned_id);
+			this.command_type = builder$.buildColumn(
+				this,
+				sqlassist.bb.transfer_errors.command_type);
 			this.message = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfer_errors.message);

@@ -1,4 +1,4 @@
-package jp.ats.blackbox.model;
+package jp.ats.blackbox.persistence;
 
 import java.math.BigDecimal;
 

@@ -16,11 +16,11 @@ public class TransferPromise {
 
 	private Throwable error;
 
-	public UUID getTransferId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void waitUntilFinished() throws TransferFailedException, InterruptedException {
+	public void waitUntilFinished() throws CommandFailedException, InterruptedException {
 		lock.lock();
 		try {
 			if (finished) {
@@ -56,7 +56,7 @@ public class TransferPromise {
 		}
 	}
 
-	private void checkError() throws TransferFailedException {
-		if (error != null) throw new TransferFailedException(error);
+	private void checkError() throws CommandFailedException {
+		if (error != null) throw new CommandFailedException(error);
 	}
 }

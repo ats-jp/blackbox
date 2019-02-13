@@ -1,5 +1,6 @@
 package jp.ats.blackbox.executor;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -13,11 +14,12 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.persistence.ClosingHandler;
+import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
 import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.Retry;
 import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
-import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterResult;
 import jp.ats.blackbox.persistence.TransferHandler;
 import sqlassist.bb.transfer_errors;
 
@@ -54,10 +56,12 @@ public class TransferExecutor {
 		disruptor.shutdown();
 	}
 
-	public TransferPromise register(UUID userId, Supplier<TransferRegisterRequest> requestSupplier) {
-		TransferPromise promise = new TransferPromise();
+	public TransferPromise registerTransfer(UUID userId, Supplier<TransferRegisterRequest> requestSupplier) {
+		var promise = new TransferPromise();
 
-		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, requestSupplier.get(), promise));
+		var command = new TransferRegisterCommand(promise.getId(), userId, requestSupplier.get());
+
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
 		//バッチなど、単一の処理が大量に登録しても、他のスレッドが割り込めるように
 		Thread.yield();
@@ -65,10 +69,22 @@ public class TransferExecutor {
 		return promise;
 	}
 
-	public TransferPromise deny(UUID userId, Supplier<TransferDenyRequest> requestSupplier) {
-		TransferPromise promise = new TransferPromise();
+	public TransferPromise denyTransfer(UUID userId, Supplier<TransferDenyRequest> requestSupplier) {
+		var promise = new TransferPromise();
 
-		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, requestSupplier.get(), promise));
+		var command = new TransferDenyCommand(promise.getId(), userId, requestSupplier.get());
+
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
+
+		return promise;
+	}
+
+	public TransferPromise close(UUID userId, Supplier<ClosingRequest> requestSupplier) {
+		var promise = new TransferPromise();
+
+		var command = new ClosingCommand(promise.getId(), userId, requestSupplier.get());
+
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
 		return promise;
 	}
@@ -76,10 +92,9 @@ public class TransferExecutor {
 	private static void execute(Event event) {
 		try {
 			Blendee.execute(t -> {
-				TransferRegisterResult result = null;
 				while (true) {
 					try {
-						result = event.execute();
+						event.command.execute();
 					} catch (Retry r) {
 						logger.warn(r.getMessage(), r);
 
@@ -93,8 +108,7 @@ public class TransferExecutor {
 				//他スレッドに更新が見えるようにcommit
 				t.commit();
 
-				//移動時刻を通知
-				JobExecutor.next(U.convert(result.transferredAt));
+				event.command.doAfterCommit();
 
 				//publishスレッドに新IDを通知
 				event.promise.notifyFinished();
@@ -116,64 +130,156 @@ public class TransferExecutor {
 
 	private class Event {
 
-		private UUID transferId;
-
 		private UUID userId;
 
-		private TransferRegisterRequest registerRequest;
-
-		private TransferDenyRequest denyRequest;
+		private Command command;
 
 		private TransferPromise promise;
 
-		private boolean deny;
-
-		private void set(UUID userId, TransferRegisterRequest request, TransferPromise promise) {
-			deny = false;
-
-			transferId = promise.getTransferId();
+		private void set(UUID userId, Command command, TransferPromise promise) {
 			this.userId = userId;
-			registerRequest = request;
-			denyRequest = null;
+			this.command = command;
 			this.promise = promise;
-		}
-
-		private void set(UUID userId, TransferDenyRequest request, TransferPromise promise) {
-			deny = true;
-
-			transferId = promise.getTransferId();
-			this.userId = userId;
-			registerRequest = null;
-			denyRequest = request;
-			this.promise = promise;
-		}
-
-		private TransferRegisterResult execute() {
-			if (deny) {
-				return handler.deny(transferId, userId, denyRequest);
-			}
-
-			return handler.register(transferId, userId, registerRequest);
 		}
 
 		private void insertErrorLog(Throwable error) {
 			new transfer_errors().insertStatement(
 				a -> a
 					.INSERT(
-						a.transfer_id,
+						a.abandoned_id,
+						a.command_type,
 						a.message,
 						a.stack_trace,
 						a.sql_state,
 						a.user_id,
 						a.request)
 					.VALUES(
-						transferId,
+						promise.getId(),
+						command.type().ordinal(),
 						error.getMessage(),
 						U.getStackTrace(error),
 						U.getSQLState(error).orElse(""),
 						userId,
-						JsonHelper.toJson(new Gson().toJson(deny ? denyRequest : registerRequest))))
+						JsonHelper.toJson(new Gson().toJson(command.request()))))
 				.execute();
+		}
+	}
+
+	private interface Command {
+
+		void execute();
+
+		void doAfterCommit();
+
+		Object request();
+
+		CommandType type();
+	}
+
+	private class TransferRegisterCommand implements Command {
+
+		private final UUID transferId;
+
+		private final UUID userId;
+
+		private final TransferRegisterRequest request;
+
+		private TransferRegisterCommand(UUID transferId, UUID userId, TransferRegisterRequest request) {
+			this.transferId = transferId;
+			this.userId = userId;
+			this.request = request;
+		}
+
+		@Override
+		public void execute() {
+			handler.register(transferId, userId, request);
+		}
+
+		@Override
+		public void doAfterCommit() {
+			//移動時刻を通知
+			JobExecutor.next(U.convert(request.transferred_at));
+		}
+
+		@Override
+		public Object request() {
+			return request;
+		}
+
+		@Override
+		public CommandType type() {
+			return CommandType.TRANSFER_REGISTER;
+		}
+	}
+
+	private class TransferDenyCommand implements Command {
+
+		private final UUID transferId;
+
+		private final UUID userId;
+
+		private final TransferDenyRequest request;
+
+		private Timestamp transferredAt;
+
+		private TransferDenyCommand(UUID transferId, UUID userId, TransferDenyRequest request) {
+			this.transferId = transferId;
+			this.userId = userId;
+			this.request = request;
+		}
+
+		@Override
+		public void execute() {
+			transferredAt = handler.deny(transferId, userId, request);
+		}
+
+		@Override
+		public void doAfterCommit() {
+			//移動時刻を通知
+			JobExecutor.next(U.convert(transferredAt));
+		}
+
+		@Override
+		public Object request() {
+			return request;
+		}
+
+		@Override
+		public CommandType type() {
+			return CommandType.TRANSFER_DENY;
+		}
+	}
+
+	private class ClosingCommand implements Command {
+
+		private final UUID closingId;
+
+		private final UUID userId;
+
+		private final ClosingRequest request;
+
+		private ClosingCommand(UUID closingId, UUID userId, ClosingRequest request) {
+			this.closingId = closingId;
+			this.userId = userId;
+			this.request = request;
+		}
+
+		@Override
+		public void execute() {
+			ClosingHandler.close(closingId, userId, request);
+		}
+
+		@Override
+		public void doAfterCommit() {}
+
+		@Override
+		public Object request() {
+			return request;
+		}
+
+		@Override
+		public CommandType type() {
+			return CommandType.CLOSING;
 		}
 	}
 }

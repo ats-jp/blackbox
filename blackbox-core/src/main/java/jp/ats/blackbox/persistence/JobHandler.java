@@ -36,10 +36,10 @@ public class JobHandler {
 			.SELECT(a -> a.id)
 			.WHERE(a -> a.completed.eq(false).AND.$transfers().transferred_at.le(Timestamp.valueOf(time)))
 			.ORDER_BY(a -> a.ls(a.$transfers().transferred_at, a.$transfers().created_at))
-			.forEach(r -> {
+			.forEach(row -> {
 				new snapshots()
 					.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().stock_id))
-					.WHERE(sa -> sa.$nodes().$bundles().transfer_id.eq(r.getId()))
+					.WHERE(sa -> sa.$nodes().$bundles().transfer_id.eq(row.getId()))
 					.ORDER_BY(a -> a.node_seq)
 					.aggregate(result -> {
 						while (result.next()) {
@@ -57,9 +57,9 @@ public class JobHandler {
 					});
 
 				//完了済み
-				r.setCompleted(true);
+				row.setCompleted(true);
 
-				r.update(batch);
+				row.update(batch);
 			});
 
 		batch.executeBatch();
@@ -69,15 +69,15 @@ public class JobHandler {
 		return new jobs()
 			.SELECT(a -> a.MIN(a.$transfers().transferred_at))
 			.WHERE(a -> a.completed.eq(false))
-			.aggregateAndGet(r -> {
-				r.next();
-				var next = r.getTimestamp(1);
+			.aggregateAndGet(result -> {
+				result.next();
+				var next = result.getTimestamp(1);
 
 				if (next == null)
 					//一件もない場合は次にjobが登録されるまで待つために最大値を返す
 					return LocalDateTime.MAX;
 
-				return U.convert(r.getTimestamp(1));
+				return U.convert(result.getTimestamp(1));
 			});
 	}
 

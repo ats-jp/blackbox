@@ -35,21 +35,21 @@ public class TransferExecutorTest {
 			IntStream.range(0, transfers).forEach(i -> {
 				logger.trace("##### " + i);
 
-				var promise = executor.register(U.NULL_ID, () -> TransferHandlerTest.createRequest(group));
+				var promise = executor.registerTransfer(U.NULL_ID, () -> TransferHandlerTest.createRequest(group));
 
 				try {
-					UUID newId = promise.getTransferId();
+					UUID newId = promise.getId();
 					logger.trace("register: " + newId + " " + Thread.currentThread());
 
 					promise.waitUntilFinished();
 
-					var denyPromise = executor.deny(U.NULL_ID, () -> {
+					var denyPromise = executor.denyTransfer(U.NULL_ID, () -> {
 						var req = new TransferDenyRequest();
 						req.denyId = newId;
 						return req;
 					});
 
-					logger.trace("deny    : " + denyPromise.getTransferId() + " " + Thread.currentThread());
+					logger.trace("deny    : " + denyPromise.getId() + " " + Thread.currentThread());
 
 					denyPromise.waitUntilFinished();
 				} catch (Exception e) {
