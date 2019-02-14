@@ -46,10 +46,8 @@ public class UserHandler {
 		if (result != 1) throw Utils.decisionException(users.$TABLE, id);
 	}
 
-	public static void delete(UUID id, long revision) {
-		int result = new users().DELETE().WHERE(a -> a.id.eq(id).AND.revision.eq(revision)).execute();
-
-		if (result != 1) throw Utils.decisionException(users.$TABLE, id);
+	public static void delete(UUID userId, long revision) {
+		Utils.delete(users.$TABLE, userId, revision);
 	}
 
 	public static users.Row fetch(UUID id) {

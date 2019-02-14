@@ -1,4 +1,6 @@
 package jp.ats.blackbox.persistence;
 
+import jp.ats.blackbox.common.BlackboxException;
+
 @SuppressWarnings("serial")
-public class MinusTotalException extends BlackboxPersistenceException {}
+public class MinusTotalException extends BlackboxException {}

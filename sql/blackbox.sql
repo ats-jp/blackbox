@@ -358,6 +358,7 @@ COMMENT ON COLUMN bb.users.id IS 'ID';
 COMMENT ON COLUMN bb.users.group_id IS 'グループID';
 COMMENT ON COLUMN bb.users.name IS '名称';
 COMMENT ON COLUMN bb.users.role IS '役割
+値の小さいほうが強い権限となる
 0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE';
 COMMENT ON COLUMN bb.users.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.users.extension IS '外部アプリケーション情報JSON';
@@ -815,8 +816,8 @@ CREATE FUNCTION bb.closed_check() RETURNS TRIGGER AS $$
 	DECLARE closed_at_local timestamptz;
 	BEGIN
 		SELECT INTO closed_at_local closed_at FROM bb.last_closings WHERE id = NEW.group_id;
-		IF closed_at_local IS NOT NULL AND NEW.transferred_at < closed_at_local THEN
-			RAISE EXCEPTION 'closed_check(): group id=[%], transferred_at %, closed at %', NEW.group_id, NEW.transferred_at, closed_at_local;
+		IF closed_at_local IS NOT NULL AND NEW.transferred_at <= closed_at_local THEN
+			RAISE EXCEPTION 'closed_check(): {"id":"%", "group_id":"%", "transferred_at":"%", "closed_at":"%"}', NEW.id, NEW.group_id, NEW.transferred_at, closed_at_local;
 		END IF;
 		RETURN NEW;
 	END;
@@ -1049,7 +1050,8 @@ COMMENT ON COLUMN bb.jobs.updated_at IS '更新時刻';
 --transfer登録時に発生したエラー
 CREATE TABLE bb.transfer_errors (
 	abandoned_id uuid NOT NULL,
-	command_type smallint CHECK (command_type IN (0, 1, 2)) NOT NULL,
+	command_type "char" CHECK (command_type IN ('R', 'D', 'C')) NOT NULL,
+	error_type text NOT NULL,
 	message text NOT NULL,
 	stack_trace text NOT NULL,
 	sql_state text NOT NULL,
@@ -1060,7 +1062,8 @@ CREATE TABLE bb.transfer_errors (
 COMMENT ON TABLE bb.transfer_errors IS 'transfer登録時に発生したエラー';
 COMMENT ON COLUMN bb.transfer_errors.abandoned_id IS 'transferもしくはclosingに使用される予定だったID';
 COMMENT ON COLUMN bb.transfer_errors.command_type IS '処理のタイプ
-0=transfer登録, 1=transfer取消, 2=closing';
+R=transfer登録, D=transfer取消, C=closing';
+COMMENT ON COLUMN bb.transfer_errors.error_type IS 'エラーの種類';
 COMMENT ON COLUMN bb.transfer_errors.message IS 'エラーメッセージ';
 COMMENT ON COLUMN bb.transfer_errors.stack_trace IS 'スタックトレース';
 COMMENT ON COLUMN bb.transfer_errors.sql_state IS 'DBエラーコード';
@@ -1076,9 +1079,9 @@ COMMENT ON COLUMN bb.transfer_errors.created_at IS '登録時刻';
 --一時作業
 CREATE TABLE bb.transients (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	group_id uuid REFERENCES bb.groups ON DELETE CASCADE CHECK (owner_type = 0 AND group_id <> '00000000-0000-0000-0000-000000000000') NOT NULL,
-	user_id uuid REFERENCES bb.users ON DELETE CASCADE CHECK (owner_type = 1 AND user_id <> '00000000-0000-0000-0000-000000000000') NOT NULL,
-	owner_type smallint CHECK (owner_type IN (0, 1)) NOT NULL,
+	group_id uuid REFERENCES bb.groups ON DELETE CASCADE CHECK (owner_type = 'G' AND group_id <> '00000000-0000-0000-0000-000000000000') NOT NULL,
+	user_id uuid REFERENCES bb.users ON DELETE CASCADE CHECK (owner_type = 'U' AND user_id <> '00000000-0000-0000-0000-000000000000') NOT NULL,
+	owner_type "char" CHECK (owner_type IN ('G', 'U')) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
@@ -1093,7 +1096,7 @@ COMMENT ON COLUMN bb.transients.user_id IS 'この一時作業のオーナーユ
 0の場合、オーナーユーザーはいない';
 COMMENT ON COLUMN bb.transients.owner_type IS 'オーナータイプ
 group_idとuser_idどちらに値が入っているかを表す
-0=GROUP, 1=USER';
+G=GROUP, U=USER';
 COMMENT ON COLUMN bb.transients.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transients.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transients.created_by IS '作成ユーザー';

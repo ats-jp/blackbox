@@ -166,11 +166,11 @@ public class transients
 	 * name: owner_type<br>
 	 * remarks: オーナータイプ<br>
 	 * group_idとuser_idどちらに値が入っているかを表す<br>
-	 * 0=GROUP, 1=USER<br>
-	 * type: int2(5)<br>
+	 * G=GROUP, U=USER<br>
+	 * type: char(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "owner_type", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "オーナータイプ\ngroup_idとuser_idどちらに値が入っているかを表す\n0=GROUP, 1=USER", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "owner_type", type = 1, typeName = "char", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "オーナータイプ\ngroup_idとuser_idどちらに値が入っているかを表す\nG=GROUP, U=USER", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String owner_type = "owner_type";
 
 	/**
@@ -408,12 +408,12 @@ public class transients
 		 * name: owner_type<br>
 		* remarks: オーナータイプ<br>
 		* group_idとuser_idどちらに値が入っているかを表す<br>
-		* 0=GROUP, 1=USER<br>
-		* type: int2(5)<br>
+		* G=GROUP, U=USER<br>
+		* type: char(1)<br>
 		* not null: true<br>
-		 * @param value java.lang.Integer
+		 * @param value java.lang.String
 		 */
-		public void setOwner_type(java.lang.Integer value) {
+		public void setOwner_type(java.lang.String value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -427,14 +427,14 @@ public class transients
 		 * name: owner_type<br>
 		* remarks: オーナータイプ<br>
 		* group_idとuser_idどちらに値が入っているかを表す<br>
-		* 0=GROUP, 1=USER<br>
-		* type: int2(5)<br>
+		* G=GROUP, U=USER<br>
+		* type: char(1)<br>
 		* not null: true<br>
-		 * @return java.lang.Integer
+		 * @return java.lang.String
 		 */
-		public java.lang.Integer getOwner_type() {
+		public java.lang.String getOwner_type() {
 			Binder binder = data$.getValue("owner_type");
-			return (java.lang.Integer) binder.getValue();
+			return (java.lang.String) binder.getValue();
 		}
 
 		/**

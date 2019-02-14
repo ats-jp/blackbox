@@ -4,8 +4,10 @@ import java.util.UUID;
 
 import org.blendee.jdbc.TablePath;
 
+import jp.ats.blackbox.common.BlackboxException;
+
 @SuppressWarnings("serial")
-public class DataNotFoundException extends BlackboxPersistenceException {
+public class DataNotFoundException extends BlackboxException {
 
 	private final TablePath table;
 

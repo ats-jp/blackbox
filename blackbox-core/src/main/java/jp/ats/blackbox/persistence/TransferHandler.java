@@ -14,12 +14,15 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.blendee.assist.Vargs;
 import org.blendee.jdbc.BSQLException;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
 import org.blendee.jdbc.exception.UniqueConstraintViolationException;
 import org.blendee.sql.AsyncRecorder;
+
+import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
@@ -97,6 +100,14 @@ public class TransferHandler {
 		} catch (UniqueConstraintViolationException e) {
 			//同一groupで全く同一時刻に登録した場合、UNIQUE違反エラーとなるので再登録対象
 			throw new Retry(e);
+		} catch (BSQLException e) {
+			//既に締められているグループの場合
+			var matcher = Pattern.compile("closed_check\\(\\): (\\{[^\\}]+\\})").matcher(e.getMessage());
+
+			if (!matcher.find()) throw e;
+
+			ClosedCheckError error = new Gson().fromJson(matcher.group(1), ClosedCheckError.class);
+			throw new AlreadyClosedGroupException(error, e);
 		}
 
 		Arrays.stream(request.bundles).forEach(r -> registerBundle(userId, transferId, request.group_id, request.transferred_at, r));
@@ -115,6 +126,17 @@ public class TransferHandler {
 
 		//jobを登録し、別プロセスで現在数量を更新させる
 		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($UUID), transferId).execute();
+	}
+
+	public static class ClosedCheckError {
+
+		public String id;
+
+		public String group_id;
+
+		public String transferred_at;
+
+		public String closed_at;
 	}
 
 	public Timestamp deny(UUID transferId, UUID userId, TransferDenyRequest denyRequest) {

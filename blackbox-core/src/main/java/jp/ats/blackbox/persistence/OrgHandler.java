@@ -43,10 +43,8 @@ public class OrgHandler {
 		if (result != 1) throw Utils.decisionException(orgs.$TABLE, id);
 	}
 
-	public static void delete(UUID id, long revision) {
-		int result = new orgs().DELETE().WHERE(a -> a.id.eq(id).AND.revision.eq(revision)).execute();
-
-		if (result != 1) throw Utils.decisionException(orgs.$TABLE, id);
+	public static void delete(UUID orgId, long revision) {
+		Utils.delete(orgs.$TABLE, orgId, revision);
 	}
 
 	public static orgs.Row fetch(UUID id) {

@@ -45,12 +45,17 @@ public class TransientHandler {
 			return cache[0];
 		};
 
-		OwnerType type = request.owner_type.orElseGet(() -> OwnerType.getInstance(row.get().getOwner_type()));
+		OwnerType type = request.owner_type.orElseGet(() -> OwnerType.of(row.get().getOwner_type()));
 		UUID ownerId = request.transient_owner_id.orElseGet(() -> type.getOwnerId(row.get()));
 
 		type.setOwnerId(ownerId, builder);
 
-		builder.executeUpdate();
+		if (builder.executeUpdate() != 1)
+			throw Utils.decisionException(transients.$TABLE, request.id);
+	}
+
+	public static void delete(UUID transientId, long revision) {
+		Utils.delete(transients.$TABLE, transientId, revision);
 	}
 
 	public static enum OwnerType {
@@ -83,8 +88,22 @@ public class TransientHandler {
 			}
 		};
 
-		private static OwnerType getInstance(int type) {
-			return OwnerType.values()[type];
+		private static class Constant {
+
+			private static final String GROUP = "G";
+
+			private static final String USER = "U";
+		}
+
+		private static OwnerType of(String value) {
+			switch (value) {
+			case Constant.GROUP:
+				return GROUP;
+			case Constant.USER:
+				return USER;
+			default:
+				throw new Error();
+			}
 		}
 
 		abstract void setOwnerId(UUID ownerId, Updater updater);

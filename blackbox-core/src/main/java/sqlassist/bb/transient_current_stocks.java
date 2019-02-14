@@ -241,14 +241,6 @@ public class transient_current_stocks
 	public static final String bb$users$transient_current_stocks_updated_by_fkey = "transient_current_stocks_updated_by_fkey";
 
 	/**
-	 * name: transient_current_stocks_transient_id_fkey<br>
-	 * references: transients<br>
-	 * columns: transient_id
-	 */
-	@ForeignKey(name = "transient_current_stocks_transient_id_fkey", references = "bb.transients", columns = { "transient_id" }, refColumns = { "id" }, pseudo = true)
-	public static final String bb$transients$transient_current_stocks_transient_id_fkey = "transient_current_stocks_transient_id_fkey";
-
-	/**
 	 * 登録用コンストラクタです。
 	 * @return {@link Row}
 	 */
@@ -599,18 +591,6 @@ public class transient_current_stocks
 		public sqlassist.bb.users.Row $users$transient_current_stocks_updated_by_fkey() {
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$transient_current_stocks_updated_by_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 transients<br>
-		 * 外部キー名 transient_current_stocks_transient_id_fkey<br>
-		 * 項目名 transient_id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.transients.Row $transients() {
-			return sqlassist.bb.transients.row(
-				data$.getDataObject(bb$transients$transient_current_stocks_transient_id_fkey));
 		}
 
 	}
@@ -1920,19 +1900,6 @@ public class transient_current_stocks
 				builder$,
 				this,
 				sqlassist.bb.transient_current_stocks.bb$users$transient_current_stocks_updated_by_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 transients<br>
-		 * 外部キー名 transient_current_stocks_transient_id_fkey<br>
-		 * 項目名 transient_id
-		 * @return transients relationship
-		 */
-		public sqlassist.bb.transients.ExtAssist<T, Many<sqlassist.bb.transient_current_stocks.Row, M>> $transients() {
-			return new sqlassist.bb.transients.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb.transient_current_stocks.bb$transients$transient_current_stocks_transient_id_fkey);
 		}
 
 	}

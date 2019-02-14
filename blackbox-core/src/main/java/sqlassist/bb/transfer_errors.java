@@ -143,12 +143,21 @@ public class transfer_errors
 	/**
 	 * name: command_type<br>
 	 * remarks: 処理のタイプ<br>
-	 * 0=transfer登録, 1=transfer取消, 2=closing<br>
-	 * type: int2(5)<br>
+	 * R=transfer登録, D=transfer取消, C=closing<br>
+	 * type: char(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "command_type", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "処理のタイプ\n0=transfer登録, 1=transfer取消, 2=closing", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "command_type", type = 1, typeName = "char", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "処理のタイプ\nR=transfer登録, D=transfer取消, C=closing", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String command_type = "command_type";
+
+	/**
+	 * name: error_type<br>
+	 * remarks: エラーの種類<br>
+	 * type: text(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "error_type", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "エラーの種類", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String error_type = "error_type";
 
 	/**
 	 * name: message<br>
@@ -156,7 +165,7 @@ public class transfer_errors
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "message", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "エラーメッセージ", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "message", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "エラーメッセージ", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String message = "message";
 
 	/**
@@ -165,7 +174,7 @@ public class transfer_errors
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "stack_trace", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "スタックトレース", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "stack_trace", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "スタックトレース", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String stack_trace = "stack_trace";
 
 	/**
@@ -174,7 +183,7 @@ public class transfer_errors
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "sql_state", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "DBエラーコード", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "sql_state", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "DBエラーコード", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String sql_state = "sql_state";
 
 	/**
@@ -183,7 +192,7 @@ public class transfer_errors
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録ユーザー", defaultValue = "null", ordinalPosition = 7, notNull = true)
 	public static final String user_id = "user_id";
 
 	/**
@@ -193,7 +202,7 @@ public class transfer_errors
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "request", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録リクエスト内容\n取消処理の場合、{}", defaultValue = "'{}'::jsonb", ordinalPosition = 7, notNull = true)
+	@Column(name = "request", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録リクエスト内容\n取消処理の場合、{}", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
 	public static final String request = "request";
 
 	/**
@@ -202,7 +211,7 @@ public class transfer_errors
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻", defaultValue = "now()", ordinalPosition = 9, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -306,12 +315,12 @@ public class transfer_errors
 		 * setter
 		 * name: command_type<br>
 		* remarks: 処理のタイプ<br>
-		* 0=transfer登録, 1=transfer取消, 2=closing<br>
-		* type: int2(5)<br>
+		* R=transfer登録, D=transfer取消, C=closing<br>
+		* type: char(1)<br>
 		* not null: true<br>
-		 * @param value java.lang.Integer
+		 * @param value java.lang.String
 		 */
-		public void setCommand_type(java.lang.Integer value) {
+		public void setCommand_type(java.lang.String value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -324,14 +333,44 @@ public class transfer_errors
 		 * getter
 		 * name: command_type<br>
 		* remarks: 処理のタイプ<br>
-		* 0=transfer登録, 1=transfer取消, 2=closing<br>
-		* type: int2(5)<br>
+		* R=transfer登録, D=transfer取消, C=closing<br>
+		* type: char(1)<br>
 		* not null: true<br>
-		 * @return java.lang.Integer
+		 * @return java.lang.String
 		 */
-		public java.lang.Integer getCommand_type() {
+		public java.lang.String getCommand_type() {
 			Binder binder = data$.getValue("command_type");
-			return (java.lang.Integer) binder.getValue();
+			return (java.lang.String) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: error_type<br>
+		* remarks: エラーの種類<br>
+		* type: text(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.lang.String
+		 */
+		public void setError_type(java.lang.String value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("error_type").getType());
+			data$.setValue("error_type", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: error_type<br>
+		* remarks: エラーの種類<br>
+		* type: text(2147483647)<br>
+		* not null: true<br>
+		 * @return java.lang.String
+		 */
+		public java.lang.String getError_type() {
+			Binder binder = data$.getValue("error_type");
+			return (java.lang.String) binder.getValue();
 		}
 
 		/**
@@ -1606,6 +1645,11 @@ public class transfer_errors
 		public final T command_type;
 
 		/**
+		 * 項目名 error_type
+		 */
+		public final T error_type;
+
+		/**
 		 * 項目名 message
 		 */
 		public final T message;
@@ -1652,6 +1696,9 @@ public class transfer_errors
 			this.command_type = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfer_errors.command_type);
+			this.error_type = builder$.buildColumn(
+				this,
+				sqlassist.bb.transfer_errors.error_type);
 			this.message = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfer_errors.message);

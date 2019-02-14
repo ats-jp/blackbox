@@ -13,11 +13,13 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 
+import jp.ats.blackbox.common.BlackboxException;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.ClosingHandler;
 import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
 import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.Retry;
+import jp.ats.blackbox.persistence.TooMatchRetryException;
 import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler;
@@ -89,14 +91,21 @@ public class TransferExecutor {
 		return promise;
 	}
 
+	private static final int RETRY = 1;
+
 	private static void execute(Event event) {
 		try {
 			Blendee.execute(t -> {
+				int counter = 0;
 				while (true) {
 					try {
 						event.command.execute();
 					} catch (Retry r) {
 						logger.warn(r.getMessage(), r);
+
+						if (counter++ >= RETRY) {
+							throw new TooMatchRetryException();
+						}
 
 						t.rollback();
 						continue;
@@ -148,6 +157,7 @@ public class TransferExecutor {
 					.INSERT(
 						a.abandoned_id,
 						a.command_type,
+						a.error_type,
 						a.message,
 						a.stack_trace,
 						a.sql_state,
@@ -155,7 +165,8 @@ public class TransferExecutor {
 						a.request)
 					.VALUES(
 						promise.getId(),
-						command.type().ordinal(),
+						command.type().value,
+						errorType(error),
 						error.getMessage(),
 						U.getStackTrace(error),
 						U.getSQLState(error).orElse(""),
@@ -163,6 +174,16 @@ public class TransferExecutor {
 						JsonHelper.toJson(new Gson().toJson(command.request()))))
 				.execute();
 		}
+	}
+
+	private static String errorType(Throwable t) {
+		if (t instanceof BlackboxException) return t.getClass().getName();
+
+		var cause = t.getCause();
+
+		if (cause == null) return t.getClass().getName();
+
+		return errorType(t.getCause());
 	}
 
 	private interface Command {

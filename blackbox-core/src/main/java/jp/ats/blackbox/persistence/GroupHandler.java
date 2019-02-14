@@ -228,6 +228,10 @@ public class GroupHandler {
 			});
 	}
 
+	public void delete(UUID groupId, long revision) {
+		Utils.delete(groups.$TABLE, groupId, revision);
+	}
+
 	public static class RegisterRequest {
 
 		public String name;

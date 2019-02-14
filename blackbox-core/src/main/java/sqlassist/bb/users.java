@@ -164,11 +164,12 @@ public class users
 	/**
 	 * name: role<br>
 	 * remarks: 役割<br>
+	 * 値の小さいほうが強い権限となる<br>
 	 * 0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE<br>
 	 * type: int2(5)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "role", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "役割\n0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "role", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "役割\n値の小さいほうが強い権限となる\n0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String role = "role";
 
 	/**
@@ -420,6 +421,7 @@ public class users
 		 * setter
 		 * name: role<br>
 		* remarks: 役割<br>
+		* 値の小さいほうが強い権限となる<br>
 		* 0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE<br>
 		* type: int2(5)<br>
 		* not null: true<br>
@@ -438,6 +440,7 @@ public class users
 		 * getter
 		 * name: role<br>
 		* remarks: 役割<br>
+		* 値の小さいほうが強い権限となる<br>
 		* 0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE<br>
 		* type: int2(5)<br>
 		* not null: true<br>
