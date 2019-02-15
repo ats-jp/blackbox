@@ -172,11 +172,11 @@ public class nodes
 
 	/**
 	 * name: seq<br>
-	 * remarks: <br>
+	 * remarks: 移動伝票内連番<br>
 	 * type: int4(10)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動伝票内連番", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String seq = "seq";
 
 	/**
@@ -305,15 +305,27 @@ public class nodes
 
 		private final Relationship rowRel$ = RelationshipFactory.getInstance().getInstance($TABLE);
 
-		private Row() {
+		/**
+		 * 登録用コンストラクタです。
+		 */
+		protected Row() {
 			data$ = new DataObject(rowRel$);
 		}
 
-		private Row(DataObject data) {
+		/**
+		 * 参照、更新用コンストラクタです。
+		 * @param data 値を持つ {@link DataObject}
+		 */
+		protected Row(DataObject data) {
 			this.data$ = data;
 		}
 
-		private Row(Result result) {
+		/**
+		 * 参照、更新用コンストラクタです。<br>
+		 * aggregate の検索結果からカラム名により値を取り込みます。
+		 * @param result 値を持つ {@link Result}
+		 */
+		protected Row(Result result) {
 			this.data$ = ColumnNameDataObjectBuilder.build(result, rowRel$, ContextManager.get(ValueExtractorsConfigure.class).getValueExtractors());
 		}
 
@@ -450,7 +462,7 @@ public class nodes
 		/**
 		 * setter
 		 * name: seq<br>
-		* remarks: <br>
+		* remarks: 移動伝票内連番<br>
 		* type: int4(10)<br>
 		* not null: true<br>
 		 * @param value java.lang.Integer
@@ -467,7 +479,7 @@ public class nodes
 		/**
 		 * getter
 		 * name: seq<br>
-		* remarks: <br>
+		* remarks: 移動伝票内連番<br>
 		* type: int4(10)<br>
 		* not null: true<br>
 		 * @return java.lang.Integer

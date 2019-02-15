@@ -23,7 +23,7 @@ import sqlassist.bb.snapshots;
  */
 public class JobHandler {
 
-	private static final Recorder recorder = new Recorder();
+	private static final Recorder recorder = U.recorder;
 
 	/**
 	 * パラメータのtime以降のjobをもとにcurrent_stockを更新する

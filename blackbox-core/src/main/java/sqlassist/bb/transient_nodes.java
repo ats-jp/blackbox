@@ -170,13 +170,31 @@ public class transient_nodes
 	public static final String in_out = "in_out";
 
 	/**
+	 * name: seq_in_bundle<br>
+	 * remarks: 伝票明細内連番<br>
+	 * type: int4(10)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "seq_in_bundle", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票明細内連番", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	public static final String seq_in_bundle = "seq_in_bundle";
+
+	/**
 	 * name: quantity<br>
 	 * remarks: 移動数量<br>
 	 * type: numeric(131089)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "quantity", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動数量", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "quantity", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動数量", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String quantity = "quantity";
+
+	/**
+	 * name: grants_unlimited<br>
+	 * remarks: 数量無制限の許可<br>
+	 * type: bool(1)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "grants_unlimited", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "数量無制限の許可", defaultValue = "false", ordinalPosition = 7, notNull = true)
+	public static final String grants_unlimited = "grants_unlimited";
 
 	/**
 	 * name: extension<br>
@@ -184,7 +202,7 @@ public class transient_nodes
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 6, notNull = true)
+	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
 	public static final String extension = "extension";
 
 	/**
@@ -193,7 +211,7 @@ public class transient_nodes
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 7, notNull = true)
+	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 9, notNull = true)
 	public static final String revision = "revision";
 
 	/**
@@ -202,7 +220,7 @@ public class transient_nodes
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 10, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -211,7 +229,7 @@ public class transient_nodes
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 9, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 11, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -220,7 +238,7 @@ public class transient_nodes
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 10, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 12, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -229,7 +247,7 @@ public class transient_nodes
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 11, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 13, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -301,15 +319,27 @@ public class transient_nodes
 
 		private final Relationship rowRel$ = RelationshipFactory.getInstance().getInstance($TABLE);
 
-		private Row() {
+		/**
+		 * 登録用コンストラクタです。
+		 */
+		protected Row() {
 			data$ = new DataObject(rowRel$);
 		}
 
-		private Row(DataObject data) {
+		/**
+		 * 参照、更新用コンストラクタです。
+		 * @param data 値を持つ {@link DataObject}
+		 */
+		protected Row(DataObject data) {
 			this.data$ = data;
 		}
 
-		private Row(Result result) {
+		/**
+		 * 参照、更新用コンストラクタです。<br>
+		 * aggregate の検索結果からカラム名により値を取り込みます。
+		 * @param result 値を持つ {@link Result}
+		 */
+		protected Row(Result result) {
 			this.data$ = ColumnNameDataObjectBuilder.build(result, rowRel$, ContextManager.get(ValueExtractorsConfigure.class).getValueExtractors());
 		}
 
@@ -445,6 +475,36 @@ public class transient_nodes
 
 		/**
 		 * setter
+		 * name: seq_in_bundle<br>
+		* remarks: 伝票明細内連番<br>
+		* type: int4(10)<br>
+		* not null: true<br>
+		 * @param value java.lang.Integer
+		 */
+		public void setSeq_in_bundle(java.lang.Integer value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("seq_in_bundle").getType());
+			data$.setValue("seq_in_bundle", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: seq_in_bundle<br>
+		* remarks: 伝票明細内連番<br>
+		* type: int4(10)<br>
+		* not null: true<br>
+		 * @return java.lang.Integer
+		 */
+		public java.lang.Integer getSeq_in_bundle() {
+			Binder binder = data$.getValue("seq_in_bundle");
+			return (java.lang.Integer) binder.getValue();
+		}
+
+		/**
+		 * setter
 		 * name: quantity<br>
 		* remarks: 移動数量<br>
 		* type: numeric(131089)<br>
@@ -471,6 +531,36 @@ public class transient_nodes
 		public java.math.BigDecimal getQuantity() {
 			Binder binder = data$.getValue("quantity");
 			return (java.math.BigDecimal) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: grants_unlimited<br>
+		* remarks: 数量無制限の許可<br>
+		* type: bool(1)<br>
+		* not null: true<br>
+		 * @param value java.lang.Boolean
+		 */
+		public void setGrants_unlimited(java.lang.Boolean value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("grants_unlimited").getType());
+			data$.setValue("grants_unlimited", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: grants_unlimited<br>
+		* remarks: 数量無制限の許可<br>
+		* type: bool(1)<br>
+		* not null: true<br>
+		 * @return java.lang.Boolean
+		 */
+		public java.lang.Boolean getGrants_unlimited() {
+			Binder binder = data$.getValue("grants_unlimited");
+			return (java.lang.Boolean) binder.getValue();
 		}
 
 		/**
@@ -1789,9 +1879,19 @@ public class transient_nodes
 		public final T in_out;
 
 		/**
+		 * 項目名 seq_in_bundle
+		 */
+		public final T seq_in_bundle;
+
+		/**
 		 * 項目名 quantity
 		 */
 		public final T quantity;
+
+		/**
+		 * 項目名 grants_unlimited
+		 */
+		public final T grants_unlimited;
 
 		/**
 		 * 項目名 extension
@@ -1846,9 +1946,15 @@ public class transient_nodes
 			this.in_out = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_nodes.in_out);
+			this.seq_in_bundle = builder$.buildColumn(
+				this,
+				sqlassist.bb.transient_nodes.seq_in_bundle);
 			this.quantity = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_nodes.quantity);
+			this.grants_unlimited = builder$.buildColumn(
+				this,
+				sqlassist.bb.transient_nodes.grants_unlimited);
 			this.extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_nodes.extension);

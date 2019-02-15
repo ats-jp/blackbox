@@ -152,12 +152,21 @@ public class transient_bundles
 	public static final String transient_transfer_id = "transient_transfer_id";
 
 	/**
+	 * name: seq_in_transfer<br>
+	 * remarks: 移動伝票内連番<br>
+	 * type: int4(10)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "seq_in_transfer", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動伝票内連番", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String seq_in_transfer = "seq_in_transfer";
+
+	/**
 	 * name: extension<br>
 	 * remarks: 外部アプリケーション情報JSON<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 3, notNull = true)
+	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 4, notNull = true)
 	public static final String extension = "extension";
 
 	/**
@@ -166,7 +175,7 @@ public class transient_bundles
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 4, notNull = true)
+	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 5, notNull = true)
 	public static final String revision = "revision";
 
 	/**
@@ -175,7 +184,7 @@ public class transient_bundles
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 5, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 6, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -184,8 +193,26 @@ public class transient_bundles
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 7, notNull = true)
 	public static final String created_by = "created_by";
+
+	/**
+	 * name: updated_at<br>
+	 * remarks: 更新時刻<br>
+	 * type: timestamptz(35, 6)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
+	public static final String updated_at = "updated_at";
+
+	/**
+	 * name: updated_by<br>
+	 * remarks: 更新ユーザー<br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 9, notNull = true)
+	public static final String updated_by = "updated_by";
 
 	/**
 	 * name: transient_bundles_transient_transfer_id_fkey<br>
@@ -202,6 +229,14 @@ public class transient_bundles
 	 */
 	@ForeignKey(name = "transient_bundles_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
 	public static final String bb$users$transient_bundles_created_by_fkey = "transient_bundles_created_by_fkey";
+
+	/**
+	 * name: transient_bundles_updated_by_fkey<br>
+	 * references: users<br>
+	 * columns: updated_by
+	 */
+	@ForeignKey(name = "transient_bundles_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$transient_bundles_updated_by_fkey = "transient_bundles_updated_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -240,15 +275,27 @@ public class transient_bundles
 
 		private final Relationship rowRel$ = RelationshipFactory.getInstance().getInstance($TABLE);
 
-		private Row() {
+		/**
+		 * 登録用コンストラクタです。
+		 */
+		protected Row() {
 			data$ = new DataObject(rowRel$);
 		}
 
-		private Row(DataObject data) {
+		/**
+		 * 参照、更新用コンストラクタです。
+		 * @param data 値を持つ {@link DataObject}
+		 */
+		protected Row(DataObject data) {
 			this.data$ = data;
 		}
 
-		private Row(Result result) {
+		/**
+		 * 参照、更新用コンストラクタです。<br>
+		 * aggregate の検索結果からカラム名により値を取り込みます。
+		 * @param result 値を持つ {@link Result}
+		 */
+		protected Row(Result result) {
 			this.data$ = ColumnNameDataObjectBuilder.build(result, rowRel$, ContextManager.get(ValueExtractorsConfigure.class).getValueExtractors());
 		}
 
@@ -320,6 +367,36 @@ public class transient_bundles
 		public java.util.UUID getTransient_transfer_id() {
 			Binder binder = data$.getValue("transient_transfer_id");
 			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: seq_in_transfer<br>
+		* remarks: 移動伝票内連番<br>
+		* type: int4(10)<br>
+		* not null: true<br>
+		 * @param value java.lang.Integer
+		 */
+		public void setSeq_in_transfer(java.lang.Integer value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("seq_in_transfer").getType());
+			data$.setValue("seq_in_transfer", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: seq_in_transfer<br>
+		* remarks: 移動伝票内連番<br>
+		* type: int4(10)<br>
+		* not null: true<br>
+		 * @return java.lang.Integer
+		 */
+		public java.lang.Integer getSeq_in_transfer() {
+			Binder binder = data$.getValue("seq_in_transfer");
+			return (java.lang.Integer) binder.getValue();
 		}
 
 		/**
@@ -443,6 +520,66 @@ public class transient_bundles
 		}
 
 		/**
+		 * setter
+		 * name: updated_at<br>
+		* remarks: 更新時刻<br>
+		* type: timestamptz(35, 6)<br>
+		* not null: true<br>
+		 * @param value java.sql.Timestamp
+		 */
+		public void setUpdated_at(java.sql.Timestamp value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("updated_at").getType());
+			data$.setValue("updated_at", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: updated_at<br>
+		* remarks: 更新時刻<br>
+		* type: timestamptz(35, 6)<br>
+		* not null: true<br>
+		 * @return java.sql.Timestamp
+		 */
+		public java.sql.Timestamp getUpdated_at() {
+			Binder binder = data$.getValue("updated_at");
+			return (java.sql.Timestamp) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: updated_by<br>
+		* remarks: 更新ユーザー<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setUpdated_by(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("updated_by").getType());
+			data$.setValue("updated_by", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: updated_by<br>
+		* remarks: 更新ユーザー<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getUpdated_by() {
+			Binder binder = data$.getValue("updated_by");
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 transient_transfers<br>
 		 * 外部キー名 transient_bundles_transient_transfer_id_fkey<br>
@@ -461,9 +598,21 @@ public class transient_bundles
 		 * 項目名 created_by
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.users.Row $users() {
+		public sqlassist.bb.users.Row $users$transient_bundles_created_by_fkey() {
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$transient_bundles_created_by_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 users<br>
+		 * 外部キー名 transient_bundles_updated_by_fkey<br>
+		 * 項目名 updated_by
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.users.Row $users$transient_bundles_updated_by_fkey() {
+			return sqlassist.bb.users.row(
+				data$.getDataObject(bb$users$transient_bundles_updated_by_fkey));
 		}
 
 	}
@@ -1544,6 +1693,11 @@ public class transient_bundles
 		public final T transient_transfer_id;
 
 		/**
+		 * 項目名 seq_in_transfer
+		 */
+		public final T seq_in_transfer;
+
+		/**
 		 * 項目名 extension
 		 */
 		public final T extension;
@@ -1563,6 +1717,16 @@ public class transient_bundles
 		 */
 		public final T created_by;
 
+		/**
+		 * 項目名 updated_at
+		 */
+		public final T updated_at;
+
+		/**
+		 * 項目名 updated_by
+		 */
+		public final T updated_by;
+
 		private Assist(
 			transient_bundles table$,
 			TableFacadeContext<T> builder$,
@@ -1580,6 +1744,9 @@ public class transient_bundles
 			this.transient_transfer_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_bundles.transient_transfer_id);
+			this.seq_in_transfer = builder$.buildColumn(
+				this,
+				sqlassist.bb.transient_bundles.seq_in_transfer);
 			this.extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_bundles.extension);
@@ -1592,6 +1759,12 @@ public class transient_bundles
 			this.created_by = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_bundles.created_by);
+			this.updated_at = builder$.buildColumn(
+				this,
+				sqlassist.bb.transient_bundles.updated_at);
+			this.updated_by = builder$.buildColumn(
+				this,
+				sqlassist.bb.transient_bundles.updated_by);
 
 		}
 
@@ -1726,11 +1899,24 @@ public class transient_bundles
 		 * 項目名 created_by
 		 * @return users relationship
 		 */
-		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb.transient_bundles.Row, M>> $users() {
+		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb.transient_bundles.Row, M>> $users$transient_bundles_created_by_fkey() {
 			return new sqlassist.bb.users.ExtAssist<>(
 				builder$,
 				this,
 				sqlassist.bb.transient_bundles.bb$users$transient_bundles_created_by_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 users<br>
+		 * 外部キー名 transient_bundles_updated_by_fkey<br>
+		 * 項目名 updated_by
+		 * @return users relationship
+		 */
+		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb.transient_bundles.Row, M>> $users$transient_bundles_updated_by_fkey() {
+			return new sqlassist.bb.users.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb.transient_bundles.bb$users$transient_bundles_updated_by_fkey);
 		}
 
 	}

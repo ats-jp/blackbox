@@ -91,7 +91,7 @@ public class TransferExecutor {
 		return promise;
 	}
 
-	private static final int RETRY = 1;
+	private static final int retry = 3;
 
 	private static void execute(Event event) {
 		try {
@@ -103,7 +103,7 @@ public class TransferExecutor {
 					} catch (Retry r) {
 						logger.warn(r.getMessage(), r);
 
-						if (counter++ >= RETRY) {
+						if (++counter >= retry) {
 							throw new TooMatchRetryException();
 						}
 

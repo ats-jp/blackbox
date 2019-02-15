@@ -250,15 +250,27 @@ public class closed_stocks
 
 		private final Relationship rowRel$ = RelationshipFactory.getInstance().getInstance($TABLE);
 
-		private Row() {
+		/**
+		 * 登録用コンストラクタです。
+		 */
+		protected Row() {
 			data$ = new DataObject(rowRel$);
 		}
 
-		private Row(DataObject data) {
+		/**
+		 * 参照、更新用コンストラクタです。
+		 * @param data 値を持つ {@link DataObject}
+		 */
+		protected Row(DataObject data) {
 			this.data$ = data;
 		}
 
-		private Row(Result result) {
+		/**
+		 * 参照、更新用コンストラクタです。<br>
+		 * aggregate の検索結果からカラム名により値を取り込みます。
+		 * @param result 値を持つ {@link Result}
+		 */
+		protected Row(Result result) {
 			this.data$ = ColumnNameDataObjectBuilder.build(result, rowRel$, ContextManager.get(ValueExtractorsConfigure.class).getValueExtractors());
 		}
 

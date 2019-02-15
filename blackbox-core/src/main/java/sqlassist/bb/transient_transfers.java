@@ -170,12 +170,21 @@ public class transient_transfers
 	public static final String transferred_at = "transferred_at";
 
 	/**
+	 * name: seq<br>
+	 * remarks: DB内生成順<br>
+	 * type: bigserial(19)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "seq", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "DB内生成順", defaultValue = "nextval('bb.transient_transfers_seq_seq'::regclass)", ordinalPosition = 5, notNull = true)
+	public static final String seq = "seq";
+
+	/**
 	 * name: extension<br>
 	 * remarks: 外部アプリケーション情報JSON<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 5, notNull = true)
+	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 6, notNull = true)
 	public static final String extension = "extension";
 
 	/**
@@ -184,7 +193,7 @@ public class transient_transfers
 	 * type: _text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 6, notNull = true)
+	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 7, notNull = true)
 	public static final String tags = "tags";
 
 	/**
@@ -193,7 +202,7 @@ public class transient_transfers
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "completed", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "実施済フラグ", defaultValue = "false", ordinalPosition = 7, notNull = true)
+	@Column(name = "completed", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "実施済フラグ", defaultValue = "false", ordinalPosition = 8, notNull = true)
 	public static final String completed = "completed";
 
 	/**
@@ -202,7 +211,7 @@ public class transient_transfers
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 8, notNull = true)
+	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 9, notNull = true)
 	public static final String revision = "revision";
 
 	/**
@@ -211,7 +220,7 @@ public class transient_transfers
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 9, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 10, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -220,7 +229,7 @@ public class transient_transfers
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 10, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 11, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -229,7 +238,7 @@ public class transient_transfers
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 11, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 12, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -238,7 +247,7 @@ public class transient_transfers
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 12, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 13, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -310,15 +319,27 @@ public class transient_transfers
 
 		private final Relationship rowRel$ = RelationshipFactory.getInstance().getInstance($TABLE);
 
-		private Row() {
+		/**
+		 * 登録用コンストラクタです。
+		 */
+		protected Row() {
 			data$ = new DataObject(rowRel$);
 		}
 
-		private Row(DataObject data) {
+		/**
+		 * 参照、更新用コンストラクタです。
+		 * @param data 値を持つ {@link DataObject}
+		 */
+		protected Row(DataObject data) {
 			this.data$ = data;
 		}
 
-		private Row(Result result) {
+		/**
+		 * 参照、更新用コンストラクタです。<br>
+		 * aggregate の検索結果からカラム名により値を取り込みます。
+		 * @param result 値を持つ {@link Result}
+		 */
+		protected Row(Result result) {
 			this.data$ = ColumnNameDataObjectBuilder.build(result, rowRel$, ContextManager.get(ValueExtractorsConfigure.class).getValueExtractors());
 		}
 
@@ -450,6 +471,36 @@ public class transient_transfers
 		public java.sql.Timestamp getTransferred_at() {
 			Binder binder = data$.getValue("transferred_at");
 			return (java.sql.Timestamp) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: seq<br>
+		* remarks: DB内生成順<br>
+		* type: bigserial(19)<br>
+		* not null: true<br>
+		 * @param value java.lang.Long
+		 */
+		public void setSeq(java.lang.Long value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("seq").getType());
+			data$.setValue("seq", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: seq<br>
+		* remarks: DB内生成順<br>
+		* type: bigserial(19)<br>
+		* not null: true<br>
+		 * @return java.lang.Long
+		 */
+		public java.lang.Long getSeq() {
+			Binder binder = data$.getValue("seq");
+			return (java.lang.Long) binder.getValue();
 		}
 
 		/**
@@ -1828,6 +1879,11 @@ public class transient_transfers
 		public final T transferred_at;
 
 		/**
+		 * 項目名 seq
+		 */
+		public final T seq;
+
+		/**
 		 * 項目名 extension
 		 */
 		public final T extension;
@@ -1890,6 +1946,9 @@ public class transient_transfers
 			this.transferred_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_transfers.transferred_at);
+			this.seq = builder$.buildColumn(
+				this,
+				sqlassist.bb.transient_transfers.seq);
 			this.extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_transfers.extension);

@@ -16,6 +16,7 @@ import org.blendee.jdbc.BatchStatement;
 import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
+import jp.ats.blackbox.common.U;
 import sqlassist.bb.closed_stocks;
 import sqlassist.bb.closings;
 import sqlassist.bb.last_closings;
@@ -24,7 +25,7 @@ import sqlassist.bb.snapshots;
 
 public class ClosingHandler {
 
-	private static final Recorder recorder = new Recorder();
+	private static final Recorder recorder = U.recorder;
 
 	public static void close(UUID closingId, UUID userId, ClosingRequest request) {
 		var closing = closings.row();
@@ -102,7 +103,7 @@ public class ClosingHandler {
 					.WHERE(
 						a -> a.EXISTS(
 							new closed_stocks()
-								.SELECT(sa -> sa.asterisk())
+								.SELECT(sa -> sa.any(0))
 								.WHERE(sa -> sa.id.eq(a.stock_id)))))
 									.WHERE(a -> a.col("rank").eq(1)),
 			groupId,
@@ -140,7 +141,7 @@ public class ClosingHandler {
 					.WHERE(
 						a -> a.NOT_EXISTS(
 							new closed_stocks()
-								.SELECT(sa -> sa.asterisk())
+								.SELECT(sa -> sa.any(0))
 								.WHERE(sa -> sa.id.eq(a.stock_id)))));
 
 			return new closed_stocks()

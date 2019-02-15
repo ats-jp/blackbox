@@ -882,6 +882,7 @@ COMMENT ON COLUMN bb.nodes.id IS 'ID';
 COMMENT ON COLUMN bb.nodes.bundle_id IS '移動ID';
 COMMENT ON COLUMN bb.nodes.stock_id IS '在庫ID';
 COMMENT ON COLUMN bb.nodes.in_out IS '入出庫区分';
+COMMENT ON COLUMN bb.nodes.seq IS '移動伝票内連番';
 COMMENT ON COLUMN bb.nodes.quantity IS '移動数量';
 COMMENT ON COLUMN bb.nodes.grants_unlimited IS '数量無制限の許可
 trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない';
@@ -1079,8 +1080,8 @@ COMMENT ON COLUMN bb.transfer_errors.created_at IS '登録時刻';
 --一時作業
 CREATE TABLE bb.transients (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	group_id uuid REFERENCES bb.groups ON DELETE CASCADE CHECK (owner_type = 'G' AND group_id <> '00000000-0000-0000-0000-000000000000') NOT NULL,
-	user_id uuid REFERENCES bb.users ON DELETE CASCADE CHECK (owner_type = 'U' AND user_id <> '00000000-0000-0000-0000-000000000000') NOT NULL,
+	group_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
+	user_id uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	owner_type "char" CHECK (owner_type IN ('G', 'U')) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
@@ -1116,6 +1117,7 @@ CREATE TABLE bb.transient_transfers (
 	transient_id uuid REFERENCES bb.transients ON DELETE CASCADE NOT NULL, --transientが削除されたら削除
 	group_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
 	transferred_at timestamptz NOT NULL,
+	seq bigserial NOT NULL, --DB内生成順を保証
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	completed boolean DEFAULT false NOT NULL,
@@ -1130,6 +1132,7 @@ COMMENT ON COLUMN bb.transient_transfers.id IS 'ID';
 COMMENT ON COLUMN bb.transient_transfers.transient_id IS '一時作業ID';
 COMMENT ON COLUMN bb.transient_transfers.group_id IS 'グループID';
 COMMENT ON COLUMN bb.transient_transfers.transferred_at IS '移動時刻';
+COMMENT ON COLUMN bb.transient_transfers.seq IS 'DB内生成順';
 COMMENT ON COLUMN bb.transient_transfers.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.transient_transfers.tags IS '保存用タグ';
 COMMENT ON COLUMN bb.transient_transfers.completed IS '実施済フラグ';
@@ -1165,18 +1168,24 @@ CREATE TABLE bb.transient_transfers_tags (
 CREATE TABLE bb.transient_bundles (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	transient_transfer_id uuid REFERENCES bb.transient_transfers ON DELETE CASCADE NOT NULL,
+	seq_in_transfer integer NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,-- 編集でtransient_bundlesだけ追加することもあるので必要
-	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
+	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	updated_at timestamptz DEFAULT now() NOT NULL,
+	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 
 COMMENT ON TABLE bb.transient_bundles IS '一時作業移動伝票明細';
 COMMENT ON COLUMN bb.transient_bundles.id IS 'ID';
 COMMENT ON COLUMN bb.transient_bundles.transient_transfer_id IS '一時作業移動伝票ID';
+COMMENT ON COLUMN bb.transient_bundles.seq_in_transfer IS '移動伝票内連番';
 COMMENT ON COLUMN bb.transient_bundles.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.transient_bundles.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_bundles.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_bundles.created_by IS '作成ユーザー';
+COMMENT ON COLUMN bb.transient_bundles.updated_at IS '更新時刻';
+COMMENT ON COLUMN bb.transient_bundles.updated_by IS '更新ユーザー';
 
 ----------
 
@@ -1186,7 +1195,9 @@ CREATE TABLE bb.transient_nodes (
 	transient_bundle_id uuid REFERENCES bb.transient_bundles ON DELETE CASCADE NOT NULL,
 	stock_id uuid REFERENCES bb.stocks NOT NULL, --stockは削除されない
 	in_out "char" CHECK (in_out IN ('I', 'O')) NOT NULL,
+	seq_in_bundle integer NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
+	grants_unlimited boolean DEFAULT false NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
@@ -1199,7 +1210,9 @@ COMMENT ON COLUMN bb.transient_nodes.id IS 'ID';
 COMMENT ON COLUMN bb.transient_nodes.transient_bundle_id IS '移動ID';
 COMMENT ON COLUMN bb.transient_nodes.stock_id IS '在庫ID';
 COMMENT ON COLUMN bb.transient_nodes.in_out IS '入出庫区分';
+COMMENT ON COLUMN bb.transient_nodes.seq_in_bundle IS '伝票明細内連番';
 COMMENT ON COLUMN bb.transient_nodes.quantity IS '移動数量';
+COMMENT ON COLUMN bb.transient_nodes.grants_unlimited IS '数量無制限の許可';
 COMMENT ON COLUMN bb.transient_nodes.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.transient_nodes.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_nodes.created_at IS '作成時刻';

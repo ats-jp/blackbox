@@ -1,6 +1,5 @@
 package jp.ats.blackbox.persistence;
 
-import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 import static org.blendee.sql.Placeholder.$BIGDECIMAL;
 import static org.blendee.sql.Placeholder.$BOOLEAN;
 import static org.blendee.sql.Placeholder.$INT;
@@ -20,32 +19,27 @@ import org.blendee.assist.Vargs;
 import org.blendee.jdbc.BSQLException;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
 import org.blendee.jdbc.exception.UniqueConstraintViolationException;
-import org.blendee.sql.AsyncRecorder;
+import org.blendee.sql.Recorder;
 
 import com.google.gson.Gson;
 
-import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import sqlassist.bb.bundles;
-import sqlassist.bb.current_stocks;
-import sqlassist.bb.groups;
 import sqlassist.bb.jobs;
 import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
-import sqlassist.bb.stocks;
 import sqlassist.bb.transfers;
 import sqlassist.bb.transfers_tags;
-import sqlassist.bb.users;
 
 /**
  * transfer操作クラス
  */
 public class TransferHandler {
 
-	private final AsyncRecorder recorder = new AsyncRecorder();
+	private final Recorder recorder = Recorder.newAsyncInstance();
 
 	private UUID instanceId;
 
@@ -56,6 +50,8 @@ public class TransferHandler {
 
 	private int nodeSeq;
 
+	private class Transfer extends transfers.Row implements TransferPreparer.Transfer {}
+
 	/**
 	 * transfer登録処理
 	 */
@@ -63,37 +59,8 @@ public class TransferHandler {
 		//初期化
 		nodeSeq = 0;
 
-		var group = recorder.play(() -> new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension)))
-			.fetch(request.group_id)
-			.orElseThrow(() -> new DataNotFoundException(groups.$TABLE, request.group_id));
-
-		var user = recorder.play(() -> new users().SELECT(r -> r.extension))
-			.fetch(userId)
-			.orElseThrow(() -> new DataNotFoundException(users.$TABLE, userId));
-
-		var transfer = transfers.row();
-
-		transfer.setId(transferId);
-		transfer.setGroup_id(request.group_id);
-
-		request.denied_id.ifPresent(v -> transfer.setDenied_id(v));
-		request.deny_reason.ifPresent(v -> transfer.setDeny_reason(v));
-
-		transfer.setTransferred_at(request.transferred_at);
-
-		request.restored_extension.ifPresentOrElse(
-			v -> transfer.setExtension(v),
-			() -> request.extension.ifPresent(v -> transfer.setExtension(toJson(v))));
-
-		transfer.setGroup_extension(group.getExtension());
-		transfer.setOrg_extension(group.$orgs().getExtension());
-		transfer.setUser_extension(user.getExtension());
-
-		request.tags.ifPresent(v -> transfer.setTags(v));
-
-		transfer.setInstance_id(instanceId());
-
-		transfer.setCreated_by(userId);
+		var transfer = new Transfer();
+		TransferPreparer.prepareTransfer(transferId, userId, instanceId(), request, transfer, recorder);
 
 		try {
 			transfer.insert();
@@ -137,6 +104,157 @@ public class TransferHandler {
 		public String transferred_at;
 
 		public String closed_at;
+	}
+
+	private class Bundle extends bundles.Row implements TransferPreparer.Bundle {}
+
+	/**
+	 * bundle登録処理
+	 */
+	private void registerBundle(
+		UUID userId,
+		UUID transferId,
+		UUID groupId,
+		Timestamp transferredAt,
+		BundleRegisterRequest request) {
+		var bundle = new Bundle();
+
+		UUID bundleId = UUID.randomUUID();
+
+		TransferPreparer.prepareBundle(transferId, bundleId, request, bundle);
+
+		bundle.insert();
+
+		Arrays.stream(request.nodes).forEach(r -> registerNode(userId, bundleId, groupId, transferredAt, r));
+	}
+
+	private class Node extends nodes.Row implements TransferPreparer.Node {}
+
+	/**
+	 * node登録処理
+	 */
+	private void registerNode(
+		UUID userId,
+		UUID bundleId,
+		UUID groupId,
+		Timestamp transferredAt,
+		NodeRegisterRequest request) {
+		UUID nodeId = UUID.randomUUID();
+		var node = new Node();
+		UUID stockId = TransferPreparer.prepareNode(bundleId, nodeId, userId, request, node, ++nodeSeq, recorder);
+
+		node.insert();
+
+		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
+		JustBeforeSnapshot justBefore = getJustBeforeSnapshot(stockId, transferredAt, recorder);
+
+		BigDecimal total = request.in_out.calcurate(justBefore.total, request.quantity);
+
+		//移動した結果数量がマイナスになる場合エラー
+		//ただし無制限設定がされていればOK
+		if (!justBefore.unlimited && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
+
+		//直前のsnapshotが無制限の場合、以降すべてのsnapshotが無制限になるので引き継ぐ
+		//そうでなければ今回のリクエストに従う
+		boolean unlimited = justBefore.unlimited ? true : request.grants_unlimited.orElse(false);
+
+		recorder.play(
+			() -> new snapshots().insertStatement(
+				a -> a
+					.INSERT(
+						a.id,
+						a.unlimited,
+						a.total,
+						a.stock_id,
+						a.transfer_group_id,
+						a.transferred_at,
+						a.node_seq,
+						a.updated_by)
+					.VALUES(
+						$UUID,
+						$BOOLEAN,
+						$BIGDECIMAL,
+						$UUID,
+						$UUID,
+						$TIMESTAMP,
+						$INT,
+						$UUID)),
+			nodeId,
+			unlimited,
+			total,
+			stockId,
+			groupId,
+			transferredAt,
+			nodeSeq,
+			userId)
+			.execute();
+
+		//登録以降のsnapshotの数量と無制限設定を更新
+		try {
+			recorder.play(
+				() -> new snapshots().updateStatement(
+					a -> a.UPDATE(
+						//一度trueになったらずっとそのままtrue
+						a.unlimited.set("{0} OR ?", Vargs.of(a.unlimited), Vargs.of($BOOLEAN)),
+						//自身の数に今回の移動数量を正規化してプラス
+						a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of($BIGDECIMAL)))
+						.WHERE(
+							wa -> wa.id.IN(
+								new snapshots()
+									.SELECT(sa -> sa.id)
+									//transferred_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
+									.WHERE(swa -> swa.stock_id.eq($UUID).AND.transferred_at.gt($TIMESTAMP))))),
+				unlimited,
+				request.in_out.normalize(request.quantity),
+				stockId,
+				transferredAt)
+				.execute();
+		} catch (CheckConstraintViolationException e) {
+			//未来のsnapshotで数量がマイナスになった
+			throw new MinusTotalException();
+		}
+	}
+
+	//TODO 途中
+	//直近のsnapshotを取得
+	static JustBeforeSnapshot getJustBeforeSnapshot(UUID stockId, Timestamp transferredAt, Recorder recorder) {
+		return recorder.play(
+			() -> new snapshots()
+				.SELECT(a -> a.ls(a.total, a.unlimited))
+				.WHERE(
+					a -> a.stock_id.eq($UUID).AND.transferred_at.eq(
+						new snapshots()
+							.SELECT(sa -> sa.MAX(sa.transferred_at))
+							.WHERE(sa -> sa.stock_id.eq($UUID).AND.in_search_scope.eq(true).AND.transferred_at.le($TIMESTAMP))))
+				.ORDER_BY(
+					a -> a.ls(
+						a.created_at.DESC, //同一時刻であればcreated_atが最近のもの
+						a.node_seq.DESC)), //created_atが等しければ同一伝票、同一伝票内であれば生成順
+			stockId,
+			stockId,
+			transferredAt).aggregateAndGet(r -> {
+				var container = new JustBeforeSnapshot();
+				while (r.next()) {
+					container.total = r.getBigDecimal(1);
+					container.unlimited = r.getBoolean(2);
+					return container;
+				}
+
+				container.total = BigDecimal.ZERO;
+				container.unlimited = false;
+
+				return container;
+			});
+	}
+
+	/**
+	 * 直前のsnapshotの情報を保持するコンテナ
+	 */
+	static class JustBeforeSnapshot {
+
+		private BigDecimal total;
+
+		private boolean unlimited;
 	}
 
 	public Timestamp deny(UUID transferId, UUID userId, TransferDenyRequest denyRequest) {
@@ -226,245 +344,5 @@ public class TransferHandler {
 		register(transferId, userId, request);
 
 		return request.transferred_at;
-	}
-
-	/**
-	 * bundle登録処理
-	 */
-	private void registerBundle(
-		UUID userId,
-		UUID transferId,
-		UUID groupId,
-		Timestamp transferredAt,
-		BundleRegisterRequest request) {
-		var bundle = bundles.row();
-
-		UUID bundleId = UUID.randomUUID();
-
-		bundle.setId(bundleId);
-		bundle.setTransfer_id(transferId);
-		request.restored_extension
-			.ifPresentOrElse(
-				v -> bundle.setExtension(v),
-				() -> request.extension.ifPresent(v -> bundle.setExtension(toJson(v))));
-
-		bundle.insert();
-
-		Arrays.stream(request.nodes).forEach(r -> registerNode(userId, bundleId, groupId, transferredAt, r));
-	}
-
-	/**
-	 * node登録処理
-	 */
-	private void registerNode(
-		UUID userId,
-		UUID bundleId,
-		UUID groupId,
-		Timestamp transferredAt,
-		NodeRegisterRequest request) {
-		//stockが既に存在すればそれを使う
-		//なければ新たに登録
-		var stock = recorder.play(
-			() -> selectedStocks()
-				.WHERE(a -> a.group_id.eq($UUID).AND.item_id.eq($UUID).AND.owner_id.eq($UUID).AND.location_id.eq($UUID).AND.status_id.eq($UUID)),
-			request.group_id,
-			request.item_id,
-			request.owner_id,
-			request.location_id,
-			request.status_id)
-			.willUnique()
-			.orElseGet(() -> registerStock(userId, request));
-
-		UUID stockId = stock.getId();
-
-		var node = nodes.row();
-
-		UUID nodeId = UUID.randomUUID();
-
-		node.setId(nodeId);
-		node.setBundle_id(bundleId);
-		//nodeではgroup_idを持たないが、requestが持つgroup_idはstockに格納しており、それが在庫の所属グループを表す
-		node.setStock_id(stockId);
-		node.setIn_out(request.in_out.value);
-		node.setSeq(++nodeSeq);
-		node.setQuantity(request.quantity);
-
-		request.grants_unlimited.ifPresent(v -> node.setGrants_unlimited(v));
-
-		request.restored_extension
-			.ifPresentOrElse(
-				v -> node.setExtension(v),
-				() -> request.extension.ifPresent(v -> node.setExtension(toJson(v))));
-
-		node.setGroup_extension(stock.$groups().getExtension());
-		node.setItem_extension(stock.$items().getExtension());
-		node.setOwner_extension(stock.$owners().getExtension());
-		node.setLocation_extension(stock.$locations().getExtension());
-		node.setStatus_extension(stock.$statuses().getExtension());
-
-		node.insert();
-
-		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
-		JustBefore justBefore = recorder.play(
-			() -> new snapshots()
-				.SELECT(a -> a.ls(a.total, a.unlimited))
-				.WHERE(
-					a -> a.stock_id.eq($UUID).AND.transferred_at.eq(
-						new snapshots()
-							.SELECT(sa -> sa.MAX(sa.transferred_at))
-							.WHERE(sa -> sa.stock_id.eq($UUID).AND.in_search_scope.eq(true).AND.transferred_at.le($TIMESTAMP))))
-				.ORDER_BY(
-					a -> a.ls(
-						a.created_at.DESC, //同一時刻であればcreated_atが最近のもの
-						a.node_seq.DESC)), //同一伝票内であれば生成順
-			stockId,
-			stockId,
-			transferredAt).aggregateAndGet(r -> {
-				var container = new JustBefore();
-				while (r.next()) {
-					container.total = r.getBigDecimal(1);
-					container.unlimited = r.getBoolean(2);
-					return container;
-				}
-
-				container.total = BigDecimal.ZERO;
-				container.unlimited = false;
-
-				return container;
-			});
-
-		BigDecimal total = request.in_out.calcurate(justBefore.total, request.quantity);
-
-		//移動した結果数量がマイナスになる場合エラー
-		//ただし無制限設定がされていればOK
-		if (!justBefore.unlimited && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
-
-		//直前のsnapshotが無制限の場合、以降すべてのsnapshotが無制限になるので引き継ぐ
-		//そうでなければ今回のリクエストに従う
-		boolean unlimited = justBefore.unlimited ? true : request.grants_unlimited.orElse(false);
-
-		recorder.play(
-			() -> new snapshots().insertStatement(
-				a -> a
-					.INSERT(
-						a.id,
-						a.unlimited,
-						a.total,
-						a.stock_id,
-						a.transfer_group_id,
-						a.transferred_at,
-						a.node_seq,
-						a.updated_by)
-					.VALUES(
-						$UUID,
-						$BOOLEAN,
-						$BIGDECIMAL,
-						$UUID,
-						$UUID,
-						$TIMESTAMP,
-						$INT,
-						$UUID)),
-			nodeId,
-			unlimited,
-			total,
-			stockId,
-			groupId,
-			transferredAt,
-			nodeSeq,
-			userId)
-			.execute();
-
-		//登録以降のsnapshotの数量と無制限設定を更新
-		try {
-			recorder.play(
-				() -> new snapshots().updateStatement(
-					a -> a.UPDATE(
-						//一度trueになったらずっとそのままtrue
-						a.unlimited.set("{0} OR ?", Vargs.of(a.unlimited), Vargs.of($BOOLEAN)),
-						//自身の数に今回の移動数量を正規化してプラス
-						a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of($BIGDECIMAL)))
-						.WHERE(
-							wa -> wa.id.IN(
-								new snapshots()
-									.SELECT(sa -> sa.id)
-									//transferred_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
-									.WHERE(swa -> swa.stock_id.eq($UUID).AND.transferred_at.gt($TIMESTAMP))))),
-				unlimited,
-				request.in_out.normalize(request.quantity),
-				stockId,
-				transferredAt)
-				.execute();
-		} catch (CheckConstraintViolationException e) {
-			//未来のsnapshotで数量がマイナスになった
-			throw new MinusTotalException();
-		}
-	}
-
-	/**
-	 * 直前のsnapshotの情報を保持するコンテナ
-	 */
-	private static class JustBefore {
-
-		private BigDecimal total;
-
-		private boolean unlimited;
-	}
-
-	/**
-	 * stock登録処理
-	 */
-	private stocks.Row registerStock(UUID userId, TransferComponent.NodeRegisterRequest request) {
-		UUID stockId = UUID.randomUUID();
-
-		recorder.play(
-			() -> new stocks().insertStatement(
-				a -> a
-					.INSERT(
-						a.id,
-						a.group_id,
-						a.item_id,
-						a.owner_id,
-						a.location_id,
-						a.status_id,
-						a.created_by)
-					.VALUES(
-						$UUID,
-						$UUID,
-						$UUID,
-						$UUID,
-						$UUID,
-						$UUID,
-						$UUID)),
-			stockId,
-			request.group_id,
-			request.item_id,
-			request.owner_id,
-			request.location_id,
-			request.status_id,
-			userId)
-			.execute();
-
-		recorder.play(
-			() -> new current_stocks().insertStatement(
-				//後でjobから更新されるのでunlimitedはとりあえずfalse、totalは0
-				a -> a.INSERT(a.id, a.unlimited, a.total, a.snapshot_id).VALUES($UUID, $BOOLEAN, $INT, $UUID)),
-			stockId,
-			false,
-			0,
-			U.NULL_ID).execute();
-
-		//関連情報取得のため改めて検索
-		return recorder.play(() -> selectedStocks()).fetch(stockId).get();
-	}
-
-	private static stocks selectedStocks() {
-		return new stocks().SELECT(
-			a -> a.ls(
-				a.id,
-				a.$groups().extension,
-				a.$items().extension,
-				a.$owners().extension,
-				a.$locations().extension,
-				a.$statuses().extension));
 	}
 }

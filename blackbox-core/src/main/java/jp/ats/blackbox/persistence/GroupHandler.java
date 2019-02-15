@@ -21,7 +21,7 @@ import sqlassist.bb.relationships;
 
 public class GroupHandler {
 
-	private static final Recorder recorder = new Recorder();
+	private static final Recorder recorder = U.recorder;
 
 	public static void lock(UUID groupId) {
 		lockRelatingGroupsInternal(groupId, getParentId(groupId));

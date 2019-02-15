@@ -58,7 +58,7 @@ public class TransferAndClosingTest {
 					var closePromise = executor.close(U.NULL_ID, () -> {
 						var req = new ClosingRequest();
 						req.group_id = group;
-						req.closed_at = new Timestamp(System.currentTimeMillis());
+						req.closed_at = new Timestamp(System.currentTimeMillis() - 100000);
 
 						return req;
 					});
