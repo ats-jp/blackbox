@@ -3,13 +3,16 @@ package jp.ats.blackbox.persistence;
 import static org.blendee.sql.Placeholder.$UUID;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.LinkedList;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.blendee.assist.AnonymousTable;
 import org.blendee.jdbc.BResultSet;
+import org.blendee.jdbc.BSQLException;
 import org.blendee.jdbc.Result;
 import org.blendee.sql.InsertDMLBuilder;
 import org.blendee.sql.Recorder;
@@ -118,6 +121,91 @@ public class TransientHandler {
 		for (int i = 0; i < request.bundles.length; i++) {
 			registerBundle(userId, id, request.bundles[i], i + 1);
 		}
+	}
+
+	public TransferRegisterRequest buildTransferRegisterRequest(UUID transientTransferId, UUID transferId, UUID userId, Recorder recorder) {
+		var request = new TransferRegisterRequest();
+
+		var bundles = new LinkedList<BundleRegisterRequest>();
+
+		recorder.play(
+			() -> new transient_nodes().selectClause(
+				a -> {
+					var bundlesAssist = a.$transient_bundles();
+					var transfersAssist = bundlesAssist.$transient_transfers();
+					var stocksAssist = a.$stocks();
+
+					a.SELECT(
+						transfersAssist.group_id,
+						transfersAssist.transferred_at,
+						transfersAssist.extension,
+						transfersAssist.tags,
+						bundlesAssist.extension,
+						stocksAssist.group_id,
+						stocksAssist.item_id,
+						stocksAssist.owner_id,
+						stocksAssist.location_id,
+						stocksAssist.status_id,
+						a.in_out,
+						a.quantity,
+						a.grants_unlimited,
+						a.extension);
+				})
+				.WHERE(a -> a.$transient_bundles().transient_transfer_id.eq($UUID))
+				.assist()
+				.$transient_bundles()
+				.$transient_transfers()
+				.intercept(),
+			transientTransferId)
+			.forEach(transferOne -> {
+				var transfer = transferOne.get();
+
+				request.group_id = transfer.getGroup_id();
+				request.transferred_at = transfer.getTransferred_at();
+				request.restored_extension = Optional.of(transfer.getExtension());
+
+				try {
+					request.tags = Optional.of(Utils.restoreTags(transfer.getTags()));
+				} catch (SQLException e) {
+					throw new BSQLException(e);
+				}
+
+				transferOne.many().forEach(bundleOne -> {
+					var nodes = new LinkedList<NodeRegisterRequest>();
+
+					var bundleRequest = new BundleRegisterRequest();
+
+					bundleRequest.restored_extension = Optional.of(bundleOne.get().getExtension());
+
+					bundles.add(bundleRequest);
+
+					bundleOne.many().forEach(nodeOne -> {
+						var node = nodeOne.get();
+
+						var nodeRequest = new NodeRegisterRequest();
+
+						var stock = node.$stocks();
+
+						nodeRequest.group_id = stock.getGroup_id();
+						nodeRequest.item_id = stock.getItem_id();
+						nodeRequest.owner_id = stock.getOwner_id();
+						nodeRequest.location_id = stock.getLocation_id();
+						nodeRequest.status_id = stock.getStatus_id();
+						nodeRequest.in_out = InOut.of(node.getIn_out()).reverse();
+						nodeRequest.quantity = node.getQuantity();
+						nodeRequest.grants_unlimited = Optional.of(node.getGrants_unlimited());
+						nodeRequest.restored_extension = Optional.of(node.getExtension());
+
+						nodes.add(nodeRequest);
+					});
+
+					bundleRequest.nodes = nodes.toArray(new NodeRegisterRequest[nodes.size()]);
+				});
+
+				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
+			});
+
+		return request;
 	}
 
 	private static class Bundle extends transient_bundles.Row implements TransferPreparer.Bundle {
@@ -272,11 +360,13 @@ public class TransientHandler {
 		while (result.next()) {
 			var row = new ResultRow(result);
 
-			if (row.transferred_at.getTime() <= row.closed_at.getTime()) throw new InvalidTransientException();
+			if (row.closed_at != null && row.transferred_at.getTime() <= row.closed_at.getTime())
+				throw new InvalidTransientException();
 
 			if (!row.stock_id.equals(currentStockId)) {
 				currentStockId = row.stock_id;
 
+				//直近のsnapshotを取得
 				var snapshot = TransferHandler.getJustBeforeSnapshot(currentStockId, row.transferred_at, recorder);
 				currentStockTotal = snapshot.total;
 				currentStockUnlimited = snapshot.unlimited;
@@ -289,7 +379,8 @@ public class TransientHandler {
 
 			currentStockTotal = row.in_out.calcurate(currentStockTotal, row.quantity);
 
-			if (!currentStockUnlimited && currentStockTotal.compareTo(BigDecimal.ZERO) < 0) throw new InvalidTransientException();
+			if (!currentStockUnlimited && currentStockTotal.compareTo(BigDecimal.ZERO) < 0)
+				throw new InvalidTransientException();
 		}
 	}
 
