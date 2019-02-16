@@ -17,9 +17,7 @@ import java.util.regex.Pattern;
 
 import org.blendee.assist.Vargs;
 import org.blendee.jdbc.BSQLException;
-import org.blendee.jdbc.BlendeeManager;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
-import org.blendee.jdbc.exception.UniqueConstraintViolationException;
 import org.blendee.sql.Recorder;
 
 import com.google.gson.Gson;
@@ -73,24 +71,6 @@ public class TransferHandler {
 	 * transfer登録処理
 	 */
 	public void register(UUID transferId, UUID userId, TransferRegisterRequest request) {
-		//タグ重複発生でrollbackするため先頭で処理
-		while (true) {
-			try {
-				request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
-					var table = new transfers_tags();
-					tagIds.forEach(tagId -> {
-						recorder.play(() -> table.INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
-					});
-				}));
-
-				break;
-			} catch (UniqueConstraintViolationException e) {
-				//他のorg, groupのtransfer登録処理が僅差で同じtagを登録した場合エラーとなるので再登録対象
-				BlendeeManager.get().getCurrentTransaction().rollback();
-				continue;
-			}
-		}
-
 		//初期化
 		nodeSeq = 0;
 
@@ -111,6 +91,13 @@ public class TransferHandler {
 			ClosedCheckError error = new Gson().fromJson(matcher.group(1), ClosedCheckError.class);
 			throw new AlreadyClosedGroupException(error, e);
 		}
+
+		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
+			var table = new transfers_tags();
+			tagIds.forEach(tagId -> {
+				recorder.play(() -> table.INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
+			});
+		}, recorder));
 
 		Arrays.stream(request.bundles)
 			.forEach(

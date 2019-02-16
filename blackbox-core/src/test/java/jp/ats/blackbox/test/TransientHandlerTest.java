@@ -3,7 +3,6 @@ package jp.ats.blackbox.test;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
-import org.blendee.sql.Recorder;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
@@ -28,8 +27,6 @@ public class TransientHandlerTest {
 			IntStream.range(0, 100).forEach(i -> {
 				TransientHandler.registerTransfer(transientId, TransferHandlerTest.createRequest(U.NULL_ID));
 			});
-
-			TransientHandler.check(transientId, Recorder.instance());
 
 			SecurityValues.end();
 		});
