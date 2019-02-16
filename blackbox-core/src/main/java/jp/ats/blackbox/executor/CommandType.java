@@ -6,7 +6,9 @@ public enum CommandType {
 
 	TRANSFER_DENY(Constant.TRANSFER_DENY),
 
-	CLOSING(Constant.CLOSING);
+	CLOSING(Constant.CLOSING),
+
+	TRANSIENT_MOVE(Constant.TRANSIENT_MOVE);
 
 	private static class Constant {
 
@@ -15,6 +17,8 @@ public enum CommandType {
 		private static final String TRANSFER_DENY = "D";
 
 		private static final String CLOSING = "C";
+
+		private static final String TRANSIENT_MOVE = "T";
 	}
 
 	public static CommandType of(String value) {
@@ -25,6 +29,8 @@ public enum CommandType {
 			return TRANSFER_DENY;
 		case Constant.CLOSING:
 			return CLOSING;
+		case Constant.TRANSIENT_MOVE:
+			return TRANSIENT_MOVE;
 		default:
 			throw new Error();
 		}

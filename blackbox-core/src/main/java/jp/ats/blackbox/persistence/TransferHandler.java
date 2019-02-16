@@ -22,6 +22,7 @@ import org.blendee.sql.Recorder;
 
 import com.google.gson.Gson;
 
+import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
@@ -30,6 +31,7 @@ import sqlassist.bb.bundles;
 import sqlassist.bb.jobs;
 import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
+import sqlassist.bb.transfer_batches;
 import sqlassist.bb.transfers;
 import sqlassist.bb.transfers_tags;
 
@@ -38,7 +40,11 @@ import sqlassist.bb.transfers_tags;
  */
 public class TransferHandler {
 
-	private final Recorder recorder = Recorder.newAsyncInstance();
+	private final Recorder recorder;
+
+	public TransferHandler(Recorder recorder) {
+		this.recorder = recorder;
+	}
 
 	private long time = System.currentTimeMillis();
 
@@ -70,7 +76,7 @@ public class TransferHandler {
 	/**
 	 * transfer登録処理
 	 */
-	public void register(UUID transferId, UUID userId, TransferRegisterRequest request) {
+	public void register(UUID transferId, UUID batchId, UUID userId, TransferRegisterRequest request) {
 		//初期化
 		nodeSeq = 0;
 
@@ -78,7 +84,7 @@ public class TransferHandler {
 
 		var createdAt = uniqueTime();
 
-		TransferPreparer.prepareTransfer(transferId, userId, instanceId(), request, createdAt, transfer, recorder);
+		TransferPreparer.prepareTransfer(transferId, instanceId(), batchId, userId, request, createdAt, transfer, recorder);
 
 		try {
 			transfer.insert();
@@ -371,8 +377,16 @@ public class TransferHandler {
 				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
 			});
 
-		register(transferId, userId, request);
+		register(transferId, U.NULL_ID, userId, request);
 
 		return request.transferred_at;
+	}
+
+	public void registerBatch(UUID batchId, UUID userId) {
+		recorder.play(
+			() -> new transfer_batches().insertStatement(
+				a -> a.INSERT(a.id, a.created_by).VALUES($UUID, $UUID)),
+			batchId,
+			userId).execute();
 	}
 }

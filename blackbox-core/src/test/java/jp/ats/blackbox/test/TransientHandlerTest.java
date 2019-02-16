@@ -9,6 +9,7 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.TransientHandler;
 import jp.ats.blackbox.persistence.TransientHandler.OwnerType;
+import jp.ats.blackbox.persistence.TransientHandler.TransientMoveRequest;
 
 public class TransientHandlerTest {
 
@@ -24,9 +25,18 @@ public class TransientHandlerTest {
 
 			UUID transientId = TransientHandler.register(req);
 
-			IntStream.range(0, 100).forEach(i -> {
+			IntStream.range(0, 10).forEach(i -> {
 				TransientHandler.registerTransfer(transientId, TransferHandlerTest.createRequest(U.NULL_ID));
 			});
+
+			TransientHandler.check(transientId, U.recorder);
+
+			UUID batchId = UUID.randomUUID();
+
+			var batchReq = new TransientMoveRequest();
+			batchReq.transient_id = transientId;
+
+			TransientHandler.move(batchId, U.NULL_ID, batchReq, U.recorder);
 
 			SecurityValues.end();
 		});

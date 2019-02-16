@@ -749,10 +749,27 @@ INSERT INTO bb.stocks (
 --transfer tables
 --===========================
 
+--移動伝票一括登録
+CREATE TABLE bb.transfer_batches (
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	created_at timestamptz DEFAULT now() NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL);
+--log対象外
+
+COMMENT ON TABLE bb.transfer_batches IS '移動伝票一括登録';
+COMMENT ON COLUMN bb.transfer_batches.id IS 'ID';
+COMMENT ON COLUMN bb.transfer_batches.created_at IS '作成時刻';
+COMMENT ON COLUMN bb.transfer_batches.created_by IS '作成ユーザー';
+
+INSERT INTO bb.transfer_batches (id, created_by) VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
+
+----------
+
 --移動伝票
 CREATE TABLE bb.transfers (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
+	transfer_batch_id uuid REFERENCES bb.transfer_batches NOT NULL,
 	transferred_at timestamptz NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -766,7 +783,6 @@ CREATE TABLE bb.transfers (
 	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, created_at)); 
 --log対象外
---created_atをUNIQUEにするために一件毎にcommitすること
 --順序を一意付けするためにcreated_atをUNIQUE化、他DBから移行してきたtransferのcreated_atと重複しないようにgroup_idも含める
 --groupは単一instance内でのみ動かすのでcreated_atが重複することはないはず
 
@@ -774,6 +790,7 @@ COMMENT ON TABLE bb.transfers IS '移動伝票';
 COMMENT ON COLUMN bb.transfers.id IS 'ID';
 COMMENT ON COLUMN bb.transfers.group_id IS 'グループID
 この伝票の属するグループ';
+COMMENT ON COLUMN bb.transfers.transfer_batch_id IS '移動伝票一括登録ID';
 COMMENT ON COLUMN bb.transfers.transferred_at IS '移動時刻';
 COMMENT ON COLUMN bb.transfers.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.transfers.tags IS '保存用タグ';
@@ -792,6 +809,7 @@ COMMENT ON COLUMN bb.transfers.created_by IS '作成ユーザー';
 INSERT INTO bb.transfers (
 	id,
 	group_id,
+	transfer_batch_id,
 	transferred_at,
 	extension,
 	instance_id,
@@ -801,6 +819,7 @@ INSERT INTO bb.transfers (
 	created_at,
 	created_by
 ) VALUES (
+	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'1900-1-1'::timestamptz,
@@ -1434,6 +1453,7 @@ TO blackbox;
 GRANT INSERT ON TABLE
 	bb.closings,
 	bb.stocks,
+	bb.transfer_batches,
 	bb.transfers,
 	bb.bundles,
 	bb.nodes,

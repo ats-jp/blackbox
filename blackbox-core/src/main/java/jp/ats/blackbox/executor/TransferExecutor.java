@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.blendee.sql.Recorder;
 import org.blendee.util.Blendee;
 
 import com.google.gson.Gson;
@@ -21,6 +22,9 @@ import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler;
+import jp.ats.blackbox.persistence.TransientHandler;
+import jp.ats.blackbox.persistence.TransientHandler.TransientMoveRequest;
+import jp.ats.blackbox.persistence.TransientHandler.TransientMoveResult;
 import sqlassist.bb.transfer_errors;
 
 public class TransferExecutor {
@@ -33,7 +37,9 @@ public class TransferExecutor {
 
 	private final RingBuffer<Event> ringBuffer;
 
-	private final TransferHandler handler;
+	private final Recorder recorder = Recorder.newAsyncInstance();
+
+	private final TransferHandler handler = new TransferHandler(recorder);
 
 	public TransferExecutor() {
 		disruptor = new Disruptor<>(Event::new, bufferSize, DaemonThreadFactory.INSTANCE);
@@ -43,8 +49,6 @@ public class TransferExecutor {
 		});
 
 		ringBuffer = disruptor.getRingBuffer();
-
-		handler = new TransferHandler();
 	}
 
 	public void start() {
@@ -83,6 +87,16 @@ public class TransferExecutor {
 		var promise = new TransferPromise();
 
 		var command = new ClosingCommand(promise.getId(), userId, requestSupplier.get());
+
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
+
+		return promise;
+	}
+
+	public TransferPromise moveTransient(UUID userId, Supplier<TransientMoveRequest> requestSupplier) {
+		var promise = new TransferPromise();
+
+		var command = new TransientMoveCommand(promise.getId(), userId, requestSupplier.get());
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -193,7 +207,7 @@ public class TransferExecutor {
 
 		@Override
 		public void execute() {
-			handler.register(transferId, userId, request);
+			handler.register(transferId, U.NULL_ID, userId, request);
 		}
 
 		@Override
@@ -281,6 +295,44 @@ public class TransferExecutor {
 		@Override
 		public CommandType type() {
 			return CommandType.CLOSING;
+		}
+	}
+
+	private class TransientMoveCommand implements Command {
+
+		private final TransientMoveRequest request;
+
+		private final UUID batchId;
+
+		private final UUID userId;
+
+		private TransientMoveResult result;
+
+		private TransientMoveCommand(UUID batchId, UUID userId, TransientMoveRequest request) {
+			this.batchId = batchId;
+			this.userId = userId;
+			this.request = request;
+		}
+
+		@Override
+		public void execute() {
+			result = TransientHandler.move(batchId, userId, request, recorder);
+		}
+
+		@Override
+		public void doAfterCommit() {
+			//最古の移動時刻を通知
+			JobExecutor.next(U.convert(result.firstTransferredAt));
+		}
+
+		@Override
+		public Object request() {
+			return request;
+		}
+
+		@Override
+		public CommandType type() {
+			return CommandType.TRANSIENT_MOVE;
 		}
 	}
 }

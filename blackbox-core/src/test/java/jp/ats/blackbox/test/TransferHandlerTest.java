@@ -23,9 +23,9 @@ public class TransferHandlerTest {
 		Common.startWithLog();
 
 		Blendee.execute(t -> {
-			var handler = new TransferHandler();
+			var handler = new TransferHandler(U.recorder);
 			IntStream.range(0, 10).forEach(i -> {
-				handler.register(UUID.randomUUID(), U.NULL_ID, createRequest(U.NULL_ID));
+				handler.register(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(U.NULL_ID));
 				JobHandler.execute(LocalDateTime.now());
 
 				t.commit(); //created_atを確定するために一件毎commit

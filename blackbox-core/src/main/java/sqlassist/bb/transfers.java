@@ -153,12 +153,21 @@ public class transfers
 	public static final String group_id = "group_id";
 
 	/**
+	 * name: transfer_batch_id<br>
+	 * remarks: 移動伝票一括登録ID<br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "transfer_batch_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動伝票一括登録ID", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String transfer_batch_id = "transfer_batch_id";
+
+	/**
 	 * name: transferred_at<br>
 	 * remarks: 移動時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "transferred_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "移動時刻", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "transferred_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "移動時刻", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String transferred_at = "transferred_at";
 
 	/**
@@ -167,7 +176,7 @@ public class transfers
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 4, notNull = true)
+	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 5, notNull = true)
 	public static final String extension = "extension";
 
 	/**
@@ -176,7 +185,7 @@ public class transfers
 	 * type: _text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 5, notNull = true)
+	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 6, notNull = true)
 	public static final String tags = "tags";
 
 	/**
@@ -185,7 +194,7 @@ public class transfers
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "instance_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "発生元インスタンスのID", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "instance_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "発生元インスタンスのID", defaultValue = "null", ordinalPosition = 7, notNull = true)
 	public static final String instance_id = "instance_id";
 
 	/**
@@ -196,7 +205,7 @@ public class transfers
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "denied_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消元伝票ID\n訂正後の伝票が訂正前の伝票のIDを持つ\nここに入っているIDが指す伝票は、取り消されたものとなる", defaultValue = "'00000000-0000-0000-0000-000000000000'::uuid", ordinalPosition = 7, notNull = true)
+	@Column(name = "denied_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消元伝票ID\n訂正後の伝票が訂正前の伝票のIDを持つ\nここに入っているIDが指す伝票は、取り消されたものとなる", defaultValue = "'00000000-0000-0000-0000-000000000000'::uuid", ordinalPosition = 8, notNull = true)
 	public static final String denied_id = "denied_id";
 
 	/**
@@ -205,7 +214,7 @@ public class transfers
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "deny_reason", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消理由", defaultValue = "''::text", ordinalPosition = 8, notNull = true)
+	@Column(name = "deny_reason", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消理由", defaultValue = "''::text", ordinalPosition = 9, notNull = true)
 	public static final String deny_reason = "deny_reason";
 
 	/**
@@ -214,7 +223,7 @@ public class transfers
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "org_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "組織のextension", defaultValue = "null", ordinalPosition = 9, notNull = true)
+	@Column(name = "org_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "組織のextension", defaultValue = "null", ordinalPosition = 10, notNull = true)
 	public static final String org_extension = "org_extension";
 
 	/**
@@ -223,7 +232,7 @@ public class transfers
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "null", ordinalPosition = 10, notNull = true)
+	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "null", ordinalPosition = 11, notNull = true)
 	public static final String group_extension = "group_extension";
 
 	/**
@@ -232,7 +241,7 @@ public class transfers
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザーのextension", defaultValue = "null", ordinalPosition = 11, notNull = true)
+	@Column(name = "user_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザーのextension", defaultValue = "null", ordinalPosition = 12, notNull = true)
 	public static final String user_extension = "user_extension";
 
 	/**
@@ -241,7 +250,7 @@ public class transfers
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "transaction_timestamp()", ordinalPosition = 12, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "null", ordinalPosition = 13, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -250,7 +259,7 @@ public class transfers
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 13, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 14, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -276,6 +285,14 @@ public class transfers
 	 */
 	@ForeignKey(name = "transfers_denied_id_fkey", references = "bb.transfers", columns = { "denied_id" }, refColumns = { "id" })
 	public static final String bb$transfers$transfers_denied_id_fkey = "transfers_denied_id_fkey";
+
+	/**
+	 * name: transfers_transfer_batch_id_fkey<br>
+	 * references: transfer_batches<br>
+	 * columns: transfer_batch_id
+	 */
+	@ForeignKey(name = "transfers_transfer_batch_id_fkey", references = "bb.transfer_batches", columns = { "transfer_batch_id" }, refColumns = { "id" })
+	public static final String bb$transfer_batches$transfers_transfer_batch_id_fkey = "transfers_transfer_batch_id_fkey";
 
 	/**
 	 * name: transfers_created_by_fkey<br>
@@ -415,6 +432,36 @@ public class transfers
 		 */
 		public java.util.UUID getGroup_id() {
 			Binder binder = data$.getValue("group_id");
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: transfer_batch_id<br>
+		* remarks: 移動伝票一括登録ID<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setTransfer_batch_id(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("transfer_batch_id").getType());
+			data$.setValue("transfer_batch_id", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: transfer_batch_id<br>
+		* remarks: 移動伝票一括登録ID<br>
+		* type: uuid(2147483647)<br>
+		* not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getTransfer_batch_id() {
+			Binder binder = data$.getValue("transfer_batch_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
@@ -786,6 +833,18 @@ public class transfers
 		public sqlassist.bb.transfers.Row $transfers() {
 			return sqlassist.bb.transfers.row(
 				data$.getDataObject(bb$transfers$transfers_denied_id_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 transfer_batches<br>
+		 * 外部キー名 transfers_transfer_batch_id_fkey<br>
+		 * 項目名 transfer_batch_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.transfer_batches.Row $transfer_batches() {
+			return sqlassist.bb.transfer_batches.row(
+				data$.getDataObject(bb$transfer_batches$transfers_transfer_batch_id_fkey));
 		}
 
 		/**
@@ -1878,6 +1937,11 @@ public class transfers
 		public final T group_id;
 
 		/**
+		 * 項目名 transfer_batch_id
+		 */
+		public final T transfer_batch_id;
+
+		/**
 		 * 項目名 transferred_at
 		 */
 		public final T transferred_at;
@@ -1949,6 +2013,9 @@ public class transfers
 			this.group_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfers.group_id);
+			this.transfer_batch_id = builder$.buildColumn(
+				this,
+				sqlassist.bb.transfers.transfer_batch_id);
 			this.transferred_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.transfers.transferred_at);
@@ -2134,6 +2201,19 @@ public class transfers
 				builder$,
 				this,
 				sqlassist.bb.transfers.bb$transfers$transfers_denied_id_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 transfer_batches<br>
+		 * 外部キー名 transfers_transfer_batch_id_fkey<br>
+		 * 項目名 transfer_batch_id
+		 * @return transfer_batches relationship
+		 */
+		public sqlassist.bb.transfer_batches.ExtAssist<T, Many<sqlassist.bb.transfers.Row, M>> $transfer_batches() {
+			return new sqlassist.bb.transfer_batches.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb.transfers.bb$transfer_batches$transfers_transfer_batch_id_fkey);
 		}
 
 		/**

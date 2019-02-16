@@ -24,8 +24,9 @@ class TransferPreparer {
 
 	static void prepareTransfer(
 		UUID transferId,
-		UUID userId,
 		UUID instanceId,
+		UUID batchId,
+		UUID userId,
 		TransferRegisterRequest request,
 		Timestamp createdAt,
 		Transfer transfer,
@@ -41,13 +42,15 @@ class TransferPreparer {
 		transfer.setId(transferId);
 		transfer.setGroup_id(request.group_id);
 
+		transfer.setTransfer_batch_id(batchId);
+
 		request.denied_id.ifPresent(v -> transfer.setDenied_id(v));
 		request.deny_reason.ifPresent(v -> transfer.setDeny_reason(v));
 
 		transfer.setTransferred_at(request.transferred_at);
 
 		transfer.setCreated_at(createdAt);
-		
+
 		request.restored_extension.ifPresentOrElse(
 			v -> transfer.setExtension(v),
 			() -> request.extension.ifPresent(v -> transfer.setExtension(toJson(v))));
@@ -182,6 +185,8 @@ class TransferPreparer {
 		void setId(UUID id);
 
 		void setGroup_id(UUID id);
+
+		void setTransfer_batch_id(UUID id);
 
 		void setDenied_id(UUID id);
 

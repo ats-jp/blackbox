@@ -2,14 +2,20 @@ package jp.ats.blackbox.persistence;
 
 import static org.blendee.sql.Placeholder.$UUID;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import org.blendee.assist.AnonymousTable;
+import org.blendee.jdbc.BResultSet;
 import org.blendee.jdbc.BSQLException;
+import org.blendee.jdbc.Result;
 import org.blendee.sql.InsertDMLBuilder;
 import org.blendee.sql.Recorder;
 import org.blendee.sql.UpdateDMLBuilder;
@@ -19,6 +25,8 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
+import sqlassist.bb.closed_stocks;
+import sqlassist.bb.nodes;
 import sqlassist.bb.transient_bundles;
 import sqlassist.bb.transient_nodes;
 import sqlassist.bb.transient_transfers;
@@ -93,6 +101,9 @@ public class TransientHandler {
 
 		@Override
 		public void setInstance_id(UUID id) {}
+
+		@Override
+		public void setTransfer_batch_id(UUID id) {}
 	}
 
 	public static void registerTransfer(UUID transientId, TransferRegisterRequest request) {
@@ -102,8 +113,9 @@ public class TransientHandler {
 		var userId = SecurityValues.currentUserId();
 		TransferPreparer.prepareTransfer(
 			id,
-			userId,
 			U.NULL_ID,
+			U.NULL_ID,
+			userId,
 			request,
 			new Timestamp(System.currentTimeMillis()),
 			transfer,
@@ -121,8 +133,46 @@ public class TransientHandler {
 		}
 	}
 
-	public TransferRegisterRequest buildTransferRegisterRequest(UUID transientTransferId, Recorder recorder) {
-		var request = new TransferRegisterRequest();
+	public static class TransientMoveRequest {
+
+		public UUID transient_id;
+	}
+
+	public static TransientMoveResult move(UUID batchId, UUID userId, TransientMoveRequest request, Recorder recorder) {
+		var transferHandler = new TransferHandler(recorder);
+
+		var result = new TransientMoveResult();
+
+		transferHandler.registerBatch(batchId, userId);
+
+		buildTransferRegisterRequests(request.transient_id, recorder).forEach(r -> {
+			var transferId = UUID.randomUUID();
+			transferHandler.register(transferId, batchId, userId, r);
+
+			result.transferIds.add(transferId);
+			result.compareAndChange(r.transferred_at);
+		});
+
+		return result;
+	}
+
+	public static class TransientMoveResult {
+
+		public final List<UUID> transferIds = new LinkedList<>();
+
+		public Timestamp firstTransferredAt;
+
+		private void compareAndChange(Timestamp transferredAt) {
+			if (firstTransferredAt == null) {
+				firstTransferredAt = transferredAt;
+			} else {
+				firstTransferredAt = firstTransferredAt.getTime() < transferredAt.getTime() ? firstTransferredAt : transferredAt;
+			}
+		}
+	}
+
+	private static List<TransferRegisterRequest> buildTransferRegisterRequests(UUID transientId, Recorder recorder) {
+		var list = new LinkedList<TransferRegisterRequest>();
 
 		var bundles = new LinkedList<BundleRegisterRequest>();
 
@@ -149,14 +199,21 @@ public class TransientHandler {
 						a.grants_unlimited,
 						a.extension);
 				})
-				.WHERE(a -> a.$transient_bundles().transient_transfer_id.eq($UUID))
+				.WHERE(a -> a.$transient_bundles().$transient_transfers().transient_id.eq($UUID))
+				.ORDER_BY(
+					a -> a.ls(
+						a.$transient_bundles().$transient_transfers().seq,
+						a.$transient_bundles().seq_in_transfer,
+						a.seq_in_bundle))
 				.assist()
 				.$transient_bundles()
 				.$transient_transfers()
 				.intercept(),
-			transientTransferId)
+			transientId)
 			.forEach(transferOne -> {
 				var transfer = transferOne.get();
+
+				var request = new TransferRegisterRequest();
 
 				request.group_id = transfer.getGroup_id();
 				request.transferred_at = transfer.getTransferred_at();
@@ -189,7 +246,7 @@ public class TransientHandler {
 						nodeRequest.owner_id = stock.getOwner_id();
 						nodeRequest.location_id = stock.getLocation_id();
 						nodeRequest.status_id = stock.getStatus_id();
-						nodeRequest.in_out = InOut.of(node.getIn_out()).reverse();
+						nodeRequest.in_out = InOut.of(node.getIn_out());
 						nodeRequest.quantity = node.getQuantity();
 						nodeRequest.grants_unlimited = Optional.of(node.getGrants_unlimited());
 						nodeRequest.restored_extension = Optional.of(node.getExtension());
@@ -201,9 +258,11 @@ public class TransientHandler {
 				});
 
 				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
+
+				list.add(request);
 			});
 
-		return request;
+		return list;
 	}
 
 	private static class Bundle extends transient_bundles.Row implements TransferPreparer.Bundle {
@@ -343,5 +402,134 @@ public class TransientHandler {
 		public Optional<OwnerType> owner_type;
 
 		public long revision;
+	}
+
+	public static void check(UUID transientId, Recorder recorder) {
+		recorder.play(() -> build(), transientId, transientId).aggregate(r -> checkInternal(r, recorder));
+	}
+
+	private static void checkInternal(BResultSet result, Recorder recorder) {
+		UUID currentStockId = null;
+
+		BigDecimal currentStockTotal = null;
+		boolean currentStockUnlimited = false;
+
+		boolean skip = false;
+
+		var errors = new LinkedHashMap<UUID, String>();
+
+		while (result.next()) {
+			var row = new ResultRow(result);
+
+			if (!row.stock_id.equals(currentStockId)) {
+				skip = false;
+
+				currentStockId = row.stock_id;
+
+				//直近のsnapshotを取得
+				var snapshot = TransferHandler.getJustBeforeSnapshot(currentStockId, row.transferred_at, recorder);
+				currentStockTotal = snapshot.total;
+				currentStockUnlimited = snapshot.unlimited;
+			}
+
+			//次のstockまでスキップ
+			if (skip) continue;
+
+			if (row.closed_at != null && row.transferred_at.getTime() <= row.closed_at.getTime()) {
+				errors.put(currentStockId, "");//TODO エラーコードセット
+				skip = true;
+				continue;
+			}
+
+			//すでに無制限と判明していれば
+			if (currentStockUnlimited) continue;
+
+			currentStockUnlimited = currentStockUnlimited | row.grants_unlimited;
+
+			currentStockTotal = row.in_out.calcurate(currentStockTotal, row.quantity);
+
+			if (!currentStockUnlimited && currentStockTotal.compareTo(BigDecimal.ZERO) < 0) {
+				errors.put(currentStockId, "");//TODO エラーコードセット
+				skip = true;
+			}
+		}
+	}
+
+	private static class ResultRow {
+
+		private final UUID stock_id;
+
+		private final boolean grants_unlimited;
+
+		private final InOut in_out;
+
+		private final BigDecimal quantity;
+
+		private final Timestamp transferred_at;
+
+		private final Timestamp closed_at;
+
+		private ResultRow(Result result) {
+			stock_id = UUID.fromString(result.getString("stock_id"));
+			grants_unlimited = result.getBoolean("grants_unlimited");
+			in_out = InOut.of(result.getString("in_out"));
+			quantity = result.getBigDecimal("quantity");
+			transferred_at = result.getTimestamp("transferred_at");
+			closed_at = result.getTimestamp("closed_at");
+		}
+	}
+
+	private static AnonymousTable build() {
+		var inner = new nodes()
+			.SELECT(
+				a -> a.ls(
+					a.any(0).AS("node_type"),
+					a.stock_id,
+					a.grants_unlimited,
+					a.in_out,
+					a.quantity,
+					a.$bundles().$transfers().transferred_at,
+					a.any(
+						"RANK() OVER (ORDER BY {0}, {1}, {2})",
+						a.$bundles().$transfers().transferred_at,
+						a.$bundles().$transfers().created_at,
+						a.seq).AS("seq")))
+			.WHERE(
+				a -> a.EXISTS(
+					new transient_nodes()
+						.SELECT(sa -> sa.any(0))
+						.WHERE(
+							sa -> sa.$transient_bundles().$transient_transfers().transient_id.eq($UUID),
+							sa -> sa.stock_id.eq(a.stock_id),
+
+							//同一時刻のnodeはsnapshotを後で取得した際、織込み済みなので取得しない
+							sa -> sa.$transient_bundles().$transient_transfers().transferred_at.lt(a.$bundles().$transfers().transferred_at))))
+			.UNION_ALL(
+				new transient_nodes()
+					.SELECT(
+						a -> a.ls(
+							a.any(1).AS("node_type"),
+							a.stock_id,
+							a.grants_unlimited,
+							a.in_out,
+							a.quantity,
+							a.$transient_bundles().$transient_transfers().transferred_at,
+							a.any(
+								"RANK() OVER (ORDER BY {0}, {1})",
+								a.$transient_bundles().$transient_transfers().transferred_at,
+								a.$transient_bundles().$transient_transfers().seq) //transferred_atが同一であれば生成順
+								.AS("seq")))
+					.WHERE(a -> a.$transient_bundles().$transient_transfers().transient_id.eq($UUID)))
+			.ORDER_BY(
+				a -> a.ls(
+					a.any("stock_id"),
+					a.any("transferred_at"),
+					a.any("node_type"), //transient_nodesよりnodesが先
+					a.any("seq")));
+
+		return new AnonymousTable(inner, "unioned_nodes")
+			.LEFT_OUTER_JOIN(
+				new closed_stocks().SELECT(a -> a.$closings().closed_at))
+			.ON((l, r) -> l.col("stock_id").eq(r.id));
 	}
 }
