@@ -103,6 +103,9 @@ public class TransientHandler {
 
 	public static void registerTransfer(UUID transientId, TransferRegisterRequest request) {
 		var id = UUID.randomUUID();
+
+		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, transient_transfers.$TABLE, id));
+
 		var transfer = new Transfer();
 		var userId = SecurityValues.currentUserId();
 		TransferPreparer.prepareTransfer(
@@ -110,6 +113,7 @@ public class TransientHandler {
 			userId,
 			U.NULL_ID,
 			request,
+			new Timestamp(System.currentTimeMillis()),
 			transfer,
 			U.recorder);
 
@@ -123,7 +127,7 @@ public class TransientHandler {
 		}
 	}
 
-	public TransferRegisterRequest buildTransferRegisterRequest(UUID transientTransferId, UUID transferId, UUID userId, Recorder recorder) {
+	public TransferRegisterRequest buildTransferRegisterRequest(UUID transientTransferId, Recorder recorder) {
 		var request = new TransferRegisterRequest();
 
 		var bundles = new LinkedList<BundleRegisterRequest>();

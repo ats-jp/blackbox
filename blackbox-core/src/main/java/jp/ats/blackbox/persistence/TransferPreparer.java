@@ -27,6 +27,7 @@ class TransferPreparer {
 		UUID userId,
 		UUID instanceId,
 		TransferRegisterRequest request,
+		Timestamp createdAt,
 		Transfer transfer,
 		Recorder recorder) {
 		var group = recorder.play(() -> new groups().SELECT(a -> a.ls(a.extension, a.$orgs().extension)))
@@ -45,6 +46,8 @@ class TransferPreparer {
 
 		transfer.setTransferred_at(request.transferred_at);
 
+		transfer.setCreated_at(createdAt);
+		
 		request.restored_extension.ifPresentOrElse(
 			v -> transfer.setExtension(v),
 			() -> request.extension.ifPresent(v -> transfer.setExtension(toJson(v))));
@@ -185,6 +188,8 @@ class TransferPreparer {
 		void setDeny_reason(String reason);
 
 		void setTransferred_at(Timestamp transferredAt);
+
+		void setCreated_at(Timestamp createdAt);
 
 		void setExtension(Object json);
 

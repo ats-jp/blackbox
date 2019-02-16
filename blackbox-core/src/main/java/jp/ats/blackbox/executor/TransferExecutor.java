@@ -18,8 +18,6 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.ClosingHandler;
 import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
 import jp.ats.blackbox.persistence.JsonHelper;
-import jp.ats.blackbox.persistence.Retry;
-import jp.ats.blackbox.persistence.TooMatchRetryException;
 import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler;
@@ -91,28 +89,10 @@ public class TransferExecutor {
 		return promise;
 	}
 
-	private static final int retry = 3;
-
 	private static void execute(Event event) {
 		try {
 			Blendee.execute(t -> {
-				int counter = 0;
-				while (true) {
-					try {
-						event.command.execute();
-					} catch (Retry r) {
-						logger.warn(r.getMessage(), r);
-
-						if (++counter >= retry) {
-							throw new TooMatchRetryException();
-						}
-
-						t.rollback();
-						continue;
-					}
-
-					break;
-				}
+				event.command.execute();
 
 				//他スレッドに更新が見えるようにcommit
 				t.commit();

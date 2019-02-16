@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.blendee.assist.Vargs;
 import org.blendee.jdbc.BSQLException;
+import org.blendee.jdbc.BlendeeManager;
 import org.blendee.jdbc.exception.CheckConstraintViolationException;
 import org.blendee.jdbc.exception.UniqueConstraintViolationException;
 import org.blendee.sql.Recorder;
@@ -41,6 +42,22 @@ public class TransferHandler {
 
 	private final Recorder recorder = Recorder.newAsyncInstance();
 
+	private long time = System.currentTimeMillis();
+
+	private Timestamp uniqueTime() {
+		while (true) {
+			var current = System.currentTimeMillis();
+			if (current == time) {
+				Thread.yield();
+				continue;
+			}
+
+			time = current;
+
+			return new Timestamp(time);
+		}
+	}
+
 	private UUID instanceId;
 
 	private UUID instanceId() {
@@ -56,17 +73,35 @@ public class TransferHandler {
 	 * transfer登録処理
 	 */
 	public void register(UUID transferId, UUID userId, TransferRegisterRequest request) {
+		//タグ重複発生でrollbackするため先頭で処理
+		while (true) {
+			try {
+				request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
+					var table = new transfers_tags();
+					tagIds.forEach(tagId -> {
+						recorder.play(() -> table.INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
+					});
+				}));
+
+				break;
+			} catch (UniqueConstraintViolationException e) {
+				//他のorg, groupのtransfer登録処理が僅差で同じtagを登録した場合エラーとなるので再登録対象
+				BlendeeManager.get().getCurrentTransaction().rollback();
+				continue;
+			}
+		}
+
 		//初期化
 		nodeSeq = 0;
 
 		var transfer = new Transfer();
-		TransferPreparer.prepareTransfer(transferId, userId, instanceId(), request, transfer, recorder);
+
+		var createdAt = uniqueTime();
+
+		TransferPreparer.prepareTransfer(transferId, userId, instanceId(), request, createdAt, transfer, recorder);
 
 		try {
 			transfer.insert();
-		} catch (UniqueConstraintViolationException e) {
-			//同一groupで全く同一時刻に登録した場合、UNIQUE違反エラーとなるので再登録対象
-			throw new Retry(e);
 		} catch (BSQLException e) {
 			//既に締められているグループの場合
 			var matcher = Pattern.compile("closed_check\\(\\): (\\{[^\\}]+\\})").matcher(e.getMessage());
@@ -77,19 +112,15 @@ public class TransferHandler {
 			throw new AlreadyClosedGroupException(error, e);
 		}
 
-		Arrays.stream(request.bundles).forEach(r -> registerBundle(userId, transferId, request.group_id, request.transferred_at, r));
-
-		try {
-			request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
-				var table = new transfers_tags();
-				tagIds.forEach(tagId -> {
-					recorder.play(() -> table.INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
-				});
-			}));
-		} catch (UniqueConstraintViolationException e) {
-			//他のorg, groupのtransfer登録処理が僅差で同じtagを登録した場合エラーとなるので再登録対象
-			throw new Retry(e);
-		}
+		Arrays.stream(request.bundles)
+			.forEach(
+				r -> registerBundle(
+					userId,
+					transferId,
+					request.group_id,
+					request.transferred_at,
+					createdAt,
+					r));
 
 		//jobを登録し、別プロセスで現在数量を更新させる
 		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($UUID), transferId).execute();
@@ -116,6 +147,7 @@ public class TransferHandler {
 		UUID transferId,
 		UUID groupId,
 		Timestamp transferredAt,
+		Timestamp createdAt,
 		BundleRegisterRequest request) {
 		var bundle = new Bundle();
 
@@ -125,7 +157,15 @@ public class TransferHandler {
 
 		bundle.insert();
 
-		Arrays.stream(request.nodes).forEach(r -> registerNode(userId, bundleId, groupId, transferredAt, r));
+		Arrays.stream(request.nodes)
+			.forEach(
+				r -> registerNode(
+					userId,
+					bundleId,
+					groupId,
+					transferredAt,
+					createdAt,
+					r));
 	}
 
 	private class Node extends nodes.Row implements TransferPreparer.Node {}
@@ -138,6 +178,7 @@ public class TransferHandler {
 		UUID bundleId,
 		UUID groupId,
 		Timestamp transferredAt,
+		Timestamp createdAt,
 		NodeRegisterRequest request) {
 		UUID nodeId = UUID.randomUUID();
 		var node = new Node();
@@ -168,6 +209,7 @@ public class TransferHandler {
 						a.stock_id,
 						a.transfer_group_id,
 						a.transferred_at,
+						a.created_at,
 						a.node_seq,
 						a.updated_by)
 					.VALUES(
@@ -177,6 +219,7 @@ public class TransferHandler {
 						$UUID,
 						$UUID,
 						$TIMESTAMP,
+						$TIMESTAMP,
 						$INT,
 						$UUID)),
 			nodeId,
@@ -185,6 +228,7 @@ public class TransferHandler {
 			stockId,
 			groupId,
 			transferredAt,
+			createdAt,
 			nodeSeq,
 			userId)
 			.execute();

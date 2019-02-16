@@ -762,14 +762,13 @@ CREATE TABLE bb.transfers (
 	org_extension jsonb NOT NULL,
 	group_extension jsonb NOT NULL,
 	user_extension jsonb NOT NULL,
-	created_at timestamptz DEFAULT transaction_timestamp() NOT NULL,
+	created_at timestamptz NOT NULL, --Javaから指定するためDEFAULTなし
 	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, created_at)); 
 --log対象外
 --created_atをUNIQUEにするために一件毎にcommitすること
 --順序を一意付けするためにcreated_atをUNIQUE化、他DBから移行してきたtransferのcreated_atと重複しないようにgroup_idも含める
 --groupは単一instance内でのみ動かすのでcreated_atが重複することはないはず
---transaction_timestamp()はnow()と同等だが、仕様として何を必要としているかを明確にするために使用している
 
 COMMENT ON TABLE bb.transfers IS '移動伝票';
 COMMENT ON COLUMN bb.transfers.id IS 'ID';
@@ -799,6 +798,7 @@ INSERT INTO bb.transfers (
 	org_extension,
 	group_extension,
 	user_extension,
+	created_at,
 	created_by
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
@@ -809,6 +809,7 @@ INSERT INTO bb.transfers (
 	'{}',
 	'{}',
 	'{}',
+	now(),
 	'00000000-0000-0000-0000-000000000000');
 
 --締め済グループチェック
@@ -927,15 +928,13 @@ CREATE UNLOGGED TABLE bb.snapshots (
 	transfer_group_id uuid REFERENCES bb.groups NOT NULL,
 	stock_id uuid REFERENCES bb.stocks NOT NULL,
 	transferred_at timestamptz NOT NULL,
-	created_at timestamptz DEFAULT transaction_timestamp() NOT NULL, 
+	created_at timestamptz NOT NULL, --transfers.created_atと同一時間をJavaから指定するためDEFAULTなし
 	node_seq integer NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時transfersから復元する必要あり
 --頻繁に参照、更新されることが予想されるので締め済のデータは削除する
---transaction_timestamp()はnow()と同等だが、仕様として何を必要としているかを明確にするために使用している
---トランザクション開始時刻を返すのでtransfers.created_atと同一となるため、transfers.created_atを参照する必要がなくなる
 
 COMMENT ON TABLE bb.snapshots IS '移動ノード状態
 transferred_at時点でのstockの状態';
@@ -969,6 +968,7 @@ INSERT INTO bb.snapshots (
 	transfer_group_id,
 	stock_id,
 	transferred_at,
+	created_at,
 	node_seq,
 	updated_by
 ) VALUES (
@@ -979,6 +979,7 @@ INSERT INTO bb.snapshots (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'1900-1-1'::timestamptz,
+	now(),
 	0,
 	'00000000-0000-0000-0000-000000000000');
 
