@@ -2,11 +2,15 @@ package jp.ats.blackbox.persistence;
 
 import static org.blendee.sql.Placeholder.$UUID;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.blendee.assist.AnonymousTable;
+import org.blendee.jdbc.BResultSet;
+import org.blendee.jdbc.Result;
 import org.blendee.sql.InsertDMLBuilder;
 import org.blendee.sql.Recorder;
 import org.blendee.sql.UpdateDMLBuilder;
@@ -22,7 +26,6 @@ import sqlassist.bb.transient_bundles;
 import sqlassist.bb.transient_nodes;
 import sqlassist.bb.transient_transfers;
 import sqlassist.bb.transients;
-import sqlassist.bb.transients.Row;
 
 public class TransientHandler {
 
@@ -195,7 +198,7 @@ public class TransientHandler {
 			}
 
 			@Override
-			UUID getOwnerId(Row row) {
+			UUID getOwnerId(transients.Row row) {
 				return row.getGroup_id();
 			}
 		},
@@ -210,7 +213,7 @@ public class TransientHandler {
 			}
 
 			@Override
-			UUID getOwnerId(Row row) {
+			UUID getOwnerId(transients.Row row) {
 				return row.getUser_id();
 			}
 		};
@@ -256,10 +259,62 @@ public class TransientHandler {
 		public long revision;
 	}
 
-	//TODO 途中
 	public static void check(UUID transientId, Recorder recorder) {
-		recorder.play(() -> build(), transientId, transientId).aggregate();
+		recorder.play(() -> build(), transientId, transientId).aggregate(r -> checkInternal(r, recorder));
+	}
 
+	private static void checkInternal(BResultSet result, Recorder recorder) {
+		UUID currentStockId = null;
+
+		BigDecimal currentStockTotal = null;
+		boolean currentStockUnlimited = false;
+
+		while (result.next()) {
+			var row = new ResultRow(result);
+
+			if (row.transferred_at.getTime() <= row.closed_at.getTime()) throw new InvalidTransientException();
+
+			if (!row.stock_id.equals(currentStockId)) {
+				currentStockId = row.stock_id;
+
+				var snapshot = TransferHandler.getJustBeforeSnapshot(currentStockId, row.transferred_at, recorder);
+				currentStockTotal = snapshot.total;
+				currentStockUnlimited = snapshot.unlimited;
+			}
+
+			//すでに無制限と判明していれば
+			if (currentStockUnlimited) continue;
+
+			currentStockUnlimited = currentStockUnlimited | row.grants_unlimited;
+
+			currentStockTotal = row.in_out.calcurate(currentStockTotal, row.quantity);
+
+			if (!currentStockUnlimited && currentStockTotal.compareTo(BigDecimal.ZERO) < 0) throw new InvalidTransientException();
+		}
+	}
+
+	private static class ResultRow {
+
+		private final UUID stock_id;
+
+		private final boolean grants_unlimited;
+
+		private final InOut in_out;
+
+		private final BigDecimal quantity;
+
+		private final Timestamp transferred_at;
+
+		private final Timestamp closed_at;
+
+		private ResultRow(Result result) {
+			stock_id = UUID.fromString(result.getString("stock_id"));
+			grants_unlimited = result.getBoolean("grants_unlimited");
+			in_out = InOut.of(result.getString("in_out"));
+			quantity = result.getBigDecimal("quantity");
+			transferred_at = result.getTimestamp("transferred_at");
+			closed_at = result.getTimestamp("closed_at");
+		}
 	}
 
 	private static AnonymousTable build() {
@@ -269,6 +324,7 @@ public class TransientHandler {
 					a.any(0).AS("node_type"),
 					a.stock_id,
 					a.grants_unlimited,
+					a.in_out,
 					a.quantity,
 					a.$bundles().$transfers().transferred_at,
 					a.any(
@@ -293,6 +349,7 @@ public class TransientHandler {
 							a.any(1).AS("node_type"),
 							a.stock_id,
 							a.grants_unlimited,
+							a.in_out,
 							a.quantity,
 							a.$transient_bundles().$transient_transfers().transferred_at,
 							a.any(
@@ -305,10 +362,10 @@ public class TransientHandler {
 				a -> a.ls(
 					a.any("stock_id"),
 					a.any("transferred_at"),
-					a.any("node_type"), //nodesが先
+					a.any("node_type"), //transient_nodesよりnodesが先
 					a.any("seq")));
 
-		return new AnonymousTable(inner, "union_nodes")
+		return new AnonymousTable(inner, "unioned_nodes")
 			.LEFT_OUTER_JOIN(
 				new closed_stocks().SELECT(a -> a.$closings().closed_at))
 			.ON((l, r) -> l.col("stock_id").eq(r.id));

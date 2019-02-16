@@ -80,14 +80,4 @@ public class JobHandler {
 				return U.convert(result.getTimestamp(1));
 			});
 	}
-
-	public static void executeTransient(LocalDateTime time) {
-		//TODO transient用
-		//jobsの代わりにtransient_transfersを使用する
-	}
-
-	public static LocalDateTime getNextTimeTransient() {
-		//TODO transient用
-		return null;
-	}
 }

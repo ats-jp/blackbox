@@ -215,7 +215,6 @@ public class TransferHandler {
 		}
 	}
 
-	//TODO 途中
 	//直近のsnapshotを取得
 	static JustBeforeSnapshot getJustBeforeSnapshot(UUID stockId, Timestamp transferredAt, Recorder recorder) {
 		return recorder.play(
@@ -252,9 +251,9 @@ public class TransferHandler {
 	 */
 	static class JustBeforeSnapshot {
 
-		private BigDecimal total;
+		BigDecimal total;
 
-		private boolean unlimited;
+		boolean unlimited;
 	}
 
 	public Timestamp deny(UUID transferId, UUID userId, TransferDenyRequest denyRequest) {

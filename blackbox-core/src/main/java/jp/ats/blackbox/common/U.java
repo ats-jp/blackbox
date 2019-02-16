@@ -25,7 +25,7 @@ public class U {
 
 	public static final UUID PRIVILEGE_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-	public static final Recorder recorder = Recorder.getInstance();
+	public static final Recorder recorder = Recorder.instance();
 
 	public static LocalDateTime convert(Timestamp timestamp) {
 		return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());

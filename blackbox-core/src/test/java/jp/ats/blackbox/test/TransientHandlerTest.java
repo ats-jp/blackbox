@@ -29,7 +29,7 @@ public class TransientHandlerTest {
 				TransientHandler.registerTransfer(transientId, TransferHandlerTest.createRequest(U.NULL_ID));
 			});
 
-			TransientHandler.check(transientId, Recorder.getInstance());
+			TransientHandler.check(transientId, Recorder.instance());
 
 			SecurityValues.end();
 		});
