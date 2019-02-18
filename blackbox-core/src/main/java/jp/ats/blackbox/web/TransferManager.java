@@ -36,11 +36,5 @@ public class TransferManager implements ServletContextListener {
 		} catch (Throwable t) {
 			logger.fatal(t.getMessage(), t);
 		}
-
-		try {
-			JobExecutor.stop();
-		} catch (Throwable t) {
-			logger.fatal(t.getMessage(), t);
-		}
 	}
 }

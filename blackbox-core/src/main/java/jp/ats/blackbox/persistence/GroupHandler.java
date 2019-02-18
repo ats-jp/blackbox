@@ -15,6 +15,7 @@ import org.blendee.jdbc.exception.UniqueConstraintViolationException;
 import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.executor.TagExecutor;
 import sqlassist.bb.groups;
 import sqlassist.bb.locking_groups;
 import sqlassist.bb.relationships;
@@ -126,7 +127,7 @@ public class GroupHandler {
 
 			row.insert();
 
-			request.tags.ifPresent(v -> TagHandler.stickTags(v, groups.$TABLE, id));
+			request.tags.ifPresent(v -> TagExecutor.stickTags(v, id, groups.$TABLE));
 
 			registerRelationships(id, id, U.LONG_NULL_ID);
 

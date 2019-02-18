@@ -2,6 +2,7 @@ package jp.ats.blackbox.test;
 
 import java.sql.Timestamp;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -10,8 +11,8 @@ import org.apache.logging.log4j.Logger;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TransferExecutor;
-import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
+import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
 
 public class TransferAndClosingTest {
@@ -28,6 +29,8 @@ public class TransferAndClosingTest {
 	}
 
 	static void execute(UUID group, int transfers, int threads) {
+		AtomicInteger counter = new AtomicInteger(0);
+
 		var executor = new TransferExecutor();
 
 		executor.start();
@@ -71,6 +74,8 @@ public class TransferAndClosingTest {
 					return;
 				}
 			});
+
+			counter.incrementAndGet();
 		};
 
 		IntStream.range(0, threads).forEach(i -> {
@@ -81,14 +86,16 @@ public class TransferAndClosingTest {
 
 		while (true) {
 			try {
-				Thread.sleep(1000);
-				System.gc();
+				Thread.sleep(100);
+
+				if (counter.get() == threads) break;
 			} catch (Exception e) {
 				break;
 			}
 		}
 
+		System.gc();
+
 		executor.stop();
-		JobExecutor.stop();
 	}
 }

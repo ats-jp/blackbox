@@ -17,7 +17,11 @@ public class JobExecutor {
 
 	private static final Logger logger = LogManager.getLogger(JobExecutor.class);
 
-	private static final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+	private static final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor(r -> {
+		var thread = Executors.defaultThreadFactory().newThread(r);
+		thread.setDaemon(true);//daemonスレッドを使用
+		return thread;
+	});
 
 	private static final ReentrantLock lock = new ReentrantLock();
 
@@ -37,10 +41,6 @@ public class JobExecutor {
 		} finally {
 			lock.unlock();
 		}
-	}
-
-	public static void stop() {
-		service.shutdown();
 	}
 
 	private static void execute() {

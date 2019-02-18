@@ -11,6 +11,7 @@ import org.blendee.jdbc.Result;
 import org.blendee.jdbc.TablePath;
 import org.blendee.util.GenericTable;
 
+import jp.ats.blackbox.executor.TagExecutor;
 import jp.ats.blackbox.persistence.StockComponent.ForcibleUpdateRequest;
 import jp.ats.blackbox.persistence.StockComponent.RegisterRequest;
 import jp.ats.blackbox.persistence.StockComponent.UpdateRequest;
@@ -58,7 +59,7 @@ public class StockComponentHandler {
 
 		row.insert();
 
-		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, uuid));
+		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, uuid, table));
 
 		return uuid;
 	}
@@ -76,7 +77,7 @@ public class StockComponentHandler {
 			a.col(updated_at).setAny("now()");
 		}).WHERE(a -> a.col(id).eq(request.id).AND.col(revision).eq(request.revision)).execute();
 
-		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, request.id));
+		request.tags.ifPresent(tags -> TagExecutor.stickTagsAgain(tags, request.id, table));
 
 		if (result != 1) throw Utils.decisionException(table, request.id);
 	}
@@ -94,7 +95,7 @@ public class StockComponentHandler {
 			a.col(updated_at).setAny("now()");
 		}).WHERE(a -> a.col(id).eq(request.id)).execute();
 
-		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, table, request.id));
+		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, request.id, table));
 
 		if (result != 1) throw Utils.decisionException(table, request.id);
 	}

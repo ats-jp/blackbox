@@ -66,6 +66,5 @@ public class TransferErrorTest {
 		}
 
 		executor.stop();
-		JobExecutor.stop();
 	}
 }

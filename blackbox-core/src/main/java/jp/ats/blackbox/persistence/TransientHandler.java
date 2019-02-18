@@ -22,6 +22,7 @@ import org.blendee.sql.UpdateDMLBuilder;
 import org.blendee.sql.Updater;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.executor.TagExecutor;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
@@ -126,7 +127,7 @@ public class TransientHandler {
 
 		transfer.insert();
 
-		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, transient_transfers.$TABLE, id));
+		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, id, transient_transfers.$TABLE));
 
 		for (int i = 0; i < request.bundles.length; i++) {
 			registerBundle(userId, id, request.bundles[i], i + 1);

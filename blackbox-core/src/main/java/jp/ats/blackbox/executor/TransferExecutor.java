@@ -60,6 +60,10 @@ public class TransferExecutor {
 		disruptor.shutdown();
 	}
 
+	public boolean isEmpty() {
+		return bufferSize - ringBuffer.remainingCapacity() == 0;
+	}
+
 	public TransferPromise registerTransfer(UUID userId, Supplier<TransferRegisterRequest> requestSupplier) {
 		var promise = new TransferPromise();
 

@@ -23,6 +23,7 @@ import org.blendee.sql.Recorder;
 import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.executor.TagExecutor;
 import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
@@ -98,12 +99,9 @@ public class TransferHandler {
 			throw new AlreadyClosedGroupException(error, e);
 		}
 
-		request.tags.ifPresent(tags -> TagHandler.stickTags(tags, tagIds -> {
-			var table = new transfers_tags();
-			tagIds.forEach(tagId -> {
-				recorder.play(() -> table.INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
-			});
-		}, recorder));
+		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, tagId -> {
+			recorder.play(() -> new transfers_tags().INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
+		}));
 
 		Arrays.stream(request.bundles)
 			.forEach(

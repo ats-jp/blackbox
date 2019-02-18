@@ -1,6 +1,7 @@
 package jp.ats.blackbox.test;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -26,6 +27,8 @@ public class TransferExecutorTest {
 	}
 
 	static void execute(UUID group, int transfers, int threads) {
+		AtomicInteger counter = new AtomicInteger(0);
+
 		var executor = new TransferExecutor();
 
 		executor.start();
@@ -57,6 +60,8 @@ public class TransferExecutorTest {
 					return;
 				}
 			});
+
+			counter.incrementAndGet();
 		};
 
 		IntStream.range(0, threads).forEach(i -> {
@@ -67,14 +72,16 @@ public class TransferExecutorTest {
 
 		while (true) {
 			try {
-				Thread.sleep(1000);
-				System.gc();
+				Thread.sleep(100);
+
+				if (counter.get() == threads) break;
 			} catch (Exception e) {
 				break;
 			}
 		}
 
+		System.gc();
+
 		executor.stop();
-		JobExecutor.stop();
 	}
 }
