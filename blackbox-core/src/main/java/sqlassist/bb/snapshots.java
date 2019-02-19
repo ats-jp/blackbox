@@ -211,7 +211,7 @@ public class snapshots
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻\n検索高速化のためtransfers.created_atをここに持つ", defaultValue = "transaction_timestamp()", ordinalPosition = 8, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻\n検索高速化のためtransfers.created_atをここに持つ", defaultValue = "null", ordinalPosition = 8, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**

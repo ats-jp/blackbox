@@ -3,7 +3,7 @@ package jp.ats.blackbox.test;
 import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
+import jp.ats.blackbox.persistence.TransferHandler.TransferRegisterRequest;
 
 public class JsonTest {
 

@@ -32,12 +32,14 @@ public class UserHandler {
 		Optional<String> name,
 		Optional<UUID> groupId,
 		Optional<String> extension,
+		Optional<String[]> tags,
 		Optional<Boolean> active) {
 		int result = new users().UPDATE(a -> {
 			a.revision.set(revision + 1);
 			name.ifPresent(v -> a.name.set(v));
 			groupId.ifPresent(v -> a.group_id.set(v));
-			extension.ifPresent(v -> a.extension.set(v));
+			extension.ifPresent(v -> a.extension.set(JsonHelper.toJson(v)));
+			tags.ifPresent(v -> a.tags.set((Object) v));
 			active.ifPresent(v -> a.active.set(v));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");

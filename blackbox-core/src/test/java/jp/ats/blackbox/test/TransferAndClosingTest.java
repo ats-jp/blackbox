@@ -13,7 +13,7 @@ import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TransferExecutor;
 import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
 import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
+import jp.ats.blackbox.persistence.TransferHandler.TransferDenyRequest;
 
 public class TransferAndClosingTest {
 
@@ -50,7 +50,7 @@ public class TransferAndClosingTest {
 
 					var denyPromise = executor.denyTransfer(U.NULL_ID, () -> {
 						var req = new TransferDenyRequest();
-						req.denyId = newId;
+						req.deny_id = newId;
 						return req;
 					});
 

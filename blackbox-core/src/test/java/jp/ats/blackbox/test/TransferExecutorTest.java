@@ -1,5 +1,6 @@
 package jp.ats.blackbox.test;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -11,7 +12,7 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TransferExecutor;
 import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
+import jp.ats.blackbox.persistence.TransferHandler.TransferDenyRequest;
 
 public class TransferExecutorTest {
 
@@ -48,7 +49,8 @@ public class TransferExecutorTest {
 
 					var denyPromise = executor.denyTransfer(U.NULL_ID, () -> {
 						var req = new TransferDenyRequest();
-						req.denyId = newId;
+						req.deny_id = newId;
+						req.deny_reason = Optional.of("deny reson");
 						return req;
 					});
 

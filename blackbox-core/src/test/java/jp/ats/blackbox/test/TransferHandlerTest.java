@@ -12,9 +12,9 @@ import org.blendee.util.Blendee;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
-import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
-import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
-import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
+import jp.ats.blackbox.persistence.TransferHandler.BundleRegisterRequest;
+import jp.ats.blackbox.persistence.TransferHandler.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.TransferHandler.TransferRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler;
 
 public class TransferHandlerTest {

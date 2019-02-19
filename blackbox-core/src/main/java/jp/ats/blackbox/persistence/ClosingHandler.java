@@ -48,7 +48,7 @@ public class ClosingHandler {
 			request.group_id)
 			.aggregate(r -> {
 				while (r.next()) {
-					UUID groupId = UUID.fromString(r.getString(relationships.child_id));
+					UUID groupId = U.uuid(r, relationships.child_id);
 
 					closeGroup(groupId, request.closed_at, closingId, userId, batch);
 				}
@@ -123,7 +123,7 @@ public class ClosingHandler {
 						r.getBoolean(snapshots.unlimited),
 						r.getBigDecimal(snapshots.total),
 						userId,
-						UUID.fromString(r.getString(snapshots.stock_id)))
+						U.uuid(r, snapshots.stock_id))
 						.execute(batch);
 				}
 			});

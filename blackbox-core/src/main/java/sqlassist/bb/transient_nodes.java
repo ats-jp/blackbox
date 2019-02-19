@@ -163,10 +163,10 @@ public class transient_nodes
 	/**
 	 * name: in_out<br>
 	 * remarks: 入出庫区分<br>
-	 * type: char(1)<br>
+	 * type: int2(5)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "in_out", type = 1, typeName = "char", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "入出庫区分", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "in_out", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "入出庫区分", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String in_out = "in_out";
 
 	/**
@@ -447,11 +447,11 @@ public class transient_nodes
 		 * setter
 		 * name: in_out<br>
 		* remarks: 入出庫区分<br>
-		* type: char(1)<br>
+		* type: int2(5)<br>
 		* not null: true<br>
-		 * @param value java.lang.String
+		 * @param value java.lang.Integer
 		 */
-		public void setIn_out(java.lang.String value) {
+		public void setIn_out(java.lang.Integer value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
@@ -464,13 +464,13 @@ public class transient_nodes
 		 * getter
 		 * name: in_out<br>
 		* remarks: 入出庫区分<br>
-		* type: char(1)<br>
+		* type: int2(5)<br>
 		* not null: true<br>
-		 * @return java.lang.String
+		 * @return java.lang.Integer
 		 */
-		public java.lang.String getIn_out() {
+		public java.lang.Integer getIn_out() {
 			Binder binder = data$.getValue("in_out");
-			return (java.lang.String) binder.getValue();
+			return (java.lang.Integer) binder.getValue();
 		}
 
 		/**

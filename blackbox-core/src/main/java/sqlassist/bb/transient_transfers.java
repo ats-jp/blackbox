@@ -172,10 +172,11 @@ public class transient_transfers
 	/**
 	 * name: seq<br>
 	 * remarks: DB内生成順<br>
+	 * transferred_atが同一の場合、優先順を決定<br>
 	 * type: bigserial(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "DB内生成順", defaultValue = "nextval('bb.transient_transfers_seq_seq'::regclass)", ordinalPosition = 5, notNull = true)
+	@Column(name = "seq", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "DB内生成順\ntransferred_atが同一の場合、優先順を決定", defaultValue = "nextval('bb.transient_transfers_seq_seq'::regclass)", ordinalPosition = 5, notNull = true)
 	public static final String seq = "seq";
 
 	/**
@@ -197,21 +198,12 @@ public class transient_transfers
 	public static final String tags = "tags";
 
 	/**
-	 * name: completed<br>
-	 * remarks: 実施済フラグ<br>
-	 * type: bool(1)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "completed", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "実施済フラグ", defaultValue = "false", ordinalPosition = 8, notNull = true)
-	public static final String completed = "completed";
-
-	/**
 	 * name: revision<br>
 	 * remarks: リビジョン番号<br>
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 9, notNull = true)
+	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 8, notNull = true)
 	public static final String revision = "revision";
 
 	/**
@@ -220,7 +212,7 @@ public class transient_transfers
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 10, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 9, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -229,7 +221,7 @@ public class transient_transfers
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 11, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 10, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -238,7 +230,7 @@ public class transient_transfers
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 12, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 11, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -247,7 +239,7 @@ public class transient_transfers
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 13, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 12, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -477,6 +469,7 @@ public class transient_transfers
 		 * setter
 		 * name: seq<br>
 		* remarks: DB内生成順<br>
+		* transferred_atが同一の場合、優先順を決定<br>
 		* type: bigserial(19)<br>
 		* not null: true<br>
 		 * @param value java.lang.Long
@@ -494,6 +487,7 @@ public class transient_transfers
 		 * getter
 		 * name: seq<br>
 		* remarks: DB内生成順<br>
+		* transferred_atが同一の場合、優先順を決定<br>
 		* type: bigserial(19)<br>
 		* not null: true<br>
 		 * @return java.lang.Long
@@ -561,36 +555,6 @@ public class transient_transfers
 		public java.lang.Object getTags() {
 			Binder binder = data$.getValue("tags");
 			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: completed<br>
-		* remarks: 実施済フラグ<br>
-		* type: bool(1)<br>
-		* not null: true<br>
-		 * @param value java.lang.Boolean
-		 */
-		public void setCompleted(java.lang.Boolean value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("completed").getType());
-			data$.setValue("completed", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: completed<br>
-		* remarks: 実施済フラグ<br>
-		* type: bool(1)<br>
-		* not null: true<br>
-		 * @return java.lang.Boolean
-		 */
-		public java.lang.Boolean getCompleted() {
-			Binder binder = data$.getValue("completed");
-			return (java.lang.Boolean) binder.getValue();
 		}
 
 		/**
@@ -1894,11 +1858,6 @@ public class transient_transfers
 		public final T tags;
 
 		/**
-		 * 項目名 completed
-		 */
-		public final T completed;
-
-		/**
 		 * 項目名 revision
 		 */
 		public final T revision;
@@ -1955,9 +1914,6 @@ public class transient_transfers
 			this.tags = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_transfers.tags);
-			this.completed = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_transfers.completed);
 			this.revision = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_transfers.revision);

@@ -29,7 +29,9 @@ public class TransientHandlerTest {
 				TransientHandler.registerTransfer(transientId, TransferHandlerTest.createRequest(U.NULL_ID));
 			});
 
-			TransientHandler.check(transientId, U.recorder);
+			TransientHandler.check(transientId, (e, c) -> {
+				System.out.println(e);
+			});
 
 			UUID batchId = UUID.randomUUID();
 

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import org.blendee.assist.Vargs;
@@ -24,10 +25,7 @@ import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
-import jp.ats.blackbox.persistence.TransferComponent.BundleRegisterRequest;
-import jp.ats.blackbox.persistence.TransferComponent.NodeRegisterRequest;
-import jp.ats.blackbox.persistence.TransferComponent.TransferDenyRequest;
-import jp.ats.blackbox.persistence.TransferComponent.TransferRegisterRequest;
+import jp.ats.blackbox.persistence.StockHandler.StockComponents;
 import sqlassist.bb.bundles;
 import sqlassist.bb.jobs;
 import sqlassist.bb.nodes;
@@ -40,6 +38,177 @@ import sqlassist.bb.transfers_tags;
  * transfer操作クラス
  */
 public class TransferHandler {
+
+	/**
+	 * transfer登録に必要な情報クラス
+	 */
+	public static class TransferRegisterRequest {
+
+		/**
+		 * このtransferが属するグループ
+		 * 必須
+		 */
+		public UUID group_id;
+
+		/**
+		 * 移動時刻
+		 * 必須
+		 */
+		public Timestamp transferred_at;
+
+		/**
+		 * 打消し元のtransfer_id
+		 */
+		public Optional<UUID> denied_id = Optional.empty();
+
+		public Optional<String> deny_reason = Optional.empty();
+
+		/**
+		 * 追加情報JSON
+		 */
+		public Optional<String> extension = Optional.empty();
+
+		/**
+		 * DBから復元した追加情報JSON
+		 */
+		Optional<Object> restored_extension = Optional.empty();
+
+		/**
+		 * 検索用タグ
+		 */
+		public Optional<String[]> tags = Optional.empty();
+
+		/**
+		 * 配下のbundle
+		 * 必須
+		 */
+		public BundleRegisterRequest[] bundles;
+	}
+
+	/**
+	 * bundle登録に必要な情報クラス
+	 */
+	public static class BundleRegisterRequest {
+
+		/**
+		 * 追加情報JSON
+		 */
+		public Optional<String> extension = Optional.empty();
+
+		/**
+		 * DBから復元した追加情報JSON
+		 */
+		Optional<Object> restored_extension = Optional.empty();
+
+		/**
+		 * 配下のnode
+		 * 必須
+		 */
+		public NodeRegisterRequest[] nodes;
+	}
+
+	/**
+	 * node登録に必要な情報クラス
+	 */
+	public static class NodeRegisterRequest implements StockComponents {
+
+		/**
+		 * stockの所属するグループ
+		 * stockに格納される
+		 * 必須
+		 */
+		public UUID group_id;
+
+		/**
+		 * stockのitem
+		 * stockに格納される
+		 * 必須
+		 */
+		public UUID item_id;
+
+		/**
+		 * stockのowner
+		 * stockに格納される
+		 * 必須
+		 */
+		public UUID owner_id;
+
+		/**
+		 * stockのlocation
+		 * stockに格納される
+		 * 必須
+		 */
+		public UUID location_id;
+
+		/**
+		 * stockのstatus
+		 * stockに格納される
+		 * 必須
+		 */
+		public UUID status_id;
+
+		/**
+		 * 入出庫タイプ
+		 */
+		public InOut in_out;
+
+		/**
+		 * 移動数量
+		 */
+		public BigDecimal quantity;
+
+		/**
+		 * これ以降在庫無制限を設定するか
+		 * 在庫無制限の場合、通常はstock登録時からtrueにしておく
+		 */
+		public Optional<Boolean> grants_unlimited = Optional.empty();
+
+		/**
+		 * 移動数量
+		 */
+		public Optional<String> extension = Optional.empty();
+
+		/**
+		 * DBから復元した追加情報JSON
+		 */
+		Optional<Object> restored_extension = Optional.empty();
+
+		@Override
+		public UUID groupId() {
+			return group_id;
+		}
+
+		@Override
+		public UUID itemId() {
+			return item_id;
+		}
+
+		@Override
+		public UUID ownerId() {
+			return owner_id;
+		}
+
+		@Override
+		public UUID locationId() {
+			return location_id;
+		}
+
+		@Override
+		public UUID statusId() {
+			return status_id;
+		}
+	}
+
+	/**
+	 * transfer打消し
+	 *
+	 */
+	public static class TransferDenyRequest {
+
+		public UUID deny_id;
+
+		public Optional<String> deny_reason = Optional.empty();
+	}
 
 	private final Recorder recorder;
 
@@ -240,7 +409,7 @@ public class TransferHandler {
 									//transferred_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
 									.WHERE(swa -> swa.stock_id.eq($UUID).AND.transferred_at.gt($TIMESTAMP))))),
 				unlimited,
-				request.in_out.normalize(request.quantity),
+				request.in_out.relativize(request.quantity),
 				stockId,
 				transferredAt)
 				.execute();
@@ -292,6 +461,24 @@ public class TransferHandler {
 	}
 
 	public Timestamp deny(UUID transferId, UUID userId, TransferDenyRequest denyRequest) {
+		var request = pickup(denyRequest.deny_id, r -> {
+			r.denied_id = Optional.of(denyRequest.deny_id);
+			r.deny_reason = denyRequest.deny_reason;
+		}, true);
+
+		register(transferId, U.NULL_ID, userId, request);
+
+		return request.transferred_at;
+	}
+
+	public TransferRegisterRequest pickup(UUID transferId) {
+		return pickup(transferId, r -> {}, false);
+	}
+
+	private TransferRegisterRequest pickup(
+		UUID transferId,
+		Consumer<TransferRegisterRequest> transferRequestDecorator,
+		boolean reverse) {
 		var request = new TransferRegisterRequest();
 
 		var bundles = new LinkedList<BundleRegisterRequest>();
@@ -324,13 +511,14 @@ public class TransferHandler {
 				.$bundles()
 				.$transfers()
 				.intercept(),
-			denyRequest.denyId)
+			transferId)
 			.forEach(transferOne -> {
 				var transfer = transferOne.get();
 
 				request.group_id = transfer.getGroup_id();
-				request.denied_id = Optional.of(denyRequest.denyId);
-				request.deny_reason = denyRequest.denyReason;
+
+				transferRequestDecorator.accept(request);
+
 				request.transferred_at = transfer.getTransferred_at();
 				request.restored_extension = Optional.of(transfer.getExtension());
 
@@ -361,7 +549,10 @@ public class TransferHandler {
 						nodeRequest.owner_id = stock.getOwner_id();
 						nodeRequest.location_id = stock.getLocation_id();
 						nodeRequest.status_id = stock.getStatus_id();
-						nodeRequest.in_out = InOut.of(node.getIn_out()).reverse();
+
+						var inOut = InOut.of(node.getIn_out());
+
+						nodeRequest.in_out = reverse ? inOut.reverse() : inOut;
 						nodeRequest.quantity = node.getQuantity();
 						nodeRequest.grants_unlimited = Optional.of(node.getGrants_unlimited());
 						nodeRequest.restored_extension = Optional.of(node.getExtension());
@@ -375,9 +566,7 @@ public class TransferHandler {
 				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
 			});
 
-		register(transferId, U.NULL_ID, userId, request);
-
-		return request.transferred_at;
+		return request;
 	}
 
 	public void registerBatch(UUID batchId, UUID userId) {

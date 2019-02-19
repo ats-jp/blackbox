@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public enum InOut {
 
-	IN(Constant.IN, BigDecimal.ONE) {
+	IN(Constant.IN) {
 
 		@Override
 		public InOut reverse() {
@@ -12,7 +12,7 @@ public enum InOut {
 		}
 	},
 
-	OUT(Constant.OUT, BigDecimal.ONE.negate()) {
+	OUT(Constant.OUT) {
 
 		@Override
 		public InOut reverse() {
@@ -20,23 +20,23 @@ public enum InOut {
 		}
 	};
 
-	public final String value;
+	public final BigDecimal value;
 
-	private final BigDecimal coefficient;
+	public final int intValue;
 
-	private InOut(String value, BigDecimal coefficient) {
-		this.value = value;
-		this.coefficient = coefficient;
+	private InOut(int value) {
+		this.intValue = value;
+		this.value = new BigDecimal(value);
 	}
 
 	private static class Constant {
 
-		private static final String IN = "I";
+		private static final int IN = 1;
 
-		private static final String OUT = "O";
+		private static final int OUT = -1;
 	}
 
-	public static InOut of(String value) {
+	public static InOut of(int value) {
 		switch (value) {
 		case Constant.IN:
 			return IN;
@@ -48,11 +48,11 @@ public enum InOut {
 	}
 
 	public BigDecimal calcurate(BigDecimal total, BigDecimal quantity) {
-		return total.add(normalize(quantity));
+		return total.add(relativize(quantity));
 	}
 
-	public BigDecimal normalize(BigDecimal quantity) {
-		return quantity.multiply(coefficient);
+	public BigDecimal relativize(BigDecimal quantity) {
+		return quantity.multiply(value);
 	}
 
 	public abstract InOut reverse();
