@@ -5,6 +5,7 @@ import static org.blendee.sql.Placeholder.$UUID;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -880,5 +881,29 @@ public class TransientHandler {
 		}).WHERE(a -> a.id.eq(request.node_id).AND.revision.eq(request.revision)).execute();
 
 		if (result != 1) throw Utils.decisionException(transient_bundles.$TABLE, request.node_id);
+	}
+
+	public static void executeQuery(LocalDateTime time, UUID transientId) {
+		var snapshots = StockHandler.buildQuery(time, a -> {});
+
+		var nodes = new transient_nodes();
+
+		snapshots.selectClause(snapshotAssist -> {
+			nodes
+				.SELECT(
+					a -> a.ls(
+						a.stock_id,
+						a.SUM(a.expr("{0} * {1} + {2}", a.quantity, a.in_out, snapshotAssist.total)).AS("total")));
+		});
+
+		nodes
+			.LEFT_OUTER_JOIN(snapshots)
+			.ON((l, r) -> l.stock_id.eq(r.stock_id))
+			.WHERE(
+				a -> a.$transient_bundles().$transient_transfers().transferred_at.le(U.convert(time)),
+				a -> a.$transient_bundles().$transient_transfers().transient_id.eq(transientId))
+			.GROUP_BY(a -> a.stock_id);
+
+		nodes.aggregate();
 	}
 }
