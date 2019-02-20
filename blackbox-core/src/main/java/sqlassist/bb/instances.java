@@ -627,7 +627,11 @@ public class instances
 	private class DMSBehavior extends DataManipulationStatementBehavior<InsertAssist, ListInsertAssist, UpdateAssist, ListUpdateAssist, DMSWhereAssist> {
 
 		public DMSBehavior() {
-			super($TABLE, instances.this.getRuntimeId(), instances.this);
+			super(
+				$TABLE,
+				relationship$,
+				instances.this.getRuntimeId(),
+				instances.this);
 		}
 
 		@Override
@@ -1687,10 +1691,11 @@ public class instances
 		 */
 		@Override
 		public WhereColumn<WhereLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new WhereColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -1816,10 +1821,11 @@ public class instances
 		 */
 		@Override
 		public HavingColumn<HavingLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new HavingColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -1940,10 +1946,11 @@ public class instances
 		 */
 		@Override
 		public OnLeftColumn<OnLeftLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new OnLeftColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2030,10 +2037,11 @@ public class instances
 		 */
 		@Override
 		public OnRightColumn<OnRightLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new OnRightColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2178,10 +2186,11 @@ public class instances
 		 */
 		@Override
 		public WhereColumn<DMSWhereLogicalOperators> any(String template) {
+			DataManipulationStatement statement = getDataManipulationStatement();
 			return new WhereColumn<>(
-				getDataManipulationStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**

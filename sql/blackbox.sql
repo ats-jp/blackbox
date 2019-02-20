@@ -449,7 +449,8 @@ ALTER TABLE bb.locking_groups ADD CONSTRAINT locking_groups_cascade_id_fkey FORE
 --master tables
 --===========================
 
---もの
+--アイテム
+--SKU、個品
 CREATE TABLE bb.items (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
@@ -504,6 +505,7 @@ CREATE TABLE bb.items_tags (
 ----------
 
 --所有者
+--顧客、委託者
 CREATE TABLE bb.owners (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
@@ -558,6 +560,7 @@ CREATE TABLE bb.owners_tags (
 ----------
 
 --置き場
+--棚、現場
 CREATE TABLE bb.locations (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
@@ -883,7 +886,7 @@ CREATE TABLE bb.nodes (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	bundle_id uuid REFERENCES bb.bundles NOT NULL,
 	stock_id uuid REFERENCES bb.stocks NOT NULL,
-	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL,
+	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL, --そのまま計算に使用できるように
 	seq integer NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
@@ -1214,7 +1217,7 @@ CREATE TABLE bb.transient_nodes (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	transient_bundle_id uuid REFERENCES bb.transient_bundles ON DELETE CASCADE NOT NULL,
 	stock_id uuid REFERENCES bb.stocks NOT NULL, --stockは削除されない
-	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL,
+	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL, --そのまま計算に使用できるように
 	seq_in_bundle integer NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
@@ -1239,58 +1242,6 @@ COMMENT ON COLUMN bb.transient_nodes.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_nodes.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transient_nodes.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transient_nodes.updated_by IS '更新ユーザー';
-
-----------
-
---削除予定
---直接検索に変更?
---一時作業移動ノード状態
-CREATE TABLE bb.transient_snapshots (
-	id uuid PRIMARY KEY REFERENCES bb.transient_nodes ON DELETE CASCADE,
-	unlimited boolean NOT NULL,
-	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
-	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
-
-COMMENT ON TABLE bb.transient_snapshots IS '一時作業移動ノード状態';
-COMMENT ON COLUMN bb.transient_snapshots.id IS 'ID';
-COMMENT ON COLUMN bb.transient_snapshots.unlimited IS '在庫無制限
-trueの場合、totalがマイナスでもエラーとならない';
-COMMENT ON COLUMN bb.transient_snapshots.total IS 'この時点の在庫総数';
-COMMENT ON COLUMN bb.transient_snapshots.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.transient_snapshots.created_by IS '作成ユーザー';
-COMMENT ON COLUMN bb.transient_snapshots.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.transient_snapshots.updated_by IS '更新ユーザー';
-
-----------
-
---削除予定
---直接検索に変更?
---一時作業現在在庫
-CREATE TABLE bb.transient_current_stocks (
-	id uuid PRIMARY KEY REFERENCES bb.stocks, --先にstocksにデータを作成してからこのテーブルにデータ作成
-	unlimited boolean NOT NULL,
-	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
-	transient_snapshot_id uuid REFERENCES bb.transient_snapshots ON DELETE CASCADE NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
-	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
-
-COMMENT ON TABLE bb.transient_current_stocks IS '一時作業現在在庫';
-COMMENT ON COLUMN bb.transient_current_stocks.id IS 'ID
-stocks.stock_idに従属';
-COMMENT ON COLUMN bb.transient_current_stocks.unlimited IS '在庫無制限
-trueの場合、totalがマイナスでもエラーとならない';
-COMMENT ON COLUMN bb.transient_current_stocks.total IS '現時点の在庫総数';
-COMMENT ON COLUMN bb.transient_current_stocks.transient_snapshot_id IS '一時作業移動ノード状態ID
-現時点の数量を変更した伝票';
-COMMENT ON COLUMN bb.transient_current_stocks.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.transient_current_stocks.created_by IS '作成ユーザー';
-COMMENT ON COLUMN bb.transient_current_stocks.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.transient_current_stocks.updated_by IS '更新ユーザー';
 
 --===========================
 --indexes
@@ -1380,11 +1331,6 @@ CREATE INDEX ON bb.transient_bundles (transient_transfer_id);
 CREATE INDEX ON bb.transient_nodes (transient_bundle_id);
 CREATE INDEX ON bb.transient_nodes (stock_id);
 
---transient_snapshots
-
---transient_current_stocks
-CREATE INDEX ON bb.transient_current_stocks (transient_snapshot_id);
-
 --tags
 CREATE INDEX ON bb.groups_tags (tag_id);
 CREATE INDEX ON bb.users_tags (tag_id);
@@ -1419,11 +1365,9 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb.locations,
 	bb.statuses,
 	bb.transients,
-	bb.transient_current_stocks,
 	bb.transient_transfers,
 	bb.transient_bundles,
-	bb.transient_nodes,
-	bb.transient_snapshots
+	bb.transient_nodes
 TO blackbox;
 
 GRANT INSERT, UPDATE ON TABLE

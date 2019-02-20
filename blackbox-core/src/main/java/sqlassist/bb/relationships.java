@@ -692,7 +692,11 @@ public class relationships
 	private class DMSBehavior extends DataManipulationStatementBehavior<InsertAssist, ListInsertAssist, UpdateAssist, ListUpdateAssist, DMSWhereAssist> {
 
 		public DMSBehavior() {
-			super($TABLE, relationships.this.getRuntimeId(), relationships.this);
+			super(
+				$TABLE,
+				relationship$,
+				relationships.this.getRuntimeId(),
+				relationships.this);
 		}
 
 		@Override
@@ -1793,10 +1797,11 @@ public class relationships
 		 */
 		@Override
 		public WhereColumn<WhereLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new WhereColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -1922,10 +1927,11 @@ public class relationships
 		 */
 		@Override
 		public HavingColumn<HavingLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new HavingColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2046,10 +2052,11 @@ public class relationships
 		 */
 		@Override
 		public OnLeftColumn<OnLeftLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new OnLeftColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2136,10 +2143,11 @@ public class relationships
 		 */
 		@Override
 		public OnRightColumn<OnRightLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new OnRightColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2284,10 +2292,11 @@ public class relationships
 		 */
 		@Override
 		public WhereColumn<DMSWhereLogicalOperators> any(String template) {
+			DataManipulationStatement statement = getDataManipulationStatement();
 			return new WhereColumn<>(
-				getDataManipulationStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**

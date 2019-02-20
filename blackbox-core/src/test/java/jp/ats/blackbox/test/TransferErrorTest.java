@@ -2,6 +2,7 @@ package jp.ats.blackbox.test;
 
 import java.sql.Timestamp;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import jp.ats.blackbox.common.U;
@@ -21,6 +22,8 @@ public class TransferErrorTest {
 	}
 
 	static void execute(UUID group, int transfers, int threads) {
+		AtomicInteger counter = new AtomicInteger(0);
+
 		var executor = new TransferExecutor();
 
 		executor.start();
@@ -48,6 +51,8 @@ public class TransferErrorTest {
 					return;
 				}
 			});
+
+			counter.incrementAndGet();
 		};
 
 		IntStream.range(0, threads).forEach(i -> {
@@ -58,8 +63,9 @@ public class TransferErrorTest {
 
 		while (true) {
 			try {
-				Thread.sleep(1000);
-				System.gc();
+				Thread.sleep(100);
+
+				if (counter.get() == threads) break;
 			} catch (Exception e) {
 				break;
 			}

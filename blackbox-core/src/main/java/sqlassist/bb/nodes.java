@@ -164,10 +164,11 @@ public class nodes
 	/**
 	 * name: in_out<br>
 	 * remarks: 入出庫区分<br>
+	 * IN=1, OUT=-1<br>
 	 * type: int2(5)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "in_out", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "入出庫区分", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "in_out", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "入出庫区分\nIN=1, OUT=-1", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String in_out = "in_out";
 
 	/**
@@ -433,6 +434,7 @@ public class nodes
 		 * setter
 		 * name: in_out<br>
 		* remarks: 入出庫区分<br>
+		* IN=1, OUT=-1<br>
 		* type: int2(5)<br>
 		* not null: true<br>
 		 * @param value java.lang.Integer
@@ -450,6 +452,7 @@ public class nodes
 		 * getter
 		 * name: in_out<br>
 		* remarks: 入出庫区分<br>
+		* IN=1, OUT=-1<br>
 		* type: int2(5)<br>
 		* not null: true<br>
 		 * @return java.lang.Integer
@@ -1020,7 +1023,11 @@ public class nodes
 	private class DMSBehavior extends DataManipulationStatementBehavior<InsertAssist, ListInsertAssist, UpdateAssist, ListUpdateAssist, DMSWhereAssist> {
 
 		public DMSBehavior() {
-			super($TABLE, nodes.this.getRuntimeId(), nodes.this);
+			super(
+				$TABLE,
+				relationship$,
+				nodes.this.getRuntimeId(),
+				nodes.this);
 		}
 
 		@Override
@@ -2180,10 +2187,11 @@ public class nodes
 		 */
 		@Override
 		public WhereColumn<WhereLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new WhereColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2309,10 +2317,11 @@ public class nodes
 		 */
 		@Override
 		public HavingColumn<HavingLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new HavingColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2433,10 +2442,11 @@ public class nodes
 		 */
 		@Override
 		public OnLeftColumn<OnLeftLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new OnLeftColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2523,10 +2533,11 @@ public class nodes
 		 */
 		@Override
 		public OnRightColumn<OnRightLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new OnRightColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2671,10 +2682,11 @@ public class nodes
 		 */
 		@Override
 		public WhereColumn<DMSWhereLogicalOperators> any(String template) {
+			DataManipulationStatement statement = getDataManipulationStatement();
 			return new WhereColumn<>(
-				getDataManipulationStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**

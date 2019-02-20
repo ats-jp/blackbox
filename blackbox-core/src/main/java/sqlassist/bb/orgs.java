@@ -920,7 +920,11 @@ public class orgs
 	private class DMSBehavior extends DataManipulationStatementBehavior<InsertAssist, ListInsertAssist, UpdateAssist, ListUpdateAssist, DMSWhereAssist> {
 
 		public DMSBehavior() {
-			super($TABLE, orgs.this.getRuntimeId(), orgs.this);
+			super(
+				$TABLE,
+				relationship$,
+				orgs.this.getRuntimeId(),
+				orgs.this);
 		}
 
 		@Override
@@ -2069,10 +2073,11 @@ public class orgs
 		 */
 		@Override
 		public WhereColumn<WhereLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new WhereColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2198,10 +2203,11 @@ public class orgs
 		 */
 		@Override
 		public HavingColumn<HavingLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new HavingColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2322,10 +2328,11 @@ public class orgs
 		 */
 		@Override
 		public OnLeftColumn<OnLeftLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new OnLeftColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2412,10 +2419,11 @@ public class orgs
 		 */
 		@Override
 		public OnRightColumn<OnRightLogicalOperators> any(String template) {
+			SelectStatement statement = getSelectStatement();
 			return new OnRightColumn<>(
-				getSelectStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**
@@ -2560,10 +2568,11 @@ public class orgs
 		 */
 		@Override
 		public WhereColumn<DMSWhereLogicalOperators> any(String template) {
+			DataManipulationStatement statement = getDataManipulationStatement();
 			return new WhereColumn<>(
-				getDataManipulationStatement(),
+				statement,
 				getContext(),
-				new MultiColumn(template));
+				new MultiColumn(statement.getRootRealtionship(), template));
 		}
 
 		/**

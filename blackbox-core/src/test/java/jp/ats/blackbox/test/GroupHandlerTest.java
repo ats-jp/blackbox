@@ -15,7 +15,7 @@ public class GroupHandlerTest {
 	static final AtomicInteger counter = new AtomicInteger();
 
 	public static void main(String[] args) {
-		TransferCommon.start();
+		TransferCommon.startWithLog();
 		SecurityValues.start(U.NULL_ID);
 		register();
 		SecurityValues.end();

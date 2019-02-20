@@ -4,7 +4,6 @@ import static org.blendee.sql.Placeholder.$BOOLEAN;
 import static org.blendee.sql.Placeholder.$INT;
 import static org.blendee.sql.Placeholder.$UUID;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -24,7 +23,6 @@ public class StockHandler {
 	}
 
 	public static snapshots buildQuery(
-		LocalDateTime time,
 		Consumer<snapshots.WhereAssist> criteriaDecorator) {
 		var raw = new snapshots().SELECT(
 			a -> a.ls(
@@ -34,9 +32,7 @@ public class StockHandler {
 					a.transferred_at,
 					a.created_at,
 					a.node_seq).AS("rank")))
-			.WHERE(a -> a.transferred_at.le(U.convert(time)));
-
-		raw.WHERE(a -> criteriaDecorator.accept(a));
+			.WHERE(a -> criteriaDecorator.accept(a));
 
 		var inner = new AnonymousTable(raw, "subquery").SELECT(a -> a.any(0)).WHERE(a -> a.col("rank").eq(1));
 

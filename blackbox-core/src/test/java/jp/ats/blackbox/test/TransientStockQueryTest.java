@@ -3,14 +3,16 @@ package jp.ats.blackbox.test;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.blendee.assist.Vargs;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.TransientHandler;
 import jp.ats.blackbox.persistence.TransientHandler.OwnerType;
+import jp.ats.blackbox.persistence.TransientStockQuery;
 
-public class TransientHandlerQueryTest {
+public class TransientStockQueryTest {
 
 	public static void main(String[] args) {
 		Common.startWithLog();
@@ -24,7 +26,9 @@ public class TransientHandlerQueryTest {
 
 			UUID transientId = TransientHandler.register(req);
 
-			TransientHandler.executeQuery(LocalDateTime.now(), transientId);
+			var query = new TransientStockQuery(table -> {}, table -> {});
+
+			query.execute(LocalDateTime.now(), transientId, Vargs.of(), Vargs.of(), r -> {});
 
 			SecurityValues.end();
 		});
