@@ -8,7 +8,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.blendee.jdbc.BatchStatement;
 import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
@@ -30,7 +29,7 @@ public class JobHandler {
 	 */
 	public static void execute(LocalDateTime time) {
 		//トランザクション内の他の検索で参照されない、数が多い可能性があるのでbatchで実行
-		BatchStatement batch = BlendeeManager.getConnection().getBatchStatement();
+		var batch = BlendeeManager.getConnection().getBatch();
 
 		new jobs()
 			.SELECT(a -> a.id)
@@ -62,7 +61,7 @@ public class JobHandler {
 				row.update(batch);
 			});
 
-		batch.executeBatch();
+		batch.execute();
 	}
 
 	public static LocalDateTime getNextTime() {

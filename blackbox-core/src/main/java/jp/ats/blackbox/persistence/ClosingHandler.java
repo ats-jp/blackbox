@@ -12,7 +12,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.blendee.assist.AnonymousTable;
-import org.blendee.jdbc.BatchStatement;
+import org.blendee.jdbc.Batch;
 import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
@@ -38,7 +38,7 @@ public class ClosingHandler {
 
 		closing.insert();
 
-		var batch = BlendeeManager.getConnection().getBatchStatement();
+		var batch = BlendeeManager.getConnection().getBatch();
 
 		//全ての子グループも対象
 		recorder.play(
@@ -54,7 +54,7 @@ public class ClosingHandler {
 				}
 			});
 
-		batch.executeBatch();
+		batch.execute();
 	}
 
 	private static void closeGroup(
@@ -62,7 +62,7 @@ public class ClosingHandler {
 		Timestamp closedAt,
 		UUID closingId,
 		UUID userId,
-		BatchStatement batch) {
+		Batch batch) {
 		var lastClosing = recorder.play(() -> new last_closings())
 			.fetch(groupId)
 			.orElseGet(() -> {
@@ -128,7 +128,7 @@ public class ClosingHandler {
 				}
 			});
 
-		batch.executeBatch();
+		batch.execute();
 
 		//close_stocksに存在しないものを追加
 		recorder.play(() -> {

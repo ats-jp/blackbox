@@ -96,11 +96,11 @@ public class GroupHandler {
 
 			player.execute();
 
-			var batch = BlendeeManager.getConnection().getBatchStatement();
+			var batch = BlendeeManager.getConnection().getBatch();
 
 			groups.forEach(id -> player.reproduce(id, groupId, userId).execute(batch));
 
-			batch.executeBatch();
+			batch.execute();
 		} catch (UniqueConstraintViolationException e) {
 			throw new GroupLockingException(groupId);
 		}
