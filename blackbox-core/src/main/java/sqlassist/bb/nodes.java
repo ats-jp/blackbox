@@ -101,10 +101,10 @@ import org.blendee.assist.annotation.Table;
  * schema: bb<br>
  * name: nodes<br>
  * type: TABLE<br>
- * remarks: 移動ノード<br>
- * 一移動の中の入庫もしくは出庫を表す<br>
+ * remarks: 伝票明細ノード<br>
+ * 一伝票の中の入もしくは出を表す<br>
  */
-@Table(name = "nodes", schema = "bb", type = "TABLE", remarks = "移動ノード\n一移動の中の入庫もしくは出庫を表す")
+@Table(name = "nodes", schema = "bb", type = "TABLE", remarks = "伝票明細ノード\n一伝票の中の入もしくは出を表す")
 @PrimaryKey(name = "nodes_pkey", columns = { "id" })
 public class nodes
 	extends java.lang.Object
@@ -144,49 +144,49 @@ public class nodes
 	public static final String id = "id";
 
 	/**
-	 * name: bundle_id<br>
-	 * remarks: 移動ID<br>
+	 * name: detail_id<br>
+	 * remarks: 明細ID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "bundle_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ID", defaultValue = "null", ordinalPosition = 2, notNull = true)
-	public static final String bundle_id = "bundle_id";
+	@Column(name = "detail_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "明細ID", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	public static final String detail_id = "detail_id";
 
 	/**
-	 * name: stock_id<br>
-	 * remarks: 在庫ID<br>
+	 * name: unit_id<br>
+	 * remarks: 管理対象ID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "stock_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫ID", defaultValue = "null", ordinalPosition = 3, notNull = true)
-	public static final String stock_id = "stock_id";
+	@Column(name = "unit_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象ID", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String unit_id = "unit_id";
 
 	/**
 	 * name: in_out<br>
-	 * remarks: 入出庫区分<br>
+	 * remarks: 入出区分<br>
 	 * IN=1, OUT=-1<br>
 	 * type: int2(5)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "in_out", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "入出庫区分\nIN=1, OUT=-1", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "in_out", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "入出区分\nIN=1, OUT=-1", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String in_out = "in_out";
 
 	/**
 	 * name: seq<br>
-	 * remarks: 移動伝票内連番<br>
+	 * remarks: 伝票内連番<br>
 	 * type: int4(10)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動伝票内連番", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票内連番", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String seq = "seq";
 
 	/**
 	 * name: quantity<br>
-	 * remarks: 移動数量<br>
+	 * remarks: 数量<br>
 	 * type: numeric(131089)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "quantity", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動数量", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "quantity", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "数量", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String quantity = "quantity";
 
 	/**
@@ -218,56 +218,29 @@ public class nodes
 	public static final String group_extension = "group_extension";
 
 	/**
-	 * name: item_extension<br>
-	 * remarks: アイテムのextension<br>
+	 * name: unit_extension<br>
+	 * remarks: 管理対象のextension<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "item_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 10, notNull = true)
-	public static final String item_extension = "item_extension";
+	@Column(name = "unit_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 10, notNull = true)
+	public static final String unit_extension = "unit_extension";
 
 	/**
-	 * name: owner_extension<br>
-	 * remarks: 所有者のextension<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
+	 * name: nodes_detail_id_fkey<br>
+	 * references: details<br>
+	 * columns: detail_id
 	 */
-	@Column(name = "owner_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 11, notNull = true)
-	public static final String owner_extension = "owner_extension";
+	@ForeignKey(name = "nodes_detail_id_fkey", references = "bb.details", columns = { "detail_id" }, refColumns = { "id" })
+	public static final String bb$details$nodes_detail_id_fkey = "nodes_detail_id_fkey";
 
 	/**
-	 * name: location_extension<br>
-	 * remarks: 置き場のextension<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
+	 * name: nodes_unit_id_fkey<br>
+	 * references: units<br>
+	 * columns: unit_id
 	 */
-	@Column(name = "location_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 12, notNull = true)
-	public static final String location_extension = "location_extension";
-
-	/**
-	 * name: status_extension<br>
-	 * remarks: 状態のextension<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "status_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 13, notNull = true)
-	public static final String status_extension = "status_extension";
-
-	/**
-	 * name: nodes_bundle_id_fkey<br>
-	 * references: bundles<br>
-	 * columns: bundle_id
-	 */
-	@ForeignKey(name = "nodes_bundle_id_fkey", references = "bb.bundles", columns = { "bundle_id" }, refColumns = { "id" })
-	public static final String bb$bundles$nodes_bundle_id_fkey = "nodes_bundle_id_fkey";
-
-	/**
-	 * name: nodes_stock_id_fkey<br>
-	 * references: stocks<br>
-	 * columns: stock_id
-	 */
-	@ForeignKey(name = "nodes_stock_id_fkey", references = "bb.stocks", columns = { "stock_id" }, refColumns = { "id" })
-	public static final String bb$stocks$nodes_stock_id_fkey = "nodes_stock_id_fkey";
+	@ForeignKey(name = "nodes_unit_id_fkey", references = "bb.units", columns = { "unit_id" }, refColumns = { "id" })
+	public static final String bb$units$nodes_unit_id_fkey = "nodes_unit_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -372,68 +345,68 @@ public class nodes
 
 		/**
 		 * setter
-		 * name: bundle_id<br>
-		* remarks: 移動ID<br>
+		 * name: detail_id<br>
+		* remarks: 明細ID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setBundle_id(java.util.UUID value) {
+		public void setDetail_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("bundle_id").getType());
-			data$.setValue("bundle_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("detail_id").getType());
+			data$.setValue("detail_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: bundle_id<br>
-		* remarks: 移動ID<br>
+		 * name: detail_id<br>
+		* remarks: 明細ID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getBundle_id() {
-			Binder binder = data$.getValue("bundle_id");
+		public java.util.UUID getDetail_id() {
+			Binder binder = data$.getValue("detail_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
-		 * name: stock_id<br>
-		* remarks: 在庫ID<br>
+		 * name: unit_id<br>
+		* remarks: 管理対象ID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setStock_id(java.util.UUID value) {
+		public void setUnit_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("stock_id").getType());
-			data$.setValue("stock_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("unit_id").getType());
+			data$.setValue("unit_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: stock_id<br>
-		* remarks: 在庫ID<br>
+		 * name: unit_id<br>
+		* remarks: 管理対象ID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getStock_id() {
-			Binder binder = data$.getValue("stock_id");
+		public java.util.UUID getUnit_id() {
+			Binder binder = data$.getValue("unit_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
 		 * name: in_out<br>
-		* remarks: 入出庫区分<br>
+		* remarks: 入出区分<br>
 		* IN=1, OUT=-1<br>
 		* type: int2(5)<br>
 		* not null: true<br>
@@ -451,7 +424,7 @@ public class nodes
 		/**
 		 * getter
 		 * name: in_out<br>
-		* remarks: 入出庫区分<br>
+		* remarks: 入出区分<br>
 		* IN=1, OUT=-1<br>
 		* type: int2(5)<br>
 		* not null: true<br>
@@ -465,7 +438,7 @@ public class nodes
 		/**
 		 * setter
 		 * name: seq<br>
-		* remarks: 移動伝票内連番<br>
+		* remarks: 伝票内連番<br>
 		* type: int4(10)<br>
 		* not null: true<br>
 		 * @param value java.lang.Integer
@@ -482,7 +455,7 @@ public class nodes
 		/**
 		 * getter
 		 * name: seq<br>
-		* remarks: 移動伝票内連番<br>
+		* remarks: 伝票内連番<br>
 		* type: int4(10)<br>
 		* not null: true<br>
 		 * @return java.lang.Integer
@@ -495,7 +468,7 @@ public class nodes
 		/**
 		 * setter
 		 * name: quantity<br>
-		* remarks: 移動数量<br>
+		* remarks: 数量<br>
 		* type: numeric(131089)<br>
 		* not null: true<br>
 		 * @param value java.math.BigDecimal
@@ -512,7 +485,7 @@ public class nodes
 		/**
 		 * getter
 		 * name: quantity<br>
-		* remarks: 移動数量<br>
+		* remarks: 数量<br>
 		* type: numeric(131089)<br>
 		* not null: true<br>
 		 * @return java.math.BigDecimal
@@ -616,146 +589,56 @@ public class nodes
 
 		/**
 		 * setter
-		 * name: item_extension<br>
-		* remarks: アイテムのextension<br>
+		 * name: unit_extension<br>
+		* remarks: 管理対象のextension<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
 		 */
-		public void setItem_extension(java.lang.Object value) {
+		public void setUnit_extension(java.lang.Object value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("item_extension").getType());
-			data$.setValue("item_extension", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("unit_extension").getType());
+			data$.setValue("unit_extension", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: item_extension<br>
-		* remarks: アイテムのextension<br>
+		 * name: unit_extension<br>
+		* remarks: 管理対象のextension<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
 		 */
-		public java.lang.Object getItem_extension() {
-			Binder binder = data$.getValue("item_extension");
-			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: owner_extension<br>
-		* remarks: 所有者のextension<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.lang.Object
-		 */
-		public void setOwner_extension(java.lang.Object value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("owner_extension").getType());
-			data$.setValue("owner_extension", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: owner_extension<br>
-		* remarks: 所有者のextension<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @return java.lang.Object
-		 */
-		public java.lang.Object getOwner_extension() {
-			Binder binder = data$.getValue("owner_extension");
-			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: location_extension<br>
-		* remarks: 置き場のextension<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.lang.Object
-		 */
-		public void setLocation_extension(java.lang.Object value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("location_extension").getType());
-			data$.setValue("location_extension", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: location_extension<br>
-		* remarks: 置き場のextension<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @return java.lang.Object
-		 */
-		public java.lang.Object getLocation_extension() {
-			Binder binder = data$.getValue("location_extension");
-			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: status_extension<br>
-		* remarks: 状態のextension<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.lang.Object
-		 */
-		public void setStatus_extension(java.lang.Object value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("status_extension").getType());
-			data$.setValue("status_extension", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: status_extension<br>
-		* remarks: 状態のextension<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @return java.lang.Object
-		 */
-		public java.lang.Object getStatus_extension() {
-			Binder binder = data$.getValue("status_extension");
+		public java.lang.Object getUnit_extension() {
+			Binder binder = data$.getValue("unit_extension");
 			return binder.getValue();
 		}
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 bundles<br>
-		 * 外部キー名 nodes_bundle_id_fkey<br>
-		 * 項目名 bundle_id
+		 * 参照先テーブル名 details<br>
+		 * 外部キー名 nodes_detail_id_fkey<br>
+		 * 項目名 detail_id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.bundles.Row $bundles() {
-			return sqlassist.bb.bundles.row(
-				data$.getDataObject(bb$bundles$nodes_bundle_id_fkey));
+		public sqlassist.bb.details.Row $details() {
+			return sqlassist.bb.details.row(
+				data$.getDataObject(bb$details$nodes_detail_id_fkey));
 		}
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 stocks<br>
-		 * 外部キー名 nodes_stock_id_fkey<br>
-		 * 項目名 stock_id
+		 * 参照先テーブル名 units<br>
+		 * 外部キー名 nodes_unit_id_fkey<br>
+		 * 項目名 unit_id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.stocks.Row $stocks() {
-			return sqlassist.bb.stocks.row(
-				data$.getDataObject(bb$stocks$nodes_stock_id_fkey));
+		public sqlassist.bb.units.Row $units() {
+			return sqlassist.bb.units.row(
+				data$.getDataObject(bb$units$nodes_unit_id_fkey));
 		}
 
 	}
@@ -1835,14 +1718,14 @@ public class nodes
 		public final T id;
 
 		/**
-		 * 項目名 bundle_id
+		 * 項目名 detail_id
 		 */
-		public final T bundle_id;
+		public final T detail_id;
 
 		/**
-		 * 項目名 stock_id
+		 * 項目名 unit_id
 		 */
-		public final T stock_id;
+		public final T unit_id;
 
 		/**
 		 * 項目名 in_out
@@ -1875,24 +1758,9 @@ public class nodes
 		public final T group_extension;
 
 		/**
-		 * 項目名 item_extension
+		 * 項目名 unit_extension
 		 */
-		public final T item_extension;
-
-		/**
-		 * 項目名 owner_extension
-		 */
-		public final T owner_extension;
-
-		/**
-		 * 項目名 location_extension
-		 */
-		public final T location_extension;
-
-		/**
-		 * 項目名 status_extension
-		 */
-		public final T status_extension;
+		public final T unit_extension;
 
 		private Assist(
 			nodes table$,
@@ -1908,12 +1776,12 @@ public class nodes
 			this.id = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.id);
-			this.bundle_id = builder$.buildColumn(
+			this.detail_id = builder$.buildColumn(
 				this,
-				sqlassist.bb.nodes.bundle_id);
-			this.stock_id = builder$.buildColumn(
+				sqlassist.bb.nodes.detail_id);
+			this.unit_id = builder$.buildColumn(
 				this,
-				sqlassist.bb.nodes.stock_id);
+				sqlassist.bb.nodes.unit_id);
 			this.in_out = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.in_out);
@@ -1932,18 +1800,9 @@ public class nodes
 			this.group_extension = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.group_extension);
-			this.item_extension = builder$.buildColumn(
+			this.unit_extension = builder$.buildColumn(
 				this,
-				sqlassist.bb.nodes.item_extension);
-			this.owner_extension = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.owner_extension);
-			this.location_extension = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.location_extension);
-			this.status_extension = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.status_extension);
+				sqlassist.bb.nodes.unit_extension);
 
 		}
 
@@ -2060,29 +1919,29 @@ public class nodes
 		}
 
 		/**
-		 * 参照先テーブル名 bundles<br>
-		 * 外部キー名 nodes_bundle_id_fkey<br>
-		 * 項目名 bundle_id
-		 * @return bundles relationship
+		 * 参照先テーブル名 details<br>
+		 * 外部キー名 nodes_detail_id_fkey<br>
+		 * 項目名 detail_id
+		 * @return details relationship
 		 */
-		public sqlassist.bb.bundles.ExtAssist<T, Many<sqlassist.bb.nodes.Row, M>> $bundles() {
-			return new sqlassist.bb.bundles.ExtAssist<>(
+		public sqlassist.bb.details.ExtAssist<T, Many<sqlassist.bb.nodes.Row, M>> $details() {
+			return new sqlassist.bb.details.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb.nodes.bb$bundles$nodes_bundle_id_fkey);
+				sqlassist.bb.nodes.bb$details$nodes_detail_id_fkey);
 		}
 
 		/**
-		 * 参照先テーブル名 stocks<br>
-		 * 外部キー名 nodes_stock_id_fkey<br>
-		 * 項目名 stock_id
-		 * @return stocks relationship
+		 * 参照先テーブル名 units<br>
+		 * 外部キー名 nodes_unit_id_fkey<br>
+		 * 項目名 unit_id
+		 * @return units relationship
 		 */
-		public sqlassist.bb.stocks.ExtAssist<T, Many<sqlassist.bb.nodes.Row, M>> $stocks() {
-			return new sqlassist.bb.stocks.ExtAssist<>(
+		public sqlassist.bb.units.ExtAssist<T, Many<sqlassist.bb.nodes.Row, M>> $units() {
+			return new sqlassist.bb.units.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb.nodes.bb$stocks$nodes_stock_id_fkey);
+				sqlassist.bb.nodes.bb$units$nodes_unit_id_fkey);
 		}
 
 	}

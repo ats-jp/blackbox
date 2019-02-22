@@ -102,9 +102,9 @@ import org.blendee.assist.annotation.Table;
  * name: snapshots<br>
  * type: TABLE<br>
  * remarks: 移動ノード状態<br>
- * transferred_at時点でのstockの状態<br>
+ * fixed_at時点でのstockの状態<br>
  */
-@Table(name = "snapshots", schema = "bb", type = "TABLE", remarks = "移動ノード状態\ntransferred_at時点でのstockの状態")
+@Table(name = "snapshots", schema = "bb", type = "TABLE", remarks = "移動ノード状態\nfixed_at時点でのstockの状態")
 @PrimaryKey(name = "snapshots_pkey", columns = { "id" })
 public class snapshots
 	extends java.lang.Object
@@ -146,82 +146,82 @@ public class snapshots
 
 	/**
 	 * name: unlimited<br>
-	 * remarks: 在庫無制限<br>
+	 * remarks: 数量無制限<br>
 	 * trueの場合、totalがマイナスでもエラーとならない<br>
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "unlimited", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫無制限\ntrueの場合、totalがマイナスでもエラーとならない", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "unlimited", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "数量無制限\ntrueの場合、totalがマイナスでもエラーとならない", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String unlimited = "unlimited";
 
 	/**
 	 * name: in_search_scope<br>
-	 * remarks: 在庫数量検索対象<br>
+	 * remarks: 数量検索対象<br>
 	 * snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する<br>
 	 * 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "in_search_scope", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫数量検索対象\nsnapshotの検索対象を少なくすることで直近数量の取得検索を高速化する\n締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる", defaultValue = "true", ordinalPosition = 3, notNull = true)
+	@Column(name = "in_search_scope", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "数量検索対象\nsnapshotの検索対象を少なくすることで直近数量の取得検索を高速化する\n締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる", defaultValue = "true", ordinalPosition = 3, notNull = true)
 	public static final String in_search_scope = "in_search_scope";
 
 	/**
 	 * name: total<br>
-	 * remarks: この時点の在庫総数<br>
+	 * remarks: この時点の総数<br>
 	 * type: numeric(131089)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "total", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "この時点の在庫総数", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "total", type = 2, typeName = "numeric", size = 131089, hasDecimalDigits = true, decimalDigits = 0, remarks = "この時点の総数", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String total = "total";
 
 	/**
-	 * name: transfer_group_id<br>
-	 * remarks: 移動伝票のグループID<br>
-	 * 検索高速化のためtransfers.group_idをここに持つ<br>
+	 * name: journal_group_id<br>
+	 * remarks: 伝票のグループID<br>
+	 * 検索高速化のためjournals.group_idをここに持つ<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "transfer_group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動伝票のグループID\n検索高速化のためtransfers.group_idをここに持つ", defaultValue = "null", ordinalPosition = 5, notNull = true)
-	public static final String transfer_group_id = "transfer_group_id";
+	@Column(name = "journal_group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票のグループID\n検索高速化のためjournals.group_idをここに持つ", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	public static final String journal_group_id = "journal_group_id";
 
 	/**
-	 * name: stock_id<br>
-	 * remarks: 在庫ID<br>
-	 * 検索高速化のためnodes.stock_idをここに持つ<br>
+	 * name: unit_id<br>
+	 * remarks: 管理対象ID<br>
+	 * 検索高速化のためnodes.unit_idをここに持つ<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "stock_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫ID\n検索高速化のためnodes.stock_idをここに持つ", defaultValue = "null", ordinalPosition = 6, notNull = true)
-	public static final String stock_id = "stock_id";
+	@Column(name = "unit_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象ID\n検索高速化のためnodes.unit_idをここに持つ", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	public static final String unit_id = "unit_id";
 
 	/**
-	 * name: transferred_at<br>
-	 * remarks: 移動時刻<br>
-	 * 検索高速化のためtransfers.transferred_atをここに持つ<br>
+	 * name: fixed_at<br>
+	 * remarks: 確定時刻<br>
+	 * 検索高速化のためjournals.fixed_atをここに持つ<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "transferred_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "移動時刻\n検索高速化のためtransfers.transferred_atをここに持つ", defaultValue = "null", ordinalPosition = 7, notNull = true)
-	public static final String transferred_at = "transferred_at";
+	@Column(name = "fixed_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "確定時刻\n検索高速化のためjournals.fixed_atをここに持つ", defaultValue = "null", ordinalPosition = 7, notNull = true)
+	public static final String fixed_at = "fixed_at";
 
 	/**
 	 * name: created_at<br>
 	 * remarks: 登録時刻<br>
-	 * 検索高速化のためtransfers.created_atをここに持つ<br>
+	 * 検索高速化のためjournals.created_atをここに持つ<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻\n検索高速化のためtransfers.created_atをここに持つ", defaultValue = "null", ordinalPosition = 8, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻\n検索高速化のためjournals.created_atをここに持つ", defaultValue = "null", ordinalPosition = 8, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
 	 * name: node_seq<br>
-	 * remarks: 移動ノードの登録順<br>
+	 * remarks: 伝票ノードの登録順<br>
 	 * 検索高速化のためnodes.seqをここに持つ<br>
 	 * type: int4(10)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "node_seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ノードの登録順\n検索高速化のためnodes.seqをここに持つ", defaultValue = "null", ordinalPosition = 9, notNull = true)
+	@Column(name = "node_seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票ノードの登録順\n検索高速化のためnodes.seqをここに持つ", defaultValue = "null", ordinalPosition = 9, notNull = true)
 	public static final String node_seq = "node_seq";
 
 	/**
@@ -243,12 +243,12 @@ public class snapshots
 	public static final String updated_by = "updated_by";
 
 	/**
-	 * name: snapshots_transfer_group_id_fkey<br>
+	 * name: snapshots_journal_group_id_fkey<br>
 	 * references: groups<br>
-	 * columns: transfer_group_id
+	 * columns: journal_group_id
 	 */
-	@ForeignKey(name = "snapshots_transfer_group_id_fkey", references = "bb.groups", columns = { "transfer_group_id" }, refColumns = { "id" })
-	public static final String bb$groups$snapshots_transfer_group_id_fkey = "snapshots_transfer_group_id_fkey";
+	@ForeignKey(name = "snapshots_journal_group_id_fkey", references = "bb.groups", columns = { "journal_group_id" }, refColumns = { "id" })
+	public static final String bb$groups$snapshots_journal_group_id_fkey = "snapshots_journal_group_id_fkey";
 
 	/**
 	 * name: snapshots_id_fkey<br>
@@ -259,12 +259,12 @@ public class snapshots
 	public static final String bb$nodes$snapshots_id_fkey = "snapshots_id_fkey";
 
 	/**
-	 * name: snapshots_stock_id_fkey<br>
-	 * references: stocks<br>
-	 * columns: stock_id
+	 * name: snapshots_unit_id_fkey<br>
+	 * references: units<br>
+	 * columns: unit_id
 	 */
-	@ForeignKey(name = "snapshots_stock_id_fkey", references = "bb.stocks", columns = { "stock_id" }, refColumns = { "id" })
-	public static final String bb$stocks$snapshots_stock_id_fkey = "snapshots_stock_id_fkey";
+	@ForeignKey(name = "snapshots_unit_id_fkey", references = "bb.units", columns = { "unit_id" }, refColumns = { "id" })
+	public static final String bb$units$snapshots_unit_id_fkey = "snapshots_unit_id_fkey";
 
 	/**
 	 * name: snapshots_updated_by_fkey<br>
@@ -380,7 +380,7 @@ public class snapshots
 		/**
 		 * setter
 		 * name: unlimited<br>
-		* remarks: 在庫無制限<br>
+		* remarks: 数量無制限<br>
 		* trueの場合、totalがマイナスでもエラーとならない<br>
 		* type: bool(1)<br>
 		* not null: true<br>
@@ -398,7 +398,7 @@ public class snapshots
 		/**
 		 * getter
 		 * name: unlimited<br>
-		* remarks: 在庫無制限<br>
+		* remarks: 数量無制限<br>
 		* trueの場合、totalがマイナスでもエラーとならない<br>
 		* type: bool(1)<br>
 		* not null: true<br>
@@ -412,7 +412,7 @@ public class snapshots
 		/**
 		 * setter
 		 * name: in_search_scope<br>
-		* remarks: 在庫数量検索対象<br>
+		* remarks: 数量検索対象<br>
 		* snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する<br>
 		* 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
 		* type: bool(1)<br>
@@ -431,7 +431,7 @@ public class snapshots
 		/**
 		 * getter
 		 * name: in_search_scope<br>
-		* remarks: 在庫数量検索対象<br>
+		* remarks: 数量検索対象<br>
 		* snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する<br>
 		* 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
 		* type: bool(1)<br>
@@ -446,7 +446,7 @@ public class snapshots
 		/**
 		 * setter
 		 * name: total<br>
-		* remarks: この時点の在庫総数<br>
+		* remarks: この時点の総数<br>
 		* type: numeric(131089)<br>
 		* not null: true<br>
 		 * @param value java.math.BigDecimal
@@ -463,7 +463,7 @@ public class snapshots
 		/**
 		 * getter
 		 * name: total<br>
-		* remarks: この時点の在庫総数<br>
+		* remarks: この時点の総数<br>
 		* type: numeric(131089)<br>
 		* not null: true<br>
 		 * @return java.math.BigDecimal
@@ -475,97 +475,97 @@ public class snapshots
 
 		/**
 		 * setter
-		 * name: transfer_group_id<br>
-		* remarks: 移動伝票のグループID<br>
-		* 検索高速化のためtransfers.group_idをここに持つ<br>
+		 * name: journal_group_id<br>
+		* remarks: 伝票のグループID<br>
+		* 検索高速化のためjournals.group_idをここに持つ<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setTransfer_group_id(java.util.UUID value) {
+		public void setJournal_group_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("transfer_group_id").getType());
-			data$.setValue("transfer_group_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("journal_group_id").getType());
+			data$.setValue("journal_group_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: transfer_group_id<br>
-		* remarks: 移動伝票のグループID<br>
-		* 検索高速化のためtransfers.group_idをここに持つ<br>
+		 * name: journal_group_id<br>
+		* remarks: 伝票のグループID<br>
+		* 検索高速化のためjournals.group_idをここに持つ<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getTransfer_group_id() {
-			Binder binder = data$.getValue("transfer_group_id");
+		public java.util.UUID getJournal_group_id() {
+			Binder binder = data$.getValue("journal_group_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
-		 * name: stock_id<br>
-		* remarks: 在庫ID<br>
-		* 検索高速化のためnodes.stock_idをここに持つ<br>
+		 * name: unit_id<br>
+		* remarks: 管理対象ID<br>
+		* 検索高速化のためnodes.unit_idをここに持つ<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setStock_id(java.util.UUID value) {
+		public void setUnit_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("stock_id").getType());
-			data$.setValue("stock_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("unit_id").getType());
+			data$.setValue("unit_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: stock_id<br>
-		* remarks: 在庫ID<br>
-		* 検索高速化のためnodes.stock_idをここに持つ<br>
+		 * name: unit_id<br>
+		* remarks: 管理対象ID<br>
+		* 検索高速化のためnodes.unit_idをここに持つ<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getStock_id() {
-			Binder binder = data$.getValue("stock_id");
+		public java.util.UUID getUnit_id() {
+			Binder binder = data$.getValue("unit_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
-		 * name: transferred_at<br>
-		* remarks: 移動時刻<br>
-		* 検索高速化のためtransfers.transferred_atをここに持つ<br>
+		 * name: fixed_at<br>
+		* remarks: 確定時刻<br>
+		* 検索高速化のためjournals.fixed_atをここに持つ<br>
 		* type: timestamptz(35, 6)<br>
 		* not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
-		public void setTransferred_at(java.sql.Timestamp value) {
+		public void setFixed_at(java.sql.Timestamp value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("transferred_at").getType());
-			data$.setValue("transferred_at", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("fixed_at").getType());
+			data$.setValue("fixed_at", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: transferred_at<br>
-		* remarks: 移動時刻<br>
-		* 検索高速化のためtransfers.transferred_atをここに持つ<br>
+		 * name: fixed_at<br>
+		* remarks: 確定時刻<br>
+		* 検索高速化のためjournals.fixed_atをここに持つ<br>
 		* type: timestamptz(35, 6)<br>
 		* not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
-		public java.sql.Timestamp getTransferred_at() {
-			Binder binder = data$.getValue("transferred_at");
+		public java.sql.Timestamp getFixed_at() {
+			Binder binder = data$.getValue("fixed_at");
 			return (java.sql.Timestamp) binder.getValue();
 		}
 
@@ -573,7 +573,7 @@ public class snapshots
 		 * setter
 		 * name: created_at<br>
 		* remarks: 登録時刻<br>
-		* 検索高速化のためtransfers.created_atをここに持つ<br>
+		* 検索高速化のためjournals.created_atをここに持つ<br>
 		* type: timestamptz(35, 6)<br>
 		* not null: true<br>
 		 * @param value java.sql.Timestamp
@@ -591,7 +591,7 @@ public class snapshots
 		 * getter
 		 * name: created_at<br>
 		* remarks: 登録時刻<br>
-		* 検索高速化のためtransfers.created_atをここに持つ<br>
+		* 検索高速化のためjournals.created_atをここに持つ<br>
 		* type: timestamptz(35, 6)<br>
 		* not null: true<br>
 		 * @return java.sql.Timestamp
@@ -604,7 +604,7 @@ public class snapshots
 		/**
 		 * setter
 		 * name: node_seq<br>
-		* remarks: 移動ノードの登録順<br>
+		* remarks: 伝票ノードの登録順<br>
 		* 検索高速化のためnodes.seqをここに持つ<br>
 		* type: int4(10)<br>
 		* not null: true<br>
@@ -622,7 +622,7 @@ public class snapshots
 		/**
 		 * getter
 		 * name: node_seq<br>
-		* remarks: 移動ノードの登録順<br>
+		* remarks: 伝票ノードの登録順<br>
 		* 検索高速化のためnodes.seqをここに持つ<br>
 		* type: int4(10)<br>
 		* not null: true<br>
@@ -696,13 +696,13 @@ public class snapshots
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 snapshots_transfer_group_id_fkey<br>
-		 * 項目名 transfer_group_id
+		 * 外部キー名 snapshots_journal_group_id_fkey<br>
+		 * 項目名 journal_group_id
 		 * @return 参照しているレコードの Row
 		 */
 		public sqlassist.bb.groups.Row $groups() {
 			return sqlassist.bb.groups.row(
-				data$.getDataObject(bb$groups$snapshots_transfer_group_id_fkey));
+				data$.getDataObject(bb$groups$snapshots_journal_group_id_fkey));
 		}
 
 		/**
@@ -719,14 +719,14 @@ public class snapshots
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 stocks<br>
-		 * 外部キー名 snapshots_stock_id_fkey<br>
-		 * 項目名 stock_id
+		 * 参照先テーブル名 units<br>
+		 * 外部キー名 snapshots_unit_id_fkey<br>
+		 * 項目名 unit_id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.stocks.Row $stocks() {
-			return sqlassist.bb.stocks.row(
-				data$.getDataObject(bb$stocks$snapshots_stock_id_fkey));
+		public sqlassist.bb.units.Row $units() {
+			return sqlassist.bb.units.row(
+				data$.getDataObject(bb$units$snapshots_unit_id_fkey));
 		}
 
 		/**
@@ -1833,19 +1833,19 @@ public class snapshots
 		public final T total;
 
 		/**
-		 * 項目名 transfer_group_id
+		 * 項目名 journal_group_id
 		 */
-		public final T transfer_group_id;
+		public final T journal_group_id;
 
 		/**
-		 * 項目名 stock_id
+		 * 項目名 unit_id
 		 */
-		public final T stock_id;
+		public final T unit_id;
 
 		/**
-		 * 項目名 transferred_at
+		 * 項目名 fixed_at
 		 */
-		public final T transferred_at;
+		public final T fixed_at;
 
 		/**
 		 * 項目名 created_at
@@ -1890,15 +1890,15 @@ public class snapshots
 			this.total = builder$.buildColumn(
 				this,
 				sqlassist.bb.snapshots.total);
-			this.transfer_group_id = builder$.buildColumn(
+			this.journal_group_id = builder$.buildColumn(
 				this,
-				sqlassist.bb.snapshots.transfer_group_id);
-			this.stock_id = builder$.buildColumn(
+				sqlassist.bb.snapshots.journal_group_id);
+			this.unit_id = builder$.buildColumn(
 				this,
-				sqlassist.bb.snapshots.stock_id);
-			this.transferred_at = builder$.buildColumn(
+				sqlassist.bb.snapshots.unit_id);
+			this.fixed_at = builder$.buildColumn(
 				this,
-				sqlassist.bb.snapshots.transferred_at);
+				sqlassist.bb.snapshots.fixed_at);
 			this.created_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.snapshots.created_at);
@@ -2028,15 +2028,15 @@ public class snapshots
 
 		/**
 		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 snapshots_transfer_group_id_fkey<br>
-		 * 項目名 transfer_group_id
+		 * 外部キー名 snapshots_journal_group_id_fkey<br>
+		 * 項目名 journal_group_id
 		 * @return groups relationship
 		 */
 		public sqlassist.bb.groups.ExtAssist<T, Many<sqlassist.bb.snapshots.Row, M>> $groups() {
 			return new sqlassist.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb.snapshots.bb$groups$snapshots_transfer_group_id_fkey);
+				sqlassist.bb.snapshots.bb$groups$snapshots_journal_group_id_fkey);
 		}
 
 		/**
@@ -2053,16 +2053,16 @@ public class snapshots
 		}
 
 		/**
-		 * 参照先テーブル名 stocks<br>
-		 * 外部キー名 snapshots_stock_id_fkey<br>
-		 * 項目名 stock_id
-		 * @return stocks relationship
+		 * 参照先テーブル名 units<br>
+		 * 外部キー名 snapshots_unit_id_fkey<br>
+		 * 項目名 unit_id
+		 * @return units relationship
 		 */
-		public sqlassist.bb.stocks.ExtAssist<T, Many<sqlassist.bb.snapshots.Row, M>> $stocks() {
-			return new sqlassist.bb.stocks.ExtAssist<>(
+		public sqlassist.bb.units.ExtAssist<T, Many<sqlassist.bb.snapshots.Row, M>> $units() {
+			return new sqlassist.bb.units.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb.snapshots.bb$stocks$snapshots_stock_id_fkey);
+				sqlassist.bb.snapshots.bb$units$snapshots_unit_id_fkey);
 		}
 
 		/**

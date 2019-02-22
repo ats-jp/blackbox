@@ -163,11 +163,11 @@ public class jobs
 
 	/**
 	 * name: jobs_id_fkey<br>
-	 * references: transfers<br>
+	 * references: journals<br>
 	 * columns: id
 	 */
-	@ForeignKey(name = "jobs_id_fkey", references = "bb.transfers", columns = { "id" }, refColumns = { "id" })
-	public static final String bb$transfers$jobs_id_fkey = "jobs_id_fkey";
+	@ForeignKey(name = "jobs_id_fkey", references = "bb.journals", columns = { "id" }, refColumns = { "id" })
+	public static final String bb$journals$jobs_id_fkey = "jobs_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -334,14 +334,14 @@ public class jobs
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 transfers<br>
+		 * 参照先テーブル名 journals<br>
 		 * 外部キー名 jobs_id_fkey<br>
 		 * 項目名 id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.transfers.Row $transfers() {
-			return sqlassist.bb.transfers.row(
-				data$.getDataObject(bb$transfers$jobs_id_fkey));
+		public sqlassist.bb.journals.Row $journals() {
+			return sqlassist.bb.journals.row(
+				data$.getDataObject(bb$journals$jobs_id_fkey));
 		}
 
 	}
@@ -1566,16 +1566,16 @@ public class jobs
 		}
 
 		/**
-		 * 参照先テーブル名 transfers<br>
+		 * 参照先テーブル名 journals<br>
 		 * 外部キー名 jobs_id_fkey<br>
 		 * 項目名 id
-		 * @return transfers relationship
+		 * @return journals relationship
 		 */
-		public sqlassist.bb.transfers.ExtAssist<T, Many<sqlassist.bb.jobs.Row, M>> $transfers() {
-			return new sqlassist.bb.transfers.ExtAssist<>(
+		public sqlassist.bb.journals.ExtAssist<T, Many<sqlassist.bb.jobs.Row, M>> $journals() {
+			return new sqlassist.bb.journals.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb.jobs.bb$transfers$jobs_id_fkey);
+				sqlassist.bb.jobs.bb$journals$jobs_id_fkey);
 		}
 
 	}

@@ -76,7 +76,7 @@ id='00000000-0000-0000-0000-000000000000'のデータ
 
 CREATE SCHEMA bb;
 
-COMMENT ON SCHEMA bb IS 'Blackbox Main Schema';
+COMMENT ON SCHEMA bb IS 'Blackbox Core Schema';
 
 /*
 --postgresql tablespace
@@ -104,6 +104,8 @@ INSERT INTO bb.instances VALUES (
 	COALESCE(current_database(), 'unknown_database') || ' [' || COALESCE(inet_server_addr()::text, 'unknown_addr') || ':' || COALESCE(inet_server_port()::text, 'unknown_port') || ']',
 	true,
 	'');
+
+----------
 
 --組織
 CREATE TABLE bb.orgs (
@@ -174,6 +176,8 @@ INSERT INTO bb.orgs (
 CREATE TABLE bb.tags (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	tag text UNIQUE NOT NULL);
+
+----------
 
 --グループ
 CREATE TABLE bb.groups (
@@ -445,227 +449,6 @@ COMMENT ON COLUMN bb.locking_groups.locked_at IS 'ロック開始時刻';
 
 ALTER TABLE bb.locking_groups ADD CONSTRAINT locking_groups_cascade_id_fkey FOREIGN KEY (cascade_id) REFERENCES bb.locking_groups ON DELETE CASCADE;
 
---===========================
---master tables
---===========================
-
---アイテム
---SKU、個品
-CREATE TABLE bb.items (
-	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	group_id uuid REFERENCES bb.groups NOT NULL,
-	name text NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
-	tags text[] DEFAULT '{}' NOT NULL,
-	active boolean DEFAULT true NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by uuid REFERENCES bb.users NOT NULL,
-	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users NOT NULL);
---log対象
-
-COMMENT ON TABLE bb.items IS 'アイテム
-在庫管理する対象となる「もの」';
-COMMENT ON COLUMN bb.items.id IS 'ID';
-COMMENT ON COLUMN bb.items.group_id IS 'グループID';
-COMMENT ON COLUMN bb.items.name IS '名称';
-COMMENT ON COLUMN bb.items.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb.items.extension IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.items.tags IS 'log保存用タグ';
-COMMENT ON COLUMN bb.items.active IS 'アクティブフラグ';
-COMMENT ON COLUMN bb.items.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.items.created_by IS '作成ユーザー';
-COMMENT ON COLUMN bb.items.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.items.updated_by IS '更新ユーザー';
-
---NULLの代用(id=0)
-INSERT INTO bb.items (
-	id,
-	group_id,
-	name,
-	revision,
-	extension,
-	created_by,
-	updated_by
-) VALUES (
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000',
-	'NULL',
-	0,
-	'{}',
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000');
-
-CREATE TABLE bb.items_tags (
-	id uuid REFERENCES bb.items ON DELETE CASCADE NOT NULL,
-	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
-	UNIQUE (id, tag_id));
-
-----------
-
---所有者
---顧客、委託者
-CREATE TABLE bb.owners (
-	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	group_id uuid REFERENCES bb.groups NOT NULL,
-	name text NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
-	tags text[] DEFAULT '{}' NOT NULL,
-	active boolean DEFAULT true NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by uuid REFERENCES bb.users NOT NULL,
-	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users NOT NULL);
---log対象
-
-COMMENT ON TABLE bb.owners IS '所有者
-アイテムの所有者';
-COMMENT ON COLUMN bb.owners.id IS 'ID';
-COMMENT ON COLUMN bb.owners.group_id IS 'グループID';
-COMMENT ON COLUMN bb.owners.name IS '名称';
-COMMENT ON COLUMN bb.owners.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb.owners.extension IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.owners.tags IS 'log保存用タグ';
-COMMENT ON COLUMN bb.owners.active IS 'アクティブフラグ';
-COMMENT ON COLUMN bb.owners.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.owners.created_by IS '作成ユーザー';
-COMMENT ON COLUMN bb.owners.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.owners.updated_by IS '更新ユーザー';
-
---NULLの代用(id=0)
-INSERT INTO bb.owners (
-	id,
-	group_id,
-	name,
-	revision,
-	extension,
-	created_by,
-	updated_by
-) VALUES (
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000',
-	'NULL',
-	0,
-	'{}',
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000');
-
-CREATE TABLE bb.owners_tags (
-	id uuid REFERENCES bb.owners ON DELETE CASCADE NOT NULL,
-	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
-	UNIQUE (id, tag_id));
-
-----------
-
---置き場
---棚、現場
-CREATE TABLE bb.locations (
-	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	group_id uuid REFERENCES bb.groups NOT NULL,
-	name text NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
-	tags text[] DEFAULT '{}' NOT NULL,
-	active boolean DEFAULT true NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by uuid REFERENCES bb.users NOT NULL,
-	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users NOT NULL);
---log対象
-
-COMMENT ON TABLE bb.locations IS '置き場
-アイテムの置き場';
-COMMENT ON COLUMN bb.locations.id IS 'ID';
-COMMENT ON COLUMN bb.locations.group_id IS 'グループID';
-COMMENT ON COLUMN bb.locations.name IS '名称';
-COMMENT ON COLUMN bb.locations.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb.locations.extension IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.locations.tags IS 'log保存用タグ';
-COMMENT ON COLUMN bb.locations.active IS 'アクティブフラグ';
-COMMENT ON COLUMN bb.locations.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.locations.created_by IS '作成ユーザー';
-COMMENT ON COLUMN bb.locations.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.locations.updated_by IS '更新ユーザー';
-
---NULLの代用(id=0)
-INSERT INTO bb.locations (
-	id,
-	group_id,
-	name,
-	revision,
-	extension,
-	created_by,
-	updated_by
-) VALUES (
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000',
-	'NULL',
-	0,
-	'{}',
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000');
-
-CREATE TABLE bb.locations_tags (
-	id uuid REFERENCES bb.locations ON DELETE CASCADE NOT NULL,
-	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
-	UNIQUE (id, tag_id));
-
-----------
-
---状態
-CREATE TABLE bb.statuses (
-	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	group_id uuid REFERENCES bb.groups NOT NULL,
-	name text NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
-	tags text[] DEFAULT '{}' NOT NULL,
-	active boolean DEFAULT true NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by uuid REFERENCES bb.users NOT NULL,
-	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users NOT NULL);
---log対象
-
-COMMENT ON TABLE bb.statuses IS '状態
-Blackbox内でのアイテムの状態';
-COMMENT ON COLUMN bb.statuses.id IS 'ID';
-COMMENT ON COLUMN bb.statuses.group_id IS 'グループID';
-COMMENT ON COLUMN bb.statuses.name IS '名称';
-COMMENT ON COLUMN bb.statuses.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb.statuses.extension IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.statuses.tags IS 'log保存用タグ';
-COMMENT ON COLUMN bb.statuses.active IS 'アクティブフラグ';
-COMMENT ON COLUMN bb.statuses.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.statuses.created_by IS '作成ユーザー';
-COMMENT ON COLUMN bb.statuses.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.statuses.updated_by IS '更新ユーザー';
-
---NULLの代用(id=0)
-INSERT INTO bb.statuses (
-	id,
-	group_id,
-	name,
-	revision,
-	extension,
-	created_by,
-	updated_by
-) VALUES (
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000',
-	'NULL',
-	0,
-	'{}',
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000');
-
-CREATE TABLE bb.statuses_tags (
-	id uuid REFERENCES bb.statuses ON DELETE CASCADE NOT NULL,
-	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
-	UNIQUE (id, tag_id));
-
 ----------
 
 --締め
@@ -704,80 +487,63 @@ COMMENT ON COLUMN bb.last_closings.closed_at IS '締め時刻';
 
 ----------
 
---在庫
-CREATE TABLE bb.stocks (
+--管理対象
+CREATE TABLE bb.units (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
-	item_id uuid REFERENCES bb.items NOT NULL,
-	owner_id uuid REFERENCES bb.owners NOT NULL,
-	location_id uuid REFERENCES bb.locations NOT NULL,
-	status_id uuid REFERENCES bb.statuses NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by uuid REFERENCES bb.users NOT NULL,
-	UNIQUE (group_id, item_id, owner_id, location_id, status_id));
+	created_by uuid REFERENCES bb.users NOT NULL);
 --log対象外
 --一度登録されたら変更されない
 
-COMMENT ON TABLE bb.stocks IS '在庫
-Blackboxで数量管理する在庫の最小単位';
-COMMENT ON COLUMN bb.stocks.id IS 'ID';
-COMMENT ON COLUMN bb.stocks.group_id IS 'グループID
+COMMENT ON TABLE bb.units IS '管理対象
+Blackboxで数量管理する管理対象の最小単位';
+COMMENT ON COLUMN bb.units.id IS 'ID';
+COMMENT ON COLUMN bb.units.group_id IS 'グループID
 この在庫の属するグループ';
-COMMENT ON COLUMN bb.stocks.item_id IS 'アイテムID';
-COMMENT ON COLUMN bb.stocks.owner_id IS '所有者ID';
-COMMENT ON COLUMN bb.stocks.location_id IS '置き場ID';
-COMMENT ON COLUMN bb.stocks.status_id IS '状態ID';
-COMMENT ON COLUMN bb.stocks.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.stocks.created_by IS '作成ユーザー';
+COMMENT ON COLUMN bb.units.created_at IS '作成時刻';
+COMMENT ON COLUMN bb.units.created_by IS '作成ユーザー';
 
 --NULLの代用(id=0)
-INSERT INTO bb.stocks (
+INSERT INTO bb.units (
 	id,
 	group_id,
-	item_id,
-	owner_id,
-	location_id,
-	status_id,
 	created_by
 ) VALUES (
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
 --===========================
---transfer tables
+--journal tables
 --===========================
 
---移動伝票一括登録
-CREATE TABLE bb.transfer_batches (
+--伝票一括登録
+CREATE TABLE bb.journal_batches (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL);
 --log対象外
 
-COMMENT ON TABLE bb.transfer_batches IS '移動伝票一括登録';
-COMMENT ON COLUMN bb.transfer_batches.id IS 'ID';
-COMMENT ON COLUMN bb.transfer_batches.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.transfer_batches.created_by IS '作成ユーザー';
+COMMENT ON TABLE bb.journal_batches IS '伝票一括登録';
+COMMENT ON COLUMN bb.journal_batches.id IS 'ID';
+COMMENT ON COLUMN bb.journal_batches.created_at IS '作成時刻';
+COMMENT ON COLUMN bb.journal_batches.created_by IS '作成ユーザー';
 
-INSERT INTO bb.transfer_batches (id, created_by) VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
+INSERT INTO bb.journal_batches (id, created_by) VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
 
 ----------
 
---移動伝票
-CREATE TABLE bb.transfers (
+--伝票
+CREATE TABLE bb.journals (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
-	transfer_batch_id uuid REFERENCES bb.transfer_batches NOT NULL,
-	transferred_at timestamptz NOT NULL,
+	journal_batch_id uuid REFERENCES bb.journal_batches NOT NULL,
+	fixed_at timestamptz NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	instance_id uuid REFERENCES bb.instances NOT NULL,
-	denied_id uuid REFERENCES bb.transfers DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,
+	denied_id uuid REFERENCES bb.journals DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,
 	deny_reason text DEFAULT '' NOT NULL,
 	org_extension jsonb NOT NULL,
 	group_extension jsonb NOT NULL,
@@ -786,34 +552,34 @@ CREATE TABLE bb.transfers (
 	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, created_at)); 
 --log対象外
---順序を一意付けするためにcreated_atをUNIQUE化、他DBから移行してきたtransferのcreated_atと重複しないようにgroup_idも含める
+--順序を一意付けするためにcreated_atをUNIQUE化、他DBから移行してきたjournalのcreated_atと重複しないようにgroup_idも含める
 --groupは単一instance内でのみ動かすのでcreated_atが重複することはないはず
 
-COMMENT ON TABLE bb.transfers IS '移動伝票';
-COMMENT ON COLUMN bb.transfers.id IS 'ID';
-COMMENT ON COLUMN bb.transfers.group_id IS 'グループID
+COMMENT ON TABLE bb.journals IS '伝票';
+COMMENT ON COLUMN bb.journals.id IS 'ID';
+COMMENT ON COLUMN bb.journals.group_id IS 'グループID
 この伝票の属するグループ';
-COMMENT ON COLUMN bb.transfers.transfer_batch_id IS '移動伝票一括登録ID';
-COMMENT ON COLUMN bb.transfers.transferred_at IS '移動時刻';
-COMMENT ON COLUMN bb.transfers.extension IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.transfers.tags IS '保存用タグ';
-COMMENT ON COLUMN bb.transfers.instance_id IS '発生元インスタンスのID';
-COMMENT ON COLUMN bb.transfers.denied_id IS '取消元伝票ID
+COMMENT ON COLUMN bb.journals.journal_batch_id IS '移動伝票一括登録ID';
+COMMENT ON COLUMN bb.journals.fixed_at IS '確定時刻';
+COMMENT ON COLUMN bb.journals.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.journals.tags IS '保存用タグ';
+COMMENT ON COLUMN bb.journals.instance_id IS '発生元インスタンスのID';
+COMMENT ON COLUMN bb.journals.denied_id IS '取消元伝票ID
 訂正後の伝票が訂正前の伝票のIDを持つ
 ここに入っているIDが指す伝票は、取り消されたものとなる';
-COMMENT ON COLUMN bb.transfers.deny_reason IS '取消理由';
-COMMENT ON COLUMN bb.transfers.org_extension IS '組織のextension';
-COMMENT ON COLUMN bb.transfers.group_extension IS 'グループのextension';
-COMMENT ON COLUMN bb.transfers.user_extension IS '作成ユーザーのextension';
-COMMENT ON COLUMN bb.transfers.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.transfers.created_by IS '作成ユーザー';
+COMMENT ON COLUMN bb.journals.deny_reason IS '取消理由';
+COMMENT ON COLUMN bb.journals.org_extension IS '組織のextension';
+COMMENT ON COLUMN bb.journals.group_extension IS 'グループのextension';
+COMMENT ON COLUMN bb.journals.user_extension IS '作成ユーザーのextension';
+COMMENT ON COLUMN bb.journals.created_at IS '作成時刻';
+COMMENT ON COLUMN bb.journals.created_by IS '作成ユーザー';
 
 --NULLの代用(id=0)
-INSERT INTO bb.transfers (
+INSERT INTO bb.journals (
 	id,
 	group_id,
-	transfer_batch_id,
-	transferred_at,
+	journal_batch_id,
+	fixed_at,
 	extension,
 	instance_id,
 	org_extension,
@@ -839,96 +605,81 @@ CREATE FUNCTION bb.closed_check() RETURNS TRIGGER AS $$
 	DECLARE closed_at_local timestamptz;
 	BEGIN
 		SELECT INTO closed_at_local closed_at FROM bb.last_closings WHERE id = NEW.group_id;
-		IF closed_at_local IS NOT NULL AND NEW.transferred_at <= closed_at_local THEN
-			RAISE EXCEPTION 'closed_check(): {"id":"%", "group_id":"%", "transferred_at":"%", "closed_at":"%"}', NEW.id, NEW.group_id, NEW.transferred_at, closed_at_local;
+		IF closed_at_local IS NOT NULL AND NEW.fixed_at <= closed_at_local THEN
+			RAISE EXCEPTION 'closed_check(): {"id":"%", "group_id":"%", "fixed_at":"%", "closed_at":"%"}', NEW.id, NEW.group_id, NEW.fixed_at, closed_at_local;
 		END IF;
 		RETURN NEW;
 	END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER closed_checktrigger BEFORE INSERT ON bb.transfers
+CREATE TRIGGER closed_checktrigger BEFORE INSERT ON bb.journals
 FOR EACH ROW EXECUTE PROCEDURE bb.closed_check();
 
-CREATE TABLE bb.transfers_tags (
-	id uuid REFERENCES bb.transfers ON DELETE CASCADE NOT NULL,
+CREATE TABLE bb.journals_tags (
+	id uuid REFERENCES bb.journals ON DELETE CASCADE NOT NULL,
 	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
 
---移動伝票明細
-CREATE TABLE bb.bundles (
+--伝票明細
+CREATE TABLE bb.details (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	transfer_id uuid REFERENCES bb.transfers NOT NULL,
+	journal_id uuid REFERENCES bb.journals NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL);
 --log対象外
 
-COMMENT ON TABLE bb.bundles IS '移動伝票明細
-移動の単体
-移動伝票とノードの関連付けテーブル
-出庫ノードと入庫ノードを束ねる';
-COMMENT ON COLUMN bb.bundles.id IS 'ID';
-COMMENT ON COLUMN bb.bundles.transfer_id IS '移動伝票ID';
-COMMENT ON COLUMN bb.bundles.extension IS '外部アプリケーション情報JSON';
+COMMENT ON TABLE bb.details IS '伝票明細
+伝票とノードの関連付けテーブル
+出ノードと入ノードを束ねる';
+COMMENT ON COLUMN bb.details.id IS 'ID';
+COMMENT ON COLUMN bb.details.journal_id IS '伝票ID';
+COMMENT ON COLUMN bb.details.extension IS '外部アプリケーション情報JSON';
 
 --NULLの代用(id=0)
-INSERT INTO bb.bundles (
+INSERT INTO bb.details (
 	id,
-	transfer_id
+	journal_id
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
 ----------
 
---移動ノード
+--伝票明細ノード
 CREATE TABLE bb.nodes (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	bundle_id uuid REFERENCES bb.bundles NOT NULL,
-	stock_id uuid REFERENCES bb.stocks NOT NULL,
+	detail_id uuid REFERENCES bb.details NOT NULL,
+	unit_id uuid REFERENCES bb.units NOT NULL,
 	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL, --そのまま計算に使用できるように
 	seq integer NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	group_extension jsonb DEFAULT '{}' NOT NULL,
-	item_extension jsonb DEFAULT '{}' NOT NULL,
-	owner_extension jsonb DEFAULT '{}' NOT NULL,
-	location_extension jsonb DEFAULT '{}' NOT NULL,
-	status_extension jsonb DEFAULT '{}' NOT NULL);
---移動伝票明細片側
+	unit_extension jsonb DEFAULT '{}' NOT NULL);
 --log対象外
 
-COMMENT ON TABLE bb.nodes IS '移動ノード
-一移動の中の入庫もしくは出庫を表す';
+COMMENT ON TABLE bb.nodes IS '伝票明細ノード
+一伝票の中の入もしくは出を表す';
 COMMENT ON COLUMN bb.nodes.id IS 'ID';
-COMMENT ON COLUMN bb.nodes.bundle_id IS '移動ID';
-COMMENT ON COLUMN bb.nodes.stock_id IS '在庫ID';
-COMMENT ON COLUMN bb.nodes.in_out IS '入出庫区分
+COMMENT ON COLUMN bb.nodes.detail_id IS '明細ID';
+COMMENT ON COLUMN bb.nodes.unit_id IS '管理対象ID';
+COMMENT ON COLUMN bb.nodes.in_out IS '入出区分
 IN=1, OUT=-1';
-COMMENT ON COLUMN bb.nodes.seq IS '移動伝票内連番';
-COMMENT ON COLUMN bb.nodes.quantity IS '移動数量';
+COMMENT ON COLUMN bb.nodes.seq IS '伝票内連番';
+COMMENT ON COLUMN bb.nodes.quantity IS '数量';
 COMMENT ON COLUMN bb.nodes.grants_unlimited IS '数量無制限の許可
 trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない';
 COMMENT ON COLUMN bb.nodes.extension IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.nodes.group_extension IS 'グループのextension';
-COMMENT ON COLUMN bb.nodes.item_extension IS 'アイテムのextension';
-COMMENT ON COLUMN bb.nodes.owner_extension IS '所有者のextension';
-COMMENT ON COLUMN bb.nodes.location_extension IS '置き場のextension';
-COMMENT ON COLUMN bb.nodes.status_extension IS '状態のextension';
-
---transfer系のテーブルはINSERTのみなので、autovacuumは行わない場合は実行
---ただし、ANALYZEがかからなくなるので、定期的に実施する必要がある
---ALTER TABLE bb.transfers SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
---ALTER TABLE bb.bundles SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
---ALTER TABLE bb.stocks SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
---ALTER TABLE bb.nodes SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+COMMENT ON COLUMN bb.nodes.unit_extension IS '管理対象のextension';
 
 --NULLの代用(id=0)
 INSERT INTO bb.nodes (
 	id,
-	bundle_id,
-	stock_id,
+	detail_id,
+	unit_id,
 	in_out,
 	seq,
 	quantity
@@ -942,42 +693,51 @@ INSERT INTO bb.nodes (
 
 ----------
 
+--transfer系のテーブルはINSERTのみなので、autovacuumは行わない場合は実行
+--ただし、ANALYZEがかからなくなるので、定期的に実施する必要がある
+--ALTER TABLE bb.units SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+--ALTER TABLE bb.journals SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+--ALTER TABLE bb.details SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+--ALTER TABLE bb.nodes SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+
+----------
+
 --移動ノード状態
 CREATE UNLOGGED TABLE bb.snapshots (
 	id uuid PRIMARY KEY REFERENCES bb.nodes,
 	unlimited boolean NOT NULL,
 	in_search_scope boolean DEFAULT true NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
-	transfer_group_id uuid REFERENCES bb.groups NOT NULL,
-	stock_id uuid REFERENCES bb.stocks NOT NULL,
-	transferred_at timestamptz NOT NULL,
-	created_at timestamptz NOT NULL, --transfers.created_atと同一時間をJavaから指定するためDEFAULTなし
+	journal_group_id uuid REFERENCES bb.groups NOT NULL,
+	unit_id uuid REFERENCES bb.units NOT NULL,
+	fixed_at timestamptz NOT NULL,
+	created_at timestamptz NOT NULL, --journals.created_atと同一時間をJavaから指定するためDEFAULTなし
 	node_seq integer NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
---WAL対象外のため、クラッシュ時transfersから復元する必要あり
---頻繁に参照、更新されることが予想されるので締め済のデータは削除する
+--WAL対象外のため、クラッシュ時journalから復元する必要あり
+--頻繁に参照、更新されることが予想されるので締め済のデータは削除も可
 
 COMMENT ON TABLE bb.snapshots IS '移動ノード状態
-transferred_at時点でのstockの状態';
+fixed_at時点でのstockの状態';
 COMMENT ON COLUMN bb.snapshots.id IS 'ID
 nodes.node_idに従属';
-COMMENT ON COLUMN bb.snapshots.unlimited IS '在庫無制限
+COMMENT ON COLUMN bb.snapshots.unlimited IS '数量無制限
 trueの場合、totalがマイナスでもエラーとならない';
-COMMENT ON COLUMN bb.snapshots.in_search_scope IS '在庫数量検索対象
+COMMENT ON COLUMN bb.snapshots.in_search_scope IS '数量検索対象
 snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する
 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる';
-COMMENT ON COLUMN bb.snapshots.total IS 'この時点の在庫総数';
-COMMENT ON COLUMN bb.snapshots.transfer_group_id IS '移動伝票のグループID
-検索高速化のためtransfers.group_idをここに持つ';
-COMMENT ON COLUMN bb.snapshots.stock_id IS '在庫ID
-検索高速化のためnodes.stock_idをここに持つ';
-COMMENT ON COLUMN bb.snapshots.transferred_at IS '移動時刻
-検索高速化のためtransfers.transferred_atをここに持つ';
+COMMENT ON COLUMN bb.snapshots.total IS 'この時点の総数';
+COMMENT ON COLUMN bb.snapshots.journal_group_id IS '伝票のグループID
+検索高速化のためjournals.group_idをここに持つ';
+COMMENT ON COLUMN bb.snapshots.unit_id IS '管理対象ID
+検索高速化のためnodes.unit_idをここに持つ';
+COMMENT ON COLUMN bb.snapshots.fixed_at IS '確定時刻
+検索高速化のためjournals.fixed_atをここに持つ';
 COMMENT ON COLUMN bb.snapshots.created_at IS '登録時刻
-検索高速化のためtransfers.created_atをここに持つ';
-COMMENT ON COLUMN bb.snapshots.node_seq IS '移動ノードの登録順
+検索高速化のためjournals.created_atをここに持つ';
+COMMENT ON COLUMN bb.snapshots.node_seq IS '伝票ノードの登録順
 検索高速化のためnodes.seqをここに持つ';
 COMMENT ON COLUMN bb.snapshots.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
@@ -988,9 +748,9 @@ INSERT INTO bb.snapshots (
 	unlimited,
 	in_search_scope,
 	total,
-	transfer_group_id,
-	stock_id,
-	transferred_at,
+	journal_group_id,
+	unit_id,
+	fixed_at,
 	created_at,
 	node_seq,
 	updated_by
@@ -1009,32 +769,32 @@ INSERT INTO bb.snapshots (
 ----------
 
 --現在在庫
-CREATE UNLOGGED TABLE bb.current_stocks (
-	id uuid PRIMARY KEY REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
+CREATE UNLOGGED TABLE bb.current_units (
+	id uuid PRIMARY KEY REFERENCES bb.units, --unitは削除されないのでCASCADEなし
 	unlimited boolean NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
 	snapshot_id uuid REFERENCES bb.snapshots NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
---WAL対象外のため、クラッシュ時transfersから復元する必要あり
+--WAL対象外のため、クラッシュ時journalsから復元する必要あり
 --totalの更新は常にポーリング処理から行われるためupdated_byを持たない
 
-COMMENT ON TABLE bb.current_stocks IS '現在在庫
-在庫の現在数を保持';
-COMMENT ON COLUMN bb.current_stocks.id IS 'ID
-stocks.stock_idに従属';
-COMMENT ON COLUMN bb.current_stocks.unlimited IS '在庫無制限
+COMMENT ON TABLE bb.current_units IS '現時点管理対象
+管理対象の現在数を保持';
+COMMENT ON COLUMN bb.current_units.id IS 'ID
+units.unit_idに従属';
+COMMENT ON COLUMN bb.current_units.unlimited IS '数量無制限
 trueの場合、totalがマイナスでもエラーとならない';
-COMMENT ON COLUMN bb.current_stocks.total IS '現時点の在庫総数';
-COMMENT ON COLUMN bb.current_stocks.snapshot_id IS 'スナップショットID
+COMMENT ON COLUMN bb.current_units.total IS '現時点の総数';
+COMMENT ON COLUMN bb.current_units.snapshot_id IS 'スナップショットID
 現時点の数量を変更した伝票';
-COMMENT ON COLUMN bb.current_stocks.updated_at IS '更新時刻';
+COMMENT ON COLUMN bb.current_units.updated_at IS '更新時刻';
 
 ----------
 
---締め在庫
-CREATE TABLE bb.closed_stocks (
-	id uuid PRIMARY KEY REFERENCES bb.stocks, --stockは削除されないのでCASCADEなし
+--締め管理対象
+CREATE TABLE bb.closed_units (
+	id uuid PRIMARY KEY REFERENCES bb.units, --unitは削除されないのでCASCADEなし
 	closing_id uuid REFERENCES bb.closings ON DELETE CASCADE NOT NULL,
 	unlimited boolean NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
@@ -1044,19 +804,19 @@ CREATE TABLE bb.closed_stocks (
 --締め完了後の在庫数を保持
 --クラッシュ時、ここからsnapshotsとcurrent_stocksを復元する
 
-COMMENT ON TABLE bb.closed_stocks IS '締め在庫';
-COMMENT ON COLUMN bb.closed_stocks.id IS 'ID
+COMMENT ON TABLE bb.closed_units IS '締め在庫';
+COMMENT ON COLUMN bb.closed_units.id IS 'ID
 在庫IDに従属';
-COMMENT ON COLUMN bb.closed_stocks.closing_id IS '締めID';
-COMMENT ON COLUMN bb.closed_stocks.unlimited IS '在庫無制限
+COMMENT ON COLUMN bb.closed_units.closing_id IS '締めID';
+COMMENT ON COLUMN bb.closed_units.unlimited IS '在庫無制限
 trueの場合、totalがマイナスでもエラーとならない';
-COMMENT ON COLUMN bb.closed_stocks.total IS '締め後の在庫総数';
-COMMENT ON COLUMN bb.closed_stocks.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.closed_stocks.updated_by IS '更新ユーザー';
+COMMENT ON COLUMN bb.closed_units.total IS '締め後の在庫総数';
+COMMENT ON COLUMN bb.closed_units.updated_at IS '更新時刻';
+COMMENT ON COLUMN bb.closed_units.updated_by IS '更新ユーザー';
 
 --現在在庫数量反映ジョブ
 CREATE TABLE bb.jobs (
-	id uuid PRIMARY KEY REFERENCES bb.transfers,
+	id uuid PRIMARY KEY REFERENCES bb.journals,
 	completed boolean DEFAULT false NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL);
 --transfer毎に作成
@@ -1072,8 +832,8 @@ COMMENT ON COLUMN bb.jobs.updated_at IS '更新時刻';
 
 ----------
 
---transfer登録時に発生したエラー
-CREATE TABLE bb.transfer_errors (
+--journal登録時に発生したエラー
+CREATE TABLE bb.journal_errors (
 	abandoned_id uuid NOT NULL,
 	command_type "char" CHECK (command_type IN ('R', 'D', 'C')) NOT NULL,
 	error_type text NOT NULL,
@@ -1084,18 +844,18 @@ CREATE TABLE bb.transfer_errors (
 	request jsonb DEFAULT '{}' NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL);
 
-COMMENT ON TABLE bb.transfer_errors IS 'transfer登録時に発生したエラー';
-COMMENT ON COLUMN bb.transfer_errors.abandoned_id IS 'transferもしくはclosingに使用される予定だったID';
-COMMENT ON COLUMN bb.transfer_errors.command_type IS '処理のタイプ
+COMMENT ON TABLE bb.journal_errors IS 'journal登録時に発生したエラー';
+COMMENT ON COLUMN bb.journal_errors.abandoned_id IS 'journalもしくはclosingに使用される予定だったID';
+COMMENT ON COLUMN bb.journal_errors.command_type IS '処理のタイプ
 R=transfer登録, D=transfer取消, C=closing';
-COMMENT ON COLUMN bb.transfer_errors.error_type IS 'エラーの種類';
-COMMENT ON COLUMN bb.transfer_errors.message IS 'エラーメッセージ';
-COMMENT ON COLUMN bb.transfer_errors.stack_trace IS 'スタックトレース';
-COMMENT ON COLUMN bb.transfer_errors.sql_state IS 'DBエラーコード';
-COMMENT ON COLUMN bb.transfer_errors.user_id IS '登録ユーザー';
-COMMENT ON COLUMN bb.transfer_errors.request IS '登録リクエスト内容
+COMMENT ON COLUMN bb.journal_errors.error_type IS 'エラーの種類';
+COMMENT ON COLUMN bb.journal_errors.message IS 'エラーメッセージ';
+COMMENT ON COLUMN bb.journal_errors.stack_trace IS 'スタックトレース';
+COMMENT ON COLUMN bb.journal_errors.sql_state IS 'DBエラーコード';
+COMMENT ON COLUMN bb.journal_errors.user_id IS '登録ユーザー';
+COMMENT ON COLUMN bb.journal_errors.request IS '登録リクエスト内容
 取消処理の場合、{}';
-COMMENT ON COLUMN bb.transfer_errors.created_at IS '登録時刻';
+COMMENT ON COLUMN bb.journal_errors.created_at IS '登録時刻';
 
 --===========================
 --transient tables
@@ -1136,11 +896,11 @@ CREATE TABLE bb.transients_tags (
 ----------
 
 --一時作業移動伝票
-CREATE TABLE bb.transient_transfers (
+CREATE TABLE bb.transient_journals (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	transient_id uuid REFERENCES bb.transients ON DELETE CASCADE NOT NULL, --transientが削除されたら削除
 	group_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
-	transferred_at timestamptz NOT NULL,
+	fixed_at timestamptz NOT NULL,
 	seq bigserial NOT NULL, --DB内生成順を保証
 	extension jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -1150,73 +910,73 @@ CREATE TABLE bb.transient_transfers (
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 
-COMMENT ON TABLE bb.transient_transfers IS '一時作業移動伝票';
-COMMENT ON COLUMN bb.transient_transfers.id IS 'ID';
-COMMENT ON COLUMN bb.transient_transfers.transient_id IS '一時作業ID';
-COMMENT ON COLUMN bb.transient_transfers.group_id IS 'グループID';
-COMMENT ON COLUMN bb.transient_transfers.transferred_at IS '移動時刻';
-COMMENT ON COLUMN bb.transient_transfers.seq IS 'DB内生成順
-transferred_atが同一の場合、優先順を決定';
-COMMENT ON COLUMN bb.transient_transfers.extension IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.transient_transfers.tags IS '保存用タグ';
-COMMENT ON COLUMN bb.transient_transfers.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb.transient_transfers.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.transient_transfers.created_by IS '作成ユーザー';
-COMMENT ON COLUMN bb.transient_transfers.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.transient_transfers.updated_by IS '更新ユーザー';
+COMMENT ON TABLE bb.transient_journals IS '一時作業移動伝票';
+COMMENT ON COLUMN bb.transient_journals.id IS 'ID';
+COMMENT ON COLUMN bb.transient_journals.transient_id IS '一時作業ID';
+COMMENT ON COLUMN bb.transient_journals.group_id IS 'グループID';
+COMMENT ON COLUMN bb.transient_journals.fixed_at IS '移動時刻';
+COMMENT ON COLUMN bb.transient_journals.seq IS 'DB内生成順
+fixed_atが同一の場合、優先順を決定';
+COMMENT ON COLUMN bb.transient_journals.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.transient_journals.tags IS '保存用タグ';
+COMMENT ON COLUMN bb.transient_journals.revision IS 'リビジョン番号';
+COMMENT ON COLUMN bb.transient_journals.created_at IS '作成時刻';
+COMMENT ON COLUMN bb.transient_journals.created_by IS '作成ユーザー';
+COMMENT ON COLUMN bb.transient_journals.updated_at IS '更新時刻';
+COMMENT ON COLUMN bb.transient_journals.updated_by IS '更新ユーザー';
 
 --締め済グループチェック
 CREATE FUNCTION bb.transient_closed_check() RETURNS TRIGGER AS $$
 	DECLARE closed_at_local timestamptz;
 	BEGIN
 		SELECT INTO closed_at_local closed_at FROM bb.last_closings WHERE id = NEW.group_id;
-		IF closed_at_local IS NOT NULL AND NEW.transferred_at < closed_at_local THEN
+		IF closed_at_local IS NOT NULL AND NEW.fixed_at < closed_at_local THEN
 			RAISE EXCEPTION 'closed_check(): group id=[%] closed at %', NEW.group_id, closed_at_local;
 		END IF;
 		RETURN NEW;
 	END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER transient_closed_checktrigger BEFORE INSERT ON bb.transient_transfers
+CREATE TRIGGER transient_closed_checktrigger BEFORE INSERT ON bb.transient_journals
 FOR EACH ROW EXECUTE PROCEDURE bb.transient_closed_check();
 
-CREATE TABLE bb.transient_transfers_tags (
-	id uuid REFERENCES bb.transient_transfers ON DELETE CASCADE NOT NULL,
+CREATE TABLE bb.transient_journals_tags (
+	id uuid REFERENCES bb.transient_journals ON DELETE CASCADE NOT NULL,
 	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
 ----------
 
---一時作業移動伝票明細
-CREATE TABLE bb.transient_bundles (
+--一時作業伝票明細
+CREATE TABLE bb.transient_details (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	transient_transfer_id uuid REFERENCES bb.transient_transfers ON DELETE CASCADE NOT NULL,
-	seq_in_transfer integer NOT NULL,
+	transient_journal_id uuid REFERENCES bb.transient_journals ON DELETE CASCADE NOT NULL,
+	seq_in_journal integer NOT NULL,
 	extension jsonb DEFAULT '{}' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,-- 編集でtransient_bundlesだけ追加することもあるので必要
+	created_at timestamptz DEFAULT now() NOT NULL,-- 編集でtransient_detailsだけ追加することもあるので必要
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 
-COMMENT ON TABLE bb.transient_bundles IS '一時作業移動伝票明細';
-COMMENT ON COLUMN bb.transient_bundles.id IS 'ID';
-COMMENT ON COLUMN bb.transient_bundles.transient_transfer_id IS '一時作業移動伝票ID';
-COMMENT ON COLUMN bb.transient_bundles.seq_in_transfer IS '移動伝票内連番';
-COMMENT ON COLUMN bb.transient_bundles.extension IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.transient_bundles.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb.transient_bundles.created_at IS '作成時刻';
-COMMENT ON COLUMN bb.transient_bundles.created_by IS '作成ユーザー';
-COMMENT ON COLUMN bb.transient_bundles.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb.transient_bundles.updated_by IS '更新ユーザー';
+COMMENT ON TABLE bb.transient_details IS '一時作業伝票明細';
+COMMENT ON COLUMN bb.transient_details.id IS 'ID';
+COMMENT ON COLUMN bb.transient_details.transient_journal_id IS '一時作業伝票ID';
+COMMENT ON COLUMN bb.transient_details.seq_in_journal IS '伝票内連番';
+COMMENT ON COLUMN bb.transient_details.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.transient_details.revision IS 'リビジョン番号';
+COMMENT ON COLUMN bb.transient_details.created_at IS '作成時刻';
+COMMENT ON COLUMN bb.transient_details.created_by IS '作成ユーザー';
+COMMENT ON COLUMN bb.transient_details.updated_at IS '更新時刻';
+COMMENT ON COLUMN bb.transient_details.updated_by IS '更新ユーザー';
 
 ----------
 
 --一時作業移動ノード
 CREATE TABLE bb.transient_nodes (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	transient_bundle_id uuid REFERENCES bb.transient_bundles ON DELETE CASCADE NOT NULL,
-	stock_id uuid REFERENCES bb.stocks NOT NULL, --stockは削除されない
+	transient_detail_id uuid REFERENCES bb.transient_details ON DELETE CASCADE NOT NULL,
+	unit_id uuid REFERENCES bb.units NOT NULL, --unitは削除されない
 	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL, --そのまま計算に使用できるように
 	seq_in_bundle integer NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
@@ -1228,10 +988,10 @@ CREATE TABLE bb.transient_nodes (
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 
-COMMENT ON TABLE bb.transient_nodes IS '一時作業移動ノード';
+COMMENT ON TABLE bb.transient_nodes IS '一時作業伝票ノード';
 COMMENT ON COLUMN bb.transient_nodes.id IS 'ID';
-COMMENT ON COLUMN bb.transient_nodes.transient_bundle_id IS '移動ID';
-COMMENT ON COLUMN bb.transient_nodes.stock_id IS '在庫ID';
+COMMENT ON COLUMN bb.transient_nodes.transient_detail_id IS '移動ID';
+COMMENT ON COLUMN bb.transient_nodes.unit_id IS '管理対象ID';
 COMMENT ON COLUMN bb.transient_nodes.in_out IS '入出庫区分';
 COMMENT ON COLUMN bb.transient_nodes.seq_in_bundle IS '伝票明細内連番';
 COMMENT ON COLUMN bb.transient_nodes.quantity IS '移動数量';
@@ -1268,47 +1028,28 @@ CREATE INDEX ON bb.users (group_id);
 CREATE INDEX ON bb.users (role);
 CREATE INDEX ON bb.users (active);
 
---items
-CREATE INDEX ON bb.items (group_id);
-CREATE INDEX ON bb.items (active);
+--units
+CREATE INDEX ON bb.units (group_id);
 
---owners
-CREATE INDEX ON bb.owners (group_id);
-CREATE INDEX ON bb.owners (active);
+--journals
+CREATE INDEX ON bb.journals (group_id);
+CREATE INDEX ON bb.journals (fixed_at);
+CREATE INDEX ON bb.journals (created_at);
 
---locations
-CREATE INDEX ON bb.locations (group_id);
-CREATE INDEX ON bb.locations (active);
-
---statuses
-CREATE INDEX ON bb.statuses (group_id);
-CREATE INDEX ON bb.statuses (active);
-
---stocks
-CREATE INDEX ON bb.stocks (group_id);
-CREATE INDEX ON bb.stocks (item_id);
-CREATE INDEX ON bb.stocks (owner_id);
-CREATE INDEX ON bb.stocks (location_id);
-CREATE INDEX ON bb.stocks (status_id);
-
---current_stocks
-
---transfers
-CREATE INDEX ON bb.transfers (group_id);
-CREATE INDEX ON bb.transfers (transferred_at);
-CREATE INDEX ON bb.transfers (created_at);
-
---bundles
-CREATE INDEX ON bb.bundles (transfer_id);
+--details
+CREATE INDEX ON bb.details (journal_id);
 
 --nodes
-CREATE INDEX ON bb.nodes (bundle_id);
-CREATE INDEX ON bb.nodes (stock_id);
+CREATE INDEX ON bb.nodes (detail_id);
+CREATE INDEX ON bb.nodes (unit_id);
 
 --snapshots
 CREATE INDEX ON bb.snapshots (in_search_scope);
-CREATE INDEX ON bb.snapshots (stock_id);
-CREATE INDEX ON bb.snapshots (transferred_at);
+CREATE INDEX ON bb.snapshots (total);
+CREATE INDEX ON bb.snapshots (journal_group_id);
+CREATE INDEX ON bb.snapshots (unit_id);
+CREATE INDEX ON bb.snapshots (fixed_at);
+CREATE INDEX ON bb.snapshots (created_at);
 
 --jobs
 CREATE INDEX ON bb.jobs (completed);
@@ -1318,29 +1059,25 @@ CREATE INDEX ON bb.jobs (completed);
 CREATE INDEX ON bb.transients (group_id);
 CREATE INDEX ON bb.transients (user_id);
 
---transient_transfers
-CREATE INDEX ON bb.transient_transfers (transient_id);
-CREATE INDEX ON bb.transient_transfers (group_id);
-CREATE INDEX ON bb.transient_transfers (transferred_at);
-CREATE INDEX ON bb.transient_transfers (created_at);
+--transient_journals
+CREATE INDEX ON bb.transient_journals (transient_id);
+CREATE INDEX ON bb.transient_journals (group_id);
+CREATE INDEX ON bb.transient_journals (fixed_at);
+CREATE INDEX ON bb.transient_journals (created_at);
 
---transient_bundles
-CREATE INDEX ON bb.transient_bundles (transient_transfer_id);
+--transient_details
+CREATE INDEX ON bb.transient_details (transient_journal_id);
 
 --transient_nodes
-CREATE INDEX ON bb.transient_nodes (transient_bundle_id);
-CREATE INDEX ON bb.transient_nodes (stock_id);
+CREATE INDEX ON bb.transient_nodes (transient_detail_id);
+CREATE INDEX ON bb.transient_nodes (unit_id);
 
 --tags
 CREATE INDEX ON bb.groups_tags (tag_id);
 CREATE INDEX ON bb.users_tags (tag_id);
-CREATE INDEX ON bb.items_tags (tag_id);
-CREATE INDEX ON bb.owners_tags (tag_id);
-CREATE INDEX ON bb.locations_tags (tag_id);
-CREATE INDEX ON bb.statuses_tags (tag_id);
-CREATE INDEX ON bb.transfers_tags (tag_id);
+CREATE INDEX ON bb.journals_tags (tag_id);
 CREATE INDEX ON bb.transients_tags (tag_id);
-CREATE INDEX ON bb.transient_transfers_tags (tag_id);
+CREATE INDEX ON bb.transient_journals_tags (tag_id);
 
 --===========================
 --privileges
@@ -1360,21 +1097,17 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb.groups,
 	bb.relationships,
 	bb.users,
-	bb.items,
-	bb.owners,
-	bb.locations,
-	bb.statuses,
 	bb.transients,
-	bb.transient_transfers,
-	bb.transient_bundles,
+	bb.transient_journals,
+	bb.transient_details,
 	bb.transient_nodes
 TO blackbox;
 
 GRANT INSERT, UPDATE ON TABLE
 	bb.last_closings,
-	bb.current_stocks,
+	bb.current_units,
 	bb.snapshots,
-	bb.closed_stocks,
+	bb.closed_units,
 	bb.jobs
 TO blackbox;
 
@@ -1384,22 +1117,18 @@ GRANT INSERT, DELETE ON TABLE
 	bb.locking_groups,
 	bb.groups_tags,
 	bb.users_tags,
-	bb.items_tags,
-	bb.owners_tags,
-	bb.locations_tags,
-	bb.statuses_tags,
-	bb.transfers_tags,
+	bb.journals_tags,
 	bb.transients_tags,
-	bb.transient_transfers_tags
+	bb.transient_journals_tags
 TO blackbox;
 
 --closings, transfers関連はINSERTのみ
 GRANT INSERT ON TABLE
 	bb.closings,
-	bb.stocks,
-	bb.transfer_batches,
-	bb.transfers,
-	bb.bundles,
+	bb.units,
+	bb.journal_batches,
+	bb.journals,
+	bb.details,
 	bb.nodes,
-	bb.transfer_errors
+	bb.journal_errors
 TO blackbox;

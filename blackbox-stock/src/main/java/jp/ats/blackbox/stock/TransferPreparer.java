@@ -1,4 +1,4 @@
-package jp.ats.blackbox.persistence;
+package jp.ats.blackbox.stock;
 
 import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 
@@ -124,13 +124,13 @@ class TransferPreparer {
 
 		void setGroup_id(UUID id);
 
-		void setJournal_batch_id(UUID id);
+		void setTransfer_batch_id(UUID id);
 
 		void setDenied_id(UUID id);
 
 		void setDeny_reason(String reason);
 
-		void setFixed_at(Timestamp transferredAt);
+		void setTransferred_at(Timestamp transferredAt);
 
 		void setCreated_at(Timestamp createdAt);
 
@@ -153,7 +153,7 @@ class TransferPreparer {
 
 		void setId(UUID id);
 
-		void setJournal_id(UUID transferId);
+		void setTransfer_id(UUID transferId);
 
 		void setExtension(Object json);
 	}
@@ -162,9 +162,9 @@ class TransferPreparer {
 
 		void setId(UUID id);
 
-		void setDetail_id(UUID bundleId);
+		void setBundle_id(UUID bundleId);
 
-		void setUnit_id(UUID stockId);
+		void setStock_id(UUID stockId);
 
 		void setIn_out(Integer value);
 
@@ -178,6 +178,12 @@ class TransferPreparer {
 
 		void setGroup_extension(Object json);
 
-		void setUnit_extension(Object json);
+		void setItem_extension(Object json);
+
+		void setOwner_extension(Object json);
+
+		void setLocation_extension(Object json);
+
+		void setStatus_extension(Object json);
 	}
 }

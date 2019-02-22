@@ -25,14 +25,13 @@ import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
-import jp.ats.blackbox.persistence.StockHandler.StockComponents;
-import sqlassist.bb.bundles;
+import sqlassist.bb.details;
 import sqlassist.bb.jobs;
 import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
-import sqlassist.bb.transfer_batches;
-import sqlassist.bb.transfers;
-import sqlassist.bb.transfers_tags;
+import sqlassist.bb.journal_batches;
+import sqlassist.bb.journals;
+import sqlassist.bb.journals_tags;
 
 /**
  * transfer操作クラス
@@ -110,42 +109,13 @@ public class TransferHandler {
 	/**
 	 * node登録に必要な情報クラス
 	 */
-	public static class NodeRegisterRequest implements StockComponents {
+	public static class NodeRegisterRequest {
 
 		/**
-		 * stockの所属するグループ
-		 * stockに格納される
+		 * unit
 		 * 必須
 		 */
-		public UUID group_id;
-
-		/**
-		 * stockのitem
-		 * stockに格納される
-		 * 必須
-		 */
-		public UUID item_id;
-
-		/**
-		 * stockのowner
-		 * stockに格納される
-		 * 必須
-		 */
-		public UUID owner_id;
-
-		/**
-		 * stockのlocation
-		 * stockに格納される
-		 * 必須
-		 */
-		public UUID location_id;
-
-		/**
-		 * stockのstatus
-		 * stockに格納される
-		 * 必須
-		 */
-		public UUID status_id;
+		public UUID unit_id;
 
 		/**
 		 * 入出庫タイプ
@@ -153,18 +123,18 @@ public class TransferHandler {
 		public InOut in_out;
 
 		/**
-		 * 移動数量
+		 * 数量
 		 */
 		public BigDecimal quantity;
 
 		/**
-		 * これ以降在庫無制限を設定するか
-		 * 在庫無制限の場合、通常はstock登録時からtrueにしておく
+		 * これ以降数量無制限を設定するか
+		 * 数量無制限の場合、通常はunit登録時からtrueにしておく
 		 */
 		public Optional<Boolean> grants_unlimited = Optional.empty();
 
 		/**
-		 * 移動数量
+		 * 追加情報JSON
 		 */
 		public Optional<String> extension = Optional.empty();
 
@@ -173,30 +143,15 @@ public class TransferHandler {
 		 */
 		Optional<Object> restored_extension = Optional.empty();
 
-		@Override
-		public UUID groupId() {
-			return group_id;
-		}
+		/**
+		 * unit追加情報JSON
+		 */
+		public Optional<String> unit_extension = Optional.empty();
 
-		@Override
-		public UUID itemId() {
-			return item_id;
-		}
-
-		@Override
-		public UUID ownerId() {
-			return owner_id;
-		}
-
-		@Override
-		public UUID locationId() {
-			return location_id;
-		}
-
-		@Override
-		public UUID statusId() {
-			return status_id;
-		}
+		/**
+		 * DBから復元した追加情報JSON
+		 */
+		Optional<Object> restored_unit_extension = Optional.empty();
 	}
 
 	/**
@@ -241,7 +196,7 @@ public class TransferHandler {
 
 	private int nodeSeq;
 
-	private class Transfer extends transfers.Row implements TransferPreparer.Transfer {}
+	private class Transfer extends journals.Row implements TransferPreparer.Transfer {}
 
 	/**
 	 * transfer登録処理

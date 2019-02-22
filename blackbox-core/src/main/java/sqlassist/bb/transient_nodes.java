@@ -101,9 +101,9 @@ import org.blendee.assist.annotation.Table;
  * schema: bb<br>
  * name: transient_nodes<br>
  * type: TABLE<br>
- * remarks: 一時作業移動ノード<br>
+ * remarks: 一時作業伝票ノード<br>
  */
-@Table(name = "transient_nodes", schema = "bb", type = "TABLE", remarks = "一時作業移動ノード")
+@Table(name = "transient_nodes", schema = "bb", type = "TABLE", remarks = "一時作業伝票ノード")
 @PrimaryKey(name = "transient_nodes_pkey", columns = { "id" })
 public class transient_nodes
 	extends java.lang.Object
@@ -143,22 +143,22 @@ public class transient_nodes
 	public static final String id = "id";
 
 	/**
-	 * name: transient_bundle_id<br>
+	 * name: transient_detail_id<br>
 	 * remarks: 移動ID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "transient_bundle_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ID", defaultValue = "null", ordinalPosition = 2, notNull = true)
-	public static final String transient_bundle_id = "transient_bundle_id";
+	@Column(name = "transient_detail_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ID", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	public static final String transient_detail_id = "transient_detail_id";
 
 	/**
-	 * name: stock_id<br>
-	 * remarks: 在庫ID<br>
+	 * name: unit_id<br>
+	 * remarks: 管理対象ID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "stock_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "在庫ID", defaultValue = "null", ordinalPosition = 3, notNull = true)
-	public static final String stock_id = "stock_id";
+	@Column(name = "unit_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象ID", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String unit_id = "unit_id";
 
 	/**
 	 * name: in_out<br>
@@ -251,20 +251,20 @@ public class transient_nodes
 	public static final String updated_by = "updated_by";
 
 	/**
-	 * name: transient_nodes_stock_id_fkey<br>
-	 * references: stocks<br>
-	 * columns: stock_id
+	 * name: transient_nodes_transient_detail_id_fkey<br>
+	 * references: transient_details<br>
+	 * columns: transient_detail_id
 	 */
-	@ForeignKey(name = "transient_nodes_stock_id_fkey", references = "bb.stocks", columns = { "stock_id" }, refColumns = { "id" })
-	public static final String bb$stocks$transient_nodes_stock_id_fkey = "transient_nodes_stock_id_fkey";
+	@ForeignKey(name = "transient_nodes_transient_detail_id_fkey", references = "bb.transient_details", columns = { "transient_detail_id" }, refColumns = { "id" })
+	public static final String bb$transient_details$transient_nodes_transient_detail_id_fkey = "transient_nodes_transient_detail_id_fkey";
 
 	/**
-	 * name: transient_nodes_transient_bundle_id_fkey<br>
-	 * references: transient_bundles<br>
-	 * columns: transient_bundle_id
+	 * name: transient_nodes_unit_id_fkey<br>
+	 * references: units<br>
+	 * columns: unit_id
 	 */
-	@ForeignKey(name = "transient_nodes_transient_bundle_id_fkey", references = "bb.transient_bundles", columns = { "transient_bundle_id" }, refColumns = { "id" })
-	public static final String bb$transient_bundles$transient_nodes_transient_bundle_id_fkey = "transient_nodes_transient_bundle_id_fkey";
+	@ForeignKey(name = "transient_nodes_unit_id_fkey", references = "bb.units", columns = { "unit_id" }, refColumns = { "id" })
+	public static final String bb$units$transient_nodes_unit_id_fkey = "transient_nodes_unit_id_fkey";
 
 	/**
 	 * name: transient_nodes_created_by_fkey<br>
@@ -385,61 +385,61 @@ public class transient_nodes
 
 		/**
 		 * setter
-		 * name: transient_bundle_id<br>
+		 * name: transient_detail_id<br>
 		* remarks: 移動ID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setTransient_bundle_id(java.util.UUID value) {
+		public void setTransient_detail_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("transient_bundle_id").getType());
-			data$.setValue("transient_bundle_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("transient_detail_id").getType());
+			data$.setValue("transient_detail_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: transient_bundle_id<br>
+		 * name: transient_detail_id<br>
 		* remarks: 移動ID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getTransient_bundle_id() {
-			Binder binder = data$.getValue("transient_bundle_id");
+		public java.util.UUID getTransient_detail_id() {
+			Binder binder = data$.getValue("transient_detail_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
-		 * name: stock_id<br>
-		* remarks: 在庫ID<br>
+		 * name: unit_id<br>
+		* remarks: 管理対象ID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setStock_id(java.util.UUID value) {
+		public void setUnit_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("stock_id").getType());
-			data$.setValue("stock_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("unit_id").getType());
+			data$.setValue("unit_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: stock_id<br>
-		* remarks: 在庫ID<br>
+		 * name: unit_id<br>
+		* remarks: 管理対象ID<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getStock_id() {
-			Binder binder = data$.getValue("stock_id");
+		public java.util.UUID getUnit_id() {
+			Binder binder = data$.getValue("unit_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
@@ -745,26 +745,26 @@ public class transient_nodes
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 stocks<br>
-		 * 外部キー名 transient_nodes_stock_id_fkey<br>
-		 * 項目名 stock_id
+		 * 参照先テーブル名 transient_details<br>
+		 * 外部キー名 transient_nodes_transient_detail_id_fkey<br>
+		 * 項目名 transient_detail_id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.stocks.Row $stocks() {
-			return sqlassist.bb.stocks.row(
-				data$.getDataObject(bb$stocks$transient_nodes_stock_id_fkey));
+		public sqlassist.bb.transient_details.Row $transient_details() {
+			return sqlassist.bb.transient_details.row(
+				data$.getDataObject(bb$transient_details$transient_nodes_transient_detail_id_fkey));
 		}
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 transient_bundles<br>
-		 * 外部キー名 transient_nodes_transient_bundle_id_fkey<br>
-		 * 項目名 transient_bundle_id
+		 * 参照先テーブル名 units<br>
+		 * 外部キー名 transient_nodes_unit_id_fkey<br>
+		 * 項目名 unit_id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.transient_bundles.Row $transient_bundles() {
-			return sqlassist.bb.transient_bundles.row(
-				data$.getDataObject(bb$transient_bundles$transient_nodes_transient_bundle_id_fkey));
+		public sqlassist.bb.units.Row $units() {
+			return sqlassist.bb.units.row(
+				data$.getDataObject(bb$units$transient_nodes_unit_id_fkey));
 		}
 
 		/**
@@ -1868,14 +1868,14 @@ public class transient_nodes
 		public final T id;
 
 		/**
-		 * 項目名 transient_bundle_id
+		 * 項目名 transient_detail_id
 		 */
-		public final T transient_bundle_id;
+		public final T transient_detail_id;
 
 		/**
-		 * 項目名 stock_id
+		 * 項目名 unit_id
 		 */
-		public final T stock_id;
+		public final T unit_id;
 
 		/**
 		 * 項目名 in_out
@@ -1941,12 +1941,12 @@ public class transient_nodes
 			this.id = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_nodes.id);
-			this.transient_bundle_id = builder$.buildColumn(
+			this.transient_detail_id = builder$.buildColumn(
 				this,
-				sqlassist.bb.transient_nodes.transient_bundle_id);
-			this.stock_id = builder$.buildColumn(
+				sqlassist.bb.transient_nodes.transient_detail_id);
+			this.unit_id = builder$.buildColumn(
 				this,
-				sqlassist.bb.transient_nodes.stock_id);
+				sqlassist.bb.transient_nodes.unit_id);
 			this.in_out = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_nodes.in_out);
@@ -2093,29 +2093,29 @@ public class transient_nodes
 		}
 
 		/**
-		 * 参照先テーブル名 stocks<br>
-		 * 外部キー名 transient_nodes_stock_id_fkey<br>
-		 * 項目名 stock_id
-		 * @return stocks relationship
+		 * 参照先テーブル名 transient_details<br>
+		 * 外部キー名 transient_nodes_transient_detail_id_fkey<br>
+		 * 項目名 transient_detail_id
+		 * @return transient_details relationship
 		 */
-		public sqlassist.bb.stocks.ExtAssist<T, Many<sqlassist.bb.transient_nodes.Row, M>> $stocks() {
-			return new sqlassist.bb.stocks.ExtAssist<>(
+		public sqlassist.bb.transient_details.ExtAssist<T, Many<sqlassist.bb.transient_nodes.Row, M>> $transient_details() {
+			return new sqlassist.bb.transient_details.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb.transient_nodes.bb$stocks$transient_nodes_stock_id_fkey);
+				sqlassist.bb.transient_nodes.bb$transient_details$transient_nodes_transient_detail_id_fkey);
 		}
 
 		/**
-		 * 参照先テーブル名 transient_bundles<br>
-		 * 外部キー名 transient_nodes_transient_bundle_id_fkey<br>
-		 * 項目名 transient_bundle_id
-		 * @return transient_bundles relationship
+		 * 参照先テーブル名 units<br>
+		 * 外部キー名 transient_nodes_unit_id_fkey<br>
+		 * 項目名 unit_id
+		 * @return units relationship
 		 */
-		public sqlassist.bb.transient_bundles.ExtAssist<T, Many<sqlassist.bb.transient_nodes.Row, M>> $transient_bundles() {
-			return new sqlassist.bb.transient_bundles.ExtAssist<>(
+		public sqlassist.bb.units.ExtAssist<T, Many<sqlassist.bb.transient_nodes.Row, M>> $units() {
+			return new sqlassist.bb.units.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb.transient_nodes.bb$transient_bundles$transient_nodes_transient_bundle_id_fkey);
+				sqlassist.bb.transient_nodes.bb$units$transient_nodes_unit_id_fkey);
 		}
 
 		/**
