@@ -19,13 +19,13 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.ClosingHandler;
 import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
 import jp.ats.blackbox.persistence.JsonHelper;
+import jp.ats.blackbox.persistence.TransferHandler;
 import jp.ats.blackbox.persistence.TransferHandler.TransferDenyRequest;
 import jp.ats.blackbox.persistence.TransferHandler.TransferRegisterRequest;
-import jp.ats.blackbox.persistence.TransferHandler;
 import jp.ats.blackbox.persistence.TransientHandler;
 import jp.ats.blackbox.persistence.TransientHandler.TransientMoveRequest;
 import jp.ats.blackbox.persistence.TransientHandler.TransientMoveResult;
-import sqlassist.bb.transfer_errors;
+import sqlassist.bb.journal_errors;
 
 public class TransferExecutor {
 
@@ -150,7 +150,7 @@ public class TransferExecutor {
 		}
 
 		private void insertErrorLog(Throwable error) {
-			new transfer_errors().insertStatement(
+			new journal_errors().insertStatement(
 				a -> a
 					.INSERT(
 						a.abandoned_id,

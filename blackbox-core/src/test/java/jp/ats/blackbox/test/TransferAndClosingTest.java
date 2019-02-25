@@ -28,10 +28,12 @@ public class TransferAndClosingTest {
 		SecurityValues.end();
 	}
 
-	static void execute(UUID group, int transfers, int threads) {
+	static void execute(UUID groupId, int transfers, int threads) {
 		AtomicInteger counter = new AtomicInteger(0);
 
 		var executor = new TransferExecutor();
+
+		var unitId = UnitHandlerTest.register(groupId);
 
 		executor.start();
 		JobExecutor.start();
@@ -40,7 +42,7 @@ public class TransferAndClosingTest {
 			IntStream.range(0, transfers).forEach(i -> {
 				logger.trace("##### " + i);
 
-				var promise = executor.registerTransfer(U.NULL_ID, () -> TransferHandlerTest.createRequest(group));
+				var promise = executor.registerTransfer(U.NULL_ID, () -> TransferHandlerTest.createRequest(groupId, unitId));
 
 				try {
 					UUID newId = promise.getId();
@@ -60,7 +62,7 @@ public class TransferAndClosingTest {
 
 					var closePromise = executor.close(U.NULL_ID, () -> {
 						var req = new ClosingRequest();
-						req.group_id = group;
+						req.group_id = groupId;
 						req.closed_at = new Timestamp(System.currentTimeMillis() - 100000);
 
 						return req;

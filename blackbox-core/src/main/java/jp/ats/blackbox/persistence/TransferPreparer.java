@@ -5,7 +5,6 @@ import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import org.blendee.sql.Recorder;
 
@@ -13,7 +12,7 @@ import jp.ats.blackbox.persistence.TransferHandler.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler.TransferRegisterRequest;
 import sqlassist.bb.groups;
-import sqlassist.bb.stocks;
+import sqlassist.bb.units;
 import sqlassist.bb.users;
 
 class TransferPreparer {
@@ -38,12 +37,12 @@ class TransferPreparer {
 		transfer.setId(transferId);
 		transfer.setGroup_id(request.group_id);
 
-		transfer.setTransfer_batch_id(batchId);
+		transfer.setJournal_batch_id(batchId);
 
 		request.denied_id.ifPresent(v -> transfer.setDenied_id(v));
 		request.deny_reason.ifPresent(v -> transfer.setDeny_reason(v));
 
-		transfer.setTransferred_at(request.transferred_at);
+		transfer.setFixed_at(request.transferred_at);
 
 		transfer.setCreated_at(createdAt);
 
@@ -64,23 +63,14 @@ class TransferPreparer {
 
 	static void prepareBundle(UUID transferId, UUID bundleId, BundleRegisterRequest request, Bundle bundle) {
 		bundle.setId(bundleId);
-		bundle.setTransfer_id(transferId);
+		bundle.setJournal_id(transferId);
 		request.restored_extension
 			.ifPresentOrElse(
 				v -> bundle.setExtension(v),
 				() -> request.extension.ifPresent(v -> bundle.setExtension(toJson(v))));
 	}
 
-	private static final Supplier<stocks> selectStocks = () -> new stocks().SELECT(
-		a -> a.ls(
-			a.id,
-			a.$groups().extension,
-			a.$items().extension,
-			a.$owners().extension,
-			a.$locations().extension,
-			a.$statuses().extension));
-
-	static UUID prepareNode(
+	static void prepareNode(
 		UUID bundleId,
 		UUID nodeId,
 		UUID userId,
@@ -88,16 +78,10 @@ class TransferPreparer {
 		Node node,
 		int nodeSeq,
 		Recorder recorder) {
-		//stockが既に存在すればそれを使う
-		//なければ新たに登録
-		var stock = StockHandler.prepareStock(selectStocks, userId, request, recorder);
-
-		UUID stockId = stock.getId();
-
 		node.setId(nodeId);
-		node.setBundle_id(bundleId);
+		node.setDetail_id(bundleId);
 		//nodeではgroup_idを持たないが、requestが持つgroup_idはstockに格納しており、それが在庫の所属グループを表す
-		node.setStock_id(stockId);
+		node.setUnit_id(request.unit_id);
 		node.setIn_out(request.in_out.intValue);
 		node.setSeq(nodeSeq);
 		node.setQuantity(request.quantity);
@@ -109,13 +93,10 @@ class TransferPreparer {
 				v -> node.setExtension(v),
 				() -> request.extension.ifPresent(v -> node.setExtension(toJson(v))));
 
-		node.setGroup_extension(stock.$groups().getExtension());
-		node.setItem_extension(stock.$items().getExtension());
-		node.setOwner_extension(stock.$owners().getExtension());
-		node.setLocation_extension(stock.$locations().getExtension());
-		node.setStatus_extension(stock.$statuses().getExtension());
+		node.setGroup_extension(
+			recorder.play(() -> new units().SELECT(a -> a.$groups().extension)).fetch(request.unit_id).get().$groups().getExtension());
 
-		return stockId;
+		request.unit_extension.ifPresent(v -> node.setUnit_extension(JsonHelper.toJson(v)));
 	}
 
 	static interface Transfer {

@@ -24,16 +24,14 @@ import org.blendee.sql.Updater;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
-import jp.ats.blackbox.persistence.StockHandler.StockComponents;
 import jp.ats.blackbox.persistence.TransferHandler.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler.TransferRegisterRequest;
-import sqlassist.bb.closed_stocks;
+import sqlassist.bb.closed_units;
 import sqlassist.bb.nodes;
-import sqlassist.bb.stocks;
-import sqlassist.bb.transient_bundles;
+import sqlassist.bb.transient_details;
+import sqlassist.bb.transient_journals;
 import sqlassist.bb.transient_nodes;
-import sqlassist.bb.transient_transfers;
 import sqlassist.bb.transients;
 
 public class TransientHandler {
@@ -157,7 +155,7 @@ public class TransientHandler {
 		Utils.delete(transients.$TABLE, transientId, revision);
 	}
 
-	private static class Transfer extends transient_transfers.Row implements TransferPreparer.Transfer {
+	private static class Transfer extends transient_journals.Row implements TransferPreparer.Transfer {
 
 		@Override
 		public void setDenied_id(UUID id) {
@@ -182,7 +180,7 @@ public class TransientHandler {
 		public void setInstance_id(UUID id) {}
 
 		@Override
-		public void setTransfer_batch_id(UUID id) {}
+		public void setJournal_batch_id(UUID id) {}
 	}
 
 	public static UUID registerTransfer(UUID transientId, TransferRegisterRequest request) {
@@ -207,7 +205,7 @@ public class TransientHandler {
 
 		transfer.insert();
 
-		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, id, transient_transfers.$TABLE));
+		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, id, transient_journals.$TABLE));
 
 		for (int i = 0; i < request.bundles.length; i++) {
 			registerBundle(userId, id, request.bundles[i], (i + 1) * sequenceIncrement);
@@ -217,26 +215,26 @@ public class TransientHandler {
 	}
 
 	public static void deleteTransfer(UUID transferId) {
-		U.recorder.play(() -> new transient_transfers().DELETE().WHERE(a -> a.id.eq($UUID)), transferId).execute();
+		U.recorder.play(() -> new transient_journals().DELETE().WHERE(a -> a.id.eq($UUID)), transferId).execute();
 	}
 
 	private static int computeNextSeq(int currentMaxSeq) {
 		return currentMaxSeq - currentMaxSeq % sequenceIncrement + sequenceIncrement;
 	}
 
-	private static class Bundle extends transient_bundles.Row implements TransferPreparer.Bundle {
+	private static class Bundle extends transient_details.Row implements TransferPreparer.Bundle {
 
 		@Override
-		public void setTransfer_id(UUID transferId) {
-			super.setTransient_transfer_id(transferId);
+		public void setJournal_id(UUID journalId) {
+			super.setTransient_journal_id(journalId);
 		}
 	}
 
 	public static UUID registerBundle(UUID transferId, BundleRegisterRequest request) {
 		int seq = U.recorder.play(
-			() -> new transient_bundles()
-				.SELECT(a -> a.MAX(a.seq_in_transfer))
-				.WHERE(a -> a.transient_transfer_id.eq($UUID)),
+			() -> new transient_details()
+				.SELECT(a -> a.MAX(a.seq_in_journal))
+				.WHERE(a -> a.transient_journal_id.eq($UUID)),
 			transferId)
 			.aggregateAndGet(r -> {
 				r.next();
@@ -257,7 +255,7 @@ public class TransientHandler {
 
 		TransferPreparer.prepareBundle(transferId, id, request, bundle);
 
-		bundle.setSeq_in_transfer(seq);
+		bundle.setSeq_in_journal(seq);
 		bundle.setCreated_by(userId);
 		bundle.setUpdated_by(userId);
 
@@ -271,14 +269,14 @@ public class TransientHandler {
 	}
 
 	public static void deleteBundle(UUID bundleId) {
-		U.recorder.play(() -> new transient_bundles().DELETE().WHERE(a -> a.id.eq($UUID)), bundleId).execute();
+		U.recorder.play(() -> new transient_details().DELETE().WHERE(a -> a.id.eq($UUID)), bundleId).execute();
 	}
 
 	private static class Node extends transient_nodes.Row implements TransferPreparer.Node {
 
 		@Override
-		public void setBundle_id(UUID bundleId) {
-			super.setTransient_bundle_id(bundleId);
+		public void setDetail_id(UUID bundleId) {
+			super.setTransient_detail_id(bundleId);
 		}
 
 		@Override
@@ -288,23 +286,14 @@ public class TransientHandler {
 		public void setGroup_extension(Object json) {}
 
 		@Override
-		public void setItem_extension(Object json) {}
-
-		@Override
-		public void setOwner_extension(Object json) {}
-
-		@Override
-		public void setLocation_extension(Object json) {}
-
-		@Override
-		public void setStatus_extension(Object json) {}
+		public void setUnit_extension(Object json) {}
 	}
 
 	public static UUID registerNode(UUID bundleId, NodeRegisterRequest request) {
 		int seq = U.recorder.play(
 			() -> new transient_nodes()
 				.SELECT(a -> a.MAX(a.seq_in_bundle))
-				.WHERE(a -> a.transient_bundle_id.eq($UUID)),
+				.WHERE(a -> a.transient_detail_id.eq($UUID)),
 			bundleId)
 			.aggregateAndGet(r -> {
 				r.next();
@@ -384,35 +373,32 @@ public class TransientHandler {
 		recorder.play(
 			() -> new transient_nodes().selectClause(
 				a -> {
-					var bundlesAssist = a.$transient_bundles();
-					var transfersAssist = bundlesAssist.$transient_transfers();
-					var stocksAssist = a.$stocks();
+					var bundlesAssist = a.$transient_details();
+					var transfersAssist = bundlesAssist.$transient_journals();
+					var stocksAssist = a.$units();
 
 					a.SELECT(
 						transfersAssist.group_id,
-						transfersAssist.transferred_at,
+						transfersAssist.fixed_at,
 						transfersAssist.extension,
 						transfersAssist.tags,
 						bundlesAssist.extension,
 						stocksAssist.group_id,
-						stocksAssist.item_id,
-						stocksAssist.owner_id,
-						stocksAssist.location_id,
-						stocksAssist.status_id,
+						a.unit_id,
 						a.in_out,
 						a.quantity,
 						a.grants_unlimited,
 						a.extension);
 				})
-				.WHERE(a -> a.$transient_bundles().$transient_transfers().transient_id.eq($UUID))
+				.WHERE(a -> a.$transient_details().$transient_journals().transient_id.eq($UUID))
 				.ORDER_BY(
 					a -> a.ls(
-						a.$transient_bundles().$transient_transfers().seq,
-						a.$transient_bundles().seq_in_transfer,
+						a.$transient_details().$transient_journals().seq,
+						a.$transient_details().seq_in_journal,
 						a.seq_in_bundle))
 				.assist()
-				.$transient_bundles()
-				.$transient_transfers()
+				.$transient_details()
+				.$transient_journals()
 				.intercept(),
 			transientId)
 			.forEach(transferOne -> {
@@ -421,7 +407,7 @@ public class TransientHandler {
 				var request = new TransferRegisterRequest();
 
 				request.group_id = transfer.getGroup_id();
-				request.transferred_at = transfer.getTransferred_at();
+				request.transferred_at = transfer.getFixed_at();
 				request.restored_extension = Optional.of(transfer.getExtension());
 
 				try {
@@ -444,13 +430,7 @@ public class TransientHandler {
 
 						var nodeRequest = new NodeRegisterRequest();
 
-						var stock = node.$stocks();
-
-						nodeRequest.group_id = stock.getGroup_id();
-						nodeRequest.item_id = stock.getItem_id();
-						nodeRequest.owner_id = stock.getOwner_id();
-						nodeRequest.location_id = stock.getLocation_id();
-						nodeRequest.status_id = stock.getStatus_id();
+						nodeRequest.unit_id = node.getUnit_id();
 						nodeRequest.in_out = InOut.of(node.getIn_out());
 						nodeRequest.quantity = node.getQuantity();
 						nodeRequest.grants_unlimited = Optional.of(node.getGrants_unlimited());
@@ -558,11 +538,11 @@ public class TransientHandler {
 		private CheckContext(Result result) {
 			node_type = NodeType.of(result.getInt("node_type"));
 			node_or_transient_node_id = U.uuid(result, "id");
-			stock_id = U.uuid(result, "stock_id");
+			stock_id = U.uuid(result, "unit_id");
 			grants_unlimited = result.getBoolean("grants_unlimited");
 			in_out = InOut.of(result.getInt("in_out"));
 			quantity = result.getBigDecimal("quantity");
-			transferred_at = result.getTimestamp("transferred_at");
+			transferred_at = result.getTimestamp("fixed_at");
 			closed_at = result.getTimestamp("closed_at");
 		}
 	}
@@ -573,54 +553,54 @@ public class TransientHandler {
 				a -> a.ls(
 					a.any(NodeType.NODE.ordinal()).AS("node_type"),
 					a.id,
-					a.stock_id,
+					a.unit_id,
 					a.grants_unlimited,
 					a.in_out,
 					a.quantity,
-					a.$bundles().$transfers().transferred_at,
+					a.$details().$journals().fixed_at,
 					a.any(
 						"RANK() OVER (ORDER BY {0}, {1}, {2})",
-						a.$bundles().$transfers().transferred_at,
-						a.$bundles().$transfers().created_at,
+						a.$details().$journals().fixed_at,
+						a.$details().$journals().created_at,
 						a.seq).AS("seq")))
 			.WHERE(
 				a -> a.EXISTS(
 					new transient_nodes()
 						.SELECT(sa -> sa.any(0))
 						.WHERE(
-							sa -> sa.$transient_bundles().$transient_transfers().transient_id.eq($UUID),
-							sa -> sa.stock_id.eq(a.stock_id),
+							sa -> sa.$transient_details().$transient_journals().transient_id.eq($UUID),
+							sa -> sa.unit_id.eq(a.unit_id),
 
 							//同一時刻のnodeはsnapshotを後で取得した際、織込み済みなので取得しない
-							sa -> sa.$transient_bundles().$transient_transfers().transferred_at.lt(a.$bundles().$transfers().transferred_at))))
+							sa -> sa.$transient_details().$transient_journals().fixed_at.lt(a.$details().$journals().fixed_at))))
 			.UNION_ALL(
 				new transient_nodes()
 					.SELECT(
 						a -> a.ls(
 							a.any(NodeType.TRANSIENT_NODE.ordinal()).AS("node_type"),
 							a.id,
-							a.stock_id,
+							a.unit_id,
 							a.grants_unlimited,
 							a.in_out,
 							a.quantity,
-							a.$transient_bundles().$transient_transfers().transferred_at,
+							a.$transient_details().$transient_journals().fixed_at,
 							a.any(
 								"RANK() OVER (ORDER BY {0}, {1})",
-								a.$transient_bundles().$transient_transfers().transferred_at,
-								a.$transient_bundles().$transient_transfers().seq) //transferred_atが同一であれば生成順
+								a.$transient_details().$transient_journals().fixed_at,
+								a.$transient_details().$transient_journals().seq) //transferred_atが同一であれば生成順
 								.AS("seq")))
-					.WHERE(a -> a.$transient_bundles().$transient_transfers().transient_id.eq($UUID)))
+					.WHERE(a -> a.$transient_details().$transient_journals().transient_id.eq($UUID)))
 			.ORDER_BY(
 				a -> a.ls(
-					a.any("stock_id"),
-					a.any("transferred_at"),
+					a.any("unit_id"),
+					a.any("fixed_at"),
 					a.any("node_type"), //transient_nodesよりnodesが先
 					a.any("seq")));
 
 		return new AnonymousTable(inner, "unioned_nodes")
 			.LEFT_OUTER_JOIN(
-				new closed_stocks().SELECT(a -> a.$closings().closed_at))
-			.ON((l, r) -> l.col("stock_id").eq(r.id));
+				new closed_units().SELECT(a -> a.$closings().closed_at))
+			.ON((l, r) -> l.col("unit_id").eq(r.id));
 	}
 
 	/**
@@ -670,19 +650,19 @@ public class TransientHandler {
 	}
 
 	public static void updateTransfer(TransferUpdateRequest request) {
-		int result = new transient_transfers().UPDATE(a -> {
+		int result = new transient_journals().UPDATE(a -> {
 			a.revision.set(request.revision + 1);
 
 			request.transient_id.ifPresent(v -> a.transient_id.set(v));
 			request.group_id.ifPresent(v -> a.group_id.set(v));
-			request.transferred_at.ifPresent(v -> a.transferred_at.set(v));
+			request.transferred_at.ifPresent(v -> a.fixed_at.set(v));
 			request.extension.ifPresent(v -> a.extension.set(JsonHelper.toJson(v)));
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
 		}).WHERE(a -> a.id.eq(request.transfer_id).AND.revision.eq(request.revision)).execute();
 
-		if (result != 1) throw Utils.decisionException(transient_transfers.$TABLE, request.transfer_id);
+		if (result != 1) throw Utils.decisionException(transient_journals.$TABLE, request.transfer_id);
 
 		Arrays.stream(request.registerBundles).forEach(r -> registerBundle(request.transfer_id, r));
 
@@ -723,17 +703,17 @@ public class TransientHandler {
 	}
 
 	public static void updateBundle(BundleUpdateRequest request) {
-		int result = new transient_bundles().UPDATE(a -> {
+		int result = new transient_details().UPDATE(a -> {
 			a.revision.set(request.revision + 1);
 
-			request.transfer_id.ifPresent(v -> a.transient_transfer_id.set(v));
-			request.seq_in_transfer.ifPresent(v -> a.seq_in_transfer.set(v));
+			request.transfer_id.ifPresent(v -> a.transient_journal_id.set(v));
+			request.seq_in_transfer.ifPresent(v -> a.seq_in_journal.set(v));
 			request.extension.ifPresent(v -> a.extension.set(JsonHelper.toJson(v)));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
 		}).WHERE(a -> a.id.eq(request.bundle_id).AND.revision.eq(request.revision)).execute();
 
-		if (result != 1) throw Utils.decisionException(transient_bundles.$TABLE, request.bundle_id);
+		if (result != 1) throw Utils.decisionException(transient_details.$TABLE, request.bundle_id);
 
 		Arrays.stream(request.registerNodes).forEach(r -> registerNode(request.bundle_id, r));
 
@@ -757,35 +737,7 @@ public class TransientHandler {
 
 		public Optional<Integer> seq_in_bundle = Optional.empty();
 
-		/**
-		 * stockの所属するグループ
-		 * stockに格納される
-		 */
-		public Optional<UUID> group_id = Optional.empty();
-
-		/**
-		 * stockのitem
-		 * stockに格納される
-		 */
-		public Optional<UUID> item_id = Optional.empty();
-
-		/**
-		 * stockのowner
-		 * stockに格納される
-		 */
-		public Optional<UUID> owner_id = Optional.empty();
-
-		/**
-		 * stockのlocation
-		 * stockに格納される
-		 */
-		public Optional<UUID> location_id = Optional.empty();
-
-		/**
-		 * stockのstatus
-		 * stockに格納される
-		 */
-		public Optional<UUID> status_id = Optional.empty();
+		public Optional<UUID> unit_id = Optional.empty();
 
 		/**
 		 * 入出庫タイプ
@@ -810,66 +762,13 @@ public class TransientHandler {
 	}
 
 	public static void updateNode(NodeUpdateRequest request) {
-		UUID stockId = null;
-		if (request.group_id.isPresent()
-			|| request.item_id.isPresent()
-			|| request.owner_id.isPresent()
-			|| request.location_id.isPresent()
-			|| request.status_id.isPresent()) {
-			var stock = U.recorder.play(
-				() -> new nodes().SELECT(
-					a -> a.ls(
-						a.$stocks().group_id,
-						a.$stocks().item_id,
-						a.$stocks().owner_id,
-						a.$stocks().location_id,
-						a.$stocks().status_id)))
-				.fetch(request.node_id)
-				.get()
-				.$stocks();
-
-			stockId = StockHandler.prepareStock(
-				() -> new stocks().SELECT(a -> a.id),
-				SecurityValues.currentUserId(),
-				new StockComponents() {
-
-					@Override
-					public UUID groupId() {
-						return request.group_id.orElseGet(() -> stock.getGroup_id());
-					}
-
-					@Override
-					public UUID itemId() {
-						return request.item_id.orElseGet(() -> stock.getItem_id());
-					}
-
-					@Override
-					public UUID ownerId() {
-						return request.owner_id.orElseGet(() -> stock.getOwner_id());
-					}
-
-					@Override
-					public UUID locationId() {
-						return request.location_id.orElseGet(() -> stock.getLocation_id());
-					}
-
-					@Override
-					public UUID statusId() {
-						return request.status_id.orElseGet(() -> stock.getStatus_id());
-					}
-				},
-				U.recorder).getId();
-		}
-
-		final var safeStockId = stockId;
-
 		int result = new transient_nodes().UPDATE(a -> {
 			a.revision.set(request.revision + 1);
 
-			request.bundle_id.ifPresent(v -> a.transient_bundle_id.set(v));
+			request.bundle_id.ifPresent(v -> a.transient_detail_id.set(v));
 			request.seq_in_bundle.ifPresent(v -> a.seq_in_bundle.set(v));
 
-			if (safeStockId != null) a.stock_id.set(safeStockId);
+			request.unit_id.ifPresent(v -> a.unit_id.set(v));
 
 			request.in_out.ifPresent(v -> a.in_out.set(v.intValue));
 			request.quantity.ifPresent(v -> a.quantity.set(v));
@@ -879,6 +778,6 @@ public class TransientHandler {
 			a.updated_at.setAny("now()");
 		}).WHERE(a -> a.id.eq(request.node_id).AND.revision.eq(request.revision)).execute();
 
-		if (result != 1) throw Utils.decisionException(transient_bundles.$TABLE, request.node_id);
+		if (result != 1) throw Utils.decisionException(transient_details.$TABLE, request.node_id);
 	}
 }

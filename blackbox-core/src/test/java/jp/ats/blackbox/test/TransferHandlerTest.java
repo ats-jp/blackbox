@@ -12,10 +12,10 @@ import org.blendee.util.Blendee;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
+import jp.ats.blackbox.persistence.TransferHandler;
 import jp.ats.blackbox.persistence.TransferHandler.BundleRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.TransferHandler.TransferRegisterRequest;
-import jp.ats.blackbox.persistence.TransferHandler;
 
 public class TransferHandlerTest {
 
@@ -25,7 +25,7 @@ public class TransferHandlerTest {
 		Blendee.execute(t -> {
 			var handler = new TransferHandler(U.recorder);
 			IntStream.range(0, 10).forEach(i -> {
-				handler.register(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(U.NULL_ID));
+				handler.register(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(U.NULL_ID, U.NULL_ID));
 				JobHandler.execute(LocalDateTime.now());
 
 				t.commit(); //created_atを確定するために一件毎commit
@@ -33,23 +33,15 @@ public class TransferHandlerTest {
 		});
 	}
 
-	static TransferRegisterRequest createRequest(UUID groupId) {
+	static TransferRegisterRequest createRequest(UUID groupId, UUID unitId) {
 		var out = new NodeRegisterRequest();
-		out.group_id = groupId;
-		out.item_id = U.NULL_ID;
-		out.owner_id = U.NULL_ID;
-		out.location_id = U.NULL_ID;
-		out.status_id = U.NULL_ID;
+		out.unit_id = unitId;
 		out.in_out = InOut.OUT;
 		out.grants_unlimited = Optional.of(true);
 		out.quantity = BigDecimal.valueOf(100);
 
 		var in = new NodeRegisterRequest();
-		in.group_id = groupId;
-		in.item_id = U.NULL_ID;
-		in.owner_id = U.NULL_ID;
-		in.location_id = U.NULL_ID;
-		in.status_id = U.NULL_ID;
+		in.unit_id = unitId;
 		in.in_out = InOut.IN;
 		in.quantity = BigDecimal.valueOf(100);
 

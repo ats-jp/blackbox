@@ -27,17 +27,17 @@ public class TransientStockQuery {
 		var nodes = new transient_nodes()
 			.SELECT(
 				a -> a.ls(
-					a.stock_id,
+					a.unit_id,
 					a.any("bool_or({0})", a.grants_unlimited).AS("unlimited"),
 					a.SUM(a.expr("{0} * {1}", a.quantity, a.in_out)).AS("total")))
 			.WHERE(
-				a -> a.$transient_bundles().$transient_transfers().transferred_at.le($TIMESTAMP), //1
-				a -> a.$transient_bundles().$transient_transfers().transient_id.eq($UUID)) //2
-			.GROUP_BY(a -> a.stock_id);
+				a -> a.$transient_details().$transient_journals().fixed_at.le($TIMESTAMP), //1
+				a -> a.$transient_details().$transient_journals().transient_id.eq($UUID)) //2
+			.GROUP_BY(a -> a.unit_id);
 
 		transientNodeDecorator.accept(nodes);
 
-		var snapshots = StockHandler.buildQuery(a -> a.transferred_at.le($TIMESTAMP)).SELECT(a -> a.total); //3
+		var snapshots = UnitHandler.buildQuery(a -> a.fixed_at.le($TIMESTAMP)).SELECT(a -> a.total); //3
 
 		snapshotDecorator.accept(snapshots);
 
@@ -46,7 +46,7 @@ public class TransientStockQuery {
 			"nodes_sum")
 				.SELECT(a -> a.col("total"))
 				.LEFT_OUTER_JOIN(snapshots)
-				.ON((l, r) -> l.col("stock_id").eq(r.stock_id));
+				.ON((l, r) -> l.col("unit_id").eq(r.unit_id));
 	}
 
 	public void execute(

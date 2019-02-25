@@ -1,4 +1,4 @@
-package jp.ats.blackbox.persistence;
+package jp.ats.blackbox.stock;
 
 import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 
@@ -12,9 +12,9 @@ import org.blendee.jdbc.TablePath;
 import org.blendee.util.GenericTable;
 
 import jp.ats.blackbox.executor.TagExecutor;
-import jp.ats.blackbox.persistence.StockComponent.ForcibleUpdateRequest;
-import jp.ats.blackbox.persistence.StockComponent.RegisterRequest;
-import jp.ats.blackbox.persistence.StockComponent.UpdateRequest;
+import jp.ats.blackbox.stock.StockComponent.ForcibleUpdateRequest;
+import jp.ats.blackbox.stock.StockComponent.RegisterRequest;
+import jp.ats.blackbox.stock.StockComponent.UpdateRequest;
 
 public class StockComponentHandler {
 

@@ -21,10 +21,12 @@ public class TransferErrorTest {
 		SecurityValues.end();
 	}
 
-	static void execute(UUID group, int transfers, int threads) {
+	static void execute(UUID groupId, int transfers, int threads) {
 		AtomicInteger counter = new AtomicInteger(0);
 
 		var executor = new TransferExecutor();
+
+		var unitId = UnitHandlerTest.register(groupId);
 
 		executor.start();
 		JobExecutor.start();
@@ -35,7 +37,7 @@ public class TransferErrorTest {
 				try {
 					var closePromise = executor.close(U.NULL_ID, () -> {
 						var req = new ClosingRequest();
-						req.group_id = group;
+						req.group_id = groupId;
 						req.closed_at = new Timestamp(System.currentTimeMillis() + 1000000);
 
 						return req;
@@ -43,7 +45,7 @@ public class TransferErrorTest {
 
 					closePromise.waitUntilFinished();
 
-					var promise = executor.registerTransfer(U.NULL_ID, () -> TransferHandlerTest.createRequest(group));
+					var promise = executor.registerTransfer(U.NULL_ID, () -> TransferHandlerTest.createRequest(groupId, unitId));
 
 					promise.waitUntilFinished();
 				} catch (Exception e) {

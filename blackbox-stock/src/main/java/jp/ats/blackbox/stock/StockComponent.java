@@ -1,4 +1,4 @@
-package jp.ats.blackbox.persistence;
+package jp.ats.blackbox.stock;
 
 import java.sql.Timestamp;
 import java.util.Optional;

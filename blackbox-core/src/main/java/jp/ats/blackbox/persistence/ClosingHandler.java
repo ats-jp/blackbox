@@ -17,7 +17,7 @@ import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.common.U;
-import sqlassist.bb.closed_stocks;
+import sqlassist.bb.closed_units;
 import sqlassist.bb.closings;
 import sqlassist.bb.last_closings;
 import sqlassist.bb.relationships;
@@ -97,21 +97,21 @@ public class ClosingHandler {
 			() -> createRankedQuery(
 				base -> base.SELECT(
 					a -> a.ls(
-						a.stock_id,
+						a.unit_id,
 						a.unlimited,
 						a.total))
 					.WHERE(
 						a -> a.EXISTS(
-							new closed_stocks()
+							new closed_units()
 								.SELECT(sa -> sa.any(0))
-								.WHERE(sa -> sa.id.eq(a.stock_id)))))
+								.WHERE(sa -> sa.id.eq(a.unit_id)))))
 									.WHERE(a -> a.col("rank").eq(1)),
 			groupId,
 			closedAt)
 			.aggregate(r -> {
 				while (r.next()) {
 					recorder.play(
-						() -> new closed_stocks().updateStatement(
+						() -> new closed_units().updateStatement(
 							a -> a.UPDATE(
 								a.closing_id.set($UUID),
 								a.unlimited.set($BOOLEAN),
@@ -123,7 +123,7 @@ public class ClosingHandler {
 						r.getBoolean(snapshots.unlimited),
 						r.getBigDecimal(snapshots.total),
 						userId,
-						U.uuid(r, snapshots.stock_id))
+						U.uuid(r, snapshots.unit_id))
 						.execute(batch);
 				}
 			});
@@ -135,16 +135,16 @@ public class ClosingHandler {
 			var subquery = createRankedQuery(
 				base -> base.SELECT(
 					a -> a.ls(
-						a.stock_id,
+						a.unit_id,
 						a.unlimited,
 						a.total))
 					.WHERE(
 						a -> a.NOT_EXISTS(
-							new closed_stocks()
+							new closed_units()
 								.SELECT(sa -> sa.any(0))
-								.WHERE(sa -> sa.id.eq(a.stock_id)))));
+								.WHERE(sa -> sa.id.eq(a.unit_id)))));
 
-			return new closed_stocks()
+			return new closed_units()
 				.INSERT(
 					a -> a.ls(
 						a.id,
@@ -155,7 +155,7 @@ public class ClosingHandler {
 					subquery
 						.SELECT(
 							a -> a.ls(
-								a.col(snapshots.stock_id),
+								a.col(snapshots.unit_id),
 								a.any(a.expr($UUID)), //1
 								a.col(snapshots.unlimited),
 								a.col(snapshots.total),
@@ -174,10 +174,10 @@ public class ClosingHandler {
 				a -> a.ls(
 					a.any(
 						"RANK() OVER (ORDER BY {0} DESC, {1} DESC, {2} DESC)",
-						a.transferred_at,
+						a.fixed_at,
 						a.created_at,
 						a.node_seq).AS("rank")))
-			.WHERE(a -> a.transfer_group_id.eq($UUID).AND.transferred_at.le($TIMESTAMP));
+			.WHERE(a -> a.journal_group_id.eq($UUID).AND.fixed_at.le($TIMESTAMP));
 
 		applyer.accept(query);
 

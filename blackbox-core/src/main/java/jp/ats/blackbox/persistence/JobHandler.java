@@ -12,7 +12,7 @@ import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.common.U;
-import sqlassist.bb.current_stocks;
+import sqlassist.bb.current_units;
 import sqlassist.bb.jobs;
 import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
@@ -33,24 +33,24 @@ public class JobHandler {
 
 		new jobs()
 			.SELECT(a -> a.id)
-			.WHERE(a -> a.completed.eq(false).AND.$transfers().transferred_at.le(Timestamp.valueOf(time)))
-			.ORDER_BY(a -> a.ls(a.$transfers().transferred_at, a.$transfers().created_at))
+			.WHERE(a -> a.completed.eq(false).AND.$journals().fixed_at.le(Timestamp.valueOf(time)))
+			.ORDER_BY(a -> a.ls(a.$journals().fixed_at, a.$journals().created_at))
 			.forEach(row -> {
 				new snapshots()
-					.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().stock_id))
-					.WHERE(sa -> sa.$nodes().$bundles().transfer_id.eq(row.getId()))
+					.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().unit_id))
+					.WHERE(sa -> sa.$nodes().$details().journal_id.eq(row.getId()))
 					.ORDER_BY(a -> a.node_seq)
 					.aggregate(result -> {
 						while (result.next()) {
 							//TODO pluginで個別処理を複数スレッドで行うようにする
 							recorder.play(
-								() -> new current_stocks()
+								() -> new current_units()
 									.UPDATE(a -> a.ls(a.snapshot_id.set($UUID), a.unlimited.set($BOOLEAN), a.total.set($BIGDECIMAL)))
 									.WHERE(a -> a.id.eq($UUID)),
 								(UUID) result.getObject(snapshots.id),
 								result.getBoolean(snapshots.unlimited),
 								result.getBigDecimal(snapshots.total),
-								U.uuid(result, nodes.stock_id))
+								U.uuid(result, nodes.unit_id))
 								.execute(batch);
 						}
 					});
@@ -66,7 +66,7 @@ public class JobHandler {
 
 	public static LocalDateTime getNextTime() {
 		return new jobs()
-			.SELECT(a -> a.MIN(a.$transfers().transferred_at))
+			.SELECT(a -> a.MIN(a.$journals().fixed_at))
 			.WHERE(a -> a.completed.eq(false))
 			.aggregateAndGet(result -> {
 				result.next();

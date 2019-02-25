@@ -27,10 +27,12 @@ public class TransferExecutorTest {
 		SecurityValues.end();
 	}
 
-	static void execute(UUID group, int transfers, int threads) {
+	static void execute(UUID groupId, int transfers, int threads) {
 		AtomicInteger counter = new AtomicInteger(0);
 
 		var executor = new TransferExecutor();
+
+		var unitId = UnitHandlerTest.register(groupId);
 
 		executor.start();
 		JobExecutor.start();
@@ -39,7 +41,7 @@ public class TransferExecutorTest {
 			IntStream.range(0, transfers).forEach(i -> {
 				logger.trace("##### " + i);
 
-				var promise = executor.registerTransfer(U.NULL_ID, () -> TransferHandlerTest.createRequest(group));
+				var promise = executor.registerTransfer(U.NULL_ID, () -> TransferHandlerTest.createRequest(groupId, unitId));
 
 				try {
 					UUID newId = promise.getId();

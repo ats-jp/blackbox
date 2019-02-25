@@ -247,24 +247,24 @@ CREATE TABLE bb_log.transient_journals (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION bb_log.transient_transfers_logfunction() RETURNS TRIGGER AS $transient_transfers_logtrigger$
+CREATE FUNCTION bb_log.transient_journals_logfunction() RETURNS TRIGGER AS $transient_journals_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO bb_log.transient_transfers SELECT OLD.*, 'D';
+			INSERT INTO bb_log.transient_journals SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO bb_log.transient_transfers SELECT NEW.*, 'U';
+			INSERT INTO bb_log.transient_journals SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO bb_log.transient_transfers SELECT NEW.*, 'I';
+			INSERT INTO bb_log.transient_journals SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
-$transient_transfers_logtrigger$ LANGUAGE plpgsql;
+$transient_journals_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER transient_transfers_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.transient_journals
-FOR EACH ROW EXECUTE PROCEDURE bb_log.transient_transfers_logfunction();
+CREATE TRIGGER transient_journals_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.transient_journals
+FOR EACH ROW EXECUTE PROCEDURE bb_log.transient_journals_logfunction();
 
 ----------
 
@@ -284,24 +284,24 @@ CREATE TABLE bb_log.transient_details (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-CREATE FUNCTION bb_log.transient_bundles_logfunction() RETURNS TRIGGER AS $transient_bundles_logtrigger$
+CREATE FUNCTION bb_log.transient_details_logfunction() RETURNS TRIGGER AS $transient_details_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO bb_log.transient_bundles SELECT OLD.*, 'D';
+			INSERT INTO bb_log.transient_details SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO bb_log.transient_bundles SELECT NEW.*, 'U';
+			INSERT INTO bb_log.transient_details SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO bb_log.transient_bundles SELECT NEW.*, 'I';
+			INSERT INTO bb_log.transient_details SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
-$transient_bundles_logtrigger$ LANGUAGE plpgsql;
+$transient_details_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER transient_bundles_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.transient_details
-FOR EACH ROW EXECUTE PROCEDURE bb_log.transient_bundles_logfunction();
+CREATE TRIGGER transient_details_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.transient_details
+FOR EACH ROW EXECUTE PROCEDURE bb_log.transient_details_logfunction();
 
 ----------
 
@@ -310,7 +310,7 @@ CREATE TABLE bb_log.transient_nodes (
 	transient_detail_id uuid,
 	unit_id uuid,
 	in_out smallint,
-	seq_in_bundle integer,
+	seq_in_detail integer,
 	quantity numeric,
 	grants_unlimited boolean,
 	extension jsonb,

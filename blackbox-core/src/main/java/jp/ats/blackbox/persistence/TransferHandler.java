@@ -27,11 +27,11 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
 import sqlassist.bb.details;
 import sqlassist.bb.jobs;
-import sqlassist.bb.nodes;
-import sqlassist.bb.snapshots;
 import sqlassist.bb.journal_batches;
 import sqlassist.bb.journals;
 import sqlassist.bb.journals_tags;
+import sqlassist.bb.nodes;
+import sqlassist.bb.snapshots;
 
 /**
  * transfer操作クラス
@@ -224,7 +224,7 @@ public class TransferHandler {
 		}
 
 		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, tagId -> {
-			recorder.play(() -> new transfers_tags().INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
+			recorder.play(() -> new journals_tags().INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
 		}));
 
 		Arrays.stream(request.bundles)
@@ -252,7 +252,7 @@ public class TransferHandler {
 		public String closed_at;
 	}
 
-	private class Bundle extends bundles.Row implements TransferPreparer.Bundle {}
+	private class Bundle extends details.Row implements TransferPreparer.Bundle {}
 
 	/**
 	 * bundle登録処理
@@ -297,12 +297,12 @@ public class TransferHandler {
 		NodeRegisterRequest request) {
 		UUID nodeId = UUID.randomUUID();
 		var node = new Node();
-		UUID stockId = TransferPreparer.prepareNode(bundleId, nodeId, userId, request, node, ++nodeSeq, recorder);
+		TransferPreparer.prepareNode(bundleId, nodeId, userId, request, node, ++nodeSeq, recorder);
 
 		node.insert();
 
 		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
-		JustBeforeSnapshot justBefore = getJustBeforeSnapshot(stockId, transferredAt, recorder);
+		JustBeforeSnapshot justBefore = getJustBeforeSnapshot(request.unit_id, transferredAt, recorder);
 
 		BigDecimal total = request.in_out.calcurate(justBefore.total, request.quantity);
 
@@ -321,9 +321,9 @@ public class TransferHandler {
 						a.id,
 						a.unlimited,
 						a.total,
-						a.stock_id,
-						a.transfer_group_id,
-						a.transferred_at,
+						a.unit_id,
+						a.journal_group_id,
+						a.fixed_at,
 						a.created_at,
 						a.node_seq,
 						a.updated_by)
@@ -340,7 +340,7 @@ public class TransferHandler {
 			nodeId,
 			unlimited,
 			total,
-			stockId,
+			request.unit_id,
 			groupId,
 			transferredAt,
 			createdAt,
@@ -362,10 +362,10 @@ public class TransferHandler {
 								new snapshots()
 									.SELECT(sa -> sa.id)
 									//transferred_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
-									.WHERE(swa -> swa.stock_id.eq($UUID).AND.transferred_at.gt($TIMESTAMP))))),
+									.WHERE(swa -> swa.unit_id.eq($UUID).AND.fixed_at.gt($TIMESTAMP))))),
 				unlimited,
 				request.in_out.relativize(request.quantity),
-				stockId,
+				request.unit_id,
 				transferredAt)
 				.execute();
 		} catch (CheckConstraintViolationException e) {
@@ -380,10 +380,10 @@ public class TransferHandler {
 			() -> new snapshots()
 				.SELECT(a -> a.ls(a.total, a.unlimited))
 				.WHERE(
-					a -> a.stock_id.eq($UUID).AND.transferred_at.eq(
+					a -> a.unit_id.eq($UUID).AND.fixed_at.eq(
 						new snapshots()
-							.SELECT(sa -> sa.MAX(sa.transferred_at))
-							.WHERE(sa -> sa.stock_id.eq($UUID).AND.in_search_scope.eq(true).AND.transferred_at.le($TIMESTAMP))))
+							.SELECT(sa -> sa.MAX(sa.fixed_at))
+							.WHERE(sa -> sa.unit_id.eq($UUID).AND.in_search_scope.eq(true).AND.fixed_at.le($TIMESTAMP))))
 				.ORDER_BY(
 					a -> a.ls(
 						a.created_at.DESC, //同一時刻であればcreated_atが最近のもの
@@ -441,30 +441,27 @@ public class TransferHandler {
 		recorder.play(
 			() -> new nodes().selectClause(
 				a -> {
-					var bundlesAssist = a.$bundles();
-					var transfersAssist = bundlesAssist.$transfers();
-					var stocksAssist = a.$stocks();
+					var bundlesAssist = a.$details();
+					var transfersAssist = bundlesAssist.$journals();
+					var stocksAssist = a.$units();
 
 					a.SELECT(
 						transfersAssist.group_id,
-						transfersAssist.transferred_at,
+						transfersAssist.fixed_at,
 						transfersAssist.extension,
 						transfersAssist.tags,
 						bundlesAssist.extension,
 						stocksAssist.group_id,
-						stocksAssist.item_id,
-						stocksAssist.owner_id,
-						stocksAssist.location_id,
-						stocksAssist.status_id,
+						a.unit_id,
 						a.in_out,
 						a.quantity,
 						a.grants_unlimited,
 						a.extension);
 				})
-				.WHERE(a -> a.$bundles().transfer_id.eq($UUID))
+				.WHERE(a -> a.$details().journal_id.eq($UUID))
 				.assist()
-				.$bundles()
-				.$transfers()
+				.$details()
+				.$journals()
 				.intercept(),
 			transferId)
 			.forEach(transferOne -> {
@@ -474,7 +471,7 @@ public class TransferHandler {
 
 				transferRequestDecorator.accept(request);
 
-				request.transferred_at = transfer.getTransferred_at();
+				request.transferred_at = transfer.getFixed_at();
 				request.restored_extension = Optional.of(transfer.getExtension());
 
 				try {
@@ -497,13 +494,7 @@ public class TransferHandler {
 
 						var nodeRequest = new NodeRegisterRequest();
 
-						var stock = node.$stocks();
-
-						nodeRequest.group_id = stock.getGroup_id();
-						nodeRequest.item_id = stock.getItem_id();
-						nodeRequest.owner_id = stock.getOwner_id();
-						nodeRequest.location_id = stock.getLocation_id();
-						nodeRequest.status_id = stock.getStatus_id();
+						nodeRequest.unit_id = node.getUnit_id();
 
 						var inOut = InOut.of(node.getIn_out());
 
@@ -526,7 +517,7 @@ public class TransferHandler {
 
 	public void registerBatch(UUID batchId, UUID userId) {
 		recorder.play(
-			() -> new transfer_batches().insertStatement(
+			() -> new journal_batches().insertStatement(
 				a -> a.INSERT(a.id, a.created_by).VALUES($UUID, $UUID)),
 			batchId,
 			userId).execute();

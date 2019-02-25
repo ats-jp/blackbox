@@ -7,8 +7,8 @@ import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.StockComponent;
-import jp.ats.blackbox.persistence.StockComponentHandler;
+import jp.ats.blackbox.stock.StockComponent;
+import jp.ats.blackbox.stock.StockComponentHandler;
 import sqlassist.bb.locations;
 
 public class StockComponetHandlerTest {
