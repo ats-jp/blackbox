@@ -107,7 +107,7 @@ class JournalPreparer {
 
 		void setDeny_reason(String reason);
 
-		void setFixed_at(Timestamp transferredAt);
+		void setFixed_at(Timestamp fixedAt);
 
 		void setCreated_at(Timestamp createdAt);
 
@@ -130,7 +130,7 @@ class JournalPreparer {
 
 		void setId(UUID id);
 
-		void setJournal_id(UUID transferId);
+		void setJournal_id(UUID journalId);
 
 		void setProps(Object json);
 	}
@@ -139,7 +139,7 @@ class JournalPreparer {
 
 		void setId(UUID id);
 
-		void setDetail_id(UUID bundleId);
+		void setDetail_id(UUID detailId);
 
 		void setUnit_id(UUID stockId);
 

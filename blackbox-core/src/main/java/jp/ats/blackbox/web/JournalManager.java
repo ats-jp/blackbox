@@ -9,9 +9,9 @@ import org.apache.logging.log4j.Logger;
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.JournalExecutor;
 
-public class TransferManager implements ServletContextListener {
+public class JournalManager implements ServletContextListener {
 
-	private static final Logger logger = LogManager.getLogger(TransferManager.class);
+	private static final Logger logger = LogManager.getLogger(JournalManager.class);
 
 	private static final JournalExecutor executor = new JournalExecutor();
 
@@ -24,7 +24,7 @@ public class TransferManager implements ServletContextListener {
 		JobExecutor.start();
 	}
 
-	public static JournalExecutor getTransferExecutor() {
+	public static JournalExecutor getJournalExecutor() {
 		return executor;
 	}
 

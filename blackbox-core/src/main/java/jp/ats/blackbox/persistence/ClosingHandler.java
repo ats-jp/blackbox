@@ -33,7 +33,7 @@ public class ClosingHandler {
 		closing.setId(closingId);
 		closing.setGroup_id(request.group_id);
 		closing.setClosed_at(request.closed_at);
-		request.extension.ifPresent(v -> closing.setProps(toJson(v)));
+		request.props.ifPresent(v -> closing.setProps(toJson(v)));
 		closing.setCreated_by(userId);
 
 		closing.insert();
@@ -195,6 +195,6 @@ public class ClosingHandler {
 		/**
 		 * 追加情報JSON
 		 */
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 	}
 }

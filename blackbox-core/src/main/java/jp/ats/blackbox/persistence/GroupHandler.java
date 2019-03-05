@@ -117,7 +117,7 @@ public class GroupHandler {
 			row.setOrg_id(request.org_id);
 			row.setParent_id(request.parent_id);
 			row.setName(request.name);
-			request.extension.ifPresent(v -> row.setProps(v));
+			request.props.ifPresent(v -> row.setProps(v));
 			request.tags.ifPresent(v -> row.setTags(v));
 
 			UUID userId = SecurityValues.currentUserId();
@@ -175,7 +175,7 @@ public class GroupHandler {
 				.UPDATE(a -> {
 					request.name.ifPresent(v -> a.name.set(v));
 					request.parent_id.ifPresent(v -> a.parent_id.set(v));
-					request.extension.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+					request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 					request.tags.ifPresent(v -> a.tags.set((Object) v));
 					request.active.ifPresent(v -> a.active.set(v));
 					a.updated_by.set(userId);
@@ -241,7 +241,7 @@ public class GroupHandler {
 
 		public UUID parent_id;
 
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 
 		public Optional<String[]> tags = Optional.empty();
 	}
@@ -256,7 +256,7 @@ public class GroupHandler {
 
 		public long revision;
 
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 
 		public Optional<String[]> tags = Optional.empty();
 

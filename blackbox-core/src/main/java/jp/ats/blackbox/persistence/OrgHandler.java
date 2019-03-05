@@ -7,7 +7,7 @@ import sqlassist.bb.orgs;
 
 public class OrgHandler {
 
-	public static UUID register(String name, String extension) {
+	public static UUID register(String name, String props) {
 		var row = orgs.row();
 
 		UUID id = UUID.randomUUID();
@@ -16,7 +16,7 @@ public class OrgHandler {
 
 		row.setId(id);
 		row.setName(name);
-		row.setProps(extension);
+		row.setProps(props);
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 
@@ -29,12 +29,12 @@ public class OrgHandler {
 		UUID id,
 		long revision,
 		Optional<String> name,
-		Optional<String> extension,
+		Optional<String> props,
 		Optional<Boolean> active) {
 		int result = new orgs().UPDATE(a -> {
 			a.revision.set(revision + 1);
 			name.ifPresent(v -> a.name.set(v));
-			extension.ifPresent(v -> a.props.set(v));
+			props.ifPresent(v -> a.props.set(v));
 			active.ifPresent(v -> a.active.set(v));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");

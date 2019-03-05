@@ -7,7 +7,7 @@ import sqlassist.bb.users;
 
 public class UserHandler {
 
-	public static UUID register(String name, UUID groupId, String extension) {
+	public static UUID register(String name, UUID groupId, String props) {
 		var row = users.row();
 
 		UUID id = UUID.randomUUID();
@@ -17,7 +17,7 @@ public class UserHandler {
 		row.setId(id);
 		row.setName(name);
 		row.setGroup_id(groupId);
-		row.setProps(extension);
+		row.setProps(props);
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 
@@ -31,14 +31,14 @@ public class UserHandler {
 		long revision,
 		Optional<String> name,
 		Optional<UUID> groupId,
-		Optional<String> extension,
+		Optional<String> props,
 		Optional<String[]> tags,
 		Optional<Boolean> active) {
 		int result = new users().UPDATE(a -> {
 			a.revision.set(revision + 1);
 			name.ifPresent(v -> a.name.set(v));
 			groupId.ifPresent(v -> a.group_id.set(v));
-			extension.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+			props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 			tags.ifPresent(v -> a.tags.set((Object) v));
 			active.ifPresent(v -> a.active.set(v));
 			a.updated_by.set(SecurityValues.currentUserId());

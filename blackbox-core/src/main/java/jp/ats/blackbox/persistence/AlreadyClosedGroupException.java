@@ -20,7 +20,7 @@ public class AlreadyClosedGroupException extends BlackboxException {
 
 	private static String buildMessage(ClosedCheckError error) {
 		return MessageFormat.format(
-			"register transfer_id:{0} failed; group:{1} was already closed at {2}.",
+			"register journal_id:{0} failed; group:{1} was already closed at {2}.",
 			error.id,
 			error.group_id,
 			error.closed_at);

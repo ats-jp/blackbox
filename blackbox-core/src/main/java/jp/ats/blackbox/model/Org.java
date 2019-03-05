@@ -12,7 +12,7 @@ public class Org {
 
 	long revision;
 
-	String extension;
+	String props;
 
 	boolean active;
 
