@@ -32,7 +32,7 @@ database
 SET default_tablespace = 'blackbox_log';
 */
 
-DROP TABLE bb_log.items CASCADE;
+DROP TABLE IF EXISTS bb_log.items CASCADE;
 
 CREATE TABLE bb_log.items (
 	id uuid,
@@ -52,7 +52,7 @@ CREATE TABLE bb_log.items (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-DROP FUNCTION bb_log.items_logfunction CASCADE;
+DROP FUNCTION IF EXISTS bb_log.items_logfunction CASCADE;
 
 CREATE FUNCTION bb_log.items_logfunction() RETURNS TRIGGER AS $items_logtrigger$
 	BEGIN
@@ -75,7 +75,7 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.items_logfunction();
 
 ----------
 
-DROP TABLE bb_log.owners CASCADE;
+DROP TABLE IF EXISTS bb_log.owners CASCADE;
 
 CREATE TABLE bb_log.owners (
 	id uuid,
@@ -95,7 +95,7 @@ CREATE TABLE bb_log.owners (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-DROP FUNCTION bb_log.owners_logfunction CASCADE;
+DROP FUNCTION IF EXISTS bb_log.owners_logfunction CASCADE;
 
 CREATE FUNCTION bb_log.owners_logfunction() RETURNS TRIGGER AS $owners_logtrigger$
 	BEGIN
@@ -118,7 +118,7 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.owners_logfunction();
 
 ----------
 
-DROP TABLE bb_log.locations CASCADE;
+DROP TABLE IF EXISTS bb_log.locations CASCADE;
 
 CREATE TABLE bb_log.locations (
 	id uuid,
@@ -138,7 +138,7 @@ CREATE TABLE bb_log.locations (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-DROP FUNCTION bb_log.locations_logfunction CASCADE;
+DROP FUNCTION IF EXISTS bb_log.locations_logfunction CASCADE;
 
 CREATE FUNCTION bb_log.locations_logfunction() RETURNS TRIGGER AS $locations_logtrigger$
 	BEGIN
@@ -161,7 +161,7 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.locations_logfunction();
 
 ----------
 
-DROP TABLE bb_log.statuses CASCADE;
+DROP TABLE IF EXISTS bb_log.statuses CASCADE;
 
 CREATE TABLE bb_log.statuses (
 	id uuid,
@@ -181,7 +181,7 @@ CREATE TABLE bb_log.statuses (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-DROP FUNCTION bb_log.statuses_logfunction CASCADE;
+DROP FUNCTION IF EXISTS bb_log.statuses_logfunction CASCADE;
 
 CREATE FUNCTION bb_log.statuses_logfunction() RETURNS TRIGGER AS $statuses_logtrigger$
 	BEGIN

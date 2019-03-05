@@ -24,7 +24,6 @@ database
 */
 
 --全削除
-DROP SCHEMA IF EXISTS bb_log CASCADE; --logはblackboxに依存しているのでDROP
 DROP SCHEMA IF EXISTS bb_stock CASCADE;
 
 /*
