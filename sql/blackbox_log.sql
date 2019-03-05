@@ -44,7 +44,7 @@ CREATE TABLE bb_log.orgs (
 	name text,
 	instance_id uuid,
 	revision bigint,
-	extension jsonb,
+	props jsonb,
 	active boolean,
 	created_at timestamptz,
 	created_by uuid,
@@ -83,7 +83,7 @@ CREATE TABLE bb_log.groups (
 	name text,
 	parent_id uuid,
 	revision bigint,
-	extension jsonb,
+	props jsonb,
 	tags text[],
 	active boolean,
 	created_at timestamptz,
@@ -123,7 +123,7 @@ CREATE TABLE bb_log.users (
 	name text,
 	role smallint,
 	revision bigint,
-	extension jsonb,
+	props jsonb,
 	tags text[],
 	active boolean,
 	created_at timestamptz,
@@ -161,7 +161,7 @@ CREATE TABLE bb_log.closings (
 	id uuid,
 	group_id uuid,
 	closed_at timestamptz,
-	extension jsonb,
+	props jsonb,
 	created_at timestamptz,
 	created_by uuid,
 	action "char",
@@ -234,7 +234,7 @@ CREATE TABLE bb_log.transient_journals (
 	group_id uuid,
 	fixed_at timestamptz,
 	seq bigint,
-	extension jsonb,
+	props jsonb,
 	tags text[],
 	revision bigint,
 	created_at timestamptz,
@@ -272,7 +272,7 @@ CREATE TABLE bb_log.transient_details (
 	id uuid,
 	transient_journal_id uuid,
 	seq_in_journal integer,
-	extension jsonb,
+	props jsonb,
 	revision bigint,
 	created_at timestamptz,
 	created_by uuid,
@@ -313,7 +313,7 @@ CREATE TABLE bb_log.transient_nodes (
 	seq_in_detail integer,
 	quantity numeric,
 	grants_unlimited boolean,
-	extension jsonb,
+	props jsonb,
 	revision bigint,
 	created_at timestamptz,
 	created_by uuid,
@@ -369,5 +369,5 @@ GRANT USAGE ON SCHEMA bb_log TO blackbox;
 --シーケンス使用権を付与
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA bb_log TO blackbox;
 
---logはSELECTのみ
+--logはINSERTのみ
 GRANT INSERT ON ALL TABLES IN SCHEMA bb_log TO blackbox;

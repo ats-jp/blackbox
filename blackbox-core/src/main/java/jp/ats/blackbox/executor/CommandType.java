@@ -2,9 +2,9 @@ package jp.ats.blackbox.executor;
 
 public enum CommandType {
 
-	TRANSFER_REGISTER(Constant.TRANSFER_REGISTER),
+	JOURNAL_REGISTER(Constant.JOURNAL_REGISTER),
 
-	TRANSFER_DENY(Constant.TRANSFER_DENY),
+	JOURNAL_DENY(Constant.JOURNAL_DENY),
 
 	CLOSING(Constant.CLOSING),
 
@@ -12,9 +12,9 @@ public enum CommandType {
 
 	private static class Constant {
 
-		private static final String TRANSFER_REGISTER = "R";
+		private static final String JOURNAL_REGISTER = "R";
 
-		private static final String TRANSFER_DENY = "D";
+		private static final String JOURNAL_DENY = "D";
 
 		private static final String CLOSING = "C";
 
@@ -23,10 +23,10 @@ public enum CommandType {
 
 	public static CommandType of(String value) {
 		switch (value) {
-		case Constant.TRANSFER_REGISTER:
-			return TRANSFER_REGISTER;
-		case Constant.TRANSFER_DENY:
-			return TRANSFER_DENY;
+		case Constant.JOURNAL_REGISTER:
+			return JOURNAL_REGISTER;
+		case Constant.JOURNAL_DENY:
+			return JOURNAL_DENY;
 		case Constant.CLOSING:
 			return CLOSING;
 		case Constant.TRANSIENT_MOVE:

@@ -10,15 +10,15 @@ import org.postgresql.jdbc.PgArray;
 
 import jp.ats.blackbox.common.BlackboxException;
 
-class Utils {
+public class Utils {
 
-	static BlackboxException decisionException(TablePath table, UUID id) {
+	public static BlackboxException decisionException(TablePath table, UUID id) {
 		return new GenericTable(table).WHERE(a -> a.col("id").eq(id)).count() > 0
 			? new DataAlreadyUpdatedException()
 			: new DataNotFoundException(table, id);
 	}
 
-	static String[] restoreTags(Object tags) throws SQLException {
+	public static String[] restoreTags(Object tags) throws SQLException {
 		var pgArray = (PgArray) tags;
 		return (String[]) pgArray.getArray();
 	}

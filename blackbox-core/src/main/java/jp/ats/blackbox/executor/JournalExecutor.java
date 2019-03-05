@@ -19,17 +19,17 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.ClosingHandler;
 import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
 import jp.ats.blackbox.persistence.JsonHelper;
-import jp.ats.blackbox.persistence.TransferHandler;
-import jp.ats.blackbox.persistence.TransferHandler.TransferDenyRequest;
-import jp.ats.blackbox.persistence.TransferHandler.TransferRegisterRequest;
+import jp.ats.blackbox.persistence.JournalHandler;
+import jp.ats.blackbox.persistence.JournalHandler.JournalDenyRequest;
+import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
 import jp.ats.blackbox.persistence.TransientHandler;
 import jp.ats.blackbox.persistence.TransientHandler.TransientMoveRequest;
 import jp.ats.blackbox.persistence.TransientHandler.TransientMoveResult;
 import sqlassist.bb.journal_errors;
 
-public class TransferExecutor {
+public class JournalExecutor {
 
-	private static final Logger logger = LogManager.getLogger(TransferExecutor.class);
+	private static final Logger logger = LogManager.getLogger(JournalExecutor.class);
 
 	private static final int bufferSize = 256;
 
@@ -39,9 +39,9 @@ public class TransferExecutor {
 
 	private final Recorder recorder = Recorder.newAsyncInstance();
 
-	private final TransferHandler handler = new TransferHandler(recorder);
+	private final JournalHandler handler = new JournalHandler(recorder);
 
-	public TransferExecutor() {
+	public JournalExecutor() {
 		disruptor = new Disruptor<>(Event::new, bufferSize, DaemonThreadFactory.INSTANCE);
 
 		disruptor.handleEventsWith((event, sequence, endOfBatch) -> {
@@ -64,10 +64,10 @@ public class TransferExecutor {
 		return bufferSize - ringBuffer.remainingCapacity() == 0;
 	}
 
-	public TransferPromise registerTransfer(UUID userId, Supplier<TransferRegisterRequest> requestSupplier) {
-		var promise = new TransferPromise();
+	public JournalPromise registerJournal(UUID userId, Supplier<JournalRegisterRequest> requestSupplier) {
+		var promise = new JournalPromise();
 
-		var command = new TransferRegisterCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new JournalRegisterCommand(promise.getId(), userId, requestSupplier.get());
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -77,18 +77,18 @@ public class TransferExecutor {
 		return promise;
 	}
 
-	public TransferPromise denyTransfer(UUID userId, Supplier<TransferDenyRequest> requestSupplier) {
-		var promise = new TransferPromise();
+	public JournalPromise denyJournal(UUID userId, Supplier<JournalDenyRequest> requestSupplier) {
+		var promise = new JournalPromise();
 
-		var command = new TransferDenyCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new JournalDenyCommand(promise.getId(), userId, requestSupplier.get());
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
 		return promise;
 	}
 
-	public TransferPromise close(UUID userId, Supplier<ClosingRequest> requestSupplier) {
-		var promise = new TransferPromise();
+	public JournalPromise close(UUID userId, Supplier<ClosingRequest> requestSupplier) {
+		var promise = new JournalPromise();
 
 		var command = new ClosingCommand(promise.getId(), userId, requestSupplier.get());
 
@@ -97,8 +97,8 @@ public class TransferExecutor {
 		return promise;
 	}
 
-	public TransferPromise moveTransient(UUID userId, Supplier<TransientMoveRequest> requestSupplier) {
-		var promise = new TransferPromise();
+	public JournalPromise moveTransient(UUID userId, Supplier<TransientMoveRequest> requestSupplier) {
+		var promise = new JournalPromise();
 
 		var command = new TransientMoveCommand(promise.getId(), userId, requestSupplier.get());
 
@@ -141,9 +141,9 @@ public class TransferExecutor {
 
 		private Command command;
 
-		private TransferPromise promise;
+		private JournalPromise promise;
 
-		private void set(UUID userId, Command command, TransferPromise promise) {
+		private void set(UUID userId, Command command, JournalPromise promise) {
 			this.userId = userId;
 			this.command = command;
 			this.promise = promise;
@@ -195,29 +195,29 @@ public class TransferExecutor {
 		CommandType type();
 	}
 
-	private class TransferRegisterCommand implements Command {
+	private class JournalRegisterCommand implements Command {
 
-		private final UUID transferId;
+		private final UUID journalId;
 
 		private final UUID userId;
 
-		private final TransferRegisterRequest request;
+		private final JournalRegisterRequest request;
 
-		private TransferRegisterCommand(UUID transferId, UUID userId, TransferRegisterRequest request) {
-			this.transferId = transferId;
+		private JournalRegisterCommand(UUID journalId, UUID userId, JournalRegisterRequest request) {
+			this.journalId = journalId;
 			this.userId = userId;
 			this.request = request;
 		}
 
 		@Override
 		public void execute() {
-			handler.register(transferId, U.NULL_ID, userId, request);
+			handler.register(journalId, U.NULL_ID, userId, request);
 		}
 
 		@Override
 		public void doAfterCommit() {
 			//移動時刻を通知
-			JobExecutor.next(U.convert(request.transferred_at));
+			JobExecutor.next(U.convert(request.fixed_at));
 		}
 
 		@Override
@@ -227,35 +227,35 @@ public class TransferExecutor {
 
 		@Override
 		public CommandType type() {
-			return CommandType.TRANSFER_REGISTER;
+			return CommandType.JOURNAL_REGISTER;
 		}
 	}
 
-	private class TransferDenyCommand implements Command {
+	private class JournalDenyCommand implements Command {
 
-		private final UUID transferId;
+		private final UUID journalId;
 
 		private final UUID userId;
 
-		private final TransferDenyRequest request;
+		private final JournalDenyRequest request;
 
-		private Timestamp transferredAt;
+		private Timestamp fixedAt;
 
-		private TransferDenyCommand(UUID transferId, UUID userId, TransferDenyRequest request) {
-			this.transferId = transferId;
+		private JournalDenyCommand(UUID journalId, UUID userId, JournalDenyRequest request) {
+			this.journalId = journalId;
 			this.userId = userId;
 			this.request = request;
 		}
 
 		@Override
 		public void execute() {
-			transferredAt = handler.deny(transferId, userId, request);
+			fixedAt = handler.deny(journalId, userId, request);
 		}
 
 		@Override
 		public void doAfterCommit() {
 			//移動時刻を通知
-			JobExecutor.next(U.convert(transferredAt));
+			JobExecutor.next(U.convert(fixedAt));
 		}
 
 		@Override
@@ -265,7 +265,7 @@ public class TransferExecutor {
 
 		@Override
 		public CommandType type() {
-			return CommandType.TRANSFER_DENY;
+			return CommandType.JOURNAL_DENY;
 		}
 	}
 
@@ -326,7 +326,7 @@ public class TransferExecutor {
 		@Override
 		public void doAfterCommit() {
 			//最古の移動時刻を通知
-			JobExecutor.next(U.convert(result.firstTransferredAt));
+			JobExecutor.next(U.convert(result.firstFixedAt));
 		}
 
 		@Override

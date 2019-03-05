@@ -182,13 +182,13 @@ public class users
 	public static final String revision = "revision";
 
 	/**
-	 * name: extension<br>
+	 * name: props<br>
 	 * remarks: 外部アプリケーション情報JSON<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 6, notNull = true)
-	public static final String extension = "extension";
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 6, notNull = true)
+	public static final String props = "props";
 
 	/**
 	 * name: tags<br>
@@ -495,31 +495,31 @@ public class users
 
 		/**
 		 * setter
-		 * name: extension<br>
+		 * name: props<br>
 		* remarks: 外部アプリケーション情報JSON<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
 		 */
-		public void setExtension(java.lang.Object value) {
+		public void setProps(java.lang.Object value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("extension").getType());
-			data$.setValue("extension", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("props").getType());
+			data$.setValue("props", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: extension<br>
+		 * name: props<br>
 		* remarks: 外部アプリケーション情報JSON<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
 		 */
-		public java.lang.Object getExtension() {
-			Binder binder = data$.getValue("extension");
+		public java.lang.Object getProps() {
+			Binder binder = data$.getValue("props");
 			return binder.getValue();
 		}
 
@@ -1836,9 +1836,9 @@ public class users
 		public final T revision;
 
 		/**
-		 * 項目名 extension
+		 * 項目名 props
 		 */
-		public final T extension;
+		public final T props;
 
 		/**
 		 * 項目名 tags
@@ -1896,9 +1896,9 @@ public class users
 			this.revision = builder$.buildColumn(
 				this,
 				sqlassist.bb.users.revision);
-			this.extension = builder$.buildColumn(
+			this.props = builder$.buildColumn(
 				this,
-				sqlassist.bb.users.extension);
+				sqlassist.bb.users.props);
 			this.tags = builder$.buildColumn(
 				this,
 				sqlassist.bb.users.tags);

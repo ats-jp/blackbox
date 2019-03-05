@@ -16,7 +16,7 @@ public class OrgHandler {
 
 		row.setId(id);
 		row.setName(name);
-		row.setExtension(extension);
+		row.setProps(extension);
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 
@@ -34,7 +34,7 @@ public class OrgHandler {
 		int result = new orgs().UPDATE(a -> {
 			a.revision.set(revision + 1);
 			name.ifPresent(v -> a.name.set(v));
-			extension.ifPresent(v -> a.extension.set(v));
+			extension.ifPresent(v -> a.props.set(v));
 			active.ifPresent(v -> a.active.set(v));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");

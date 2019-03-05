@@ -5,7 +5,7 @@ import java.text.MessageFormat;
 import org.blendee.jdbc.BSQLException;
 
 import jp.ats.blackbox.common.BlackboxException;
-import jp.ats.blackbox.persistence.TransferHandler.ClosedCheckError;
+import jp.ats.blackbox.persistence.JournalHandler.ClosedCheckError;
 
 @SuppressWarnings("serial")
 public class AlreadyClosedGroupException extends BlackboxException {

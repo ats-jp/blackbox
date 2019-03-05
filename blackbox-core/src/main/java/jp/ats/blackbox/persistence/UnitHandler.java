@@ -35,29 +35,12 @@ public class UnitHandler {
 	}
 
 	/**
-	 * stock登録処理
+	 * unit登録 & 検索処理
 	 */
 	public static units.Row register(
-		UUID groupId,
 		UUID userId,
 		Supplier<units> supplier) {
-		UUID unitId = UUID.randomUUID();
-
-		U.recorder.play(
-			() -> new units().insertStatement(
-				a -> a
-					.INSERT(
-						a.id,
-						a.group_id,
-						a.created_by)
-					.VALUES(
-						$UUID,
-						$UUID,
-						$UUID)),
-			unitId,
-			groupId,
-			userId)
-			.execute();
+		UUID unitId = register(userId);
 
 		U.recorder.play(
 			() -> new current_units().insertStatement(
@@ -70,5 +53,27 @@ public class UnitHandler {
 
 		//関連情報取得のため改めて検索
 		return U.recorder.play(() -> supplier.get()).fetch(unitId).get();
+	}
+
+	/**
+	 * unit登録処理
+	 */
+	public static UUID register(UUID userId) {
+		UUID unitId = UUID.randomUUID();
+
+		U.recorder.play(
+			() -> new units().insertStatement(
+				a -> a
+					.INSERT(
+						a.id,
+						a.created_by)
+					.VALUES(
+						$UUID,
+						$UUID)),
+			unitId,
+			userId)
+			.execute();
+
+		return unitId;
 	}
 }

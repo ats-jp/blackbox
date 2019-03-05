@@ -10,16 +10,16 @@ import org.apache.logging.log4j.Logger;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.JobExecutor;
-import jp.ats.blackbox.executor.TransferExecutor;
+import jp.ats.blackbox.executor.JournalExecutor;
 import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.TransferHandler.TransferDenyRequest;
+import jp.ats.blackbox.persistence.JournalHandler.JournalDenyRequest;
 
-public class TransferExecutorTest {
+public class JournalExecutorTest {
 
-	private static final Logger logger = LogManager.getLogger(TransferExecutorTest.class);
+	private static final Logger logger = LogManager.getLogger(JournalExecutorTest.class);
 
 	public static void main(String[] args) throws Exception {
-		TransferCommon.start();
+		JournalCommon.start();
 		//TransferCommon.startWithLog();
 
 		SecurityValues.start(U.NULL_ID);
@@ -30,9 +30,9 @@ public class TransferExecutorTest {
 	static void execute(UUID groupId, int transfers, int threads) {
 		AtomicInteger counter = new AtomicInteger(0);
 
-		var executor = new TransferExecutor();
+		var executor = new JournalExecutor();
 
-		var unitId = UnitHandlerTest.register(groupId);
+		var unitId = UnitHandlerTest.register();
 
 		executor.start();
 		JobExecutor.start();
@@ -41,7 +41,7 @@ public class TransferExecutorTest {
 			IntStream.range(0, transfers).forEach(i -> {
 				logger.trace("##### " + i);
 
-				var promise = executor.registerTransfer(U.NULL_ID, () -> TransferHandlerTest.createRequest(groupId, unitId));
+				var promise = executor.registerJournal(U.NULL_ID, () -> JournalHandlerTest.createRequest(groupId, unitId));
 
 				try {
 					UUID newId = promise.getId();
@@ -49,8 +49,8 @@ public class TransferExecutorTest {
 
 					promise.waitUntilFinished();
 
-					var denyPromise = executor.denyTransfer(U.NULL_ID, () -> {
-						var req = new TransferDenyRequest();
+					var denyPromise = executor.denyJournal(U.NULL_ID, () -> {
+						var req = new JournalDenyRequest();
 						req.deny_id = newId;
 						req.deny_reason = Optional.of("deny reson");
 						return req;

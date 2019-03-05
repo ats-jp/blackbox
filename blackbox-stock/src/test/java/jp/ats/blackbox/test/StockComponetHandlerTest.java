@@ -9,7 +9,7 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.stock.StockComponent;
 import jp.ats.blackbox.stock.StockComponentHandler;
-import sqlassist.bb.locations;
+import sqlassist.bb_stock.locations;
 
 public class StockComponetHandlerTest {
 

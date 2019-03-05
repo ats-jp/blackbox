@@ -154,13 +154,13 @@ public class details
 	public static final String journal_id = "journal_id";
 
 	/**
-	 * name: extension<br>
+	 * name: props<br>
 	 * remarks: 外部アプリケーション情報JSON<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 3, notNull = true)
-	public static final String extension = "extension";
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 3, notNull = true)
+	public static final String props = "props";
 
 	/**
 	 * name: details_journal_id_fkey<br>
@@ -303,31 +303,31 @@ public class details
 
 		/**
 		 * setter
-		 * name: extension<br>
+		 * name: props<br>
 		* remarks: 外部アプリケーション情報JSON<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
 		 */
-		public void setExtension(java.lang.Object value) {
+		public void setProps(java.lang.Object value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("extension").getType());
-			data$.setValue("extension", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("props").getType());
+			data$.setValue("props", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: extension<br>
+		 * name: props<br>
 		* remarks: 外部アプリケーション情報JSON<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
 		 */
-		public java.lang.Object getExtension() {
-			Binder binder = data$.getValue("extension");
+		public java.lang.Object getProps() {
+			Binder binder = data$.getValue("props");
 			return binder.getValue();
 		}
 
@@ -1425,9 +1425,9 @@ public class details
 		public final T journal_id;
 
 		/**
-		 * 項目名 extension
+		 * 項目名 props
 		 */
-		public final T extension;
+		public final T props;
 
 		private Assist(
 			details table$,
@@ -1446,9 +1446,9 @@ public class details
 			this.journal_id = builder$.buildColumn(
 				this,
 				sqlassist.bb.details.journal_id);
-			this.extension = builder$.buildColumn(
+			this.props = builder$.buildColumn(
 				this,
-				sqlassist.bb.details.extension);
+				sqlassist.bb.details.props);
 
 		}
 

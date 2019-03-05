@@ -200,31 +200,22 @@ public class nodes
 	public static final String grants_unlimited = "grants_unlimited";
 
 	/**
-	 * name: extension<br>
+	 * name: props<br>
 	 * remarks: 外部アプリケーション情報JSON<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
-	public static final String extension = "extension";
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
+	public static final String props = "props";
 
 	/**
-	 * name: group_extension<br>
-	 * remarks: グループのextension<br>
+	 * name: unit_props<br>
+	 * remarks: 管理対象のprops<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
-	public static final String group_extension = "group_extension";
-
-	/**
-	 * name: unit_extension<br>
-	 * remarks: 管理対象のextension<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "unit_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象のextension", defaultValue = "'{}'::jsonb", ordinalPosition = 10, notNull = true)
-	public static final String unit_extension = "unit_extension";
+	@Column(name = "unit_props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象のprops", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
+	public static final String unit_props = "unit_props";
 
 	/**
 	 * name: nodes_detail_id_fkey<br>
@@ -529,91 +520,61 @@ public class nodes
 
 		/**
 		 * setter
-		 * name: extension<br>
+		 * name: props<br>
 		* remarks: 外部アプリケーション情報JSON<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
 		 */
-		public void setExtension(java.lang.Object value) {
+		public void setProps(java.lang.Object value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("extension").getType());
-			data$.setValue("extension", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("props").getType());
+			data$.setValue("props", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: extension<br>
+		 * name: props<br>
 		* remarks: 外部アプリケーション情報JSON<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
 		 */
-		public java.lang.Object getExtension() {
-			Binder binder = data$.getValue("extension");
+		public java.lang.Object getProps() {
+			Binder binder = data$.getValue("props");
 			return binder.getValue();
 		}
 
 		/**
 		 * setter
-		 * name: group_extension<br>
-		* remarks: グループのextension<br>
+		 * name: unit_props<br>
+		* remarks: 管理対象のprops<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
 		 */
-		public void setGroup_extension(java.lang.Object value) {
+		public void setUnit_props(java.lang.Object value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("group_extension").getType());
-			data$.setValue("group_extension", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("unit_props").getType());
+			data$.setValue("unit_props", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: group_extension<br>
-		* remarks: グループのextension<br>
+		 * name: unit_props<br>
+		* remarks: 管理対象のprops<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
 		 */
-		public java.lang.Object getGroup_extension() {
-			Binder binder = data$.getValue("group_extension");
-			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: unit_extension<br>
-		* remarks: 管理対象のextension<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.lang.Object
-		 */
-		public void setUnit_extension(java.lang.Object value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("unit_extension").getType());
-			data$.setValue("unit_extension", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: unit_extension<br>
-		* remarks: 管理対象のextension<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
-		 * @return java.lang.Object
-		 */
-		public java.lang.Object getUnit_extension() {
-			Binder binder = data$.getValue("unit_extension");
+		public java.lang.Object getUnit_props() {
+			Binder binder = data$.getValue("unit_props");
 			return binder.getValue();
 		}
 
@@ -1748,19 +1709,14 @@ public class nodes
 		public final T grants_unlimited;
 
 		/**
-		 * 項目名 extension
+		 * 項目名 props
 		 */
-		public final T extension;
+		public final T props;
 
 		/**
-		 * 項目名 group_extension
+		 * 項目名 unit_props
 		 */
-		public final T group_extension;
-
-		/**
-		 * 項目名 unit_extension
-		 */
-		public final T unit_extension;
+		public final T unit_props;
 
 		private Assist(
 			nodes table$,
@@ -1794,15 +1750,12 @@ public class nodes
 			this.grants_unlimited = builder$.buildColumn(
 				this,
 				sqlassist.bb.nodes.grants_unlimited);
-			this.extension = builder$.buildColumn(
+			this.props = builder$.buildColumn(
 				this,
-				sqlassist.bb.nodes.extension);
-			this.group_extension = builder$.buildColumn(
+				sqlassist.bb.nodes.props);
+			this.unit_props = builder$.buildColumn(
 				this,
-				sqlassist.bb.nodes.group_extension);
-			this.unit_extension = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.unit_extension);
+				sqlassist.bb.nodes.unit_props);
 
 		}
 

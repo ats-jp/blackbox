@@ -6,9 +6,9 @@ import org.blendee.jdbc.Transaction;
 import org.blendee.jdbc.impl.JDBCTransaction;
 import org.blendee.util.DriverTransactionFactory;
 
-public class TransferTestTransactionFactory extends DriverTransactionFactory {
+public class JournalTestTransactionFactory extends DriverTransactionFactory {
 
-	public TransferTestTransactionFactory() throws Exception {
+	public JournalTestTransactionFactory() throws Exception {
 		super();
 	}
 

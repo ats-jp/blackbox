@@ -15,13 +15,13 @@ public class GroupHandlerTest {
 	static final AtomicInteger counter = new AtomicInteger();
 
 	public static void main(String[] args) {
-		TransferCommon.startWithLog();
+		JournalCommon.startWithLog();
 		SecurityValues.start(U.NULL_ID);
 		register();
 		SecurityValues.end();
 	}
 
-	static UUID register() {
+	public static UUID register() {
 		var req = new RegisterRequest();
 		req.name = name();
 		req.parent_id = U.NULL_ID;

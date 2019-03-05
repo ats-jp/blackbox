@@ -6,7 +6,7 @@ import org.blendee.jdbc.OptionKey;
 import org.blendee.util.Blendee;
 import org.blendee.util.BlendeeConstants;
 
-public class TransferCommon {
+public class JournalCommon {
 
 	public static void start() {
 		var param = param();
@@ -24,7 +24,7 @@ public class TransferCommon {
 
 	private static Map<OptionKey<?>, Object> param() {
 		Map<OptionKey<?>, Object> param = Common.param();
-		param.put(BlendeeConstants.TRANSACTION_FACTORY_CLASS, TransferTestTransactionFactory.class);
+		param.put(BlendeeConstants.TRANSACTION_FACTORY_CLASS, JournalTestTransactionFactory.class);
 		param.put(BlendeeConstants.AUTO_CLOSE_INTERVAL_MILLIS, 0); //ﾃｽﾄ時はコネクションを閉じないので起動しない
 
 		return param;

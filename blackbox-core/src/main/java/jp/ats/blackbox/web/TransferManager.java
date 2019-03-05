@@ -7,13 +7,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import jp.ats.blackbox.executor.JobExecutor;
-import jp.ats.blackbox.executor.TransferExecutor;
+import jp.ats.blackbox.executor.JournalExecutor;
 
 public class TransferManager implements ServletContextListener {
 
 	private static final Logger logger = LogManager.getLogger(TransferManager.class);
 
-	private static final TransferExecutor executor = new TransferExecutor();
+	private static final JournalExecutor executor = new JournalExecutor();
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -24,7 +24,7 @@ public class TransferManager implements ServletContextListener {
 		JobExecutor.start();
 	}
 
-	public static TransferExecutor getTransferExecutor() {
+	public static JournalExecutor getTransferExecutor() {
 		return executor;
 	}
 

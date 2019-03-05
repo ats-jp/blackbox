@@ -26,7 +26,7 @@ public class TransientHandlerTest {
 			UUID transientId = TransientHandler.register(req);
 
 			IntStream.range(0, 10).forEach(i -> {
-				TransientHandler.registerTransfer(transientId, TransferHandlerTest.createRequest(U.NULL_ID, U.NULL_ID));
+				TransientHandler.registerJournal(transientId, JournalHandlerTest.createRequest(U.NULL_ID, U.NULL_ID));
 			});
 
 			TransientHandler.check(transientId, (e, c) -> {

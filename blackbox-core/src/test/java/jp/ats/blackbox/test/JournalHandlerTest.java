@@ -12,18 +12,18 @@ import org.blendee.util.Blendee;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
-import jp.ats.blackbox.persistence.TransferHandler;
-import jp.ats.blackbox.persistence.TransferHandler.BundleRegisterRequest;
-import jp.ats.blackbox.persistence.TransferHandler.NodeRegisterRequest;
-import jp.ats.blackbox.persistence.TransferHandler.TransferRegisterRequest;
+import jp.ats.blackbox.persistence.JournalHandler;
+import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
+import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
 
-public class TransferHandlerTest {
+public class JournalHandlerTest {
 
 	public static void main(String[] args) {
 		Common.startWithLog();
 
 		Blendee.execute(t -> {
-			var handler = new TransferHandler(U.recorder);
+			var handler = new JournalHandler(U.recorder);
 			IntStream.range(0, 10).forEach(i -> {
 				handler.register(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(U.NULL_ID, U.NULL_ID));
 				JobHandler.execute(LocalDateTime.now());
@@ -33,7 +33,7 @@ public class TransferHandlerTest {
 		});
 	}
 
-	static TransferRegisterRequest createRequest(UUID groupId, UUID unitId) {
+	static JournalRegisterRequest createRequest(UUID groupId, UUID unitId) {
 		var out = new NodeRegisterRequest();
 		out.unit_id = unitId;
 		out.in_out = InOut.OUT;
@@ -45,19 +45,19 @@ public class TransferHandlerTest {
 		in.in_out = InOut.IN;
 		in.quantity = BigDecimal.valueOf(100);
 
-		var bundle = new BundleRegisterRequest();
+		var bundle = new DetailRegisterRequest();
 
 		//通常はout -> inだがMinusTotalExceptionとなるのでテストではin -> outとする
 		//bundle.nodes = new NodeRegisterRequest[] { out, in };
 		bundle.nodes = new NodeRegisterRequest[] { in, out };
 
-		var transfer = new TransferRegisterRequest();
+		var transfer = new JournalRegisterRequest();
 		transfer.group_id = groupId;
-		transfer.transferred_at = new Timestamp(System.currentTimeMillis());
+		transfer.fixed_at = new Timestamp(System.currentTimeMillis());
 
 		transfer.tags = Optional.of(new String[] { "tag1", "tag2" });
 
-		transfer.bundles = new BundleRegisterRequest[] { bundle };
+		transfer.details = new DetailRegisterRequest[] { bundle };
 
 		return transfer;
 	}

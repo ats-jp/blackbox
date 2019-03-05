@@ -144,22 +144,12 @@ public class units
 	public static final String id = "id";
 
 	/**
-	 * name: group_id<br>
-	 * remarks: グループID<br>
-	 * この在庫の属するグループ<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID\nこの在庫の属するグループ", defaultValue = "null", ordinalPosition = 2, notNull = true)
-	public static final String group_id = "group_id";
-
-	/**
 	 * name: created_at<br>
 	 * remarks: 作成時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 3, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 2, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -168,16 +158,8 @@ public class units
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String created_by = "created_by";
-
-	/**
-	 * name: units_group_id_fkey<br>
-	 * references: groups<br>
-	 * columns: group_id
-	 */
-	@ForeignKey(name = "units_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
-	public static final String bb$groups$units_group_id_fkey = "units_group_id_fkey";
 
 	/**
 	 * name: units_created_by_fkey<br>
@@ -290,38 +272,6 @@ public class units
 
 		/**
 		 * setter
-		 * name: group_id<br>
-		* remarks: グループID<br>
-		* この在庫の属するグループ<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setGroup_id(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("group_id").getType());
-			data$.setValue("group_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: group_id<br>
-		* remarks: グループID<br>
-		* この在庫の属するグループ<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getGroup_id() {
-			Binder binder = data$.getValue("group_id");
-			return (java.util.UUID) binder.getValue();
-		}
-
-		/**
-		 * setter
 		 * name: created_at<br>
 		* remarks: 作成時刻<br>
 		* type: timestamptz(35, 6)<br>
@@ -378,18 +328,6 @@ public class units
 		public java.util.UUID getCreated_by() {
 			Binder binder = data$.getValue("created_by");
 			return (java.util.UUID) binder.getValue();
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 units_group_id_fkey<br>
-		 * 項目名 group_id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.groups.Row $groups() {
-			return sqlassist.bb.groups.row(
-				data$.getDataObject(bb$groups$units_group_id_fkey));
 		}
 
 		/**
@@ -1481,11 +1419,6 @@ public class units
 		public final T id;
 
 		/**
-		 * 項目名 group_id
-		 */
-		public final T group_id;
-
-		/**
 		 * 項目名 created_at
 		 */
 		public final T created_at;
@@ -1509,9 +1442,6 @@ public class units
 			this.id = builder$.buildColumn(
 				this,
 				sqlassist.bb.units.id);
-			this.group_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.units.group_id);
 			this.created_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.units.created_at);
@@ -1631,19 +1561,6 @@ public class units
 			if (super.table$ != null) throw new IllegalStateException("このインスタンスでは直接使用することはできません");
 			if (!getSelectStatement().rowMode()) throw new IllegalStateException("集計モードでは実行できない処理です");
 			return new InstantOneToManyQuery<>(this, getSelectStatement().decorators());
-		}
-
-		/**
-		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 units_group_id_fkey<br>
-		 * 項目名 group_id
-		 * @return groups relationship
-		 */
-		public sqlassist.bb.groups.ExtAssist<T, Many<sqlassist.bb.units.Row, M>> $groups() {
-			return new sqlassist.bb.groups.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb.units.bb$groups$units_group_id_fkey);
 		}
 
 		/**

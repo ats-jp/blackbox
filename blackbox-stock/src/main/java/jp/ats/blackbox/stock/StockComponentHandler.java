@@ -12,6 +12,8 @@ import org.blendee.jdbc.TablePath;
 import org.blendee.util.GenericTable;
 
 import jp.ats.blackbox.executor.TagExecutor;
+import jp.ats.blackbox.persistence.SecurityValues;
+import jp.ats.blackbox.persistence.Utils;
 import jp.ats.blackbox.stock.StockComponent.ForcibleUpdateRequest;
 import jp.ats.blackbox.stock.StockComponent.RegisterRequest;
 import jp.ats.blackbox.stock.StockComponent.UpdateRequest;
@@ -26,7 +28,7 @@ public class StockComponentHandler {
 
 	private static final String revision = "revision";
 
-	private static final String extension = "extension";
+	private static final String props = "props";
 
 	private static final String tags = "tags";
 
@@ -49,7 +51,7 @@ public class StockComponentHandler {
 
 		row.setUUID(group_id, request.group_id);
 		row.setString(name, request.name);
-		request.extension.ifPresent(v -> row.setObject(extension, toJson(v)));
+		request.extension.ifPresent(v -> row.setObject(props, toJson(v)));
 		request.tags.ifPresent(v -> row.setObject(tags, v));
 
 		UUID userId = SecurityValues.currentUserId();
@@ -70,7 +72,7 @@ public class StockComponentHandler {
 		int result = new GenericTable(table).UPDATE(a -> {
 			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
 			request.name.ifPresent(v -> a.col(name).set(v));
-			request.extension.ifPresent(v -> a.col(extension).set(toJson(v)));
+			request.extension.ifPresent(v -> a.col(props).set(toJson(v)));
 			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
 			a.col(updated_by).set(SecurityValues.currentUserId());
@@ -88,7 +90,7 @@ public class StockComponentHandler {
 		int result = new GenericTable(table).UPDATE(a -> {
 			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
 			request.name.ifPresent(v -> a.col(name).set(v));
-			request.extension.ifPresent(v -> a.col(extension).set(toJson(v)));
+			request.extension.ifPresent(v -> a.col(props).set(toJson(v)));
 			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
 			a.col(updated_by).set(SecurityValues.currentUserId());

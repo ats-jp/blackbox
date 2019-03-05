@@ -34,17 +34,17 @@ import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
 
 /**
- * transfer操作クラス
+ * journal操作クラス
  */
-public class TransferHandler {
+public class JournalHandler {
 
 	/**
-	 * transfer登録に必要な情報クラス
+	 * journal登録に必要な情報クラス
 	 */
-	public static class TransferRegisterRequest {
+	public static class JournalRegisterRequest {
 
 		/**
-		 * このtransferが属するグループ
+		 * このjournalが属するグループ
 		 * 必須
 		 */
 		public UUID group_id;
@@ -53,10 +53,10 @@ public class TransferHandler {
 		 * 移動時刻
 		 * 必須
 		 */
-		public Timestamp transferred_at;
+		public Timestamp fixed_at;
 
 		/**
-		 * 打消し元のtransfer_id
+		 * 打消し元のjournal_id
 		 */
 		public Optional<UUID> denied_id = Optional.empty();
 
@@ -65,12 +65,12 @@ public class TransferHandler {
 		/**
 		 * 追加情報JSON
 		 */
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 
 		/**
 		 * DBから復元した追加情報JSON
 		 */
-		Optional<Object> restored_extension = Optional.empty();
+		Optional<Object> restored_props = Optional.empty();
 
 		/**
 		 * 検索用タグ
@@ -78,26 +78,26 @@ public class TransferHandler {
 		public Optional<String[]> tags = Optional.empty();
 
 		/**
-		 * 配下のbundle
+		 * 配下のdetail
 		 * 必須
 		 */
-		public BundleRegisterRequest[] bundles;
+		public DetailRegisterRequest[] details;
 	}
 
 	/**
-	 * bundle登録に必要な情報クラス
+	 * detail登録に必要な情報クラス
 	 */
-	public static class BundleRegisterRequest {
+	public static class DetailRegisterRequest {
 
 		/**
 		 * 追加情報JSON
 		 */
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 
 		/**
 		 * DBから復元した追加情報JSON
 		 */
-		Optional<Object> restored_extension = Optional.empty();
+		Optional<Object> restored_props = Optional.empty();
 
 		/**
 		 * 配下のnode
@@ -136,29 +136,29 @@ public class TransferHandler {
 		/**
 		 * 追加情報JSON
 		 */
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 
 		/**
 		 * DBから復元した追加情報JSON
 		 */
-		Optional<Object> restored_extension = Optional.empty();
+		Optional<Object> restored_props = Optional.empty();
 
 		/**
 		 * unit追加情報JSON
 		 */
-		public Optional<String> unit_extension = Optional.empty();
+		public Optional<String> unit_props = Optional.empty();
 
 		/**
 		 * DBから復元した追加情報JSON
 		 */
-		Optional<Object> restored_unit_extension = Optional.empty();
+		Optional<Object> restored_unit_props = Optional.empty();
 	}
 
 	/**
-	 * transfer打消し
+	 * journal打消し
 	 *
 	 */
-	public static class TransferDenyRequest {
+	public static class JournalDenyRequest {
 
 		public UUID deny_id;
 
@@ -167,7 +167,7 @@ public class TransferHandler {
 
 	private final Recorder recorder;
 
-	public TransferHandler(Recorder recorder) {
+	public JournalHandler(Recorder recorder) {
 		this.recorder = recorder;
 	}
 
@@ -196,23 +196,23 @@ public class TransferHandler {
 
 	private int nodeSeq;
 
-	private class Transfer extends journals.Row implements TransferPreparer.Transfer {}
+	private class Journal extends journals.Row implements JournalPreparer.Journal {}
 
 	/**
-	 * transfer登録処理
+	 * journal登録処理
 	 */
-	public void register(UUID transferId, UUID batchId, UUID userId, TransferRegisterRequest request) {
+	public void register(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request) {
 		//初期化
 		nodeSeq = 0;
 
-		var transfer = new Transfer();
+		var journal = new Journal();
 
 		var createdAt = uniqueTime();
 
-		TransferPreparer.prepareTransfer(transferId, instanceId(), batchId, userId, request, createdAt, transfer, recorder);
+		JournalPreparer.prepareJournal(journalId, instanceId(), batchId, userId, request, createdAt, journal, recorder);
 
 		try {
-			transfer.insert();
+			journal.insert();
 		} catch (BSQLException e) {
 			//既に締められているグループの場合
 			var matcher = Pattern.compile("closed_check\\(\\): (\\{[^\\}]+\\})").matcher(e.getMessage());
@@ -224,21 +224,21 @@ public class TransferHandler {
 		}
 
 		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, tagId -> {
-			recorder.play(() -> new journals_tags().INSERT().VALUES($UUID, $UUID), transferId, tagId).execute();
+			recorder.play(() -> new journals_tags().INSERT().VALUES($UUID, $UUID), journalId, tagId).execute();
 		}));
 
-		Arrays.stream(request.bundles)
+		Arrays.stream(request.details)
 			.forEach(
-				r -> registerBundle(
+				r -> registerDetail(
 					userId,
-					transferId,
+					journalId,
 					request.group_id,
-					request.transferred_at,
+					request.fixed_at,
 					createdAt,
 					r));
 
 		//jobを登録し、別プロセスで現在数量を更新させる
-		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($UUID), transferId).execute();
+		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($UUID), journalId).execute();
 	}
 
 	public static class ClosedCheckError {
@@ -247,62 +247,62 @@ public class TransferHandler {
 
 		public String group_id;
 
-		public String transferred_at;
+		public String fixed_at;
 
 		public String closed_at;
 	}
 
-	private class Bundle extends details.Row implements TransferPreparer.Bundle {}
+	private class Detail extends details.Row implements JournalPreparer.Detail {}
 
 	/**
-	 * bundle登録処理
+	 * detail登録処理
 	 */
-	private void registerBundle(
+	private void registerDetail(
 		UUID userId,
-		UUID transferId,
+		UUID journalId,
 		UUID groupId,
-		Timestamp transferredAt,
+		Timestamp fixedAt,
 		Timestamp createdAt,
-		BundleRegisterRequest request) {
-		var bundle = new Bundle();
+		DetailRegisterRequest request) {
+		var detail = new Detail();
 
-		UUID bundleId = UUID.randomUUID();
+		UUID detailId = UUID.randomUUID();
 
-		TransferPreparer.prepareBundle(transferId, bundleId, request, bundle);
+		JournalPreparer.prepareDetail(journalId, detailId, request, detail);
 
-		bundle.insert();
+		detail.insert();
 
 		Arrays.stream(request.nodes)
 			.forEach(
 				r -> registerNode(
 					userId,
-					bundleId,
+					detailId,
 					groupId,
-					transferredAt,
+					fixedAt,
 					createdAt,
 					r));
 	}
 
-	private class Node extends nodes.Row implements TransferPreparer.Node {}
+	private class Node extends nodes.Row implements JournalPreparer.Node {}
 
 	/**
 	 * node登録処理
 	 */
 	private void registerNode(
 		UUID userId,
-		UUID bundleId,
+		UUID detailId,
 		UUID groupId,
-		Timestamp transferredAt,
+		Timestamp fixedAt,
 		Timestamp createdAt,
 		NodeRegisterRequest request) {
 		UUID nodeId = UUID.randomUUID();
 		var node = new Node();
-		TransferPreparer.prepareNode(bundleId, nodeId, userId, request, node, ++nodeSeq, recorder);
+		JournalPreparer.prepareNode(detailId, nodeId, userId, request, node, ++nodeSeq, recorder);
 
 		node.insert();
 
 		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
-		JustBeforeSnapshot justBefore = getJustBeforeSnapshot(request.unit_id, transferredAt, recorder);
+		JustBeforeSnapshot justBefore = getJustBeforeSnapshot(request.unit_id, fixedAt, recorder);
 
 		BigDecimal total = request.in_out.calcurate(justBefore.total, request.quantity);
 
@@ -342,7 +342,7 @@ public class TransferHandler {
 			total,
 			request.unit_id,
 			groupId,
-			transferredAt,
+			fixedAt,
 			createdAt,
 			nodeSeq,
 			userId)
@@ -361,12 +361,12 @@ public class TransferHandler {
 							wa -> wa.id.IN(
 								new snapshots()
 									.SELECT(sa -> sa.id)
-									//transferred_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
+									//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
 									.WHERE(swa -> swa.unit_id.eq($UUID).AND.fixed_at.gt($TIMESTAMP))))),
 				unlimited,
 				request.in_out.relativize(request.quantity),
 				request.unit_id,
-				transferredAt)
+				fixedAt)
 				.execute();
 		} catch (CheckConstraintViolationException e) {
 			//未来のsnapshotで数量がマイナスになった
@@ -375,7 +375,7 @@ public class TransferHandler {
 	}
 
 	//直近のsnapshotを取得
-	static JustBeforeSnapshot getJustBeforeSnapshot(UUID stockId, Timestamp transferredAt, Recorder recorder) {
+	static JustBeforeSnapshot getJustBeforeSnapshot(UUID stockId, Timestamp fixedAt, Recorder recorder) {
 		return recorder.play(
 			() -> new snapshots()
 				.SELECT(a -> a.ls(a.total, a.unlimited))
@@ -390,7 +390,7 @@ public class TransferHandler {
 						a.node_seq.DESC)), //created_atが等しければ同一伝票、同一伝票内であれば生成順
 			stockId,
 			stockId,
-			transferredAt).aggregateAndGet(r -> {
+			fixedAt).aggregateAndGet(r -> {
 				var container = new JustBeforeSnapshot();
 				while (r.next()) {
 					container.total = r.getBigDecimal(1);
@@ -415,81 +415,79 @@ public class TransferHandler {
 		boolean unlimited;
 	}
 
-	public Timestamp deny(UUID transferId, UUID userId, TransferDenyRequest denyRequest) {
+	public Timestamp deny(UUID journalId, UUID userId, JournalDenyRequest denyRequest) {
 		var request = pickup(denyRequest.deny_id, r -> {
 			r.denied_id = Optional.of(denyRequest.deny_id);
 			r.deny_reason = denyRequest.deny_reason;
 		}, true);
 
-		register(transferId, U.NULL_ID, userId, request);
+		register(journalId, U.NULL_ID, userId, request);
 
-		return request.transferred_at;
+		return request.fixed_at;
 	}
 
-	public TransferRegisterRequest pickup(UUID transferId) {
-		return pickup(transferId, r -> {}, false);
+	public JournalRegisterRequest pickup(UUID journalId) {
+		return pickup(journalId, r -> {}, false);
 	}
 
-	private TransferRegisterRequest pickup(
-		UUID transferId,
-		Consumer<TransferRegisterRequest> transferRequestDecorator,
+	private JournalRegisterRequest pickup(
+		UUID journalId,
+		Consumer<JournalRegisterRequest> journalRequestDecorator,
 		boolean reverse) {
-		var request = new TransferRegisterRequest();
+		var request = new JournalRegisterRequest();
 
-		var bundles = new LinkedList<BundleRegisterRequest>();
+		var details = new LinkedList<DetailRegisterRequest>();
 
 		recorder.play(
 			() -> new nodes().selectClause(
 				a -> {
-					var bundlesAssist = a.$details();
-					var transfersAssist = bundlesAssist.$journals();
-					var stocksAssist = a.$units();
+					var detailsAssist = a.$details();
+					var journalsAssist = detailsAssist.$journals();
 
 					a.SELECT(
-						transfersAssist.group_id,
-						transfersAssist.fixed_at,
-						transfersAssist.extension,
-						transfersAssist.tags,
-						bundlesAssist.extension,
-						stocksAssist.group_id,
+						journalsAssist.group_id,
+						journalsAssist.fixed_at,
+						journalsAssist.props,
+						journalsAssist.tags,
+						detailsAssist.props,
 						a.unit_id,
 						a.in_out,
 						a.quantity,
 						a.grants_unlimited,
-						a.extension);
+						a.props);
 				})
 				.WHERE(a -> a.$details().journal_id.eq($UUID))
 				.assist()
 				.$details()
 				.$journals()
 				.intercept(),
-			transferId)
-			.forEach(transferOne -> {
-				var transfer = transferOne.get();
+			journalId)
+			.forEach(journalOne -> {
+				var journal = journalOne.get();
 
-				request.group_id = transfer.getGroup_id();
+				request.group_id = journal.getGroup_id();
 
-				transferRequestDecorator.accept(request);
+				journalRequestDecorator.accept(request);
 
-				request.transferred_at = transfer.getFixed_at();
-				request.restored_extension = Optional.of(transfer.getExtension());
+				request.fixed_at = journal.getFixed_at();
+				request.restored_props = Optional.of(journal.getProps());
 
 				try {
-					request.tags = Optional.of(Utils.restoreTags(transfer.getTags()));
+					request.tags = Optional.of(Utils.restoreTags(journal.getTags()));
 				} catch (SQLException e) {
 					throw new BSQLException(e);
 				}
 
-				transferOne.many().forEach(bundleOne -> {
+				journalOne.many().forEach(detailOne -> {
 					var nodes = new LinkedList<NodeRegisterRequest>();
 
-					var bundleRequest = new BundleRegisterRequest();
+					var detailRequest = new DetailRegisterRequest();
 
-					bundleRequest.restored_extension = Optional.of(bundleOne.get().getExtension());
+					detailRequest.restored_props = Optional.of(detailOne.get().getProps());
 
-					bundles.add(bundleRequest);
+					details.add(detailRequest);
 
-					bundleOne.many().forEach(nodeOne -> {
+					detailOne.many().forEach(nodeOne -> {
 						var node = nodeOne.get();
 
 						var nodeRequest = new NodeRegisterRequest();
@@ -501,15 +499,15 @@ public class TransferHandler {
 						nodeRequest.in_out = reverse ? inOut.reverse() : inOut;
 						nodeRequest.quantity = node.getQuantity();
 						nodeRequest.grants_unlimited = Optional.of(node.getGrants_unlimited());
-						nodeRequest.restored_extension = Optional.of(node.getExtension());
+						nodeRequest.restored_props = Optional.of(node.getProps());
 
 						nodes.add(nodeRequest);
 					});
 
-					bundleRequest.nodes = nodes.toArray(new NodeRegisterRequest[nodes.size()]);
+					detailRequest.nodes = nodes.toArray(new NodeRegisterRequest[nodes.size()]);
 				});
 
-				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
+				request.details = details.toArray(new DetailRegisterRequest[details.size()]);
 			});
 
 		return request;

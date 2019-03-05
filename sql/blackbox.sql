@@ -53,9 +53,9 @@ name
 revision
 	楽観的排他制御のためのリビジョン番号
 	更新時にデータ参照時のリビジョン番号で更新し、失敗したら既に他で更新されていると判断する
-extension
+props
 	外部アプリケーションがBlackboxに保存させておくための情報をJSON形式にしたもの
-	基本的にマスタテーブルが持ち、集約テーブルにはその時のマスタテーブルのextensionを合成して持つ
+	基本的にマスタテーブルが持ち、集約テーブルにはその時のマスタテーブルのpropsを合成して持つ
 active
 	Blackboxでは、基本的にデータの削除は発生しないが、システム的に不要になったデータを除外する必要がある場合、このフラグを使用する
 	falseの場合、通常の検索からは除外される
@@ -113,7 +113,7 @@ CREATE TABLE bb.orgs (
 	name text NOT NULL,
 	instance_id uuid REFERENCES bb.instances NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid NOT NULL, --あとでREFERENCES usersに
@@ -128,7 +128,7 @@ COMMENT ON COLUMN bb.orgs.id IS 'ID';
 COMMENT ON COLUMN bb.orgs.name IS '名称';
 COMMENT ON COLUMN bb.orgs.instance_id IS '発生元インスタンスのID';
 COMMENT ON COLUMN bb.orgs.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb.orgs.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.orgs.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.orgs.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb.orgs.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.orgs.created_by IS '作成ユーザー';
@@ -141,7 +141,7 @@ INSERT INTO bb.orgs (
 	name,
 	instance_id,
 	revision,
-	extension,
+	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -159,7 +159,7 @@ INSERT INTO bb.orgs (
 	name,
 	instance_id,
 	revision,
-	extension,
+	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -186,7 +186,7 @@ CREATE TABLE bb.groups (
 	name text NOT NULL,
 	parent_id uuid REFERENCES bb.groups NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
@@ -206,7 +206,7 @@ COMMENT ON COLUMN bb.groups.org_id IS '組織ID';
 COMMENT ON COLUMN bb.groups.name IS '名称';
 COMMENT ON COLUMN bb.groups.parent_id IS '親グループID';
 COMMENT ON COLUMN bb.groups.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb.groups.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.groups.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.groups.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb.groups.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb.groups.created_at IS '作成時刻';
@@ -221,7 +221,7 @@ INSERT INTO bb.groups (
 	name,
 	parent_id,
 	revision,
-	extension,
+	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -241,7 +241,7 @@ INSERT INTO bb.groups (
 	name,
 	parent_id,
 	revision,
-	extension,
+	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -347,7 +347,7 @@ CREATE TABLE bb.users (
 	name text NOT NULL,
 	role smallint CHECK (role IN (0, 1, 2, 3, 9)) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
@@ -365,7 +365,7 @@ COMMENT ON COLUMN bb.users.role IS '役割
 値の小さいほうが強い権限となる
 0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE';
 COMMENT ON COLUMN bb.users.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb.users.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.users.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.users.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb.users.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb.users.created_at IS '作成時刻';
@@ -380,7 +380,7 @@ INSERT INTO bb.users (
 	name,
 	role,
 	revision,
-	extension,
+	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -400,7 +400,7 @@ INSERT INTO bb.users (
 	name,
 	role,
 	revision,
-	extension,
+	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -456,7 +456,7 @@ CREATE TABLE bb.closings (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	closed_at timestamptz NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL);
 --更新不可
@@ -465,7 +465,7 @@ COMMENT ON TABLE bb.closings IS '締め';
 COMMENT ON COLUMN bb.closings.id IS 'ID';
 COMMENT ON COLUMN bb.closings.group_id IS 'グループID';
 COMMENT ON COLUMN bb.closings.closed_at IS '締め時刻';
-COMMENT ON COLUMN bb.closings.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.closings.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.closings.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.closings.created_by IS '作成ユーザー';
 
@@ -490,7 +490,6 @@ COMMENT ON COLUMN bb.last_closings.closed_at IS '締め時刻';
 --管理対象
 CREATE TABLE bb.units (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	group_id uuid REFERENCES bb.groups NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL);
 --log対象外
@@ -499,20 +498,11 @@ CREATE TABLE bb.units (
 COMMENT ON TABLE bb.units IS '管理対象
 Blackboxで数量管理する管理対象の最小単位';
 COMMENT ON COLUMN bb.units.id IS 'ID';
-COMMENT ON COLUMN bb.units.group_id IS 'グループID
-この在庫の属するグループ';
 COMMENT ON COLUMN bb.units.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.units.created_by IS '作成ユーザー';
 
 --NULLの代用(id=0)
-INSERT INTO bb.units (
-	id,
-	group_id,
-	created_by
-) VALUES (
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000');
+INSERT INTO bb.units (id, created_by) VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
 
 --===========================
 --journal tables
@@ -540,14 +530,14 @@ CREATE TABLE bb.journals (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	journal_batch_id uuid REFERENCES bb.journal_batches NOT NULL,
 	fixed_at timestamptz NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	instance_id uuid REFERENCES bb.instances NOT NULL,
 	denied_id uuid REFERENCES bb.journals DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,
 	deny_reason text DEFAULT '' NOT NULL,
-	org_extension jsonb NOT NULL,
-	group_extension jsonb NOT NULL,
-	user_extension jsonb NOT NULL,
+	org_props jsonb NOT NULL,
+	group_props jsonb NOT NULL,
+	user_props jsonb NOT NULL,
 	created_at timestamptz NOT NULL, --Javaから指定するためDEFAULTなし
 	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, created_at)); 
@@ -561,16 +551,16 @@ COMMENT ON COLUMN bb.journals.group_id IS 'グループID
 この伝票の属するグループ';
 COMMENT ON COLUMN bb.journals.journal_batch_id IS '移動伝票一括登録ID';
 COMMENT ON COLUMN bb.journals.fixed_at IS '確定時刻';
-COMMENT ON COLUMN bb.journals.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.journals.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.journals.tags IS '保存用タグ';
 COMMENT ON COLUMN bb.journals.instance_id IS '発生元インスタンスのID';
 COMMENT ON COLUMN bb.journals.denied_id IS '取消元伝票ID
 訂正後の伝票が訂正前の伝票のIDを持つ
 ここに入っているIDが指す伝票は、取り消されたものとなる';
 COMMENT ON COLUMN bb.journals.deny_reason IS '取消理由';
-COMMENT ON COLUMN bb.journals.org_extension IS '組織のextension';
-COMMENT ON COLUMN bb.journals.group_extension IS 'グループのextension';
-COMMENT ON COLUMN bb.journals.user_extension IS '作成ユーザーのextension';
+COMMENT ON COLUMN bb.journals.org_props IS '組織のprops';
+COMMENT ON COLUMN bb.journals.group_props IS 'グループのprops';
+COMMENT ON COLUMN bb.journals.user_props IS '作成ユーザーのprops';
 COMMENT ON COLUMN bb.journals.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.journals.created_by IS '作成ユーザー';
 
@@ -580,11 +570,11 @@ INSERT INTO bb.journals (
 	group_id,
 	journal_batch_id,
 	fixed_at,
-	extension,
+	props,
 	instance_id,
-	org_extension,
-	group_extension,
-	user_extension,
+	org_props,
+	group_props,
+	user_props,
 	created_at,
 	created_by
 ) VALUES (
@@ -626,7 +616,7 @@ CREATE TABLE bb.journals_tags (
 CREATE TABLE bb.details (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	journal_id uuid REFERENCES bb.journals NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL);
+	props jsonb DEFAULT '{}' NOT NULL);
 --log対象外
 
 COMMENT ON TABLE bb.details IS '伝票明細
@@ -634,7 +624,7 @@ COMMENT ON TABLE bb.details IS '伝票明細
 出ノードと入ノードを束ねる';
 COMMENT ON COLUMN bb.details.id IS 'ID';
 COMMENT ON COLUMN bb.details.journal_id IS '伝票ID';
-COMMENT ON COLUMN bb.details.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.details.props IS '外部アプリケーション情報JSON';
 
 --NULLの代用(id=0)
 INSERT INTO bb.details (
@@ -655,9 +645,8 @@ CREATE TABLE bb.nodes (
 	seq integer NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
-	group_extension jsonb DEFAULT '{}' NOT NULL,
-	unit_extension jsonb DEFAULT '{}' NOT NULL);
+	props jsonb DEFAULT '{}' NOT NULL,
+	unit_props jsonb DEFAULT '{}' NOT NULL);
 --log対象外
 
 COMMENT ON TABLE bb.nodes IS '伝票明細ノード
@@ -671,9 +660,8 @@ COMMENT ON COLUMN bb.nodes.seq IS '伝票内連番';
 COMMENT ON COLUMN bb.nodes.quantity IS '数量';
 COMMENT ON COLUMN bb.nodes.grants_unlimited IS '数量無制限の許可
 trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない';
-COMMENT ON COLUMN bb.nodes.extension IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.nodes.group_extension IS 'グループのextension';
-COMMENT ON COLUMN bb.nodes.unit_extension IS '管理対象のextension';
+COMMENT ON COLUMN bb.nodes.props IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.nodes.unit_props IS '管理対象のprops';
 
 --NULLの代用(id=0)
 INSERT INTO bb.nodes (
@@ -902,7 +890,7 @@ CREATE TABLE bb.transient_journals (
 	group_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
 	fixed_at timestamptz NOT NULL,
 	seq bigserial NOT NULL, --DB内生成順を保証
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
@@ -917,7 +905,7 @@ COMMENT ON COLUMN bb.transient_journals.group_id IS 'グループID';
 COMMENT ON COLUMN bb.transient_journals.fixed_at IS '移動時刻';
 COMMENT ON COLUMN bb.transient_journals.seq IS 'DB内生成順
 fixed_atが同一の場合、優先順を決定';
-COMMENT ON COLUMN bb.transient_journals.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.transient_journals.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.transient_journals.tags IS '保存用タグ';
 COMMENT ON COLUMN bb.transient_journals.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_journals.created_at IS '作成時刻';
@@ -952,7 +940,7 @@ CREATE TABLE bb.transient_details (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	transient_journal_id uuid REFERENCES bb.transient_journals ON DELETE CASCADE NOT NULL,
 	seq_in_journal integer NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,-- 編集でtransient_detailsだけ追加することもあるので必要
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
@@ -963,7 +951,7 @@ COMMENT ON TABLE bb.transient_details IS '一時作業伝票明細';
 COMMENT ON COLUMN bb.transient_details.id IS 'ID';
 COMMENT ON COLUMN bb.transient_details.transient_journal_id IS '一時作業伝票ID';
 COMMENT ON COLUMN bb.transient_details.seq_in_journal IS '伝票内連番';
-COMMENT ON COLUMN bb.transient_details.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.transient_details.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.transient_details.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_details.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_details.created_by IS '作成ユーザー';
@@ -978,10 +966,10 @@ CREATE TABLE bb.transient_nodes (
 	transient_detail_id uuid REFERENCES bb.transient_details ON DELETE CASCADE NOT NULL,
 	unit_id uuid REFERENCES bb.units NOT NULL, --unitは削除されない
 	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL, --そのまま計算に使用できるように
-	seq_in_bundle integer NOT NULL,
+	seq_in_detail integer NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
@@ -993,10 +981,10 @@ COMMENT ON COLUMN bb.transient_nodes.id IS 'ID';
 COMMENT ON COLUMN bb.transient_nodes.transient_detail_id IS '移動ID';
 COMMENT ON COLUMN bb.transient_nodes.unit_id IS '管理対象ID';
 COMMENT ON COLUMN bb.transient_nodes.in_out IS '入出庫区分';
-COMMENT ON COLUMN bb.transient_nodes.seq_in_bundle IS '伝票明細内連番';
+COMMENT ON COLUMN bb.transient_nodes.seq_in_detail IS '伝票明細内連番';
 COMMENT ON COLUMN bb.transient_nodes.quantity IS '移動数量';
 COMMENT ON COLUMN bb.transient_nodes.grants_unlimited IS '数量無制限の許可';
-COMMENT ON COLUMN bb.transient_nodes.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.transient_nodes.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.transient_nodes.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_nodes.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_nodes.created_by IS '作成ユーザー';
@@ -1027,9 +1015,6 @@ CREATE INDEX ON bb.relationships (parent_id);
 CREATE INDEX ON bb.users (group_id);
 CREATE INDEX ON bb.users (role);
 CREATE INDEX ON bb.users (active);
-
---units
-CREATE INDEX ON bb.units (group_id);
 
 --journals
 CREATE INDEX ON bb.journals (group_id);

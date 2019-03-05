@@ -57,7 +57,7 @@ CREATE TABLE bb_stock.items (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
@@ -72,7 +72,7 @@ COMMENT ON COLUMN bb_stock.items.id IS 'ID';
 COMMENT ON COLUMN bb_stock.items.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.items.name IS '名称';
 COMMENT ON COLUMN bb_stock.items.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb_stock.items.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb_stock.items.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.items.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb_stock.items.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb_stock.items.created_at IS '作成時刻';
@@ -86,7 +86,7 @@ INSERT INTO bb_stock.items (
 	group_id,
 	name,
 	revision,
-	extension,
+	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -112,7 +112,7 @@ CREATE TABLE bb_stock.owners (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
@@ -127,7 +127,7 @@ COMMENT ON COLUMN bb_stock.owners.id IS 'ID';
 COMMENT ON COLUMN bb_stock.owners.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.owners.name IS '名称';
 COMMENT ON COLUMN bb_stock.owners.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb_stock.owners.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb_stock.owners.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.owners.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb_stock.owners.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb_stock.owners.created_at IS '作成時刻';
@@ -141,7 +141,7 @@ INSERT INTO bb_stock.owners (
 	group_id,
 	name,
 	revision,
-	extension,
+	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -167,7 +167,7 @@ CREATE TABLE bb_stock.locations (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
@@ -182,7 +182,7 @@ COMMENT ON COLUMN bb_stock.locations.id IS 'ID';
 COMMENT ON COLUMN bb_stock.locations.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.locations.name IS '名称';
 COMMENT ON COLUMN bb_stock.locations.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb_stock.locations.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb_stock.locations.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.locations.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb_stock.locations.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb_stock.locations.created_at IS '作成時刻';
@@ -196,7 +196,7 @@ INSERT INTO bb_stock.locations (
 	group_id,
 	name,
 	revision,
-	extension,
+	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -221,7 +221,7 @@ CREATE TABLE bb_stock.statuses (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
-	extension jsonb DEFAULT '{}' NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
@@ -236,7 +236,7 @@ COMMENT ON COLUMN bb_stock.statuses.id IS 'ID';
 COMMENT ON COLUMN bb_stock.statuses.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.statuses.name IS '名称';
 COMMENT ON COLUMN bb_stock.statuses.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb_stock.statuses.extension IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb_stock.statuses.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.statuses.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb_stock.statuses.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb_stock.statuses.created_at IS '作成時刻';
@@ -250,7 +250,7 @@ INSERT INTO bb_stock.statuses (
 	group_id,
 	name,
 	revision,
-	extension,
+	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -271,24 +271,23 @@ CREATE TABLE bb_stock.statuses_tags (
 
 --在庫
 CREATE TABLE bb_stock.stocks (
-	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	unit_id uuid REFERENCES bb.units NOT NULL,
-	unit_group_id uuid REFERENCES bb.groups NOT NULL,
+	id uuid REFERENCES bb.units PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
 	item_id uuid REFERENCES bb_stock.items NOT NULL,
 	owner_id uuid REFERENCES bb_stock.owners NOT NULL,
 	location_id uuid REFERENCES bb_stock.locations NOT NULL,
 	status_id uuid REFERENCES bb_stock.statuses NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
-	UNIQUE (unit_group_id, item_id, owner_id, location_id, status_id));
+	UNIQUE (group_id, item_id, owner_id, location_id, status_id));
 --log対象外
 --一度登録されたら変更されない
 
 COMMENT ON TABLE bb_stock.stocks IS '在庫
 Blackboxで数量管理する在庫の最小単位';
-COMMENT ON COLUMN bb_stock.stocks.id IS 'ID';
-COMMENT ON COLUMN bb_stock.stocks.unit_id IS '管理対象ID';
-COMMENT ON COLUMN bb_stock.stocks.unit_group_id IS '管理対象に持つグループID
+COMMENT ON COLUMN bb_stock.stocks.id IS 'ID
+管理対象IDに従属';
+COMMENT ON COLUMN bb_stock.stocks.group_id IS '管理対象に持つグループID
 この在庫の属するグループ';
 COMMENT ON COLUMN bb_stock.stocks.item_id IS 'アイテムID';
 COMMENT ON COLUMN bb_stock.stocks.owner_id IS '所有者ID';
@@ -300,15 +299,13 @@ COMMENT ON COLUMN bb_stock.stocks.created_by IS '作成ユーザー';
 --NULLの代用(id=0)
 INSERT INTO bb_stock.stocks (
 	id,
-	unit_id,
-	unit_group_id,
+	group_id,
 	item_id,
 	owner_id,
 	location_id,
 	status_id,
 	created_by
 ) VALUES (
-	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
@@ -343,8 +340,7 @@ CREATE INDEX ON bb_stock.statuses (group_id);
 CREATE INDEX ON bb_stock.statuses (active);
 
 --stocks
-CREATE INDEX ON bb_stock.stocks (unit_id);
-CREATE INDEX ON bb_stock.stocks (unit_group_id);
+CREATE INDEX ON bb_stock.stocks (group_id);
 CREATE INDEX ON bb_stock.stocks (item_id);
 CREATE INDEX ON bb_stock.stocks (owner_id);
 CREATE INDEX ON bb_stock.stocks (location_id);

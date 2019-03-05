@@ -8,7 +8,7 @@ public class JsonHelper {
 
 	//JDBC URLに?stringtype=unspecifiedとつけてもJSONを変換してくれるようになるが、JDBC URLはソース管理に含まれないので直接変換してセットすることとする
 	public static Object toJson(String json) {
-		PGobject object = new PGobject();
+		var object = new PGobject();
 		object.setType("json");
 		try {
 			object.setValue(json);
@@ -17,5 +17,9 @@ public class JsonHelper {
 		}
 
 		return object;
+	}
+
+	public static String toString(Object json) {
+		return ((PGobject) json).getValue();
 	}
 }

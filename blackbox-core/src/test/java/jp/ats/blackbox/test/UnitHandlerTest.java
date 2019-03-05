@@ -12,17 +12,17 @@ import sqlassist.bb.units;
 public class UnitHandlerTest {
 
 	public static void main(String[] args) throws Exception {
-		TransferCommon.start();
+		JournalCommon.start();
 		//TransferCommon.startWithLog();
 
 		SecurityValues.start(U.NULL_ID);
-		register(GroupHandlerTest.register());
+		register();
 		SecurityValues.end();
 	}
 
-	static UUID register(UUID groupId) {
+	static UUID register() {
 		return Blendee.executeAndGet(t -> {
-			return UnitHandler.register(groupId, U.NULL_ID, () -> new units().SELECT(a -> a.id)).getId();
+			return UnitHandler.register(U.NULL_ID, () -> new units().SELECT(a -> a.id)).getId();
 		});
 	}
 }

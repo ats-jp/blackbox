@@ -170,13 +170,13 @@ public class transient_nodes
 	public static final String in_out = "in_out";
 
 	/**
-	 * name: seq_in_bundle<br>
+	 * name: seq_in_detail<br>
 	 * remarks: 伝票明細内連番<br>
 	 * type: int4(10)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq_in_bundle", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票明細内連番", defaultValue = "null", ordinalPosition = 5, notNull = true)
-	public static final String seq_in_bundle = "seq_in_bundle";
+	@Column(name = "seq_in_detail", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票明細内連番", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	public static final String seq_in_detail = "seq_in_detail";
 
 	/**
 	 * name: quantity<br>
@@ -197,13 +197,13 @@ public class transient_nodes
 	public static final String grants_unlimited = "grants_unlimited";
 
 	/**
-	 * name: extension<br>
+	 * name: props<br>
 	 * remarks: 外部アプリケーション情報JSON<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
-	public static final String extension = "extension";
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
+	public static final String props = "props";
 
 	/**
 	 * name: revision<br>
@@ -475,31 +475,31 @@ public class transient_nodes
 
 		/**
 		 * setter
-		 * name: seq_in_bundle<br>
+		 * name: seq_in_detail<br>
 		* remarks: 伝票明細内連番<br>
 		* type: int4(10)<br>
 		* not null: true<br>
 		 * @param value java.lang.Integer
 		 */
-		public void setSeq_in_bundle(java.lang.Integer value) {
+		public void setSeq_in_detail(java.lang.Integer value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("seq_in_bundle").getType());
-			data$.setValue("seq_in_bundle", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("seq_in_detail").getType());
+			data$.setValue("seq_in_detail", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: seq_in_bundle<br>
+		 * name: seq_in_detail<br>
 		* remarks: 伝票明細内連番<br>
 		* type: int4(10)<br>
 		* not null: true<br>
 		 * @return java.lang.Integer
 		 */
-		public java.lang.Integer getSeq_in_bundle() {
-			Binder binder = data$.getValue("seq_in_bundle");
+		public java.lang.Integer getSeq_in_detail() {
+			Binder binder = data$.getValue("seq_in_detail");
 			return (java.lang.Integer) binder.getValue();
 		}
 
@@ -565,31 +565,31 @@ public class transient_nodes
 
 		/**
 		 * setter
-		 * name: extension<br>
+		 * name: props<br>
 		* remarks: 外部アプリケーション情報JSON<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
 		 */
-		public void setExtension(java.lang.Object value) {
+		public void setProps(java.lang.Object value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("extension").getType());
-			data$.setValue("extension", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("props").getType());
+			data$.setValue("props", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: extension<br>
+		 * name: props<br>
 		* remarks: 外部アプリケーション情報JSON<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
 		 */
-		public java.lang.Object getExtension() {
-			Binder binder = data$.getValue("extension");
+		public java.lang.Object getProps() {
+			Binder binder = data$.getValue("props");
 			return binder.getValue();
 		}
 
@@ -1883,9 +1883,9 @@ public class transient_nodes
 		public final T in_out;
 
 		/**
-		 * 項目名 seq_in_bundle
+		 * 項目名 seq_in_detail
 		 */
-		public final T seq_in_bundle;
+		public final T seq_in_detail;
 
 		/**
 		 * 項目名 quantity
@@ -1898,9 +1898,9 @@ public class transient_nodes
 		public final T grants_unlimited;
 
 		/**
-		 * 項目名 extension
+		 * 項目名 props
 		 */
-		public final T extension;
+		public final T props;
 
 		/**
 		 * 項目名 revision
@@ -1950,18 +1950,18 @@ public class transient_nodes
 			this.in_out = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_nodes.in_out);
-			this.seq_in_bundle = builder$.buildColumn(
+			this.seq_in_detail = builder$.buildColumn(
 				this,
-				sqlassist.bb.transient_nodes.seq_in_bundle);
+				sqlassist.bb.transient_nodes.seq_in_detail);
 			this.quantity = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_nodes.quantity);
 			this.grants_unlimited = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_nodes.grants_unlimited);
-			this.extension = builder$.buildColumn(
+			this.props = builder$.buildColumn(
 				this,
-				sqlassist.bb.transient_nodes.extension);
+				sqlassist.bb.transient_nodes.props);
 			this.revision = builder$.buildColumn(
 				this,
 				sqlassist.bb.transient_nodes.revision);

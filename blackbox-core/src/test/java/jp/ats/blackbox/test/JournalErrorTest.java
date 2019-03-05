@@ -7,14 +7,14 @@ import java.util.stream.IntStream;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.JobExecutor;
-import jp.ats.blackbox.executor.TransferExecutor;
+import jp.ats.blackbox.executor.JournalExecutor;
 import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
 import jp.ats.blackbox.persistence.SecurityValues;
 
-public class TransferErrorTest {
+public class JournalErrorTest {
 
 	public static void main(String[] args) throws Exception {
-		TransferCommon.startWithLog();
+		JournalCommon.startWithLog();
 
 		SecurityValues.start(U.NULL_ID);
 		execute(GroupHandlerTest.register(), 1, 1);
@@ -24,9 +24,9 @@ public class TransferErrorTest {
 	static void execute(UUID groupId, int transfers, int threads) {
 		AtomicInteger counter = new AtomicInteger(0);
 
-		var executor = new TransferExecutor();
+		var executor = new JournalExecutor();
 
-		var unitId = UnitHandlerTest.register(groupId);
+		var unitId = UnitHandlerTest.register();
 
 		executor.start();
 		JobExecutor.start();
@@ -45,7 +45,7 @@ public class TransferErrorTest {
 
 					closePromise.waitUntilFinished();
 
-					var promise = executor.registerTransfer(U.NULL_ID, () -> TransferHandlerTest.createRequest(groupId, unitId));
+					var promise = executor.registerJournal(U.NULL_ID, () -> JournalHandlerTest.createRequest(groupId, unitId));
 
 					promise.waitUntilFinished();
 				} catch (Exception e) {

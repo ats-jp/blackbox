@@ -32,12 +32,14 @@ database
 SET default_tablespace = 'blackbox_log';
 */
 
+DROP TABLE bb_log.items CASCADE;
+
 CREATE TABLE bb_log.items (
 	id uuid,
 	group_id uuid,
 	name text,
 	revision bigint,
-	extension jsonb,
+	props jsonb,
 	tags text[],
 	active boolean,
 	created_at timestamptz,
@@ -49,6 +51,8 @@ CREATE TABLE bb_log.items (
 	txid bigint DEFAULT txid_current(),
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
+
+DROP FUNCTION bb_log.items_logfunction CASCADE;
 
 CREATE FUNCTION bb_log.items_logfunction() RETURNS TRIGGER AS $items_logtrigger$
 	BEGIN
@@ -71,12 +75,14 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.items_logfunction();
 
 ----------
 
+DROP TABLE bb_log.owners CASCADE;
+
 CREATE TABLE bb_log.owners (
 	id uuid,
 	group_id uuid,
 	name text,
 	revision bigint,
-	extension jsonb,
+	props jsonb,
 	tags text[],
 	active boolean,
 	created_at timestamptz,
@@ -88,6 +94,8 @@ CREATE TABLE bb_log.owners (
 	txid bigint DEFAULT txid_current(),
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
+
+DROP FUNCTION bb_log.owners_logfunction CASCADE;
 
 CREATE FUNCTION bb_log.owners_logfunction() RETURNS TRIGGER AS $owners_logtrigger$
 	BEGIN
@@ -110,12 +118,14 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.owners_logfunction();
 
 ----------
 
+DROP TABLE bb_log.locations CASCADE;
+
 CREATE TABLE bb_log.locations (
 	id uuid,
 	group_id uuid,
 	name text,
 	revision bigint,
-	extension jsonb,
+	props jsonb,
 	tags text[],
 	active boolean,
 	created_at timestamptz,
@@ -127,6 +137,8 @@ CREATE TABLE bb_log.locations (
 	txid bigint DEFAULT txid_current(),
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
+
+DROP FUNCTION bb_log.locations_logfunction CASCADE;
 
 CREATE FUNCTION bb_log.locations_logfunction() RETURNS TRIGGER AS $locations_logtrigger$
 	BEGIN
@@ -149,12 +161,14 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.locations_logfunction();
 
 ----------
 
+DROP TABLE bb_log.statuses CASCADE;
+
 CREATE TABLE bb_log.statuses (
 	id uuid,
 	group_id uuid,
 	name text,
 	revision bigint,
-	extension jsonb,
+	props jsonb,
 	tags text[],
 	active boolean,
 	created_at timestamptz,
@@ -166,6 +180,8 @@ CREATE TABLE bb_log.statuses (
 	txid bigint DEFAULT txid_current(),
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
+
+DROP FUNCTION bb_log.statuses_logfunction CASCADE;
 
 CREATE FUNCTION bb_log.statuses_logfunction() RETURNS TRIGGER AS $statuses_logtrigger$
 	BEGIN
@@ -187,6 +203,12 @@ CREATE TRIGGER statuses_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb_stock.
 FOR EACH ROW EXECUTE PROCEDURE bb_log.statuses_logfunction();
 
 ----------
+
+--シーケンス使用権を再付与
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA bb_log TO blackbox;
+
+--logはINSERTのみ
+GRANT INSERT ON ALL TABLES IN SCHEMA bb_log TO blackbox;
 
 --log系のテーブルはINSERTのみなので、autovacuumは行わない
 --ただし、ANALYZEがかからなくなるので、定期的に実施する必要がある

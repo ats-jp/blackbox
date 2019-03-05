@@ -17,7 +17,7 @@ public class UserHandler {
 		row.setId(id);
 		row.setName(name);
 		row.setGroup_id(groupId);
-		row.setExtension(extension);
+		row.setProps(extension);
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 
@@ -38,7 +38,7 @@ public class UserHandler {
 			a.revision.set(revision + 1);
 			name.ifPresent(v -> a.name.set(v));
 			groupId.ifPresent(v -> a.group_id.set(v));
-			extension.ifPresent(v -> a.extension.set(JsonHelper.toJson(v)));
+			extension.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 			tags.ifPresent(v -> a.tags.set((Object) v));
 			active.ifPresent(v -> a.active.set(v));
 			a.updated_by.set(SecurityValues.currentUserId());

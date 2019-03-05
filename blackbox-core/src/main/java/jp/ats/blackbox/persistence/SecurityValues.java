@@ -28,7 +28,7 @@ public class SecurityValues {
 		return id[0];
 	}
 
-	static UUID currentUserId() {
+	public static UUID currentUserId() {
 		return Objects.requireNonNull(container.get());
 	}
 }

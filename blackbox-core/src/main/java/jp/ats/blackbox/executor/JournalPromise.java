@@ -4,7 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class TransferPromise {
+public class JournalPromise {
 
 	private final ReentrantLock lock = new ReentrantLock();
 

@@ -137,30 +137,22 @@ public class stocks
 	/**
 	 * name: id<br>
 	 * remarks: ID<br>
+	 * 管理対象IDに従属<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "gen_random_uuid()", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID\n管理対象IDに従属", defaultValue = "null", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
-	 * name: unit_id<br>
-	 * remarks: 管理対象ID<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "unit_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象ID", defaultValue = "null", ordinalPosition = 2, notNull = true)
-	public static final String unit_id = "unit_id";
-
-	/**
-	 * name: unit_group_id<br>
+	 * name: group_id<br>
 	 * remarks: 管理対象に持つグループID<br>
 	 * この在庫の属するグループ<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "unit_group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象に持つグループID\nこの在庫の属するグループ", defaultValue = "null", ordinalPosition = 3, notNull = true)
-	public static final String unit_group_id = "unit_group_id";
+	@Column(name = "group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象に持つグループID\nこの在庫の属するグループ", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	public static final String group_id = "group_id";
 
 	/**
 	 * name: item_id<br>
@@ -168,7 +160,7 @@ public class stocks
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "item_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムID", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "item_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムID", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String item_id = "item_id";
 
 	/**
@@ -177,7 +169,7 @@ public class stocks
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "owner_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者ID", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "owner_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者ID", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String owner_id = "owner_id";
 
 	/**
@@ -186,7 +178,7 @@ public class stocks
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "location_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場ID", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "location_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "置き場ID", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String location_id = "location_id";
 
 	/**
@@ -195,7 +187,7 @@ public class stocks
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "status_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態ID", defaultValue = "null", ordinalPosition = 7, notNull = true)
+	@Column(name = "status_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "状態ID", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String status_id = "status_id";
 
 	/**
@@ -204,7 +196,7 @@ public class stocks
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 7, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -213,24 +205,24 @@ public class stocks
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 9, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 8, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
-	 * name: stocks_unit_group_id_fkey<br>
+	 * name: stocks_group_id_fkey<br>
 	 * references: groups<br>
-	 * columns: unit_group_id
+	 * columns: group_id
 	 */
-	@ForeignKey(name = "stocks_unit_group_id_fkey", references = "bb.groups", columns = { "unit_group_id" }, refColumns = { "id" })
-	public static final String bb$groups$stocks_unit_group_id_fkey = "stocks_unit_group_id_fkey";
+	@ForeignKey(name = "stocks_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
+	public static final String bb$groups$stocks_group_id_fkey = "stocks_group_id_fkey";
 
 	/**
-	 * name: stocks_unit_id_fkey<br>
+	 * name: stocks_id_fkey<br>
 	 * references: units<br>
-	 * columns: unit_id
+	 * columns: id
 	 */
-	@ForeignKey(name = "stocks_unit_id_fkey", references = "bb.units", columns = { "unit_id" }, refColumns = { "id" })
-	public static final String bb$units$stocks_unit_id_fkey = "stocks_unit_id_fkey";
+	@ForeignKey(name = "stocks_id_fkey", references = "bb.units", columns = { "id" }, refColumns = { "id" })
+	public static final String bb$units$stocks_id_fkey = "stocks_id_fkey";
 
 	/**
 	 * name: stocks_created_by_fkey<br>
@@ -347,6 +339,7 @@ public class stocks
 		 * setter
 		 * name: id<br>
 		* remarks: ID<br>
+		* 管理対象IDに従属<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
@@ -364,6 +357,7 @@ public class stocks
 		 * getter
 		 * name: id<br>
 		* remarks: ID<br>
+		* 管理対象IDに従属<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
@@ -375,63 +369,33 @@ public class stocks
 
 		/**
 		 * setter
-		 * name: unit_id<br>
-		* remarks: 管理対象ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setUnit_id(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("unit_id").getType());
-			data$.setValue("unit_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: unit_id<br>
-		* remarks: 管理対象ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getUnit_id() {
-			Binder binder = data$.getValue("unit_id");
-			return (java.util.UUID) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: unit_group_id<br>
+		 * name: group_id<br>
 		* remarks: 管理対象に持つグループID<br>
 		* この在庫の属するグループ<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setUnit_group_id(java.util.UUID value) {
+		public void setGroup_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("unit_group_id").getType());
-			data$.setValue("unit_group_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("group_id").getType());
+			data$.setValue("group_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: unit_group_id<br>
+		 * name: group_id<br>
 		* remarks: 管理対象に持つグループID<br>
 		* この在庫の属するグループ<br>
 		* type: uuid(2147483647)<br>
 		* not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getUnit_group_id() {
-			Binder binder = data$.getValue("unit_group_id");
+		public java.util.UUID getGroup_id() {
+			Binder binder = data$.getValue("group_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
@@ -618,25 +582,25 @@ public class stocks
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 stocks_unit_group_id_fkey<br>
-		 * 項目名 unit_group_id
+		 * 外部キー名 stocks_group_id_fkey<br>
+		 * 項目名 group_id
 		 * @return 参照しているレコードの Row
 		 */
 		public sqlassist.bb.groups.Row $groups() {
 			return sqlassist.bb.groups.row(
-				data$.getDataObject(bb$groups$stocks_unit_group_id_fkey));
+				data$.getDataObject(bb$groups$stocks_group_id_fkey));
 		}
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 units<br>
-		 * 外部キー名 stocks_unit_id_fkey<br>
-		 * 項目名 unit_id
+		 * 外部キー名 stocks_id_fkey<br>
+		 * 項目名 id
 		 * @return 参照しているレコードの Row
 		 */
 		public sqlassist.bb.units.Row $units() {
 			return sqlassist.bb.units.row(
-				data$.getDataObject(bb$units$stocks_unit_id_fkey));
+				data$.getDataObject(bb$units$stocks_id_fkey));
 		}
 
 		/**
@@ -1776,14 +1740,9 @@ public class stocks
 		public final T id;
 
 		/**
-		 * 項目名 unit_id
+		 * 項目名 group_id
 		 */
-		public final T unit_id;
-
-		/**
-		 * 項目名 unit_group_id
-		 */
-		public final T unit_group_id;
+		public final T group_id;
 
 		/**
 		 * 項目名 item_id
@@ -1829,12 +1788,9 @@ public class stocks
 			this.id = builder$.buildColumn(
 				this,
 				sqlassist.bb_stock.stocks.id);
-			this.unit_id = builder$.buildColumn(
+			this.group_id = builder$.buildColumn(
 				this,
-				sqlassist.bb_stock.stocks.unit_id);
-			this.unit_group_id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.stocks.unit_group_id);
+				sqlassist.bb_stock.stocks.group_id);
 			this.item_id = builder$.buildColumn(
 				this,
 				sqlassist.bb_stock.stocks.item_id);
@@ -1970,28 +1926,28 @@ public class stocks
 
 		/**
 		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 stocks_unit_group_id_fkey<br>
-		 * 項目名 unit_group_id
+		 * 外部キー名 stocks_group_id_fkey<br>
+		 * 項目名 group_id
 		 * @return groups relationship
 		 */
 		public sqlassist.bb.groups.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $groups() {
 			return new sqlassist.bb.groups.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb_stock.stocks.bb$groups$stocks_unit_group_id_fkey);
+				sqlassist.bb_stock.stocks.bb$groups$stocks_group_id_fkey);
 		}
 
 		/**
 		 * 参照先テーブル名 units<br>
-		 * 外部キー名 stocks_unit_id_fkey<br>
-		 * 項目名 unit_id
+		 * 外部キー名 stocks_id_fkey<br>
+		 * 項目名 id
 		 * @return units relationship
 		 */
 		public sqlassist.bb.units.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $units() {
 			return new sqlassist.bb.units.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb_stock.stocks.bb$units$stocks_unit_id_fkey);
+				sqlassist.bb_stock.stocks.bb$units$stocks_id_fkey);
 		}
 
 		/**

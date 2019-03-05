@@ -171,13 +171,13 @@ public class journals
 	public static final String fixed_at = "fixed_at";
 
 	/**
-	 * name: extension<br>
+	 * name: props<br>
 	 * remarks: 外部アプリケーション情報JSON<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 5, notNull = true)
-	public static final String extension = "extension";
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 5, notNull = true)
+	public static final String props = "props";
 
 	/**
 	 * name: tags<br>
@@ -218,31 +218,31 @@ public class journals
 	public static final String deny_reason = "deny_reason";
 
 	/**
-	 * name: org_extension<br>
-	 * remarks: 組織のextension<br>
+	 * name: org_props<br>
+	 * remarks: 組織のprops<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "org_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "組織のextension", defaultValue = "null", ordinalPosition = 10, notNull = true)
-	public static final String org_extension = "org_extension";
+	@Column(name = "org_props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "組織のprops", defaultValue = "null", ordinalPosition = 10, notNull = true)
+	public static final String org_props = "org_props";
 
 	/**
-	 * name: group_extension<br>
-	 * remarks: グループのextension<br>
+	 * name: group_props<br>
+	 * remarks: グループのprops<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのextension", defaultValue = "null", ordinalPosition = 11, notNull = true)
-	public static final String group_extension = "group_extension";
+	@Column(name = "group_props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループのprops", defaultValue = "null", ordinalPosition = 11, notNull = true)
+	public static final String group_props = "group_props";
 
 	/**
-	 * name: user_extension<br>
-	 * remarks: 作成ユーザーのextension<br>
+	 * name: user_props<br>
+	 * remarks: 作成ユーザーのprops<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_extension", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザーのextension", defaultValue = "null", ordinalPosition = 12, notNull = true)
-	public static final String user_extension = "user_extension";
+	@Column(name = "user_props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザーのprops", defaultValue = "null", ordinalPosition = 12, notNull = true)
+	public static final String user_props = "user_props";
 
 	/**
 	 * name: created_at<br>
@@ -497,31 +497,31 @@ public class journals
 
 		/**
 		 * setter
-		 * name: extension<br>
+		 * name: props<br>
 		* remarks: 外部アプリケーション情報JSON<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
 		 */
-		public void setExtension(java.lang.Object value) {
+		public void setProps(java.lang.Object value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("extension").getType());
-			data$.setValue("extension", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("props").getType());
+			data$.setValue("props", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: extension<br>
+		 * name: props<br>
 		* remarks: 外部アプリケーション情報JSON<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
 		 */
-		public java.lang.Object getExtension() {
-			Binder binder = data$.getValue("extension");
+		public java.lang.Object getProps() {
+			Binder binder = data$.getValue("props");
 			return binder.getValue();
 		}
 
@@ -651,91 +651,91 @@ public class journals
 
 		/**
 		 * setter
-		 * name: org_extension<br>
-		* remarks: 組織のextension<br>
+		 * name: org_props<br>
+		* remarks: 組織のprops<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
 		 */
-		public void setOrg_extension(java.lang.Object value) {
+		public void setOrg_props(java.lang.Object value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("org_extension").getType());
-			data$.setValue("org_extension", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("org_props").getType());
+			data$.setValue("org_props", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: org_extension<br>
-		* remarks: 組織のextension<br>
+		 * name: org_props<br>
+		* remarks: 組織のprops<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
 		 */
-		public java.lang.Object getOrg_extension() {
-			Binder binder = data$.getValue("org_extension");
+		public java.lang.Object getOrg_props() {
+			Binder binder = data$.getValue("org_props");
 			return binder.getValue();
 		}
 
 		/**
 		 * setter
-		 * name: group_extension<br>
-		* remarks: グループのextension<br>
+		 * name: group_props<br>
+		* remarks: グループのprops<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
 		 */
-		public void setGroup_extension(java.lang.Object value) {
+		public void setGroup_props(java.lang.Object value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("group_extension").getType());
-			data$.setValue("group_extension", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("group_props").getType());
+			data$.setValue("group_props", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: group_extension<br>
-		* remarks: グループのextension<br>
+		 * name: group_props<br>
+		* remarks: グループのprops<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
 		 */
-		public java.lang.Object getGroup_extension() {
-			Binder binder = data$.getValue("group_extension");
+		public java.lang.Object getGroup_props() {
+			Binder binder = data$.getValue("group_props");
 			return binder.getValue();
 		}
 
 		/**
 		 * setter
-		 * name: user_extension<br>
-		* remarks: 作成ユーザーのextension<br>
+		 * name: user_props<br>
+		* remarks: 作成ユーザーのprops<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @param value java.lang.Object
 		 */
-		public void setUser_extension(java.lang.Object value) {
+		public void setUser_props(java.lang.Object value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("user_extension").getType());
-			data$.setValue("user_extension", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("user_props").getType());
+			data$.setValue("user_props", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: user_extension<br>
-		* remarks: 作成ユーザーのextension<br>
+		 * name: user_props<br>
+		* remarks: 作成ユーザーのprops<br>
 		* type: jsonb(2147483647)<br>
 		* not null: true<br>
 		 * @return java.lang.Object
 		 */
-		public java.lang.Object getUser_extension() {
-			Binder binder = data$.getValue("user_extension");
+		public java.lang.Object getUser_props() {
+			Binder binder = data$.getValue("user_props");
 			return binder.getValue();
 		}
 
@@ -1951,9 +1951,9 @@ public class journals
 		public final T fixed_at;
 
 		/**
-		 * 項目名 extension
+		 * 項目名 props
 		 */
-		public final T extension;
+		public final T props;
 
 		/**
 		 * 項目名 tags
@@ -1976,19 +1976,19 @@ public class journals
 		public final T deny_reason;
 
 		/**
-		 * 項目名 org_extension
+		 * 項目名 org_props
 		 */
-		public final T org_extension;
+		public final T org_props;
 
 		/**
-		 * 項目名 group_extension
+		 * 項目名 group_props
 		 */
-		public final T group_extension;
+		public final T group_props;
 
 		/**
-		 * 項目名 user_extension
+		 * 項目名 user_props
 		 */
-		public final T user_extension;
+		public final T user_props;
 
 		/**
 		 * 項目名 created_at
@@ -2023,9 +2023,9 @@ public class journals
 			this.fixed_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.journals.fixed_at);
-			this.extension = builder$.buildColumn(
+			this.props = builder$.buildColumn(
 				this,
-				sqlassist.bb.journals.extension);
+				sqlassist.bb.journals.props);
 			this.tags = builder$.buildColumn(
 				this,
 				sqlassist.bb.journals.tags);
@@ -2038,15 +2038,15 @@ public class journals
 			this.deny_reason = builder$.buildColumn(
 				this,
 				sqlassist.bb.journals.deny_reason);
-			this.org_extension = builder$.buildColumn(
+			this.org_props = builder$.buildColumn(
 				this,
-				sqlassist.bb.journals.org_extension);
-			this.group_extension = builder$.buildColumn(
+				sqlassist.bb.journals.org_props);
+			this.group_props = builder$.buildColumn(
 				this,
-				sqlassist.bb.journals.group_extension);
-			this.user_extension = builder$.buildColumn(
+				sqlassist.bb.journals.group_props);
+			this.user_props = builder$.buildColumn(
 				this,
-				sqlassist.bb.journals.user_extension);
+				sqlassist.bb.journals.user_props);
 			this.created_at = builder$.buildColumn(
 				this,
 				sqlassist.bb.journals.created_at);

@@ -7,7 +7,7 @@ import jp.ats.blackbox.persistence.SecurityValues;
 public class DeadlockDetectionTest {
 
 	public static void main(String[] args) {
-		TransferCommon.start();
+		JournalCommon.start();
 
 		var req = new RegisterRequest();
 		req.name = "test";
@@ -49,7 +49,7 @@ public class DeadlockDetectionTest {
 
 	private static void exec() {
 		SecurityValues.start(U.NULL_ID);
-		TransferAndClosingTest.execute(GroupHandlerTest.register(), 1000, 1);
+		RegisterAndClosingTest.execute(GroupHandlerTest.register(), 1000, 1);
 		SecurityValues.end();
 	}
 }

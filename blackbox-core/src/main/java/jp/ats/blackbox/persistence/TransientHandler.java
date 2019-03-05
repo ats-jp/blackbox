@@ -24,9 +24,9 @@ import org.blendee.sql.Updater;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
-import jp.ats.blackbox.persistence.TransferHandler.BundleRegisterRequest;
-import jp.ats.blackbox.persistence.TransferHandler.NodeRegisterRequest;
-import jp.ats.blackbox.persistence.TransferHandler.TransferRegisterRequest;
+import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
+import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
 import sqlassist.bb.closed_units;
 import sqlassist.bb.nodes;
 import sqlassist.bb.transient_details;
@@ -155,7 +155,7 @@ public class TransientHandler {
 		Utils.delete(transients.$TABLE, transientId, revision);
 	}
 
-	private static class Transfer extends transient_journals.Row implements TransferPreparer.Transfer {
+	private static class Journal extends transient_journals.Row implements JournalPreparer.Journal {
 
 		@Override
 		public void setDenied_id(UUID id) {
@@ -168,13 +168,13 @@ public class TransientHandler {
 		}
 
 		@Override
-		public void setGroup_extension(Object json) {}
+		public void setGroup_props(Object json) {}
 
 		@Override
-		public void setOrg_extension(Object json) {}
+		public void setOrg_props(Object json) {}
 
 		@Override
-		public void setUser_extension(Object json) {}
+		public void setUser_props(Object json) {}
 
 		@Override
 		public void setInstance_id(UUID id) {}
@@ -183,46 +183,46 @@ public class TransientHandler {
 		public void setJournal_batch_id(UUID id) {}
 	}
 
-	public static UUID registerTransfer(UUID transientId, TransferRegisterRequest request) {
+	public static UUID registerJournal(UUID transientId, JournalRegisterRequest request) {
 		var id = UUID.randomUUID();
 
-		var transfer = new Transfer();
+		var journal = new Journal();
 
 		var userId = SecurityValues.currentUserId();
 
-		TransferPreparer.prepareTransfer(
+		JournalPreparer.prepareJournal(
 			id,
 			U.NULL_ID,
 			U.NULL_ID,
 			userId,
 			request,
 			new Timestamp(System.currentTimeMillis()),
-			transfer,
+			journal,
 			U.recorder);
 
-		transfer.setTransient_id(transientId);
-		transfer.setUpdated_by(userId);
+		journal.setTransient_id(transientId);
+		journal.setUpdated_by(userId);
 
-		transfer.insert();
+		journal.insert();
 
 		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, id, transient_journals.$TABLE));
 
-		for (int i = 0; i < request.bundles.length; i++) {
-			registerBundle(userId, id, request.bundles[i], (i + 1) * sequenceIncrement);
+		for (int i = 0; i < request.details.length; i++) {
+			registerDetail(userId, id, request.details[i], (i + 1) * sequenceIncrement);
 		}
 
 		return id;
 	}
 
-	public static void deleteTransfer(UUID transferId) {
-		U.recorder.play(() -> new transient_journals().DELETE().WHERE(a -> a.id.eq($UUID)), transferId).execute();
+	public static void deleteJournal(UUID journalId) {
+		U.recorder.play(() -> new transient_journals().DELETE().WHERE(a -> a.id.eq($UUID)), journalId).execute();
 	}
 
 	private static int computeNextSeq(int currentMaxSeq) {
 		return currentMaxSeq - currentMaxSeq % sequenceIncrement + sequenceIncrement;
 	}
 
-	private static class Bundle extends transient_details.Row implements TransferPreparer.Bundle {
+	private static class Detail extends transient_details.Row implements JournalPreparer.Detail {
 
 		@Override
 		public void setJournal_id(UUID journalId) {
@@ -230,36 +230,36 @@ public class TransientHandler {
 		}
 	}
 
-	public static UUID registerBundle(UUID transferId, BundleRegisterRequest request) {
+	public static UUID registerDetail(UUID journalId, DetailRegisterRequest request) {
 		int seq = U.recorder.play(
 			() -> new transient_details()
 				.SELECT(a -> a.MAX(a.seq_in_journal))
 				.WHERE(a -> a.transient_journal_id.eq($UUID)),
-			transferId)
+			journalId)
 			.aggregateAndGet(r -> {
 				r.next();
 				return r.getInt(1);
 			});
 
-		return registerBundle(SecurityValues.currentUserId(), transferId, request, computeNextSeq(seq));
+		return registerDetail(SecurityValues.currentUserId(), journalId, request, computeNextSeq(seq));
 	}
 
-	public static UUID registerBundle(UUID transferId, BundleRegisterRequest request, int seq) {
-		return registerBundle(SecurityValues.currentUserId(), transferId, request, seq);
+	public static UUID registerDetail(UUID journalId, DetailRegisterRequest request, int seq) {
+		return registerDetail(SecurityValues.currentUserId(), journalId, request, seq);
 	}
 
-	private static UUID registerBundle(UUID userId, UUID transferId, BundleRegisterRequest request, int seq) {
-		var bundle = new Bundle();
+	private static UUID registerDetail(UUID userId, UUID journalId, DetailRegisterRequest request, int seq) {
+		var detail = new Detail();
 
 		UUID id = UUID.randomUUID();
 
-		TransferPreparer.prepareBundle(transferId, id, request, bundle);
+		JournalPreparer.prepareDetail(journalId, id, request, detail);
 
-		bundle.setSeq_in_journal(seq);
-		bundle.setCreated_by(userId);
-		bundle.setUpdated_by(userId);
+		detail.setSeq_in_journal(seq);
+		detail.setCreated_by(userId);
+		detail.setUpdated_by(userId);
 
-		bundle.insert();
+		detail.insert();
 
 		for (int i = 0; i < request.nodes.length; i++) {
 			registerNode(userId, id, request.nodes[i], (i + 1) * sequenceIncrement);
@@ -268,53 +268,50 @@ public class TransientHandler {
 		return id;
 	}
 
-	public static void deleteBundle(UUID bundleId) {
-		U.recorder.play(() -> new transient_details().DELETE().WHERE(a -> a.id.eq($UUID)), bundleId).execute();
+	public static void deleteDetail(UUID detailId) {
+		U.recorder.play(() -> new transient_details().DELETE().WHERE(a -> a.id.eq($UUID)), detailId).execute();
 	}
 
-	private static class Node extends transient_nodes.Row implements TransferPreparer.Node {
+	private static class Node extends transient_nodes.Row implements JournalPreparer.Node {
 
 		@Override
-		public void setDetail_id(UUID bundleId) {
-			super.setTransient_detail_id(bundleId);
+		public void setDetail_id(UUID detailId) {
+			super.setTransient_detail_id(detailId);
 		}
 
 		@Override
 		public void setSeq(Integer seq) {}
 
 		@Override
-		public void setGroup_extension(Object json) {}
-
-		@Override
-		public void setUnit_extension(Object json) {}
+		public void setUnit_props(Object json) {}
 	}
 
-	public static UUID registerNode(UUID bundleId, NodeRegisterRequest request) {
+	public static UUID registerNode(UUID detailId, NodeRegisterRequest request) {
 		int seq = U.recorder.play(
 			() -> new transient_nodes()
-				.SELECT(a -> a.MAX(a.seq_in_bundle))
+				.SELECT(a -> a.MAX(a.seq_in_detail))
 				.WHERE(a -> a.transient_detail_id.eq($UUID)),
-			bundleId)
+			detailId)
 			.aggregateAndGet(r -> {
 				r.next();
 				return r.getInt(1);
 			});
 
-		return registerNode(SecurityValues.currentUserId(), bundleId, request, computeNextSeq(seq));
+		return registerNode(SecurityValues.currentUserId(), detailId, request, computeNextSeq(seq));
 	}
 
-	public static UUID registerNode(UUID bundleId, NodeRegisterRequest request, int seq) {
-		return registerNode(SecurityValues.currentUserId(), bundleId, request, seq);
+	public static UUID registerNode(UUID detailId, NodeRegisterRequest request, int seq) {
+		return registerNode(SecurityValues.currentUserId(), detailId, request, seq);
 	}
 
-	private static UUID registerNode(UUID userId, UUID bundleId, NodeRegisterRequest request, int seq) {
+	private static UUID registerNode(UUID userId, UUID detailId, NodeRegisterRequest request, int seq) {
 		var node = new Node();
 
 		UUID id = UUID.randomUUID();
 
-		TransferPreparer.prepareNode(bundleId, id, userId, request, node, seq, U.recorder);
+		JournalPreparer.prepareNode(detailId, id, userId, request, node, seq, U.recorder);
 
-		node.setSeq_in_bundle(seq);
+		node.setSeq_in_detail(seq);
 		node.setCreated_by(userId);
 		node.setUpdated_by(userId);
 
@@ -333,18 +330,18 @@ public class TransientHandler {
 	}
 
 	public static TransientMoveResult move(UUID batchId, UUID userId, TransientMoveRequest request, Recorder recorder) {
-		var transferHandler = new TransferHandler(recorder);
+		var journalHandler = new JournalHandler(recorder);
 
 		var result = new TransientMoveResult();
 
-		transferHandler.registerBatch(batchId, userId);
+		journalHandler.registerBatch(batchId, userId);
 
-		buildTransferRegisterRequests(request.transient_id, recorder).forEach(r -> {
-			var transferId = UUID.randomUUID();
-			transferHandler.register(transferId, batchId, userId, r);
+		buildJournalRegisterRequests(request.transient_id, recorder).forEach(r -> {
+			var journalId = UUID.randomUUID();
+			journalHandler.register(journalId, batchId, userId, r);
 
-			result.transferIds.add(transferId);
-			result.compareAndChange(r.transferred_at);
+			result.journalIds.add(journalId);
+			result.compareAndChange(r.fixed_at);
 		});
 
 		return result;
@@ -352,80 +349,78 @@ public class TransientHandler {
 
 	public static class TransientMoveResult {
 
-		public final List<UUID> transferIds = new LinkedList<>();
+		public final List<UUID> journalIds = new LinkedList<>();
 
-		public Timestamp firstTransferredAt;
+		public Timestamp firstFixedAt;
 
-		private void compareAndChange(Timestamp transferredAt) {
-			if (firstTransferredAt == null) {
-				firstTransferredAt = transferredAt;
+		private void compareAndChange(Timestamp fixedAt) {
+			if (firstFixedAt == null) {
+				firstFixedAt = fixedAt;
 			} else {
-				firstTransferredAt = firstTransferredAt.getTime() < transferredAt.getTime() ? firstTransferredAt : transferredAt;
+				firstFixedAt = firstFixedAt.getTime() < fixedAt.getTime() ? firstFixedAt : fixedAt;
 			}
 		}
 	}
 
-	private static List<TransferRegisterRequest> buildTransferRegisterRequests(UUID transientId, Recorder recorder) {
-		var list = new LinkedList<TransferRegisterRequest>();
+	private static List<JournalRegisterRequest> buildJournalRegisterRequests(UUID transientId, Recorder recorder) {
+		var list = new LinkedList<JournalRegisterRequest>();
 
-		var bundles = new LinkedList<BundleRegisterRequest>();
+		var details = new LinkedList<DetailRegisterRequest>();
 
 		recorder.play(
 			() -> new transient_nodes().selectClause(
 				a -> {
-					var bundlesAssist = a.$transient_details();
-					var transfersAssist = bundlesAssist.$transient_journals();
-					var stocksAssist = a.$units();
+					var detailsAssist = a.$transient_details();
+					var journalsAssist = detailsAssist.$transient_journals();
 
 					a.SELECT(
-						transfersAssist.group_id,
-						transfersAssist.fixed_at,
-						transfersAssist.extension,
-						transfersAssist.tags,
-						bundlesAssist.extension,
-						stocksAssist.group_id,
+						journalsAssist.group_id,
+						journalsAssist.fixed_at,
+						journalsAssist.props,
+						journalsAssist.tags,
+						detailsAssist.props,
 						a.unit_id,
 						a.in_out,
 						a.quantity,
 						a.grants_unlimited,
-						a.extension);
+						a.props);
 				})
 				.WHERE(a -> a.$transient_details().$transient_journals().transient_id.eq($UUID))
 				.ORDER_BY(
 					a -> a.ls(
 						a.$transient_details().$transient_journals().seq,
 						a.$transient_details().seq_in_journal,
-						a.seq_in_bundle))
+						a.seq_in_detail))
 				.assist()
 				.$transient_details()
 				.$transient_journals()
 				.intercept(),
 			transientId)
-			.forEach(transferOne -> {
-				var transfer = transferOne.get();
+			.forEach(journalOne -> {
+				var journal = journalOne.get();
 
-				var request = new TransferRegisterRequest();
+				var request = new JournalRegisterRequest();
 
-				request.group_id = transfer.getGroup_id();
-				request.transferred_at = transfer.getFixed_at();
-				request.restored_extension = Optional.of(transfer.getExtension());
+				request.group_id = journal.getGroup_id();
+				request.fixed_at = journal.getFixed_at();
+				request.restored_props = Optional.of(journal.getProps());
 
 				try {
-					request.tags = Optional.of(Utils.restoreTags(transfer.getTags()));
+					request.tags = Optional.of(Utils.restoreTags(journal.getTags()));
 				} catch (SQLException e) {
 					throw new BSQLException(e);
 				}
 
-				transferOne.many().forEach(bundleOne -> {
+				journalOne.many().forEach(detailOne -> {
 					var nodes = new LinkedList<NodeRegisterRequest>();
 
-					var bundleRequest = new BundleRegisterRequest();
+					var detailRequest = new DetailRegisterRequest();
 
-					bundleRequest.restored_extension = Optional.of(bundleOne.get().getExtension());
+					detailRequest.restored_props = Optional.of(detailOne.get().getProps());
 
-					bundles.add(bundleRequest);
+					details.add(detailRequest);
 
-					bundleOne.many().forEach(nodeOne -> {
+					detailOne.many().forEach(nodeOne -> {
 						var node = nodeOne.get();
 
 						var nodeRequest = new NodeRegisterRequest();
@@ -434,15 +429,15 @@ public class TransientHandler {
 						nodeRequest.in_out = InOut.of(node.getIn_out());
 						nodeRequest.quantity = node.getQuantity();
 						nodeRequest.grants_unlimited = Optional.of(node.getGrants_unlimited());
-						nodeRequest.restored_extension = Optional.of(node.getExtension());
+						nodeRequest.restored_props = Optional.of(node.getProps());
 
 						nodes.add(nodeRequest);
 					});
 
-					bundleRequest.nodes = nodes.toArray(new NodeRegisterRequest[nodes.size()]);
+					detailRequest.nodes = nodes.toArray(new NodeRegisterRequest[nodes.size()]);
 				});
 
-				request.bundles = bundles.toArray(new BundleRegisterRequest[bundles.size()]);
+				request.details = details.toArray(new DetailRegisterRequest[details.size()]);
 
 				list.add(request);
 			});
@@ -471,7 +466,7 @@ public class TransientHandler {
 				currentStockId = context.stock_id;
 
 				//直近のsnapshotを取得
-				var snapshot = TransferHandler.getJustBeforeSnapshot(currentStockId, context.transferred_at, U.recorder);
+				var snapshot = JournalHandler.getJustBeforeSnapshot(currentStockId, context.fixed_at, U.recorder);
 				currentStockTotal = snapshot.total;
 				currentStockUnlimited = snapshot.unlimited;
 			}
@@ -479,7 +474,7 @@ public class TransientHandler {
 			//次のstockまでスキップ
 			if (skip) continue;
 
-			if (context.closed_at != null && context.transferred_at.getTime() <= context.closed_at.getTime()) {
+			if (context.closed_at != null && context.fixed_at.getTime() <= context.closed_at.getTime()) {
 				consumer.accept(ErrorType.CLOSED_STOCK, context);
 				skip = true;
 				continue;
@@ -531,7 +526,7 @@ public class TransientHandler {
 
 		public final BigDecimal quantity;
 
-		public final Timestamp transferred_at;
+		public final Timestamp fixed_at;
 
 		public final Timestamp closed_at;
 
@@ -542,7 +537,7 @@ public class TransientHandler {
 			grants_unlimited = result.getBoolean("grants_unlimited");
 			in_out = InOut.of(result.getInt("in_out"));
 			quantity = result.getBigDecimal("quantity");
-			transferred_at = result.getTimestamp("fixed_at");
+			fixed_at = result.getTimestamp("fixed_at");
 			closed_at = result.getTimestamp("closed_at");
 		}
 	}
@@ -587,7 +582,7 @@ public class TransientHandler {
 							a.any(
 								"RANK() OVER (ORDER BY {0}, {1})",
 								a.$transient_details().$transient_journals().fixed_at,
-								a.$transient_details().$transient_journals().seq) //transferred_atが同一であれば生成順
+								a.$transient_details().$transient_journals().seq) //fixed_atが同一であれば生成順
 								.AS("seq")))
 					.WHERE(a -> a.$transient_details().$transient_journals().transient_id.eq($UUID)))
 			.ORDER_BY(
@@ -604,34 +599,34 @@ public class TransientHandler {
 	}
 
 	/**
-	 * transient_transfer更新に必要な情報クラス
+	 * transient_更新に必要な情報クラス
 	 */
-	public static class TransferUpdateRequest {
+	public static class JournalUpdateRequest {
 
-		public UUID transfer_id;
+		public UUID journal_id;
 
 		public long revision;
 
 		/**
-		 * このtransferが属するtransient<br>
+		 * このが属するtransient<br>
 		 * 指定することでtransient間を移動
 		 */
 		public Optional<UUID> transient_id = Optional.empty();
 
 		/**
-		 * このtransferが属するグループ
+		 * このjournalが属するグループ
 		 */
 		public Optional<UUID> group_id = Optional.empty();
 
 		/**
-		 * 移動時刻
+		 * 確定時刻
 		 */
-		public Optional<Timestamp> transferred_at = Optional.empty();
+		public Optional<Timestamp> fixed_at = Optional.empty();
 
 		/**
 		 * 追加情報JSON
 		 */
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 
 		/**
 		 * 検索用タグ
@@ -639,57 +634,57 @@ public class TransientHandler {
 		public Optional<String[]> tags = Optional.empty();
 
 		/**
-		 * 追加bundle
+		 * 追加detail
 		 */
-		public BundleRegisterRequest[] registerBundles = {};
+		public DetailRegisterRequest[] registerDetails = {};
 
 		/**
-		 * 更新bundle
+		 * 更新detail
 		 */
-		public BundleUpdateRequest[] updateBundles = {};
+		public DetailUpdateRequest[] updateDetails = {};
 	}
 
-	public static void updateTransfer(TransferUpdateRequest request) {
+	public static void updateJournal(JournalUpdateRequest request) {
 		int result = new transient_journals().UPDATE(a -> {
 			a.revision.set(request.revision + 1);
 
 			request.transient_id.ifPresent(v -> a.transient_id.set(v));
 			request.group_id.ifPresent(v -> a.group_id.set(v));
-			request.transferred_at.ifPresent(v -> a.fixed_at.set(v));
-			request.extension.ifPresent(v -> a.extension.set(JsonHelper.toJson(v)));
+			request.fixed_at.ifPresent(v -> a.fixed_at.set(v));
+			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
-		}).WHERE(a -> a.id.eq(request.transfer_id).AND.revision.eq(request.revision)).execute();
+		}).WHERE(a -> a.id.eq(request.journal_id).AND.revision.eq(request.revision)).execute();
 
-		if (result != 1) throw Utils.decisionException(transient_journals.$TABLE, request.transfer_id);
+		if (result != 1) throw Utils.decisionException(transient_journals.$TABLE, request.journal_id);
 
-		Arrays.stream(request.registerBundles).forEach(r -> registerBundle(request.transfer_id, r));
+		Arrays.stream(request.registerDetails).forEach(r -> registerDetail(request.journal_id, r));
 
-		Arrays.stream(request.updateBundles).forEach(r -> updateBundle(r));
+		Arrays.stream(request.updateDetails).forEach(r -> updateDetail(r));
 	}
 
 	/**
-	 * transient_bundle更新に必要な情報クラス
+	 * transient_detail更新に必要な情報クラス
 	 */
-	public static class BundleUpdateRequest {
+	public static class DetailUpdateRequest {
 
-		public UUID bundle_id;
+		public UUID detail_id;
 
 		public long revision;
 
 		/**
-		 * このbundleが属するtransfer<br>
-		 * 指定することでtransfer間を移動
+		 * このdetailが属するjournal<br>
+		 * 指定することでjournal間を移動
 		 */
-		public Optional<UUID> transfer_id = Optional.empty();
+		public Optional<UUID> journal_id = Optional.empty();
 
-		public Optional<Integer> seq_in_transfer = Optional.empty();
+		public Optional<Integer> seq_in_journal = Optional.empty();
 
 		/**
 		 * 追加情報JSON
 		 */
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 
 		/**
 		 * 追加node
@@ -702,20 +697,20 @@ public class TransientHandler {
 		public NodeUpdateRequest[] updateNodes = {};
 	}
 
-	public static void updateBundle(BundleUpdateRequest request) {
+	public static void updateDetail(DetailUpdateRequest request) {
 		int result = new transient_details().UPDATE(a -> {
 			a.revision.set(request.revision + 1);
 
-			request.transfer_id.ifPresent(v -> a.transient_journal_id.set(v));
-			request.seq_in_transfer.ifPresent(v -> a.seq_in_journal.set(v));
-			request.extension.ifPresent(v -> a.extension.set(JsonHelper.toJson(v)));
+			request.journal_id.ifPresent(v -> a.transient_journal_id.set(v));
+			request.seq_in_journal.ifPresent(v -> a.seq_in_journal.set(v));
+			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
-		}).WHERE(a -> a.id.eq(request.bundle_id).AND.revision.eq(request.revision)).execute();
+		}).WHERE(a -> a.id.eq(request.detail_id).AND.revision.eq(request.revision)).execute();
 
-		if (result != 1) throw Utils.decisionException(transient_details.$TABLE, request.bundle_id);
+		if (result != 1) throw Utils.decisionException(transient_details.$TABLE, request.detail_id);
 
-		Arrays.stream(request.registerNodes).forEach(r -> registerNode(request.bundle_id, r));
+		Arrays.stream(request.registerNodes).forEach(r -> registerNode(request.detail_id, r));
 
 		Arrays.stream(request.updateNodes).forEach(r -> updateNode(r));
 	}
@@ -730,12 +725,12 @@ public class TransientHandler {
 		public long revision;
 
 		/**
-		 * このnodeが属するbundle<br>
-		 * 指定することでbundle間を移動
+		 * このnodeが属するdetail<br>
+		 * 指定することでdetail間を移動
 		 */
-		public Optional<UUID> bundle_id = Optional.empty();
+		public Optional<UUID> detail_id = Optional.empty();
 
-		public Optional<Integer> seq_in_bundle = Optional.empty();
+		public Optional<Integer> seq_in_detail = Optional.empty();
 
 		public Optional<UUID> unit_id = Optional.empty();
 
@@ -758,22 +753,22 @@ public class TransientHandler {
 		/**
 		 * 移動数量
 		 */
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 	}
 
 	public static void updateNode(NodeUpdateRequest request) {
 		int result = new transient_nodes().UPDATE(a -> {
 			a.revision.set(request.revision + 1);
 
-			request.bundle_id.ifPresent(v -> a.transient_detail_id.set(v));
-			request.seq_in_bundle.ifPresent(v -> a.seq_in_bundle.set(v));
+			request.detail_id.ifPresent(v -> a.transient_detail_id.set(v));
+			request.seq_in_detail.ifPresent(v -> a.seq_in_detail.set(v));
 
 			request.unit_id.ifPresent(v -> a.unit_id.set(v));
 
 			request.in_out.ifPresent(v -> a.in_out.set(v.intValue));
 			request.quantity.ifPresent(v -> a.quantity.set(v));
 			request.grants_unlimited.ifPresent(v -> a.grants_unlimited.set(v));
-			request.extension.ifPresent(v -> a.extension.set(JsonHelper.toJson(v)));
+			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
 		}).WHERE(a -> a.id.eq(request.node_id).AND.revision.eq(request.revision)).execute();
