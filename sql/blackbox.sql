@@ -681,7 +681,7 @@ INSERT INTO bb.nodes (
 
 ----------
 
---transfer系のテーブルはINSERTのみなので、autovacuumは行わない場合は実行
+--journal系のテーブルはINSERTのみなので、autovacuumは行わない場合は実行
 --ただし、ANALYZEがかからなくなるので、定期的に実施する必要がある
 --ALTER TABLE bb.units SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 --ALTER TABLE bb.journals SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
@@ -708,7 +708,7 @@ CREATE UNLOGGED TABLE bb.snapshots (
 --頻繁に参照、更新されることが予想されるので締め済のデータは削除も可
 
 COMMENT ON TABLE bb.snapshots IS '移動ノード状態
-fixed_at時点でのstockの状態';
+fixed_at時点でのunitの状態';
 COMMENT ON COLUMN bb.snapshots.id IS 'ID
 nodes.node_idに従属';
 COMMENT ON COLUMN bb.snapshots.unlimited IS '数量無制限
@@ -790,7 +790,7 @@ CREATE TABLE bb.closed_units (
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
 --締め完了後の在庫数を保持
---クラッシュ時、ここからsnapshotsとcurrent_stocksを復元する
+--クラッシュ時、ここからsnapshotsとcurrent_unitsを復元する
 
 COMMENT ON TABLE bb.closed_units IS '締め在庫';
 COMMENT ON COLUMN bb.closed_units.id IS 'ID
@@ -807,14 +807,14 @@ CREATE TABLE bb.jobs (
 	id uuid PRIMARY KEY REFERENCES bb.journals,
 	completed boolean DEFAULT false NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL);
---transfer毎に作成
---transfers.transferred_atに実行
+--journal毎に作成
+--journals.fixed_atに実行
 --currentの更新は必ず実行するためactive=falseによる無効が行えないようにactiveは無し
 --completedの更新は常にポーリング処理から行われるためupdated_byを持たない
 
 COMMENT ON TABLE bb.jobs IS '現在在庫数量反映ジョブ';
 COMMENT ON COLUMN bb.jobs.id IS 'ID
-transfers.transfers_idに従属';
+journals.journal_idに従属';
 COMMENT ON COLUMN bb.jobs.completed IS '実施済フラグ';
 COMMENT ON COLUMN bb.jobs.updated_at IS '更新時刻';
 
@@ -835,7 +835,7 @@ CREATE TABLE bb.journal_errors (
 COMMENT ON TABLE bb.journal_errors IS 'journal登録時に発生したエラー';
 COMMENT ON COLUMN bb.journal_errors.abandoned_id IS 'journalもしくはclosingに使用される予定だったID';
 COMMENT ON COLUMN bb.journal_errors.command_type IS '処理のタイプ
-R=transfer登録, D=transfer取消, C=closing';
+R=journal登録, D=journal取消, C=closing';
 COMMENT ON COLUMN bb.journal_errors.error_type IS 'エラーの種類';
 COMMENT ON COLUMN bb.journal_errors.message IS 'エラーメッセージ';
 COMMENT ON COLUMN bb.journal_errors.stack_trace IS 'スタックトレース';
@@ -1107,7 +1107,7 @@ GRANT INSERT, DELETE ON TABLE
 	bb.transient_journals_tags
 TO blackbox;
 
---closings, transfers関連はINSERTのみ
+--closing, journal関連はINSERTのみ
 GRANT INSERT ON TABLE
 	bb.closings,
 	bb.units,

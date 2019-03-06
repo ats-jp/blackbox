@@ -10,9 +10,9 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.TransientHandler;
 import jp.ats.blackbox.persistence.TransientHandler.OwnerType;
-import jp.ats.blackbox.persistence.TransientStockQuery;
+import jp.ats.blackbox.persistence.TransientUnitQuery;
 
-public class TransientStockQueryTest {
+public class TransientUnitQueryTest {
 
 	public static void main(String[] args) {
 		Common.startWithLog();
@@ -26,7 +26,7 @@ public class TransientStockQueryTest {
 
 			UUID transientId = TransientHandler.register(req);
 
-			var query = new TransientStockQuery(table -> {}, table -> {});
+			var query = new TransientUnitQuery(table -> {}, table -> {});
 
 			query.execute(LocalDateTime.now(), transientId, Vargs.of(), Vargs.of(), r -> {});
 

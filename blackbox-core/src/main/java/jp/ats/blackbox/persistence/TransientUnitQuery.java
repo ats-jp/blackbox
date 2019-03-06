@@ -17,11 +17,11 @@ import jp.ats.blackbox.common.U;
 import sqlassist.bb.snapshots;
 import sqlassist.bb.transient_nodes;
 
-public class TransientStockQuery {
+public class TransientUnitQuery {
 
 	private final AnonymousTable query;
 
-	public TransientStockQuery(
+	public TransientUnitQuery(
 		Consumer<transient_nodes> transientNodeDecorator,
 		Consumer<snapshots> snapshotDecorator) {
 		var nodes = new transient_nodes()

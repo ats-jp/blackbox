@@ -450,44 +450,44 @@ public class TransientHandler {
 	}
 
 	private static void checkInternal(BResultSet result, BiConsumer<ErrorType, CheckContext> consumer) {
-		UUID currentStockId = null;
+		UUID currentUnitId = null;
 
-		BigDecimal currentStockTotal = null;
-		boolean currentStockUnlimited = false;
+		BigDecimal currentUnitTotal = null;
+		boolean currentUnitUnlimited = false;
 
 		boolean skip = false;
 
 		while (result.next()) {
 			var context = new CheckContext(result);
 
-			if (!context.stock_id.equals(currentStockId)) {
+			if (!context.unit_id.equals(currentUnitId)) {
 				skip = false;
 
-				currentStockId = context.stock_id;
+				currentUnitId = context.unit_id;
 
 				//直近のsnapshotを取得
-				var snapshot = JournalHandler.getJustBeforeSnapshot(currentStockId, context.fixed_at, U.recorder);
-				currentStockTotal = snapshot.total;
-				currentStockUnlimited = snapshot.unlimited;
+				var snapshot = JournalHandler.getJustBeforeSnapshot(currentUnitId, context.fixed_at, U.recorder);
+				currentUnitTotal = snapshot.total;
+				currentUnitUnlimited = snapshot.unlimited;
 			}
 
-			//次のstockまでスキップ
+			//次のunitまでスキップ
 			if (skip) continue;
 
 			if (context.closed_at != null && context.fixed_at.getTime() <= context.closed_at.getTime()) {
-				consumer.accept(ErrorType.CLOSED_STOCK, context);
+				consumer.accept(ErrorType.CLOSED_UNIT, context);
 				skip = true;
 				continue;
 			}
 
 			//すでに無制限と判明していれば
-			if (currentStockUnlimited) continue;
+			if (currentUnitUnlimited) continue;
 
-			currentStockUnlimited = currentStockUnlimited | context.grants_unlimited;
+			currentUnitUnlimited = currentUnitUnlimited | context.grants_unlimited;
 
-			currentStockTotal = context.in_out.calcurate(currentStockTotal, context.quantity);
+			currentUnitTotal = context.in_out.calcurate(currentUnitTotal, context.quantity);
 
-			if (!currentStockUnlimited && currentStockTotal.compareTo(BigDecimal.ZERO) < 0) {
+			if (!currentUnitUnlimited && currentUnitTotal.compareTo(BigDecimal.ZERO) < 0) {
 				consumer.accept(ErrorType.MINUS_TOTAL, context);
 				skip = true;
 			}
@@ -496,7 +496,7 @@ public class TransientHandler {
 
 	public static enum ErrorType {
 
-		CLOSED_STOCK,
+		CLOSED_UNIT,
 
 		MINUS_TOTAL;
 	}
@@ -518,7 +518,7 @@ public class TransientHandler {
 
 		public final UUID node_or_transient_node_id;
 
-		public final UUID stock_id;
+		public final UUID unit_id;
 
 		public final boolean grants_unlimited;
 
@@ -533,7 +533,7 @@ public class TransientHandler {
 		private CheckContext(Result result) {
 			node_type = NodeType.of(result.getInt("node_type"));
 			node_or_transient_node_id = U.uuid(result, "id");
-			stock_id = U.uuid(result, "unit_id");
+			unit_id = U.uuid(result, "unit_id");
 			grants_unlimited = result.getBoolean("grants_unlimited");
 			in_out = InOut.of(result.getInt("in_out"));
 			quantity = result.getBigDecimal("quantity");
@@ -746,7 +746,7 @@ public class TransientHandler {
 
 		/**
 		 * これ以降在庫無制限を設定するか
-		 * 在庫無制限の場合、通常はstock登録時からtrueにしておく
+		 * 在庫無制限の場合、通常はunit登録時からtrueにしておく
 		 */
 		public Optional<Boolean> grants_unlimited = Optional.empty();
 

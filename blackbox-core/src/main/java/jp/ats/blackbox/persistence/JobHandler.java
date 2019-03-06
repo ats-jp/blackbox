@@ -25,7 +25,7 @@ public class JobHandler {
 	private static final Recorder recorder = U.recorder;
 
 	/**
-	 * パラメータのtime以降のjobをもとにcurrent_stockを更新する
+	 * パラメータのtime以降のjobをもとにcurrent_unitを更新する
 	 */
 	public static void execute(LocalDateTime time) {
 		//トランザクション内の他の検索で参照されない、数が多い可能性があるのでbatchで実行

@@ -90,9 +90,9 @@ public class ClosingHandler {
 			groupId,
 			closedAt).execute();
 
-		//closed_stocksの更新
+		//closed_unitsの更新
 
-		//closed_stocksに存在するものを更新
+		//closed_unitsに存在するものを更新
 		recorder.play(
 			() -> createRankedQuery(
 				base -> base.SELECT(
@@ -130,7 +130,7 @@ public class ClosingHandler {
 
 		batch.execute();
 
-		//close_stocksに存在しないものを追加
+		//closed_unitsに存在しないものを追加
 		recorder.play(() -> {
 			var subquery = createRankedQuery(
 				base -> base.SELECT(

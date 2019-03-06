@@ -79,7 +79,6 @@ class JournalPreparer {
 		Recorder recorder) {
 		node.setId(nodeId);
 		node.setDetail_id(detailId);
-		//nodeではgroup_idを持たないが、requestが持つgroup_idはstockに格納しており、それが在庫の所属グループを表す
 		node.setUnit_id(request.unit_id);
 		node.setIn_out(request.in_out.intValue);
 		node.setSeq(nodeSeq);
@@ -141,7 +140,7 @@ class JournalPreparer {
 
 		void setDetail_id(UUID detailId);
 
-		void setUnit_id(UUID stockId);
+		void setUnit_id(UUID unitId);
 
 		void setIn_out(Integer value);
 

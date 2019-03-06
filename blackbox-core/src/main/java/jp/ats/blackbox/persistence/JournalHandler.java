@@ -375,7 +375,7 @@ public class JournalHandler {
 	}
 
 	//直近のsnapshotを取得
-	static JustBeforeSnapshot getJustBeforeSnapshot(UUID stockId, Timestamp fixedAt, Recorder recorder) {
+	static JustBeforeSnapshot getJustBeforeSnapshot(UUID unitId, Timestamp fixedAt, Recorder recorder) {
 		return recorder.play(
 			() -> new snapshots()
 				.SELECT(a -> a.ls(a.total, a.unlimited))
@@ -388,8 +388,8 @@ public class JournalHandler {
 					a -> a.ls(
 						a.created_at.DESC, //同一時刻であればcreated_atが最近のもの
 						a.node_seq.DESC)), //created_atが等しければ同一伝票、同一伝票内であれば生成順
-			stockId,
-			stockId,
+			unitId,
+			unitId,
 			fixedAt).aggregateAndGet(r -> {
 				var container = new JustBeforeSnapshot();
 				while (r.next()) {
