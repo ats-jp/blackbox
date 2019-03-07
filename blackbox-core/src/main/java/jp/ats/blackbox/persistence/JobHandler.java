@@ -40,7 +40,7 @@ public class JobHandler {
 					.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().unit_id))
 					.WHERE(sa -> sa.$nodes().$details().journal_id.eq(row.getId()))
 					.ORDER_BY(a -> a.node_seq)
-					.aggregate(result -> {
+					.execute(result -> {
 						while (result.next()) {
 							//TODO pluginで個別処理を複数スレッドで行うようにする
 							recorder.play(
@@ -68,7 +68,7 @@ public class JobHandler {
 		return new jobs()
 			.SELECT(a -> a.MIN(a.$journals().fixed_at))
 			.WHERE(a -> a.completed.eq(false))
-			.aggregateAndGet(result -> {
+			.executeAndGet(result -> {
 				result.next();
 				var next = result.getTimestamp(1);
 

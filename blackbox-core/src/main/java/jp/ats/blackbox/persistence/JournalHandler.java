@@ -390,7 +390,7 @@ public class JournalHandler {
 						a.node_seq.DESC)), //created_atが等しければ同一伝票、同一伝票内であれば生成順
 			unitId,
 			unitId,
-			fixedAt).aggregateAndGet(r -> {
+			fixedAt).executeAndGet(r -> {
 				var container = new JustBeforeSnapshot();
 				while (r.next()) {
 					container.total = r.getBigDecimal(1);

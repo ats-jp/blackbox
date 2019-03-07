@@ -29,7 +29,7 @@ public class TagHandler {
 		return recorder.play(
 			() -> new tags().SELECT(a -> a.id).WHERE(a -> a.tag.eq($STRING)),
 			tag)
-			.aggregateAndGet(r -> {
+			.executeAndGet(r -> {
 				if (r.next()) return U.uuid(r, 1);
 
 				UUID newId = UUID.randomUUID();

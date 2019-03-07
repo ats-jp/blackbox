@@ -236,7 +236,7 @@ public class TransientHandler {
 				.SELECT(a -> a.MAX(a.seq_in_journal))
 				.WHERE(a -> a.transient_journal_id.eq($UUID)),
 			journalId)
-			.aggregateAndGet(r -> {
+			.executeAndGet(r -> {
 				r.next();
 				return r.getInt(1);
 			});
@@ -292,7 +292,7 @@ public class TransientHandler {
 				.SELECT(a -> a.MAX(a.seq_in_detail))
 				.WHERE(a -> a.transient_detail_id.eq($UUID)),
 			detailId)
-			.aggregateAndGet(r -> {
+			.executeAndGet(r -> {
 				r.next();
 				return r.getInt(1);
 			});
@@ -446,7 +446,7 @@ public class TransientHandler {
 	}
 
 	public static void check(UUID transientId, BiConsumer<ErrorType, CheckContext> consumer) {
-		U.recorder.play(() -> build(), transientId, transientId).aggregate(r -> checkInternal(r, consumer));
+		U.recorder.play(() -> build(), transientId, transientId).execute(r -> checkInternal(r, consumer));
 	}
 
 	private static void checkInternal(BResultSet result, BiConsumer<ErrorType, CheckContext> consumer) {

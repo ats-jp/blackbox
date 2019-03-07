@@ -238,7 +238,7 @@ public class owners
 	 * references: groups<br>
 	 * columns: group_id
 	 */
-	@ForeignKey(name = "owners_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
+	@ForeignKey(name = "owners_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" }, pseudo = true)
 	public static final String bb$groups$owners_group_id_fkey = "owners_group_id_fkey";
 
 	/**
@@ -246,7 +246,7 @@ public class owners
 	 * references: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "owners_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	@ForeignKey(name = "owners_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" }, pseudo = true)
 	public static final String bb$users$owners_created_by_fkey = "owners_created_by_fkey";
 
 	/**
@@ -254,7 +254,7 @@ public class owners
 	 * references: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "owners_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	@ForeignKey(name = "owners_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" }, pseudo = true)
 	public static final String bb$users$owners_updated_by_fkey = "owners_updated_by_fkey";
 
 	/**
@@ -1433,10 +1433,10 @@ public class owners
 	}
 
 	@Override
-	public Iterator execute() {
+	public Iterator search() {
 		SelectBehavior selectBehavior = selectBehavior();
 		selectBehavior.checkRowMode();
-		return wrap(selectBehavior.query().execute());
+		return wrap(selectBehavior.query().search());
 	}
 
 	@Override
@@ -2702,8 +2702,8 @@ public class owners
 		}
 
 		@Override
-		public Iterator execute() {
-			return wrap(inner.execute());
+		public Iterator search() {
+			return wrap(inner.search());
 		}
 
 		@Override

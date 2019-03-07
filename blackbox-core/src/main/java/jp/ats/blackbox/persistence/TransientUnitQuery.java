@@ -68,6 +68,6 @@ public class TransientUnitQuery {
 
 		snapshotPlaceholderValues.stream().forEach(values::add);
 
-		U.recorder.play(() -> query, values.toArray(new Object[values.size()])).aggregate(resultConsumer);
+		U.recorder.play(() -> query, values.toArray(new Object[values.size()])).execute(resultConsumer);
 	}
 }

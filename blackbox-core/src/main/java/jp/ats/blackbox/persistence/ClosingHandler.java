@@ -46,7 +46,7 @@ public class ClosingHandler {
 				.SELECT(a -> a.child_id)
 				.WHERE(a -> a.parent_id.eq($UUID)),
 			request.group_id)
-			.aggregate(r -> {
+			.execute(r -> {
 				while (r.next()) {
 					UUID groupId = U.uuid(r, relationships.child_id);
 
@@ -108,7 +108,7 @@ public class ClosingHandler {
 									.WHERE(a -> a.col("rank").eq(1)),
 			groupId,
 			closedAt)
-			.aggregate(r -> {
+			.execute(r -> {
 				while (r.next()) {
 					recorder.play(
 						() -> new closed_units().updateStatement(

@@ -238,7 +238,7 @@ public class statuses
 	 * references: groups<br>
 	 * columns: group_id
 	 */
-	@ForeignKey(name = "statuses_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
+	@ForeignKey(name = "statuses_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" }, pseudo = true)
 	public static final String bb$groups$statuses_group_id_fkey = "statuses_group_id_fkey";
 
 	/**
@@ -246,7 +246,7 @@ public class statuses
 	 * references: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "statuses_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	@ForeignKey(name = "statuses_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" }, pseudo = true)
 	public static final String bb$users$statuses_created_by_fkey = "statuses_created_by_fkey";
 
 	/**
@@ -254,7 +254,7 @@ public class statuses
 	 * references: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "statuses_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	@ForeignKey(name = "statuses_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" }, pseudo = true)
 	public static final String bb$users$statuses_updated_by_fkey = "statuses_updated_by_fkey";
 
 	/**
@@ -1433,10 +1433,10 @@ public class statuses
 	}
 
 	@Override
-	public Iterator execute() {
+	public Iterator search() {
 		SelectBehavior selectBehavior = selectBehavior();
 		selectBehavior.checkRowMode();
-		return wrap(selectBehavior.query().execute());
+		return wrap(selectBehavior.query().search());
 	}
 
 	@Override
@@ -2702,8 +2702,8 @@ public class statuses
 		}
 
 		@Override
-		public Iterator execute() {
-			return wrap(inner.execute());
+		public Iterator search() {
+			return wrap(inner.search());
 		}
 
 		@Override
