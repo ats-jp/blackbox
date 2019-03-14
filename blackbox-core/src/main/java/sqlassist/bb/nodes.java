@@ -1341,10 +1341,10 @@ public class nodes
 	}
 
 	@Override
-	public Iterator search() {
+	public Iterator retrieve() {
 		SelectBehavior selectBehavior = selectBehavior();
 		selectBehavior.checkRowMode();
-		return wrap(selectBehavior.query().search());
+		return wrap(selectBehavior.query().retrieve());
 	}
 
 	@Override
@@ -2581,8 +2581,8 @@ public class nodes
 		}
 
 		@Override
-		public Iterator search() {
-			return wrap(inner.search());
+		public Iterator retrieve() {
+			return wrap(inner.retrieve());
 		}
 
 		@Override
