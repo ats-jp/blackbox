@@ -15,7 +15,6 @@ import org.blendee.jdbc.TablePath;
 import org.blendee.orm.ColumnNameDataObjectBuilder;
 import org.blendee.orm.DataObject;
 import org.blendee.orm.DataObjectIterator;
-import org.blendee.selector.AnchorOptimizerFactory;
 import org.blendee.selector.Optimizer;
 import org.blendee.sql.Bindable;
 import org.blendee.sql.Binder;
@@ -886,20 +885,6 @@ public class journal_errors
 	}
 
 	/**
-	 * このクラスのインスタンスを生成します。<br>
-	 * インスタンスは ID として、引数で渡された id を使用します。<br>
-	 * フィールド定義の必要がなく、簡易に使用できますが、 ID は呼び出し側クラス内で一意である必要があります。
-	 * @param id {@link SelectStatement} を使用するクラス内で一意の ID
-	 * @return このクラスのインスタンス
-	 */
-	public static journal_errors of(String id) {
-		if (id == null || id.equals(""))
-			throw new IllegalArgumentException("id が空です");
-
-		return new journal_errors(getUsing(new Throwable().getStackTrace()[1]), id);
-	}
-
-	/**
 	 * 空のインスタンスを生成します。
 	 */
 	public journal_errors() {}
@@ -911,11 +896,6 @@ public class journal_errors
 	 */
 	public journal_errors(Optimizer optimizer) {
 		selectBehavior().setOptimizer(Objects.requireNonNull(optimizer));
-	}
-
-	private journal_errors(Class<?> using, String id) {
-		selectBehavior().setOptimizer(
-			ContextManager.get(AnchorOptimizerFactory.class).getInstance(id, getRuntimeId(), $TABLE, using));
 	}
 
 	@Override
@@ -1624,14 +1604,6 @@ public class journal_errors
 	@Override
 	public String toString() {
 		return selectBehavior().toString();
-	}
-
-	private static Class<?> getUsing(StackTraceElement element) {
-		try {
-			return Class.forName(element.getClassName());
-		} catch (Exception e) {
-			throw new IllegalStateException(e.toString());
-		}
 	}
 
 	/**
