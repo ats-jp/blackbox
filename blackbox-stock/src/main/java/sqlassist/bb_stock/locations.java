@@ -720,7 +720,8 @@ public class locations
 	 */
 	public class WhereLogicalOperators implements LogicalOperators<WhereAssist> {
 
-		private WhereLogicalOperators() {}
+		private WhereLogicalOperators() {
+		}
 
 		/**
 		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
@@ -751,7 +752,8 @@ public class locations
 	 */
 	public class HavingLogicalOperators implements LogicalOperators<HavingAssist> {
 
-		private HavingLogicalOperators() {}
+		private HavingLogicalOperators() {
+		}
 
 		/**
 		 * HAVING 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
@@ -782,7 +784,8 @@ public class locations
 	 */
 	public class OnLeftLogicalOperators implements LogicalOperators<OnLeftAssist> {
 
-		private OnLeftLogicalOperators() {}
+		private OnLeftLogicalOperators() {
+		}
 
 		/**
 		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
@@ -813,7 +816,8 @@ public class locations
 	 */
 	public class OnRightLogicalOperators implements LogicalOperators<OnRightAssist> {
 
-		private OnRightLogicalOperators() {}
+		private OnRightLogicalOperators() {
+		}
 
 		/**
 		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
@@ -844,7 +848,8 @@ public class locations
 	 */
 	public class DMSWhereLogicalOperators implements LogicalOperators<DMSWhereAssist> {
 
-		private DMSWhereLogicalOperators() {}
+		private DMSWhereLogicalOperators() {
+		}
 
 		/**
 		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
@@ -882,7 +887,7 @@ public class locations
 
 	@Override
 	public RuntimeId getRuntimeId() {
-		return id$ == null ? (id$ = RuntimeIdFactory.getRuntimeInstance()) : id$;
+		return id$ == null ? (id$ = RuntimeIdFactory.runtimeInstance()) : id$;
 	}
 
 	private class SelectBehavior extends SelectStatementBehavior<SelectAssist, ListSelectAssist, GroupByAssist, ListGroupByAssist, WhereAssist, HavingAssist, OrderByAssist, ListOrderByAssist, OnLeftAssist> {
@@ -1002,7 +1007,8 @@ public class locations
 	/**
 	 * 空のインスタンスを生成します。
 	 */
-	public locations() {}
+	public locations() {
+	}
 
 	/**
 	 * このクラスのインスタンスを生成します。<br>

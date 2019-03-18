@@ -475,7 +475,8 @@ public class current_units
 	 */
 	public class WhereLogicalOperators implements LogicalOperators<WhereAssist> {
 
-		private WhereLogicalOperators() {}
+		private WhereLogicalOperators() {
+		}
 
 		/**
 		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
@@ -506,7 +507,8 @@ public class current_units
 	 */
 	public class HavingLogicalOperators implements LogicalOperators<HavingAssist> {
 
-		private HavingLogicalOperators() {}
+		private HavingLogicalOperators() {
+		}
 
 		/**
 		 * HAVING 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
@@ -537,7 +539,8 @@ public class current_units
 	 */
 	public class OnLeftLogicalOperators implements LogicalOperators<OnLeftAssist> {
 
-		private OnLeftLogicalOperators() {}
+		private OnLeftLogicalOperators() {
+		}
 
 		/**
 		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
@@ -568,7 +571,8 @@ public class current_units
 	 */
 	public class OnRightLogicalOperators implements LogicalOperators<OnRightAssist> {
 
-		private OnRightLogicalOperators() {}
+		private OnRightLogicalOperators() {
+		}
 
 		/**
 		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
@@ -599,7 +603,8 @@ public class current_units
 	 */
 	public class DMSWhereLogicalOperators implements LogicalOperators<DMSWhereAssist> {
 
-		private DMSWhereLogicalOperators() {}
+		private DMSWhereLogicalOperators() {
+		}
 
 		/**
 		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
@@ -637,7 +642,7 @@ public class current_units
 
 	@Override
 	public RuntimeId getRuntimeId() {
-		return id$ == null ? (id$ = RuntimeIdFactory.getRuntimeInstance()) : id$;
+		return id$ == null ? (id$ = RuntimeIdFactory.runtimeInstance()) : id$;
 	}
 
 	private class SelectBehavior extends SelectStatementBehavior<SelectAssist, ListSelectAssist, GroupByAssist, ListGroupByAssist, WhereAssist, HavingAssist, OrderByAssist, ListOrderByAssist, OnLeftAssist> {
@@ -757,7 +762,8 @@ public class current_units
 	/**
 	 * 空のインスタンスを生成します。
 	 */
-	public current_units() {}
+	public current_units() {
+	}
 
 	/**
 	 * このクラスのインスタンスを生成します。<br>
