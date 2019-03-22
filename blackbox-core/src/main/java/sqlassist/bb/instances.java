@@ -15,7 +15,7 @@ import org.blendee.jdbc.TablePath;
 import org.blendee.orm.ColumnNameDataObjectBuilder;
 import org.blendee.orm.DataObject;
 import org.blendee.orm.DataObjectIterator;
-import org.blendee.selector.Optimizer;
+import org.blendee.orm.SelectContext;
 import org.blendee.sql.Bindable;
 import org.blendee.sql.Binder;
 import org.blendee.sql.Criteria;
@@ -680,11 +680,11 @@ public class instances
 
 	/**
 	 * このクラスのインスタンスを生成します。<br>
-	 * このコンストラクタで生成されたインスタンス の SELECT 句で使用されるカラムは、 パラメータの {@link Optimizer} に依存します。
-	 * @param optimizer SELECT 句を決定する
+	 * このコンストラクタで生成されたインスタンス の SELECT 句で使用されるカラムは、 パラメータの {@link SelectContext} に依存します。
+	 * @param context SELECT 句を決定する
 	 */
-	public instances(Optimizer optimizer) {
-		selectBehavior().setOptimizer(Objects.requireNonNull(optimizer));
+	public instances(SelectContext context) {
+		selectBehavior().setSelectContext(Objects.requireNonNull(context));
 	}
 
 	@Override
@@ -1037,8 +1037,8 @@ public class instances
 	}
 
 	@Override
-	public Optimizer getOptimizer() {
-		return selectBehavior().getOptimizer();
+	public SelectContext getSelectContext() {
+		return selectBehavior().getSelectContext();
 	}
 
 	@Override
