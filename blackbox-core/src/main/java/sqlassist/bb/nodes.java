@@ -1844,8 +1844,10 @@ public class nodes
 		 * @return {@link OneToManyQuery}
 		 */
 		public OneToManyQuery<Row, M> intercept() {
-			if (super.table$ != null) throw new IllegalStateException("このインスタンスでは直接使用することはできません");
-			if (!getSelectStatement().rowMode()) throw new IllegalStateException("集計モードでは実行できない処理です");
+			//このインスタンスでは直接使用することはできません
+			if (super.table$ != null) throw new IllegalStateException("It can not be used directly in this instance.");
+			//集計モードでは実行できない処理です
+			if (!getSelectStatement().rowMode()) throw new IllegalStateException("This operation can only in \"Row Mode\".");
 			return new InstantOneToManyQuery<>(this, getSelectStatement().decorators());
 		}
 
