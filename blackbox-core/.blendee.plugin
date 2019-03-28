@@ -1,5 +1,5 @@
 #
-#Wed Dec 19 01:01:44 JST 2018
+#Thu Mar 28 17:41:41 JST 2019
 tableFacadeParentClass=
 schemaNames=bb
 outputPackageName=sqlassist
@@ -10,6 +10,6 @@ transactionFactoryClass=
 codeFormatterClass=
 metadataFactoryClass=
 notUseNullGuard=
-jdbcDriverClass=org.postgresql.Driver
+jdbcDriverClass=
 columnRepositoryFile=
 queryParentClass=
