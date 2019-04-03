@@ -4,9 +4,9 @@ import java.sql.Connection;
 
 import org.blendee.jdbc.Transaction;
 import org.blendee.jdbc.impl.JDBCTransaction;
-import org.blendee.util.DriverTransactionFactory;
+import org.blendee.util.DriverManagerTransactionFactory;
 
-public class JournalTestTransactionFactory extends DriverTransactionFactory {
+public class JournalTestTransactionFactory extends DriverManagerTransactionFactory {
 
 	public JournalTestTransactionFactory() throws Exception {
 		super();
