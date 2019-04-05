@@ -149,20 +149,20 @@ public class owners_tags
 	public static final String tag_id = "tag_id";
 
 	/**
+	 * name: owners_tags_tag_id_fkey<br>
+	 * references: tags<br>
+	 * columns: tag_id
+	 */
+	@ForeignKey(name = "owners_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
+	public static final String bb$tags$owners_tags_tag_id_fkey = "owners_tags_tag_id_fkey";
+
+	/**
 	 * name: owners_tags_id_fkey<br>
 	 * references: owners<br>
 	 * columns: id
 	 */
 	@ForeignKey(name = "owners_tags_id_fkey", references = "bb_stock.owners", columns = { "id" }, refColumns = { "id" })
 	public static final String bb_stock$owners$owners_tags_id_fkey = "owners_tags_id_fkey";
-
-	/**
-	 * name: owners_tags_tag_id_fkey<br>
-	 * references: tags<br>
-	 * columns: tag_id
-	 */
-	@ForeignKey(name = "owners_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" }, pseudo = true)
-	public static final String bb$tags$owners_tags_tag_id_fkey = "owners_tags_tag_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -297,18 +297,6 @@ public class owners_tags
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 owners<br>
-		 * 外部キー名 owners_tags_id_fkey<br>
-		 * 項目名 id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb_stock.owners.Row $owners() {
-			return sqlassist.bb_stock.owners.row(
-				data$.getDataObject(bb_stock$owners$owners_tags_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 tags<br>
 		 * 外部キー名 owners_tags_tag_id_fkey<br>
 		 * 項目名 tag_id
@@ -317,6 +305,18 @@ public class owners_tags
 		public sqlassist.bb.tags.Row $tags() {
 			return sqlassist.bb.tags.row(
 				data$.getDataObject(bb$tags$owners_tags_tag_id_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 owners<br>
+		 * 外部キー名 owners_tags_id_fkey<br>
+		 * 項目名 id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb_stock.owners.Row $owners() {
+			return sqlassist.bb_stock.owners.row(
+				data$.getDataObject(bb_stock$owners$owners_tags_id_fkey));
 		}
 
 	}
@@ -1514,19 +1514,6 @@ public class owners_tags
 		}
 
 		/**
-		 * 参照先テーブル名 owners<br>
-		 * 外部キー名 owners_tags_id_fkey<br>
-		 * 項目名 id
-		 * @return owners relationship
-		 */
-		public sqlassist.bb_stock.owners.ExtAssist<T, Many<sqlassist.bb_stock.owners_tags.Row, M>> $owners() {
-			return new sqlassist.bb_stock.owners.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb_stock.owners_tags.bb_stock$owners$owners_tags_id_fkey);
-		}
-
-		/**
 		 * 参照先テーブル名 tags<br>
 		 * 外部キー名 owners_tags_tag_id_fkey<br>
 		 * 項目名 tag_id
@@ -1537,6 +1524,19 @@ public class owners_tags
 				builder$,
 				this,
 				sqlassist.bb_stock.owners_tags.bb$tags$owners_tags_tag_id_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 owners<br>
+		 * 外部キー名 owners_tags_id_fkey<br>
+		 * 項目名 id
+		 * @return owners relationship
+		 */
+		public sqlassist.bb_stock.owners.ExtAssist<T, Many<sqlassist.bb_stock.owners_tags.Row, M>> $owners() {
+			return new sqlassist.bb_stock.owners.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb_stock.owners_tags.bb_stock$owners$owners_tags_id_fkey);
 		}
 
 	}

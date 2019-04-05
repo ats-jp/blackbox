@@ -149,20 +149,20 @@ public class statuses_tags
 	public static final String tag_id = "tag_id";
 
 	/**
+	 * name: statuses_tags_tag_id_fkey<br>
+	 * references: tags<br>
+	 * columns: tag_id
+	 */
+	@ForeignKey(name = "statuses_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
+	public static final String bb$tags$statuses_tags_tag_id_fkey = "statuses_tags_tag_id_fkey";
+
+	/**
 	 * name: statuses_tags_id_fkey<br>
 	 * references: statuses<br>
 	 * columns: id
 	 */
 	@ForeignKey(name = "statuses_tags_id_fkey", references = "bb_stock.statuses", columns = { "id" }, refColumns = { "id" })
 	public static final String bb_stock$statuses$statuses_tags_id_fkey = "statuses_tags_id_fkey";
-
-	/**
-	 * name: statuses_tags_tag_id_fkey<br>
-	 * references: tags<br>
-	 * columns: tag_id
-	 */
-	@ForeignKey(name = "statuses_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" }, pseudo = true)
-	public static final String bb$tags$statuses_tags_tag_id_fkey = "statuses_tags_tag_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -297,18 +297,6 @@ public class statuses_tags
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 statuses<br>
-		 * 外部キー名 statuses_tags_id_fkey<br>
-		 * 項目名 id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb_stock.statuses.Row $statuses() {
-			return sqlassist.bb_stock.statuses.row(
-				data$.getDataObject(bb_stock$statuses$statuses_tags_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 tags<br>
 		 * 外部キー名 statuses_tags_tag_id_fkey<br>
 		 * 項目名 tag_id
@@ -317,6 +305,18 @@ public class statuses_tags
 		public sqlassist.bb.tags.Row $tags() {
 			return sqlassist.bb.tags.row(
 				data$.getDataObject(bb$tags$statuses_tags_tag_id_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 statuses<br>
+		 * 外部キー名 statuses_tags_id_fkey<br>
+		 * 項目名 id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb_stock.statuses.Row $statuses() {
+			return sqlassist.bb_stock.statuses.row(
+				data$.getDataObject(bb_stock$statuses$statuses_tags_id_fkey));
 		}
 
 	}
@@ -1514,19 +1514,6 @@ public class statuses_tags
 		}
 
 		/**
-		 * 参照先テーブル名 statuses<br>
-		 * 外部キー名 statuses_tags_id_fkey<br>
-		 * 項目名 id
-		 * @return statuses relationship
-		 */
-		public sqlassist.bb_stock.statuses.ExtAssist<T, Many<sqlassist.bb_stock.statuses_tags.Row, M>> $statuses() {
-			return new sqlassist.bb_stock.statuses.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb_stock.statuses_tags.bb_stock$statuses$statuses_tags_id_fkey);
-		}
-
-		/**
 		 * 参照先テーブル名 tags<br>
 		 * 外部キー名 statuses_tags_tag_id_fkey<br>
 		 * 項目名 tag_id
@@ -1537,6 +1524,19 @@ public class statuses_tags
 				builder$,
 				this,
 				sqlassist.bb_stock.statuses_tags.bb$tags$statuses_tags_tag_id_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 statuses<br>
+		 * 外部キー名 statuses_tags_id_fkey<br>
+		 * 項目名 id
+		 * @return statuses relationship
+		 */
+		public sqlassist.bb_stock.statuses.ExtAssist<T, Many<sqlassist.bb_stock.statuses_tags.Row, M>> $statuses() {
+			return new sqlassist.bb_stock.statuses.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb_stock.statuses_tags.bb_stock$statuses$statuses_tags_id_fkey);
 		}
 
 	}

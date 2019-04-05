@@ -208,6 +208,30 @@ public class stocks
 	public static final String created_by = "created_by";
 
 	/**
+	 * name: stocks_group_id_fkey<br>
+	 * references: groups<br>
+	 * columns: group_id
+	 */
+	@ForeignKey(name = "stocks_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
+	public static final String bb$groups$stocks_group_id_fkey = "stocks_group_id_fkey";
+
+	/**
+	 * name: stocks_id_fkey<br>
+	 * references: units<br>
+	 * columns: id
+	 */
+	@ForeignKey(name = "stocks_id_fkey", references = "bb.units", columns = { "id" }, refColumns = { "id" })
+	public static final String bb$units$stocks_id_fkey = "stocks_id_fkey";
+
+	/**
+	 * name: stocks_created_by_fkey<br>
+	 * references: users<br>
+	 * columns: created_by
+	 */
+	@ForeignKey(name = "stocks_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$stocks_created_by_fkey = "stocks_created_by_fkey";
+
+	/**
 	 * name: stocks_item_id_fkey<br>
 	 * references: items<br>
 	 * columns: item_id
@@ -238,30 +262,6 @@ public class stocks
 	 */
 	@ForeignKey(name = "stocks_status_id_fkey", references = "bb_stock.statuses", columns = { "status_id" }, refColumns = { "id" })
 	public static final String bb_stock$statuses$stocks_status_id_fkey = "stocks_status_id_fkey";
-
-	/**
-	 * name: stocks_group_id_fkey<br>
-	 * references: groups<br>
-	 * columns: group_id
-	 */
-	@ForeignKey(name = "stocks_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" }, pseudo = true)
-	public static final String bb$groups$stocks_group_id_fkey = "stocks_group_id_fkey";
-
-	/**
-	 * name: stocks_id_fkey<br>
-	 * references: units<br>
-	 * columns: id
-	 */
-	@ForeignKey(name = "stocks_id_fkey", references = "bb.units", columns = { "id" }, refColumns = { "id" }, pseudo = true)
-	public static final String bb$units$stocks_id_fkey = "stocks_id_fkey";
-
-	/**
-	 * name: stocks_created_by_fkey<br>
-	 * references: users<br>
-	 * columns: created_by
-	 */
-	@ForeignKey(name = "stocks_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" }, pseudo = true)
-	public static final String bb$users$stocks_created_by_fkey = "stocks_created_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -580,6 +580,42 @@ public class stocks
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 groups<br>
+		 * 外部キー名 stocks_group_id_fkey<br>
+		 * 項目名 group_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.groups.Row $groups() {
+			return sqlassist.bb.groups.row(
+				data$.getDataObject(bb$groups$stocks_group_id_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 units<br>
+		 * 外部キー名 stocks_id_fkey<br>
+		 * 項目名 id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.units.Row $units() {
+			return sqlassist.bb.units.row(
+				data$.getDataObject(bb$units$stocks_id_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 users<br>
+		 * 外部キー名 stocks_created_by_fkey<br>
+		 * 項目名 created_by
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.users.Row $users() {
+			return sqlassist.bb.users.row(
+				data$.getDataObject(bb$users$stocks_created_by_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 items<br>
 		 * 外部キー名 stocks_item_id_fkey<br>
 		 * 項目名 item_id
@@ -624,42 +660,6 @@ public class stocks
 		public sqlassist.bb_stock.statuses.Row $statuses() {
 			return sqlassist.bb_stock.statuses.row(
 				data$.getDataObject(bb_stock$statuses$stocks_status_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 stocks_group_id_fkey<br>
-		 * 項目名 group_id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.groups.Row $groups() {
-			return sqlassist.bb.groups.row(
-				data$.getDataObject(bb$groups$stocks_group_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 units<br>
-		 * 外部キー名 stocks_id_fkey<br>
-		 * 項目名 id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.units.Row $units() {
-			return sqlassist.bb.units.row(
-				data$.getDataObject(bb$units$stocks_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 stocks_created_by_fkey<br>
-		 * 項目名 created_by
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.users.Row $users() {
-			return sqlassist.bb.users.row(
-				data$.getDataObject(bb$users$stocks_created_by_fkey));
 		}
 
 	}
@@ -1905,6 +1905,45 @@ public class stocks
 		}
 
 		/**
+		 * 参照先テーブル名 groups<br>
+		 * 外部キー名 stocks_group_id_fkey<br>
+		 * 項目名 group_id
+		 * @return groups relationship
+		 */
+		public sqlassist.bb.groups.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $groups() {
+			return new sqlassist.bb.groups.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb_stock.stocks.bb$groups$stocks_group_id_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 units<br>
+		 * 外部キー名 stocks_id_fkey<br>
+		 * 項目名 id
+		 * @return units relationship
+		 */
+		public sqlassist.bb.units.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $units() {
+			return new sqlassist.bb.units.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb_stock.stocks.bb$units$stocks_id_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 users<br>
+		 * 外部キー名 stocks_created_by_fkey<br>
+		 * 項目名 created_by
+		 * @return users relationship
+		 */
+		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $users() {
+			return new sqlassist.bb.users.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb_stock.stocks.bb$users$stocks_created_by_fkey);
+		}
+
+		/**
 		 * 参照先テーブル名 items<br>
 		 * 外部キー名 stocks_item_id_fkey<br>
 		 * 項目名 item_id
@@ -1954,45 +1993,6 @@ public class stocks
 				builder$,
 				this,
 				sqlassist.bb_stock.stocks.bb_stock$statuses$stocks_status_id_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 stocks_group_id_fkey<br>
-		 * 項目名 group_id
-		 * @return groups relationship
-		 */
-		public sqlassist.bb.groups.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $groups() {
-			return new sqlassist.bb.groups.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb_stock.stocks.bb$groups$stocks_group_id_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 units<br>
-		 * 外部キー名 stocks_id_fkey<br>
-		 * 項目名 id
-		 * @return units relationship
-		 */
-		public sqlassist.bb.units.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $units() {
-			return new sqlassist.bb.units.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb_stock.stocks.bb$units$stocks_id_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 stocks_created_by_fkey<br>
-		 * 項目名 created_by
-		 * @return users relationship
-		 */
-		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $users() {
-			return new sqlassist.bb.users.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb_stock.stocks.bb$users$stocks_created_by_fkey);
 		}
 
 	}

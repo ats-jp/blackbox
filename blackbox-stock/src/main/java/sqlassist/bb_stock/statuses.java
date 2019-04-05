@@ -237,7 +237,7 @@ public class statuses
 	 * references: groups<br>
 	 * columns: group_id
 	 */
-	@ForeignKey(name = "statuses_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" }, pseudo = true)
+	@ForeignKey(name = "statuses_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
 	public static final String bb$groups$statuses_group_id_fkey = "statuses_group_id_fkey";
 
 	/**
@@ -245,7 +245,7 @@ public class statuses
 	 * references: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "statuses_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" }, pseudo = true)
+	@ForeignKey(name = "statuses_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
 	public static final String bb$users$statuses_created_by_fkey = "statuses_created_by_fkey";
 
 	/**
@@ -253,7 +253,7 @@ public class statuses
 	 * references: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "statuses_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" }, pseudo = true)
+	@ForeignKey(name = "statuses_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
 	public static final String bb$users$statuses_updated_by_fkey = "statuses_updated_by_fkey";
 
 	/**
