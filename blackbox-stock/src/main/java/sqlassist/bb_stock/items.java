@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -330,9 +329,9 @@ public class items
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -347,9 +346,9 @@ public class items
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -360,9 +359,9 @@ public class items
 		/**
 		 * setter
 		 * name: group_id<br>
-		* remarks: グループID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: グループID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setGroup_id(java.util.UUID value) {
@@ -377,9 +376,9 @@ public class items
 		/**
 		 * getter
 		 * name: group_id<br>
-		* remarks: グループID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: グループID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getGroup_id() {
@@ -390,9 +389,9 @@ public class items
 		/**
 		 * setter
 		 * name: name<br>
-		* remarks: 名称<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 名称<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setName(java.lang.String value) {
@@ -407,9 +406,9 @@ public class items
 		/**
 		 * getter
 		 * name: name<br>
-		* remarks: 名称<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 名称<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getName() {
@@ -420,9 +419,9 @@ public class items
 		/**
 		 * setter
 		 * name: revision<br>
-		* remarks: リビジョン番号<br>
-		* type: int8(19)<br>
-		* not null: true<br>
+		 * remarks: リビジョン番号<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Long
 		 */
 		public void setRevision(java.lang.Long value) {
@@ -437,9 +436,9 @@ public class items
 		/**
 		 * getter
 		 * name: revision<br>
-		* remarks: リビジョン番号<br>
-		* type: int8(19)<br>
-		* not null: true<br>
+		 * remarks: リビジョン番号<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
 		 * @return java.lang.Long
 		 */
 		public java.lang.Long getRevision() {
@@ -450,9 +449,9 @@ public class items
 		/**
 		 * setter
 		 * name: props<br>
-		* remarks: 外部アプリケーション情報JSON<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 外部アプリケーション情報JSON<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setProps(java.lang.Object value) {
@@ -467,9 +466,9 @@ public class items
 		/**
 		 * getter
 		 * name: props<br>
-		* remarks: 外部アプリケーション情報JSON<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 外部アプリケーション情報JSON<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getProps() {
@@ -480,9 +479,9 @@ public class items
 		/**
 		 * setter
 		 * name: tags<br>
-		* remarks: log保存用タグ<br>
-		* type: _text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: log保存用タグ<br>
+		 * type: _text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setTags(java.lang.Object value) {
@@ -497,9 +496,9 @@ public class items
 		/**
 		 * getter
 		 * name: tags<br>
-		* remarks: log保存用タグ<br>
-		* type: _text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: log保存用タグ<br>
+		 * type: _text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getTags() {
@@ -510,9 +509,9 @@ public class items
 		/**
 		 * setter
 		 * name: active<br>
-		* remarks: アクティブフラグ<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: アクティブフラグ<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Boolean
 		 */
 		public void setActive(java.lang.Boolean value) {
@@ -527,9 +526,9 @@ public class items
 		/**
 		 * getter
 		 * name: active<br>
-		* remarks: アクティブフラグ<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: アクティブフラグ<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @return java.lang.Boolean
 		 */
 		public java.lang.Boolean getActive() {
@@ -540,9 +539,9 @@ public class items
 		/**
 		 * setter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setCreated_at(java.sql.Timestamp value) {
@@ -557,9 +556,9 @@ public class items
 		/**
 		 * getter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getCreated_at() {
@@ -570,9 +569,9 @@ public class items
 		/**
 		 * setter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setCreated_by(java.util.UUID value) {
@@ -587,9 +586,9 @@ public class items
 		/**
 		 * getter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getCreated_by() {
@@ -600,9 +599,9 @@ public class items
 		/**
 		 * setter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setUpdated_at(java.sql.Timestamp value) {
@@ -617,9 +616,9 @@ public class items
 		/**
 		 * getter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getUpdated_at() {
@@ -630,9 +629,9 @@ public class items
 		/**
 		 * setter
 		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 更新ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUpdated_by(java.util.UUID value) {
@@ -647,9 +646,9 @@ public class items
 		/**
 		 * getter
 		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 更新ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUpdated_by() {
@@ -692,7 +691,6 @@ public class items
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$items_updated_by_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1809,40 +1807,17 @@ public class items
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.id);
-			this.group_id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.group_id);
-			this.name = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.name);
-			this.revision = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.revision);
-			this.props = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.props);
-			this.tags = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.tags);
-			this.active = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.active);
-			this.created_at = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.created_at);
-			this.created_by = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.created_by);
-			this.updated_at = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.updated_at);
-			this.updated_by = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items.updated_by);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb_stock.items.id);
+			this.group_id = builder$.buildColumn(this, sqlassist.bb_stock.items.group_id);
+			this.name = builder$.buildColumn(this, sqlassist.bb_stock.items.name);
+			this.revision = builder$.buildColumn(this, sqlassist.bb_stock.items.revision);
+			this.props = builder$.buildColumn(this, sqlassist.bb_stock.items.props);
+			this.tags = builder$.buildColumn(this, sqlassist.bb_stock.items.tags);
+			this.active = builder$.buildColumn(this, sqlassist.bb_stock.items.active);
+			this.created_at = builder$.buildColumn(this, sqlassist.bb_stock.items.created_at);
+			this.created_by = builder$.buildColumn(this, sqlassist.bb_stock.items.created_by);
+			this.updated_at = builder$.buildColumn(this, sqlassist.bb_stock.items.updated_at);
+			this.updated_by = builder$.buildColumn(this, sqlassist.bb_stock.items.updated_by);
 		}
 
 		/**
@@ -1997,7 +1972,6 @@ public class items
 				this,
 				sqlassist.bb_stock.items.bb$users$items_updated_by_fkey);
 		}
-
 	}
 
 	/**

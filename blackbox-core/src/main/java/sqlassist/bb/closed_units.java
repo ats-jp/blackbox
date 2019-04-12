@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -286,10 +285,10 @@ public class closed_units
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* 在庫IDに従属<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * 在庫IDに従属<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -304,10 +303,10 @@ public class closed_units
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* 在庫IDに従属<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * 在庫IDに従属<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -318,9 +317,9 @@ public class closed_units
 		/**
 		 * setter
 		 * name: closing_id<br>
-		* remarks: 締めID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 締めID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setClosing_id(java.util.UUID value) {
@@ -335,9 +334,9 @@ public class closed_units
 		/**
 		 * getter
 		 * name: closing_id<br>
-		* remarks: 締めID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 締めID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getClosing_id() {
@@ -348,10 +347,10 @@ public class closed_units
 		/**
 		 * setter
 		 * name: unlimited<br>
-		* remarks: 在庫無制限<br>
-		* trueの場合、totalがマイナスでもエラーとならない<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 在庫無制限<br>
+		 * trueの場合、totalがマイナスでもエラーとならない<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Boolean
 		 */
 		public void setUnlimited(java.lang.Boolean value) {
@@ -366,10 +365,10 @@ public class closed_units
 		/**
 		 * getter
 		 * name: unlimited<br>
-		* remarks: 在庫無制限<br>
-		* trueの場合、totalがマイナスでもエラーとならない<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 在庫無制限<br>
+		 * trueの場合、totalがマイナスでもエラーとならない<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @return java.lang.Boolean
 		 */
 		public java.lang.Boolean getUnlimited() {
@@ -380,9 +379,9 @@ public class closed_units
 		/**
 		 * setter
 		 * name: total<br>
-		* remarks: 締め後の在庫総数<br>
-		* type: numeric(131089)<br>
-		* not null: true<br>
+		 * remarks: 締め後の在庫総数<br>
+		 * type: numeric(131089)<br>
+		 * not null: true<br>
 		 * @param value java.math.BigDecimal
 		 */
 		public void setTotal(java.math.BigDecimal value) {
@@ -397,9 +396,9 @@ public class closed_units
 		/**
 		 * getter
 		 * name: total<br>
-		* remarks: 締め後の在庫総数<br>
-		* type: numeric(131089)<br>
-		* not null: true<br>
+		 * remarks: 締め後の在庫総数<br>
+		 * type: numeric(131089)<br>
+		 * not null: true<br>
 		 * @return java.math.BigDecimal
 		 */
 		public java.math.BigDecimal getTotal() {
@@ -410,9 +409,9 @@ public class closed_units
 		/**
 		 * setter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setUpdated_at(java.sql.Timestamp value) {
@@ -427,9 +426,9 @@ public class closed_units
 		/**
 		 * getter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getUpdated_at() {
@@ -440,9 +439,9 @@ public class closed_units
 		/**
 		 * setter
 		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 更新ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUpdated_by(java.util.UUID value) {
@@ -457,9 +456,9 @@ public class closed_units
 		/**
 		 * getter
 		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 更新ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUpdated_by() {
@@ -502,7 +501,6 @@ public class closed_units
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$closed_units_updated_by_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1594,25 +1592,12 @@ public class closed_units
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.closed_units.id);
-			this.closing_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.closed_units.closing_id);
-			this.unlimited = builder$.buildColumn(
-				this,
-				sqlassist.bb.closed_units.unlimited);
-			this.total = builder$.buildColumn(
-				this,
-				sqlassist.bb.closed_units.total);
-			this.updated_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.closed_units.updated_at);
-			this.updated_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.closed_units.updated_by);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.closed_units.id);
+			this.closing_id = builder$.buildColumn(this, sqlassist.bb.closed_units.closing_id);
+			this.unlimited = builder$.buildColumn(this, sqlassist.bb.closed_units.unlimited);
+			this.total = builder$.buildColumn(this, sqlassist.bb.closed_units.total);
+			this.updated_at = builder$.buildColumn(this, sqlassist.bb.closed_units.updated_at);
+			this.updated_by = builder$.buildColumn(this, sqlassist.bb.closed_units.updated_by);
 		}
 
 		/**
@@ -1767,7 +1752,6 @@ public class closed_units
 				this,
 				sqlassist.bb.closed_units.bb$users$closed_units_updated_by_fkey);
 		}
-
 	}
 
 	/**

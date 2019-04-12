@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -375,9 +374,9 @@ public class journals
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -392,9 +391,9 @@ public class journals
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -405,10 +404,10 @@ public class journals
 		/**
 		 * setter
 		 * name: group_id<br>
-		* remarks: グループID<br>
-		* この伝票の属するグループ<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: グループID<br>
+		 * この伝票の属するグループ<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setGroup_id(java.util.UUID value) {
@@ -423,10 +422,10 @@ public class journals
 		/**
 		 * getter
 		 * name: group_id<br>
-		* remarks: グループID<br>
-		* この伝票の属するグループ<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: グループID<br>
+		 * この伝票の属するグループ<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getGroup_id() {
@@ -437,9 +436,9 @@ public class journals
 		/**
 		 * setter
 		 * name: journal_batch_id<br>
-		* remarks: 移動伝票一括登録ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 移動伝票一括登録ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setJournal_batch_id(java.util.UUID value) {
@@ -454,9 +453,9 @@ public class journals
 		/**
 		 * getter
 		 * name: journal_batch_id<br>
-		* remarks: 移動伝票一括登録ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 移動伝票一括登録ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getJournal_batch_id() {
@@ -467,9 +466,9 @@ public class journals
 		/**
 		 * setter
 		 * name: fixed_at<br>
-		* remarks: 確定時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 確定時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setFixed_at(java.sql.Timestamp value) {
@@ -484,9 +483,9 @@ public class journals
 		/**
 		 * getter
 		 * name: fixed_at<br>
-		* remarks: 確定時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 確定時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getFixed_at() {
@@ -497,9 +496,9 @@ public class journals
 		/**
 		 * setter
 		 * name: props<br>
-		* remarks: 外部アプリケーション情報JSON<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 外部アプリケーション情報JSON<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setProps(java.lang.Object value) {
@@ -514,9 +513,9 @@ public class journals
 		/**
 		 * getter
 		 * name: props<br>
-		* remarks: 外部アプリケーション情報JSON<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 外部アプリケーション情報JSON<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getProps() {
@@ -527,9 +526,9 @@ public class journals
 		/**
 		 * setter
 		 * name: tags<br>
-		* remarks: 保存用タグ<br>
-		* type: _text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 保存用タグ<br>
+		 * type: _text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setTags(java.lang.Object value) {
@@ -544,9 +543,9 @@ public class journals
 		/**
 		 * getter
 		 * name: tags<br>
-		* remarks: 保存用タグ<br>
-		* type: _text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 保存用タグ<br>
+		 * type: _text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getTags() {
@@ -557,9 +556,9 @@ public class journals
 		/**
 		 * setter
 		 * name: instance_id<br>
-		* remarks: 発生元インスタンスのID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 発生元インスタンスのID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setInstance_id(java.util.UUID value) {
@@ -574,9 +573,9 @@ public class journals
 		/**
 		 * getter
 		 * name: instance_id<br>
-		* remarks: 発生元インスタンスのID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 発生元インスタンスのID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getInstance_id() {
@@ -587,11 +586,11 @@ public class journals
 		/**
 		 * setter
 		 * name: denied_id<br>
-		* remarks: 取消元伝票ID<br>
-		* 訂正後の伝票が訂正前の伝票のIDを持つ<br>
-		* ここに入っているIDが指す伝票は、取り消されたものとなる<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 取消元伝票ID<br>
+		 * 訂正後の伝票が訂正前の伝票のIDを持つ<br>
+		 * ここに入っているIDが指す伝票は、取り消されたものとなる<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setDenied_id(java.util.UUID value) {
@@ -606,11 +605,11 @@ public class journals
 		/**
 		 * getter
 		 * name: denied_id<br>
-		* remarks: 取消元伝票ID<br>
-		* 訂正後の伝票が訂正前の伝票のIDを持つ<br>
-		* ここに入っているIDが指す伝票は、取り消されたものとなる<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 取消元伝票ID<br>
+		 * 訂正後の伝票が訂正前の伝票のIDを持つ<br>
+		 * ここに入っているIDが指す伝票は、取り消されたものとなる<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getDenied_id() {
@@ -621,9 +620,9 @@ public class journals
 		/**
 		 * setter
 		 * name: deny_reason<br>
-		* remarks: 取消理由<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 取消理由<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setDeny_reason(java.lang.String value) {
@@ -638,9 +637,9 @@ public class journals
 		/**
 		 * getter
 		 * name: deny_reason<br>
-		* remarks: 取消理由<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 取消理由<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getDeny_reason() {
@@ -651,9 +650,9 @@ public class journals
 		/**
 		 * setter
 		 * name: org_props<br>
-		* remarks: 組織のprops<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 組織のprops<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setOrg_props(java.lang.Object value) {
@@ -668,9 +667,9 @@ public class journals
 		/**
 		 * getter
 		 * name: org_props<br>
-		* remarks: 組織のprops<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 組織のprops<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getOrg_props() {
@@ -681,9 +680,9 @@ public class journals
 		/**
 		 * setter
 		 * name: group_props<br>
-		* remarks: グループのprops<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: グループのprops<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setGroup_props(java.lang.Object value) {
@@ -698,9 +697,9 @@ public class journals
 		/**
 		 * getter
 		 * name: group_props<br>
-		* remarks: グループのprops<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: グループのprops<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getGroup_props() {
@@ -711,9 +710,9 @@ public class journals
 		/**
 		 * setter
 		 * name: user_props<br>
-		* remarks: 作成ユーザーのprops<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザーのprops<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setUser_props(java.lang.Object value) {
@@ -728,9 +727,9 @@ public class journals
 		/**
 		 * getter
 		 * name: user_props<br>
-		* remarks: 作成ユーザーのprops<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザーのprops<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getUser_props() {
@@ -741,9 +740,9 @@ public class journals
 		/**
 		 * setter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setCreated_at(java.sql.Timestamp value) {
@@ -758,9 +757,9 @@ public class journals
 		/**
 		 * getter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getCreated_at() {
@@ -771,9 +770,9 @@ public class journals
 		/**
 		 * setter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setCreated_by(java.util.UUID value) {
@@ -788,9 +787,9 @@ public class journals
 		/**
 		 * getter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getCreated_by() {
@@ -857,7 +856,6 @@ public class journals
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$journals_created_by_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1989,49 +1987,20 @@ public class journals
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.id);
-			this.group_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.group_id);
-			this.journal_batch_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.journal_batch_id);
-			this.fixed_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.fixed_at);
-			this.props = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.props);
-			this.tags = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.tags);
-			this.instance_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.instance_id);
-			this.denied_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.denied_id);
-			this.deny_reason = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.deny_reason);
-			this.org_props = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.org_props);
-			this.group_props = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.group_props);
-			this.user_props = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.user_props);
-			this.created_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.created_at);
-			this.created_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.journals.created_by);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.journals.id);
+			this.group_id = builder$.buildColumn(this, sqlassist.bb.journals.group_id);
+			this.journal_batch_id = builder$.buildColumn(this, sqlassist.bb.journals.journal_batch_id);
+			this.fixed_at = builder$.buildColumn(this, sqlassist.bb.journals.fixed_at);
+			this.props = builder$.buildColumn(this, sqlassist.bb.journals.props);
+			this.tags = builder$.buildColumn(this, sqlassist.bb.journals.tags);
+			this.instance_id = builder$.buildColumn(this, sqlassist.bb.journals.instance_id);
+			this.denied_id = builder$.buildColumn(this, sqlassist.bb.journals.denied_id);
+			this.deny_reason = builder$.buildColumn(this, sqlassist.bb.journals.deny_reason);
+			this.org_props = builder$.buildColumn(this, sqlassist.bb.journals.org_props);
+			this.group_props = builder$.buildColumn(this, sqlassist.bb.journals.group_props);
+			this.user_props = builder$.buildColumn(this, sqlassist.bb.journals.user_props);
+			this.created_at = builder$.buildColumn(this, sqlassist.bb.journals.created_at);
+			this.created_by = builder$.buildColumn(this, sqlassist.bb.journals.created_by);
 		}
 
 		/**
@@ -2212,7 +2181,6 @@ public class journals
 				this,
 				sqlassist.bb.journals.bb$users$journals_created_by_fkey);
 		}
-
 	}
 
 	/**

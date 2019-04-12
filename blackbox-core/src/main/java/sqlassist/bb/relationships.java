@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -269,9 +268,9 @@ public class relationships
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: bigserial(19)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: bigserial(19)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Long
 		 */
 		public void setId(java.lang.Long value) {
@@ -286,9 +285,9 @@ public class relationships
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: bigserial(19)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: bigserial(19)<br>
+		 * not null: true<br>
 		 * @return java.lang.Long
 		 */
 		public java.lang.Long getId() {
@@ -299,9 +298,9 @@ public class relationships
 		/**
 		 * setter
 		 * name: parent_id<br>
-		* remarks: 親グループID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 親グループID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setParent_id(java.util.UUID value) {
@@ -316,9 +315,9 @@ public class relationships
 		/**
 		 * getter
 		 * name: parent_id<br>
-		* remarks: 親グループID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 親グループID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getParent_id() {
@@ -329,10 +328,10 @@ public class relationships
 		/**
 		 * setter
 		 * name: child_id<br>
-		* remarks: 子グループID<br>
-		* 親グループIDに対して、親自身と親から辿れるすべての子が登録されている<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 子グループID<br>
+		 * 親グループIDに対して、親自身と親から辿れるすべての子が登録されている<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setChild_id(java.util.UUID value) {
@@ -347,10 +346,10 @@ public class relationships
 		/**
 		 * getter
 		 * name: child_id<br>
-		* remarks: 子グループID<br>
-		* 親グループIDに対して、親自身と親から辿れるすべての子が登録されている<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 子グループID<br>
+		 * 親グループIDに対して、親自身と親から辿れるすべての子が登録されている<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getChild_id() {
@@ -361,10 +360,10 @@ public class relationships
 		/**
 		 * setter
 		 * name: cascade_id<br>
-		* remarks: カスケード削除用ID<br>
-		* 自身が依存する親のIDを持っておき、親が削除されたときに連鎖的にすべて削除するための項目<br>
-		* type: int8(19)<br>
-		* not null: true<br>
+		 * remarks: カスケード削除用ID<br>
+		 * 自身が依存する親のIDを持っておき、親が削除されたときに連鎖的にすべて削除するための項目<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Long
 		 */
 		public void setCascade_id(java.lang.Long value) {
@@ -379,10 +378,10 @@ public class relationships
 		/**
 		 * getter
 		 * name: cascade_id<br>
-		* remarks: カスケード削除用ID<br>
-		* 自身が依存する親のIDを持っておき、親が削除されたときに連鎖的にすべて削除するための項目<br>
-		* type: int8(19)<br>
-		* not null: true<br>
+		 * remarks: カスケード削除用ID<br>
+		 * 自身が依存する親のIDを持っておき、親が削除されたときに連鎖的にすべて削除するための項目<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
 		 * @return java.lang.Long
 		 */
 		public java.lang.Long getCascade_id() {
@@ -425,7 +424,6 @@ public class relationships
 			return sqlassist.bb.relationships.row(
 				data$.getDataObject(bb$relationships$relationships_cascade_id_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1507,19 +1505,10 @@ public class relationships
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.relationships.id);
-			this.parent_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.relationships.parent_id);
-			this.child_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.relationships.child_id);
-			this.cascade_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.relationships.cascade_id);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.relationships.id);
+			this.parent_id = builder$.buildColumn(this, sqlassist.bb.relationships.parent_id);
+			this.child_id = builder$.buildColumn(this, sqlassist.bb.relationships.child_id);
+			this.cascade_id = builder$.buildColumn(this, sqlassist.bb.relationships.cascade_id);
 		}
 
 		/**
@@ -1674,7 +1663,6 @@ public class relationships
 				this,
 				sqlassist.bb.relationships.bb$relationships$relationships_cascade_id_fkey);
 		}
-
 	}
 
 	/**

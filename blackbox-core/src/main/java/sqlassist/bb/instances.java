@@ -90,7 +90,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -242,9 +241,9 @@ public class instances
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -259,9 +258,9 @@ public class instances
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -272,9 +271,9 @@ public class instances
 		/**
 		 * setter
 		 * name: name<br>
-		* remarks: 名称<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 名称<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setName(java.lang.String value) {
@@ -289,9 +288,9 @@ public class instances
 		/**
 		 * getter
 		 * name: name<br>
-		* remarks: 名称<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 名称<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getName() {
@@ -302,10 +301,10 @@ public class instances
 		/**
 		 * setter
 		 * name: principal<br>
-		* remarks: この実行インスタンスを表す行<br>
-		* 一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: この実行インスタンスを表す行<br>
+		 * 一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Boolean
 		 */
 		public void setPrincipal(java.lang.Boolean value) {
@@ -320,10 +319,10 @@ public class instances
 		/**
 		 * getter
 		 * name: principal<br>
-		* remarks: この実行インスタンスを表す行<br>
-		* 一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: この実行インスタンスを表す行<br>
+		 * 一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @return java.lang.Boolean
 		 */
 		public java.lang.Boolean getPrincipal() {
@@ -334,9 +333,9 @@ public class instances
 		/**
 		 * setter
 		 * name: description<br>
-		* remarks: <br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: <br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setDescription(java.lang.String value) {
@@ -351,9 +350,9 @@ public class instances
 		/**
 		 * getter
 		 * name: description<br>
-		* remarks: <br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: <br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getDescription() {
@@ -1442,19 +1441,10 @@ public class instances
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.instances.id);
-			this.name = builder$.buildColumn(
-				this,
-				sqlassist.bb.instances.name);
-			this.principal = builder$.buildColumn(
-				this,
-				sqlassist.bb.instances.principal);
-			this.description = builder$.buildColumn(
-				this,
-				sqlassist.bb.instances.description);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.instances.id);
+			this.name = builder$.buildColumn(this, sqlassist.bb.instances.name);
+			this.principal = builder$.buildColumn(this, sqlassist.bb.instances.principal);
+			this.description = builder$.buildColumn(this, sqlassist.bb.instances.description);
 		}
 
 		/**
@@ -1568,7 +1558,6 @@ public class instances
 			if (!getSelectStatement().rowMode()) throw new IllegalStateException("This operation can only in \"Row Mode\".");
 			return new InstantOneToManyQuery<>(this, getSelectStatement().decorators());
 		}
-
 	}
 
 	/**

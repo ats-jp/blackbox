@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -306,9 +305,9 @@ public class nodes
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -323,9 +322,9 @@ public class nodes
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -336,9 +335,9 @@ public class nodes
 		/**
 		 * setter
 		 * name: detail_id<br>
-		* remarks: 明細ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 明細ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setDetail_id(java.util.UUID value) {
@@ -353,9 +352,9 @@ public class nodes
 		/**
 		 * getter
 		 * name: detail_id<br>
-		* remarks: 明細ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 明細ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getDetail_id() {
@@ -366,9 +365,9 @@ public class nodes
 		/**
 		 * setter
 		 * name: unit_id<br>
-		* remarks: 管理対象ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 管理対象ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUnit_id(java.util.UUID value) {
@@ -383,9 +382,9 @@ public class nodes
 		/**
 		 * getter
 		 * name: unit_id<br>
-		* remarks: 管理対象ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 管理対象ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUnit_id() {
@@ -396,10 +395,10 @@ public class nodes
 		/**
 		 * setter
 		 * name: in_out<br>
-		* remarks: 入出区分<br>
-		* IN=1, OUT=-1<br>
-		* type: int2(5)<br>
-		* not null: true<br>
+		 * remarks: 入出区分<br>
+		 * IN=1, OUT=-1<br>
+		 * type: int2(5)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Integer
 		 */
 		public void setIn_out(java.lang.Integer value) {
@@ -414,10 +413,10 @@ public class nodes
 		/**
 		 * getter
 		 * name: in_out<br>
-		* remarks: 入出区分<br>
-		* IN=1, OUT=-1<br>
-		* type: int2(5)<br>
-		* not null: true<br>
+		 * remarks: 入出区分<br>
+		 * IN=1, OUT=-1<br>
+		 * type: int2(5)<br>
+		 * not null: true<br>
 		 * @return java.lang.Integer
 		 */
 		public java.lang.Integer getIn_out() {
@@ -428,9 +427,9 @@ public class nodes
 		/**
 		 * setter
 		 * name: seq<br>
-		* remarks: 伝票内連番<br>
-		* type: int4(10)<br>
-		* not null: true<br>
+		 * remarks: 伝票内連番<br>
+		 * type: int4(10)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Integer
 		 */
 		public void setSeq(java.lang.Integer value) {
@@ -445,9 +444,9 @@ public class nodes
 		/**
 		 * getter
 		 * name: seq<br>
-		* remarks: 伝票内連番<br>
-		* type: int4(10)<br>
-		* not null: true<br>
+		 * remarks: 伝票内連番<br>
+		 * type: int4(10)<br>
+		 * not null: true<br>
 		 * @return java.lang.Integer
 		 */
 		public java.lang.Integer getSeq() {
@@ -458,9 +457,9 @@ public class nodes
 		/**
 		 * setter
 		 * name: quantity<br>
-		* remarks: 数量<br>
-		* type: numeric(131089)<br>
-		* not null: true<br>
+		 * remarks: 数量<br>
+		 * type: numeric(131089)<br>
+		 * not null: true<br>
 		 * @param value java.math.BigDecimal
 		 */
 		public void setQuantity(java.math.BigDecimal value) {
@@ -475,9 +474,9 @@ public class nodes
 		/**
 		 * getter
 		 * name: quantity<br>
-		* remarks: 数量<br>
-		* type: numeric(131089)<br>
-		* not null: true<br>
+		 * remarks: 数量<br>
+		 * type: numeric(131089)<br>
+		 * not null: true<br>
 		 * @return java.math.BigDecimal
 		 */
 		public java.math.BigDecimal getQuantity() {
@@ -488,10 +487,10 @@ public class nodes
 		/**
 		 * setter
 		 * name: grants_unlimited<br>
-		* remarks: 数量無制限の許可<br>
-		* trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 数量無制限の許可<br>
+		 * trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Boolean
 		 */
 		public void setGrants_unlimited(java.lang.Boolean value) {
@@ -506,10 +505,10 @@ public class nodes
 		/**
 		 * getter
 		 * name: grants_unlimited<br>
-		* remarks: 数量無制限の許可<br>
-		* trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 数量無制限の許可<br>
+		 * trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @return java.lang.Boolean
 		 */
 		public java.lang.Boolean getGrants_unlimited() {
@@ -520,9 +519,9 @@ public class nodes
 		/**
 		 * setter
 		 * name: props<br>
-		* remarks: 外部アプリケーション情報JSON<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 外部アプリケーション情報JSON<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setProps(java.lang.Object value) {
@@ -537,9 +536,9 @@ public class nodes
 		/**
 		 * getter
 		 * name: props<br>
-		* remarks: 外部アプリケーション情報JSON<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 外部アプリケーション情報JSON<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getProps() {
@@ -550,9 +549,9 @@ public class nodes
 		/**
 		 * setter
 		 * name: unit_props<br>
-		* remarks: 管理対象のprops<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 管理対象のprops<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setUnit_props(java.lang.Object value) {
@@ -567,9 +566,9 @@ public class nodes
 		/**
 		 * getter
 		 * name: unit_props<br>
-		* remarks: 管理対象のprops<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 管理対象のprops<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getUnit_props() {
@@ -600,7 +599,6 @@ public class nodes
 			return sqlassist.bb.units.row(
 				data$.getDataObject(bb$units$nodes_unit_id_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1707,34 +1705,15 @@ public class nodes
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.id);
-			this.detail_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.detail_id);
-			this.unit_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.unit_id);
-			this.in_out = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.in_out);
-			this.seq = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.seq);
-			this.quantity = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.quantity);
-			this.grants_unlimited = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.grants_unlimited);
-			this.props = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.props);
-			this.unit_props = builder$.buildColumn(
-				this,
-				sqlassist.bb.nodes.unit_props);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.nodes.id);
+			this.detail_id = builder$.buildColumn(this, sqlassist.bb.nodes.detail_id);
+			this.unit_id = builder$.buildColumn(this, sqlassist.bb.nodes.unit_id);
+			this.in_out = builder$.buildColumn(this, sqlassist.bb.nodes.in_out);
+			this.seq = builder$.buildColumn(this, sqlassist.bb.nodes.seq);
+			this.quantity = builder$.buildColumn(this, sqlassist.bb.nodes.quantity);
+			this.grants_unlimited = builder$.buildColumn(this, sqlassist.bb.nodes.grants_unlimited);
+			this.props = builder$.buildColumn(this, sqlassist.bb.nodes.props);
+			this.unit_props = builder$.buildColumn(this, sqlassist.bb.nodes.unit_props);
 		}
 
 		/**
@@ -1876,7 +1855,6 @@ public class nodes
 				this,
 				sqlassist.bb.nodes.bb$units$nodes_unit_id_fkey);
 		}
-
 	}
 
 	/**

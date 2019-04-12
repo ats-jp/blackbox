@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -355,9 +354,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -372,9 +371,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -385,9 +384,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: transient_detail_id<br>
-		* remarks: 移動ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 移動ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setTransient_detail_id(java.util.UUID value) {
@@ -402,9 +401,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: transient_detail_id<br>
-		* remarks: 移動ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 移動ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getTransient_detail_id() {
@@ -415,9 +414,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: unit_id<br>
-		* remarks: 管理対象ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 管理対象ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUnit_id(java.util.UUID value) {
@@ -432,9 +431,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: unit_id<br>
-		* remarks: 管理対象ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 管理対象ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUnit_id() {
@@ -445,9 +444,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: in_out<br>
-		* remarks: 入出庫区分<br>
-		* type: int2(5)<br>
-		* not null: true<br>
+		 * remarks: 入出庫区分<br>
+		 * type: int2(5)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Integer
 		 */
 		public void setIn_out(java.lang.Integer value) {
@@ -462,9 +461,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: in_out<br>
-		* remarks: 入出庫区分<br>
-		* type: int2(5)<br>
-		* not null: true<br>
+		 * remarks: 入出庫区分<br>
+		 * type: int2(5)<br>
+		 * not null: true<br>
 		 * @return java.lang.Integer
 		 */
 		public java.lang.Integer getIn_out() {
@@ -475,9 +474,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: seq_in_detail<br>
-		* remarks: 伝票明細内連番<br>
-		* type: int4(10)<br>
-		* not null: true<br>
+		 * remarks: 伝票明細内連番<br>
+		 * type: int4(10)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Integer
 		 */
 		public void setSeq_in_detail(java.lang.Integer value) {
@@ -492,9 +491,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: seq_in_detail<br>
-		* remarks: 伝票明細内連番<br>
-		* type: int4(10)<br>
-		* not null: true<br>
+		 * remarks: 伝票明細内連番<br>
+		 * type: int4(10)<br>
+		 * not null: true<br>
 		 * @return java.lang.Integer
 		 */
 		public java.lang.Integer getSeq_in_detail() {
@@ -505,9 +504,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: quantity<br>
-		* remarks: 移動数量<br>
-		* type: numeric(131089)<br>
-		* not null: true<br>
+		 * remarks: 移動数量<br>
+		 * type: numeric(131089)<br>
+		 * not null: true<br>
 		 * @param value java.math.BigDecimal
 		 */
 		public void setQuantity(java.math.BigDecimal value) {
@@ -522,9 +521,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: quantity<br>
-		* remarks: 移動数量<br>
-		* type: numeric(131089)<br>
-		* not null: true<br>
+		 * remarks: 移動数量<br>
+		 * type: numeric(131089)<br>
+		 * not null: true<br>
 		 * @return java.math.BigDecimal
 		 */
 		public java.math.BigDecimal getQuantity() {
@@ -535,9 +534,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: grants_unlimited<br>
-		* remarks: 数量無制限の許可<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 数量無制限の許可<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Boolean
 		 */
 		public void setGrants_unlimited(java.lang.Boolean value) {
@@ -552,9 +551,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: grants_unlimited<br>
-		* remarks: 数量無制限の許可<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 数量無制限の許可<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @return java.lang.Boolean
 		 */
 		public java.lang.Boolean getGrants_unlimited() {
@@ -565,9 +564,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: props<br>
-		* remarks: 外部アプリケーション情報JSON<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 外部アプリケーション情報JSON<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setProps(java.lang.Object value) {
@@ -582,9 +581,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: props<br>
-		* remarks: 外部アプリケーション情報JSON<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 外部アプリケーション情報JSON<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getProps() {
@@ -595,9 +594,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: revision<br>
-		* remarks: リビジョン番号<br>
-		* type: int8(19)<br>
-		* not null: true<br>
+		 * remarks: リビジョン番号<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Long
 		 */
 		public void setRevision(java.lang.Long value) {
@@ -612,9 +611,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: revision<br>
-		* remarks: リビジョン番号<br>
-		* type: int8(19)<br>
-		* not null: true<br>
+		 * remarks: リビジョン番号<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
 		 * @return java.lang.Long
 		 */
 		public java.lang.Long getRevision() {
@@ -625,9 +624,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setCreated_at(java.sql.Timestamp value) {
@@ -642,9 +641,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getCreated_at() {
@@ -655,9 +654,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setCreated_by(java.util.UUID value) {
@@ -672,9 +671,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getCreated_by() {
@@ -685,9 +684,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setUpdated_at(java.sql.Timestamp value) {
@@ -702,9 +701,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getUpdated_at() {
@@ -715,9 +714,9 @@ public class transient_nodes
 		/**
 		 * setter
 		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 更新ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUpdated_by(java.util.UUID value) {
@@ -732,9 +731,9 @@ public class transient_nodes
 		/**
 		 * getter
 		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 更新ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUpdated_by() {
@@ -789,7 +788,6 @@ public class transient_nodes
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$transient_nodes_updated_by_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1916,46 +1914,19 @@ public class transient_nodes
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.id);
-			this.transient_detail_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.transient_detail_id);
-			this.unit_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.unit_id);
-			this.in_out = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.in_out);
-			this.seq_in_detail = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.seq_in_detail);
-			this.quantity = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.quantity);
-			this.grants_unlimited = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.grants_unlimited);
-			this.props = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.props);
-			this.revision = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.revision);
-			this.created_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.created_at);
-			this.created_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.created_by);
-			this.updated_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.updated_at);
-			this.updated_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.transient_nodes.updated_by);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.transient_nodes.id);
+			this.transient_detail_id = builder$.buildColumn(this, sqlassist.bb.transient_nodes.transient_detail_id);
+			this.unit_id = builder$.buildColumn(this, sqlassist.bb.transient_nodes.unit_id);
+			this.in_out = builder$.buildColumn(this, sqlassist.bb.transient_nodes.in_out);
+			this.seq_in_detail = builder$.buildColumn(this, sqlassist.bb.transient_nodes.seq_in_detail);
+			this.quantity = builder$.buildColumn(this, sqlassist.bb.transient_nodes.quantity);
+			this.grants_unlimited = builder$.buildColumn(this, sqlassist.bb.transient_nodes.grants_unlimited);
+			this.props = builder$.buildColumn(this, sqlassist.bb.transient_nodes.props);
+			this.revision = builder$.buildColumn(this, sqlassist.bb.transient_nodes.revision);
+			this.created_at = builder$.buildColumn(this, sqlassist.bb.transient_nodes.created_at);
+			this.created_by = builder$.buildColumn(this, sqlassist.bb.transient_nodes.created_by);
+			this.updated_at = builder$.buildColumn(this, sqlassist.bb.transient_nodes.updated_at);
+			this.updated_by = builder$.buildColumn(this, sqlassist.bb.transient_nodes.updated_by);
 		}
 
 		/**
@@ -2123,7 +2094,6 @@ public class transient_nodes
 				this,
 				sqlassist.bb.transient_nodes.bb$users$transient_nodes_updated_by_fkey);
 		}
-
 	}
 
 	/**

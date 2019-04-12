@@ -91,7 +91,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -295,9 +294,9 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: abandoned_id<br>
-		* remarks: journalもしくはclosingに使用される予定だったID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: journalもしくはclosingに使用される予定だったID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setAbandoned_id(java.util.UUID value) {
@@ -312,9 +311,9 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: abandoned_id<br>
-		* remarks: journalもしくはclosingに使用される予定だったID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: journalもしくはclosingに使用される予定だったID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getAbandoned_id() {
@@ -325,10 +324,10 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: command_type<br>
-		* remarks: 処理のタイプ<br>
-		* R=transfer登録, D=transfer取消, C=closing<br>
-		* type: char(1)<br>
-		* not null: true<br>
+		 * remarks: 処理のタイプ<br>
+		 * R=transfer登録, D=transfer取消, C=closing<br>
+		 * type: char(1)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setCommand_type(java.lang.String value) {
@@ -343,10 +342,10 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: command_type<br>
-		* remarks: 処理のタイプ<br>
-		* R=transfer登録, D=transfer取消, C=closing<br>
-		* type: char(1)<br>
-		* not null: true<br>
+		 * remarks: 処理のタイプ<br>
+		 * R=transfer登録, D=transfer取消, C=closing<br>
+		 * type: char(1)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getCommand_type() {
@@ -357,9 +356,9 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: error_type<br>
-		* remarks: エラーの種類<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: エラーの種類<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setError_type(java.lang.String value) {
@@ -374,9 +373,9 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: error_type<br>
-		* remarks: エラーの種類<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: エラーの種類<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getError_type() {
@@ -387,9 +386,9 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: message<br>
-		* remarks: エラーメッセージ<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: エラーメッセージ<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setMessage(java.lang.String value) {
@@ -404,9 +403,9 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: message<br>
-		* remarks: エラーメッセージ<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: エラーメッセージ<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getMessage() {
@@ -417,9 +416,9 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: stack_trace<br>
-		* remarks: スタックトレース<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: スタックトレース<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setStack_trace(java.lang.String value) {
@@ -434,9 +433,9 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: stack_trace<br>
-		* remarks: スタックトレース<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: スタックトレース<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getStack_trace() {
@@ -447,9 +446,9 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: sql_state<br>
-		* remarks: DBエラーコード<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: DBエラーコード<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setSql_state(java.lang.String value) {
@@ -464,9 +463,9 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: sql_state<br>
-		* remarks: DBエラーコード<br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: DBエラーコード<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getSql_state() {
@@ -477,9 +476,9 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: user_id<br>
-		* remarks: 登録ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 登録ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUser_id(java.util.UUID value) {
@@ -494,9 +493,9 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: user_id<br>
-		* remarks: 登録ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 登録ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUser_id() {
@@ -507,10 +506,10 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: request<br>
-		* remarks: 登録リクエスト内容<br>
-		* 取消処理の場合、{}<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 登録リクエスト内容<br>
+		 * 取消処理の場合、{}<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setRequest(java.lang.Object value) {
@@ -525,10 +524,10 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: request<br>
-		* remarks: 登録リクエスト内容<br>
-		* 取消処理の場合、{}<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 登録リクエスト内容<br>
+		 * 取消処理の場合、{}<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getRequest() {
@@ -539,9 +538,9 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: created_at<br>
-		* remarks: 登録時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 登録時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setCreated_at(java.sql.Timestamp value) {
@@ -556,9 +555,9 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: created_at<br>
-		* remarks: 登録時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 登録時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getCreated_at() {
@@ -577,7 +576,6 @@ public class journal_errors
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$journal_errors_user_id_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1684,34 +1682,15 @@ public class journal_errors
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.abandoned_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.journal_errors.abandoned_id);
-			this.command_type = builder$.buildColumn(
-				this,
-				sqlassist.bb.journal_errors.command_type);
-			this.error_type = builder$.buildColumn(
-				this,
-				sqlassist.bb.journal_errors.error_type);
-			this.message = builder$.buildColumn(
-				this,
-				sqlassist.bb.journal_errors.message);
-			this.stack_trace = builder$.buildColumn(
-				this,
-				sqlassist.bb.journal_errors.stack_trace);
-			this.sql_state = builder$.buildColumn(
-				this,
-				sqlassist.bb.journal_errors.sql_state);
-			this.user_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.journal_errors.user_id);
-			this.request = builder$.buildColumn(
-				this,
-				sqlassist.bb.journal_errors.request);
-			this.created_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.journal_errors.created_at);
-
+			this.abandoned_id = builder$.buildColumn(this, sqlassist.bb.journal_errors.abandoned_id);
+			this.command_type = builder$.buildColumn(this, sqlassist.bb.journal_errors.command_type);
+			this.error_type = builder$.buildColumn(this, sqlassist.bb.journal_errors.error_type);
+			this.message = builder$.buildColumn(this, sqlassist.bb.journal_errors.message);
+			this.stack_trace = builder$.buildColumn(this, sqlassist.bb.journal_errors.stack_trace);
+			this.sql_state = builder$.buildColumn(this, sqlassist.bb.journal_errors.sql_state);
+			this.user_id = builder$.buildColumn(this, sqlassist.bb.journal_errors.user_id);
+			this.request = builder$.buildColumn(this, sqlassist.bb.journal_errors.request);
+			this.created_at = builder$.buildColumn(this, sqlassist.bb.journal_errors.created_at);
 		}
 
 		/**
@@ -1840,7 +1819,6 @@ public class journal_errors
 				this,
 				sqlassist.bb.journal_errors.bb$users$journal_errors_user_id_fkey);
 		}
-
 	}
 
 	/**

@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -347,10 +346,10 @@ public class snapshots
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* nodes.node_idに従属<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * nodes.node_idに従属<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -365,10 +364,10 @@ public class snapshots
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* nodes.node_idに従属<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * nodes.node_idに従属<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -379,10 +378,10 @@ public class snapshots
 		/**
 		 * setter
 		 * name: unlimited<br>
-		* remarks: 数量無制限<br>
-		* trueの場合、totalがマイナスでもエラーとならない<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 数量無制限<br>
+		 * trueの場合、totalがマイナスでもエラーとならない<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Boolean
 		 */
 		public void setUnlimited(java.lang.Boolean value) {
@@ -397,10 +396,10 @@ public class snapshots
 		/**
 		 * getter
 		 * name: unlimited<br>
-		* remarks: 数量無制限<br>
-		* trueの場合、totalがマイナスでもエラーとならない<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 数量無制限<br>
+		 * trueの場合、totalがマイナスでもエラーとならない<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @return java.lang.Boolean
 		 */
 		public java.lang.Boolean getUnlimited() {
@@ -411,11 +410,11 @@ public class snapshots
 		/**
 		 * setter
 		 * name: in_search_scope<br>
-		* remarks: 数量検索対象<br>
-		* snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する<br>
-		* 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 数量検索対象<br>
+		 * snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する<br>
+		 * 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Boolean
 		 */
 		public void setIn_search_scope(java.lang.Boolean value) {
@@ -430,11 +429,11 @@ public class snapshots
 		/**
 		 * getter
 		 * name: in_search_scope<br>
-		* remarks: 数量検索対象<br>
-		* snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する<br>
-		* 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 数量検索対象<br>
+		 * snapshotの検索対象を少なくすることで直近数量の取得検索を高速化する<br>
+		 * 締められた場合、締め時刻以下の最新のsnapshotを起点に直前の在庫数を取得するので、それ以前のsnapshotはfalseとなる<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @return java.lang.Boolean
 		 */
 		public java.lang.Boolean getIn_search_scope() {
@@ -445,9 +444,9 @@ public class snapshots
 		/**
 		 * setter
 		 * name: total<br>
-		* remarks: この時点の総数<br>
-		* type: numeric(131089)<br>
-		* not null: true<br>
+		 * remarks: この時点の総数<br>
+		 * type: numeric(131089)<br>
+		 * not null: true<br>
 		 * @param value java.math.BigDecimal
 		 */
 		public void setTotal(java.math.BigDecimal value) {
@@ -462,9 +461,9 @@ public class snapshots
 		/**
 		 * getter
 		 * name: total<br>
-		* remarks: この時点の総数<br>
-		* type: numeric(131089)<br>
-		* not null: true<br>
+		 * remarks: この時点の総数<br>
+		 * type: numeric(131089)<br>
+		 * not null: true<br>
 		 * @return java.math.BigDecimal
 		 */
 		public java.math.BigDecimal getTotal() {
@@ -475,10 +474,10 @@ public class snapshots
 		/**
 		 * setter
 		 * name: journal_group_id<br>
-		* remarks: 伝票のグループID<br>
-		* 検索高速化のためjournals.group_idをここに持つ<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 伝票のグループID<br>
+		 * 検索高速化のためjournals.group_idをここに持つ<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setJournal_group_id(java.util.UUID value) {
@@ -493,10 +492,10 @@ public class snapshots
 		/**
 		 * getter
 		 * name: journal_group_id<br>
-		* remarks: 伝票のグループID<br>
-		* 検索高速化のためjournals.group_idをここに持つ<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 伝票のグループID<br>
+		 * 検索高速化のためjournals.group_idをここに持つ<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getJournal_group_id() {
@@ -507,10 +506,10 @@ public class snapshots
 		/**
 		 * setter
 		 * name: unit_id<br>
-		* remarks: 管理対象ID<br>
-		* 検索高速化のためnodes.unit_idをここに持つ<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 管理対象ID<br>
+		 * 検索高速化のためnodes.unit_idをここに持つ<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUnit_id(java.util.UUID value) {
@@ -525,10 +524,10 @@ public class snapshots
 		/**
 		 * getter
 		 * name: unit_id<br>
-		* remarks: 管理対象ID<br>
-		* 検索高速化のためnodes.unit_idをここに持つ<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 管理対象ID<br>
+		 * 検索高速化のためnodes.unit_idをここに持つ<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUnit_id() {
@@ -539,10 +538,10 @@ public class snapshots
 		/**
 		 * setter
 		 * name: fixed_at<br>
-		* remarks: 確定時刻<br>
-		* 検索高速化のためjournals.fixed_atをここに持つ<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 確定時刻<br>
+		 * 検索高速化のためjournals.fixed_atをここに持つ<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setFixed_at(java.sql.Timestamp value) {
@@ -557,10 +556,10 @@ public class snapshots
 		/**
 		 * getter
 		 * name: fixed_at<br>
-		* remarks: 確定時刻<br>
-		* 検索高速化のためjournals.fixed_atをここに持つ<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 確定時刻<br>
+		 * 検索高速化のためjournals.fixed_atをここに持つ<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getFixed_at() {
@@ -571,10 +570,10 @@ public class snapshots
 		/**
 		 * setter
 		 * name: created_at<br>
-		* remarks: 登録時刻<br>
-		* 検索高速化のためjournals.created_atをここに持つ<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 登録時刻<br>
+		 * 検索高速化のためjournals.created_atをここに持つ<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setCreated_at(java.sql.Timestamp value) {
@@ -589,10 +588,10 @@ public class snapshots
 		/**
 		 * getter
 		 * name: created_at<br>
-		* remarks: 登録時刻<br>
-		* 検索高速化のためjournals.created_atをここに持つ<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 登録時刻<br>
+		 * 検索高速化のためjournals.created_atをここに持つ<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getCreated_at() {
@@ -603,10 +602,10 @@ public class snapshots
 		/**
 		 * setter
 		 * name: node_seq<br>
-		* remarks: 伝票ノードの登録順<br>
-		* 検索高速化のためnodes.seqをここに持つ<br>
-		* type: int4(10)<br>
-		* not null: true<br>
+		 * remarks: 伝票ノードの登録順<br>
+		 * 検索高速化のためnodes.seqをここに持つ<br>
+		 * type: int4(10)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Integer
 		 */
 		public void setNode_seq(java.lang.Integer value) {
@@ -621,10 +620,10 @@ public class snapshots
 		/**
 		 * getter
 		 * name: node_seq<br>
-		* remarks: 伝票ノードの登録順<br>
-		* 検索高速化のためnodes.seqをここに持つ<br>
-		* type: int4(10)<br>
-		* not null: true<br>
+		 * remarks: 伝票ノードの登録順<br>
+		 * 検索高速化のためnodes.seqをここに持つ<br>
+		 * type: int4(10)<br>
+		 * not null: true<br>
 		 * @return java.lang.Integer
 		 */
 		public java.lang.Integer getNode_seq() {
@@ -635,9 +634,9 @@ public class snapshots
 		/**
 		 * setter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setUpdated_at(java.sql.Timestamp value) {
@@ -652,9 +651,9 @@ public class snapshots
 		/**
 		 * getter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getUpdated_at() {
@@ -665,9 +664,9 @@ public class snapshots
 		/**
 		 * setter
 		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 更新ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUpdated_by(java.util.UUID value) {
@@ -682,9 +681,9 @@ public class snapshots
 		/**
 		 * getter
 		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 更新ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUpdated_by() {
@@ -739,7 +738,6 @@ public class snapshots
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$snapshots_updated_by_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1856,40 +1854,17 @@ public class snapshots
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.id);
-			this.unlimited = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.unlimited);
-			this.in_search_scope = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.in_search_scope);
-			this.total = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.total);
-			this.journal_group_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.journal_group_id);
-			this.unit_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.unit_id);
-			this.fixed_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.fixed_at);
-			this.created_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.created_at);
-			this.node_seq = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.node_seq);
-			this.updated_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.updated_at);
-			this.updated_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.snapshots.updated_by);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.snapshots.id);
+			this.unlimited = builder$.buildColumn(this, sqlassist.bb.snapshots.unlimited);
+			this.in_search_scope = builder$.buildColumn(this, sqlassist.bb.snapshots.in_search_scope);
+			this.total = builder$.buildColumn(this, sqlassist.bb.snapshots.total);
+			this.journal_group_id = builder$.buildColumn(this, sqlassist.bb.snapshots.journal_group_id);
+			this.unit_id = builder$.buildColumn(this, sqlassist.bb.snapshots.unit_id);
+			this.fixed_at = builder$.buildColumn(this, sqlassist.bb.snapshots.fixed_at);
+			this.created_at = builder$.buildColumn(this, sqlassist.bb.snapshots.created_at);
+			this.node_seq = builder$.buildColumn(this, sqlassist.bb.snapshots.node_seq);
+			this.updated_at = builder$.buildColumn(this, sqlassist.bb.snapshots.updated_at);
+			this.updated_by = builder$.buildColumn(this, sqlassist.bb.snapshots.updated_by);
 		}
 
 		/**
@@ -2057,7 +2032,6 @@ public class snapshots
 				this,
 				sqlassist.bb.snapshots.bb$users$snapshots_updated_by_fkey);
 		}
-
 	}
 
 	/**

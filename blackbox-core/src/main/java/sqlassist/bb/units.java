@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -242,9 +241,9 @@ public class units
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -259,9 +258,9 @@ public class units
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -272,9 +271,9 @@ public class units
 		/**
 		 * setter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setCreated_at(java.sql.Timestamp value) {
@@ -289,9 +288,9 @@ public class units
 		/**
 		 * getter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getCreated_at() {
@@ -302,9 +301,9 @@ public class units
 		/**
 		 * setter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setCreated_by(java.util.UUID value) {
@@ -319,9 +318,9 @@ public class units
 		/**
 		 * getter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getCreated_by() {
@@ -340,7 +339,6 @@ public class units
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$units_created_by_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1417,16 +1415,9 @@ public class units
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.units.id);
-			this.created_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.units.created_at);
-			this.created_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.units.created_by);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.units.id);
+			this.created_at = builder$.buildColumn(this, sqlassist.bb.units.created_at);
+			this.created_by = builder$.buildColumn(this, sqlassist.bb.units.created_by);
 		}
 
 		/**
@@ -1555,7 +1546,6 @@ public class units
 				this,
 				sqlassist.bb.units.bb$users$units_created_by_fkey);
 		}
-
 	}
 
 	/**

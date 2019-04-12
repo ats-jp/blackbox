@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -269,10 +268,10 @@ public class locking_groups
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: グループID<br>
-		* ロック中のグループを表す<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: グループID<br>
+		 * ロック中のグループを表す<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -287,10 +286,10 @@ public class locking_groups
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: グループID<br>
-		* ロック中のグループを表す<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: グループID<br>
+		 * ロック中のグループを表す<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -301,10 +300,10 @@ public class locking_groups
 		/**
 		 * setter
 		 * name: cascade_id<br>
-		* remarks: カスケード削除用ID<br>
-		* 登録更新処理の起点となったgroupのIDとなる<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: カスケード削除用ID<br>
+		 * 登録更新処理の起点となったgroupのIDとなる<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setCascade_id(java.util.UUID value) {
@@ -319,10 +318,10 @@ public class locking_groups
 		/**
 		 * getter
 		 * name: cascade_id<br>
-		* remarks: カスケード削除用ID<br>
-		* 登録更新処理の起点となったgroupのIDとなる<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: カスケード削除用ID<br>
+		 * 登録更新処理の起点となったgroupのIDとなる<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getCascade_id() {
@@ -333,10 +332,10 @@ public class locking_groups
 		/**
 		 * setter
 		 * name: user_id<br>
-		* remarks: ユーザーID<br>
-		* ロックを行っているユーザーを表す<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ユーザーID<br>
+		 * ロックを行っているユーザーを表す<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUser_id(java.util.UUID value) {
@@ -351,10 +350,10 @@ public class locking_groups
 		/**
 		 * getter
 		 * name: user_id<br>
-		* remarks: ユーザーID<br>
-		* ロックを行っているユーザーを表す<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ユーザーID<br>
+		 * ロックを行っているユーザーを表す<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUser_id() {
@@ -365,9 +364,9 @@ public class locking_groups
 		/**
 		 * setter
 		 * name: locked_at<br>
-		* remarks: ロック開始時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: ロック開始時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setLocked_at(java.sql.Timestamp value) {
@@ -382,9 +381,9 @@ public class locking_groups
 		/**
 		 * getter
 		 * name: locked_at<br>
-		* remarks: ロック開始時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: ロック開始時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getLocked_at() {
@@ -427,7 +426,6 @@ public class locking_groups
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$locking_groups_user_id_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1509,19 +1507,10 @@ public class locking_groups
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.locking_groups.id);
-			this.cascade_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.locking_groups.cascade_id);
-			this.user_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.locking_groups.user_id);
-			this.locked_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.locking_groups.locked_at);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.locking_groups.id);
+			this.cascade_id = builder$.buildColumn(this, sqlassist.bb.locking_groups.cascade_id);
+			this.user_id = builder$.buildColumn(this, sqlassist.bb.locking_groups.user_id);
+			this.locked_at = builder$.buildColumn(this, sqlassist.bb.locking_groups.locked_at);
 		}
 
 		/**
@@ -1676,7 +1665,6 @@ public class locking_groups
 				this,
 				sqlassist.bb.locking_groups.bb$users$locking_groups_user_id_fkey);
 		}
-
 	}
 
 	/**

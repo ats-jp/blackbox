@@ -90,7 +90,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -222,9 +221,9 @@ public class tags
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: <br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: <br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -239,9 +238,9 @@ public class tags
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: <br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: <br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -252,9 +251,9 @@ public class tags
 		/**
 		 * setter
 		 * name: tag<br>
-		* remarks: <br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: <br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setTag(java.lang.String value) {
@@ -269,9 +268,9 @@ public class tags
 		/**
 		 * getter
 		 * name: tag<br>
-		* remarks: <br>
-		* type: text(2147483647)<br>
-		* not null: true<br>
+		 * remarks: <br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getTag() {
@@ -1350,13 +1349,8 @@ public class tags
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.tags.id);
-			this.tag = builder$.buildColumn(
-				this,
-				sqlassist.bb.tags.tag);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.tags.id);
+			this.tag = builder$.buildColumn(this, sqlassist.bb.tags.tag);
 		}
 
 		/**
@@ -1470,7 +1464,6 @@ public class tags
 			if (!getSelectStatement().rowMode()) throw new IllegalStateException("This operation can only in \"Row Mode\".");
 			return new InstantOneToManyQuery<>(this, getSelectStatement().decorators());
 		}
-
 	}
 
 	/**

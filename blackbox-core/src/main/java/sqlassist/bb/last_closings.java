@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -250,10 +249,10 @@ public class last_closings
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* グループIDに従属<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * グループIDに従属<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -268,10 +267,10 @@ public class last_closings
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* グループIDに従属<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * グループIDに従属<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -282,9 +281,9 @@ public class last_closings
 		/**
 		 * setter
 		 * name: closing_id<br>
-		* remarks: 締めID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 締めID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setClosing_id(java.util.UUID value) {
@@ -299,9 +298,9 @@ public class last_closings
 		/**
 		 * getter
 		 * name: closing_id<br>
-		* remarks: 締めID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 締めID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getClosing_id() {
@@ -312,9 +311,9 @@ public class last_closings
 		/**
 		 * setter
 		 * name: closed_at<br>
-		* remarks: 締め時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 締め時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setClosed_at(java.sql.Timestamp value) {
@@ -329,9 +328,9 @@ public class last_closings
 		/**
 		 * getter
 		 * name: closed_at<br>
-		* remarks: 締め時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 締め時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getClosed_at() {
@@ -362,7 +361,6 @@ public class last_closings
 			return sqlassist.bb.groups.row(
 				data$.getDataObject(bb$groups$last_closings_id_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1439,16 +1437,9 @@ public class last_closings
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.last_closings.id);
-			this.closing_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.last_closings.closing_id);
-			this.closed_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.last_closings.closed_at);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.last_closings.id);
+			this.closing_id = builder$.buildColumn(this, sqlassist.bb.last_closings.closing_id);
+			this.closed_at = builder$.buildColumn(this, sqlassist.bb.last_closings.closed_at);
 		}
 
 		/**
@@ -1590,7 +1581,6 @@ public class last_closings
 				this,
 				sqlassist.bb.last_closings.bb$groups$last_closings_id_fkey);
 		}
-
 	}
 
 	/**

@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -323,9 +322,9 @@ public class transients
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -340,9 +339,9 @@ public class transients
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -353,10 +352,10 @@ public class transients
 		/**
 		 * setter
 		 * name: group_id<br>
-		* remarks: この一時作業のオーナーグループ<br>
-		* 0の場合、オーナーグループはいない<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: この一時作業のオーナーグループ<br>
+		 * 0の場合、オーナーグループはいない<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setGroup_id(java.util.UUID value) {
@@ -371,10 +370,10 @@ public class transients
 		/**
 		 * getter
 		 * name: group_id<br>
-		* remarks: この一時作業のオーナーグループ<br>
-		* 0の場合、オーナーグループはいない<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: この一時作業のオーナーグループ<br>
+		 * 0の場合、オーナーグループはいない<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getGroup_id() {
@@ -385,10 +384,10 @@ public class transients
 		/**
 		 * setter
 		 * name: user_id<br>
-		* remarks: この一時作業のオーナーユーザー<br>
-		* 0の場合、オーナーユーザーはいない<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: この一時作業のオーナーユーザー<br>
+		 * 0の場合、オーナーユーザーはいない<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUser_id(java.util.UUID value) {
@@ -403,10 +402,10 @@ public class transients
 		/**
 		 * getter
 		 * name: user_id<br>
-		* remarks: この一時作業のオーナーユーザー<br>
-		* 0の場合、オーナーユーザーはいない<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: この一時作業のオーナーユーザー<br>
+		 * 0の場合、オーナーユーザーはいない<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUser_id() {
@@ -417,11 +416,11 @@ public class transients
 		/**
 		 * setter
 		 * name: owner_type<br>
-		* remarks: オーナータイプ<br>
-		* group_idとuser_idどちらに値が入っているかを表す<br>
-		* G=GROUP, U=USER<br>
-		* type: char(1)<br>
-		* not null: true<br>
+		 * remarks: オーナータイプ<br>
+		 * group_idとuser_idどちらに値が入っているかを表す<br>
+		 * G=GROUP, U=USER<br>
+		 * type: char(1)<br>
+		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
 		public void setOwner_type(java.lang.String value) {
@@ -436,11 +435,11 @@ public class transients
 		/**
 		 * getter
 		 * name: owner_type<br>
-		* remarks: オーナータイプ<br>
-		* group_idとuser_idどちらに値が入っているかを表す<br>
-		* G=GROUP, U=USER<br>
-		* type: char(1)<br>
-		* not null: true<br>
+		 * remarks: オーナータイプ<br>
+		 * group_idとuser_idどちらに値が入っているかを表す<br>
+		 * G=GROUP, U=USER<br>
+		 * type: char(1)<br>
+		 * not null: true<br>
 		 * @return java.lang.String
 		 */
 		public java.lang.String getOwner_type() {
@@ -451,9 +450,9 @@ public class transients
 		/**
 		 * setter
 		 * name: revision<br>
-		* remarks: リビジョン番号<br>
-		* type: int8(19)<br>
-		* not null: true<br>
+		 * remarks: リビジョン番号<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Long
 		 */
 		public void setRevision(java.lang.Long value) {
@@ -468,9 +467,9 @@ public class transients
 		/**
 		 * getter
 		 * name: revision<br>
-		* remarks: リビジョン番号<br>
-		* type: int8(19)<br>
-		* not null: true<br>
+		 * remarks: リビジョン番号<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
 		 * @return java.lang.Long
 		 */
 		public java.lang.Long getRevision() {
@@ -481,9 +480,9 @@ public class transients
 		/**
 		 * setter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setCreated_at(java.sql.Timestamp value) {
@@ -498,9 +497,9 @@ public class transients
 		/**
 		 * getter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getCreated_at() {
@@ -511,9 +510,9 @@ public class transients
 		/**
 		 * setter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setCreated_by(java.util.UUID value) {
@@ -528,9 +527,9 @@ public class transients
 		/**
 		 * getter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getCreated_by() {
@@ -541,9 +540,9 @@ public class transients
 		/**
 		 * setter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setUpdated_at(java.sql.Timestamp value) {
@@ -558,9 +557,9 @@ public class transients
 		/**
 		 * getter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getUpdated_at() {
@@ -571,9 +570,9 @@ public class transients
 		/**
 		 * setter
 		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 更新ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setUpdated_by(java.util.UUID value) {
@@ -588,9 +587,9 @@ public class transients
 		/**
 		 * getter
 		 * name: updated_by<br>
-		* remarks: 更新ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 更新ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getUpdated_by() {
@@ -645,7 +644,6 @@ public class transients
 			return sqlassist.bb.users.row(
 				data$.getDataObject(bb$users$transients_user_id_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1752,34 +1750,15 @@ public class transients
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transients.id);
-			this.group_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transients.group_id);
-			this.user_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.transients.user_id);
-			this.owner_type = builder$.buildColumn(
-				this,
-				sqlassist.bb.transients.owner_type);
-			this.revision = builder$.buildColumn(
-				this,
-				sqlassist.bb.transients.revision);
-			this.created_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.transients.created_at);
-			this.created_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.transients.created_by);
-			this.updated_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.transients.updated_at);
-			this.updated_by = builder$.buildColumn(
-				this,
-				sqlassist.bb.transients.updated_by);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.transients.id);
+			this.group_id = builder$.buildColumn(this, sqlassist.bb.transients.group_id);
+			this.user_id = builder$.buildColumn(this, sqlassist.bb.transients.user_id);
+			this.owner_type = builder$.buildColumn(this, sqlassist.bb.transients.owner_type);
+			this.revision = builder$.buildColumn(this, sqlassist.bb.transients.revision);
+			this.created_at = builder$.buildColumn(this, sqlassist.bb.transients.created_at);
+			this.created_by = builder$.buildColumn(this, sqlassist.bb.transients.created_by);
+			this.updated_at = builder$.buildColumn(this, sqlassist.bb.transients.updated_at);
+			this.updated_by = builder$.buildColumn(this, sqlassist.bb.transients.updated_by);
 		}
 
 		/**
@@ -1947,7 +1926,6 @@ public class transients
 				this,
 				sqlassist.bb.transients.bb$users$transients_user_id_fkey);
 		}
-
 	}
 
 	/**

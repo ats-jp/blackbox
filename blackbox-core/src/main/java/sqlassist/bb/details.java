@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -243,9 +242,9 @@ public class details
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -260,9 +259,9 @@ public class details
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -273,9 +272,9 @@ public class details
 		/**
 		 * setter
 		 * name: journal_id<br>
-		* remarks: 伝票ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 伝票ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setJournal_id(java.util.UUID value) {
@@ -290,9 +289,9 @@ public class details
 		/**
 		 * getter
 		 * name: journal_id<br>
-		* remarks: 伝票ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 伝票ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getJournal_id() {
@@ -303,9 +302,9 @@ public class details
 		/**
 		 * setter
 		 * name: props<br>
-		* remarks: 外部アプリケーション情報JSON<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 外部アプリケーション情報JSON<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Object
 		 */
 		public void setProps(java.lang.Object value) {
@@ -320,9 +319,9 @@ public class details
 		/**
 		 * getter
 		 * name: props<br>
-		* remarks: 外部アプリケーション情報JSON<br>
-		* type: jsonb(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 外部アプリケーション情報JSON<br>
+		 * type: jsonb(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.lang.Object
 		 */
 		public java.lang.Object getProps() {
@@ -341,7 +340,6 @@ public class details
 			return sqlassist.bb.journals.row(
 				data$.getDataObject(bb$journals$details_journal_id_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1418,16 +1416,9 @@ public class details
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.details.id);
-			this.journal_id = builder$.buildColumn(
-				this,
-				sqlassist.bb.details.journal_id);
-			this.props = builder$.buildColumn(
-				this,
-				sqlassist.bb.details.props);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.details.id);
+			this.journal_id = builder$.buildColumn(this, sqlassist.bb.details.journal_id);
+			this.props = builder$.buildColumn(this, sqlassist.bb.details.props);
 		}
 
 		/**
@@ -1556,7 +1547,6 @@ public class details
 				this,
 				sqlassist.bb.details.bb$journals$details_journal_id_fkey);
 		}
-
 	}
 
 	/**

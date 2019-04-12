@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -337,10 +336,10 @@ public class stocks
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* 管理対象IDに従属<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * 管理対象IDに従属<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -355,10 +354,10 @@ public class stocks
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* 管理対象IDに従属<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * 管理対象IDに従属<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -369,10 +368,10 @@ public class stocks
 		/**
 		 * setter
 		 * name: group_id<br>
-		* remarks: 管理対象に持つグループID<br>
-		* この在庫の属するグループ<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 管理対象に持つグループID<br>
+		 * この在庫の属するグループ<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setGroup_id(java.util.UUID value) {
@@ -387,10 +386,10 @@ public class stocks
 		/**
 		 * getter
 		 * name: group_id<br>
-		* remarks: 管理対象に持つグループID<br>
-		* この在庫の属するグループ<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 管理対象に持つグループID<br>
+		 * この在庫の属するグループ<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getGroup_id() {
@@ -401,9 +400,9 @@ public class stocks
 		/**
 		 * setter
 		 * name: item_id<br>
-		* remarks: アイテムID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: アイテムID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setItem_id(java.util.UUID value) {
@@ -418,9 +417,9 @@ public class stocks
 		/**
 		 * getter
 		 * name: item_id<br>
-		* remarks: アイテムID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: アイテムID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getItem_id() {
@@ -431,9 +430,9 @@ public class stocks
 		/**
 		 * setter
 		 * name: owner_id<br>
-		* remarks: 所有者ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 所有者ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setOwner_id(java.util.UUID value) {
@@ -448,9 +447,9 @@ public class stocks
 		/**
 		 * getter
 		 * name: owner_id<br>
-		* remarks: 所有者ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 所有者ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getOwner_id() {
@@ -461,9 +460,9 @@ public class stocks
 		/**
 		 * setter
 		 * name: location_id<br>
-		* remarks: 置き場ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 置き場ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setLocation_id(java.util.UUID value) {
@@ -478,9 +477,9 @@ public class stocks
 		/**
 		 * getter
 		 * name: location_id<br>
-		* remarks: 置き場ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 置き場ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getLocation_id() {
@@ -491,9 +490,9 @@ public class stocks
 		/**
 		 * setter
 		 * name: status_id<br>
-		* remarks: 状態ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 状態ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setStatus_id(java.util.UUID value) {
@@ -508,9 +507,9 @@ public class stocks
 		/**
 		 * getter
 		 * name: status_id<br>
-		* remarks: 状態ID<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 状態ID<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getStatus_id() {
@@ -521,9 +520,9 @@ public class stocks
 		/**
 		 * setter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setCreated_at(java.sql.Timestamp value) {
@@ -538,9 +537,9 @@ public class stocks
 		/**
 		 * getter
 		 * name: created_at<br>
-		* remarks: 作成時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 作成時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getCreated_at() {
@@ -551,9 +550,9 @@ public class stocks
 		/**
 		 * setter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setCreated_by(java.util.UUID value) {
@@ -568,9 +567,9 @@ public class stocks
 		/**
 		 * getter
 		 * name: created_by<br>
-		* remarks: 作成ユーザー<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: 作成ユーザー<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getCreated_by() {
@@ -661,7 +660,6 @@ public class stocks
 			return sqlassist.bb_stock.statuses.row(
 				data$.getDataObject(bb_stock$statuses$stocks_status_id_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1763,31 +1761,14 @@ public class stocks
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.stocks.id);
-			this.group_id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.stocks.group_id);
-			this.item_id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.stocks.item_id);
-			this.owner_id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.stocks.owner_id);
-			this.location_id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.stocks.location_id);
-			this.status_id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.stocks.status_id);
-			this.created_at = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.stocks.created_at);
-			this.created_by = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.stocks.created_by);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.id);
+			this.group_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.group_id);
+			this.item_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.item_id);
+			this.owner_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.owner_id);
+			this.location_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.location_id);
+			this.status_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.status_id);
+			this.created_at = builder$.buildColumn(this, sqlassist.bb_stock.stocks.created_at);
+			this.created_by = builder$.buildColumn(this, sqlassist.bb_stock.stocks.created_by);
 		}
 
 		/**
@@ -1994,7 +1975,6 @@ public class stocks
 				this,
 				sqlassist.bb_stock.stocks.bb_stock$statuses$stocks_status_id_fkey);
 		}
-
 	}
 
 	/**

@@ -91,7 +91,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -238,9 +237,9 @@ public class items_tags
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: <br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: <br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -255,9 +254,9 @@ public class items_tags
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: <br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: <br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -268,9 +267,9 @@ public class items_tags
 		/**
 		 * setter
 		 * name: tag_id<br>
-		* remarks: <br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: <br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setTag_id(java.util.UUID value) {
@@ -285,9 +284,9 @@ public class items_tags
 		/**
 		 * getter
 		 * name: tag_id<br>
-		* remarks: <br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: <br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getTag_id() {
@@ -318,7 +317,6 @@ public class items_tags
 			return sqlassist.bb_stock.items.row(
 				data$.getDataObject(bb_stock$items$items_tags_id_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1390,13 +1388,8 @@ public class items_tags
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items_tags.id);
-			this.tag_id = builder$.buildColumn(
-				this,
-				sqlassist.bb_stock.items_tags.tag_id);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb_stock.items_tags.id);
+			this.tag_id = builder$.buildColumn(this, sqlassist.bb_stock.items_tags.tag_id);
 		}
 
 		/**
@@ -1538,7 +1531,6 @@ public class items_tags
 				this,
 				sqlassist.bb_stock.items_tags.bb_stock$items$items_tags_id_fkey);
 		}
-
 	}
 
 	/**

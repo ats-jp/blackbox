@@ -92,7 +92,6 @@ import org.blendee.assist.ListUpdateClauseAssist;
 import org.blendee.assist.annotation.Column;
 import org.blendee.assist.Helper;
 import org.blendee.assist.Vargs;
-
 import org.blendee.assist.annotation.Table;
 
 /**
@@ -242,10 +241,10 @@ public class jobs
 		/**
 		 * setter
 		 * name: id<br>
-		* remarks: ID<br>
-		* transfers.transfers_idに従属<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * transfers.transfers_idに従属<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
 		public void setId(java.util.UUID value) {
@@ -260,10 +259,10 @@ public class jobs
 		/**
 		 * getter
 		 * name: id<br>
-		* remarks: ID<br>
-		* transfers.transfers_idに従属<br>
-		* type: uuid(2147483647)<br>
-		* not null: true<br>
+		 * remarks: ID<br>
+		 * transfers.transfers_idに従属<br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
 		public java.util.UUID getId() {
@@ -274,9 +273,9 @@ public class jobs
 		/**
 		 * setter
 		 * name: completed<br>
-		* remarks: 実施済フラグ<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 実施済フラグ<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @param value java.lang.Boolean
 		 */
 		public void setCompleted(java.lang.Boolean value) {
@@ -291,9 +290,9 @@ public class jobs
 		/**
 		 * getter
 		 * name: completed<br>
-		* remarks: 実施済フラグ<br>
-		* type: bool(1)<br>
-		* not null: true<br>
+		 * remarks: 実施済フラグ<br>
+		 * type: bool(1)<br>
+		 * not null: true<br>
 		 * @return java.lang.Boolean
 		 */
 		public java.lang.Boolean getCompleted() {
@@ -304,9 +303,9 @@ public class jobs
 		/**
 		 * setter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @param value java.sql.Timestamp
 		 */
 		public void setUpdated_at(java.sql.Timestamp value) {
@@ -321,9 +320,9 @@ public class jobs
 		/**
 		 * getter
 		 * name: updated_at<br>
-		* remarks: 更新時刻<br>
-		* type: timestamptz(35, 6)<br>
-		* not null: true<br>
+		 * remarks: 更新時刻<br>
+		 * type: timestamptz(35, 6)<br>
+		 * not null: true<br>
 		 * @return java.sql.Timestamp
 		 */
 		public java.sql.Timestamp getUpdated_at() {
@@ -342,7 +341,6 @@ public class jobs
 			return sqlassist.bb.journals.row(
 				data$.getDataObject(bb$journals$jobs_id_fkey));
 		}
-
 	}
 
 	private static final TableFacadeContext<SelectCol> selectContext$ = (assist, name) -> new SelectCol(assist, name);
@@ -1419,16 +1417,9 @@ public class jobs
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(
-				this,
-				sqlassist.bb.jobs.id);
-			this.completed = builder$.buildColumn(
-				this,
-				sqlassist.bb.jobs.completed);
-			this.updated_at = builder$.buildColumn(
-				this,
-				sqlassist.bb.jobs.updated_at);
-
+			this.id = builder$.buildColumn(this, sqlassist.bb.jobs.id);
+			this.completed = builder$.buildColumn(this, sqlassist.bb.jobs.completed);
+			this.updated_at = builder$.buildColumn(this, sqlassist.bb.jobs.updated_at);
 		}
 
 		/**
@@ -1557,7 +1548,6 @@ public class jobs
 				this,
 				sqlassist.bb.jobs.bb$journals$jobs_id_fkey);
 		}
-
 	}
 
 	/**
