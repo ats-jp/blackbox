@@ -25,7 +25,7 @@ public class JournalCommon {
 	private static Map<OptionKey<?>, Object> param() {
 		Map<OptionKey<?>, Object> param = Common.param();
 		param.put(BlendeeConstants.TRANSACTION_FACTORY_CLASS, JournalTestTransactionFactory.class);
-		param.put(BlendeeConstants.AUTO_CLOSE_INTERVAL_MILLIS, 0); //ﾃｽﾄ時はコネクションを閉じないので起動しない
+		param.put(BlendeeConstants.AUTO_CLOSE_INTERVAL_MILLIS, 0); //テスト時はコネクションを閉じないので起動しない
 
 		return param;
 	}

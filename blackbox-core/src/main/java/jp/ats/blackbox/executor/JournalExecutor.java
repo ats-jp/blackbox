@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.blendee.jdbc.exception.DeadlockDetectedException;
 import org.blendee.sql.Recorder;
 import org.blendee.util.Blendee;
 
@@ -18,10 +19,10 @@ import jp.ats.blackbox.common.BlackboxException;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.ClosingHandler;
 import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
-import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.JournalHandler;
 import jp.ats.blackbox.persistence.JournalHandler.JournalDenyRequest;
 import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.TransientHandler;
 import jp.ats.blackbox.persistence.TransientHandler.TransientMoveRequest;
 import jp.ats.blackbox.persistence.TransientHandler.TransientMoveResult;
@@ -32,6 +33,10 @@ public class JournalExecutor {
 	private static final Logger logger = LogManager.getLogger(JournalExecutor.class);
 
 	private static final int bufferSize = 256;
+
+	private static final int deadlockRetryCount = 10;
+
+	private static final int deadlockWaitMillis = 100;
 
 	private final Disruptor<Event> disruptor;
 
@@ -108,30 +113,79 @@ public class JournalExecutor {
 	}
 
 	private static void execute(Event event) {
-		try {
-			Blendee.execute(t -> {
-				event.command.execute();
-
-				//他スレッドに更新が見えるようにcommit
-				t.commit();
-
-				event.command.doAfterCommit();
-
-				//publishスレッドに新IDを通知
-				event.promise.notifyFinished();
-			});
-		} catch (Throwable error) {
-			logger.fatal(error.getMessage(), error);
-
+		int retry = 0;
+		while (true) {
 			try {
 				Blendee.execute(t -> {
-					event.insertErrorLog(error);
-				});
-			} catch (Throwable errorsError) {
-				logger.fatal(errorsError.getMessage(), errorsError);
-			}
+					event.command.execute();
 
-			event.promise.notifyError(error);
+					//他スレッドに更新が見えるようにcommit
+					t.commit();
+
+					event.command.doAfterCommit();
+
+					//publishスレッドに新IDを通知
+					event.promise.notifyFinished();
+				});
+
+				return;
+			} catch (DeadlockDetectedException deadlockException) {
+				//デッドロック検出で設定値分リトライ
+				if (deadlockRetryCount >= retry++) {
+					try {
+						Thread.sleep(deadlockWaitMillis);
+					} catch (InterruptedException ie) {
+						logger.fatal(ie.getMessage(), ie);
+
+						try {
+							Blendee.execute(t -> {
+								event.insertErrorLog(ie);
+							});
+						} catch (Throwable errorsError) {
+							logger.fatal(errorsError.getMessage(), errorsError);
+							event.promise.notifyError(errorsError);
+							return;
+						}
+
+						event.promise.notifyError(ie);
+						return;
+					}
+
+					logger.warn(deadlockException.getMessage(), deadlockException);
+
+					continue;
+				}
+
+				logger.fatal("Deadlock retry count exceeded " + deadlockRetryCount);
+
+				try {
+					Blendee.execute(t -> {
+						event.insertErrorLog(deadlockException);
+					});
+				} catch (Throwable errorsError) {
+					logger.fatal(errorsError.getMessage(), errorsError);
+					event.promise.notifyError(errorsError);
+					return;
+				}
+
+				event.promise.notifyError(deadlockException);
+
+				return;
+			} catch (Throwable error) {
+				logger.fatal(error.getMessage(), error);
+
+				try {
+					Blendee.execute(t -> {
+						event.insertErrorLog(error);
+					});
+				} catch (Throwable errorsError) {
+					logger.fatal(errorsError.getMessage(), errorsError);
+				}
+
+				event.promise.notifyError(error);
+
+				return;
+			}
 		}
 	}
 
@@ -289,7 +343,8 @@ public class JournalExecutor {
 		}
 
 		@Override
-		public void doAfterCommit() {}
+		public void doAfterCommit() {
+		}
 
 		@Override
 		public Object request() {
