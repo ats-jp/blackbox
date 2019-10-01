@@ -39,7 +39,7 @@ public class DeadlockTest {
 	private static void exec(UUID unitId) {
 		SecurityValues.start(U.NULL_ID);
 
-		execute(GroupHandlerTest.register(), unitId, 100, 1);
+		execute(GroupHandlerTest.register(), unitId, 1000, 1);
 
 		SecurityValues.end();
 	}

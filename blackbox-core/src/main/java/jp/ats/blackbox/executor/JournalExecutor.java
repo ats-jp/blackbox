@@ -36,8 +36,6 @@ public class JournalExecutor {
 
 	private static final int deadlockRetryCount = 10;
 
-	private static final int deadlockWaitMillis = 100;
-
 	private final Disruptor<Event> disruptor;
 
 	private final RingBuffer<Event> ringBuffer;
@@ -132,26 +130,9 @@ public class JournalExecutor {
 			} catch (DeadlockDetectedException deadlockException) {
 				//デッドロック検出で設定値分リトライ
 				if (deadlockRetryCount >= retry++) {
-					try {
-						Thread.sleep(deadlockWaitMillis);
-					} catch (InterruptedException ie) {
-						logger.fatal(ie.getMessage(), ie);
-
-						try {
-							Blendee.execute(t -> {
-								event.insertErrorLog(ie);
-							});
-						} catch (Throwable errorsError) {
-							logger.fatal(errorsError.getMessage(), errorsError);
-							event.promise.notifyError(errorsError);
-							return;
-						}
-
-						event.promise.notifyError(ie);
-						return;
-					}
-
 					logger.warn(deadlockException.getMessage(), deadlockException);
+
+					Thread.yield();
 
 					continue;
 				}
