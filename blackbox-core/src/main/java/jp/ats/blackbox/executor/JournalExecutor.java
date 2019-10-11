@@ -1,6 +1,7 @@
 package jp.ats.blackbox.executor;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -70,7 +71,7 @@ public class JournalExecutor {
 	public JournalPromise registerJournal(UUID userId, Supplier<JournalRegisterRequest> requestSupplier) {
 		var promise = new JournalPromise();
 
-		var command = new JournalRegisterCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new JournalRegisterCommand(promise.getId(), Objects.requireNonNull(userId), Objects.requireNonNull(requestSupplier.get()));
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -83,7 +84,7 @@ public class JournalExecutor {
 	public JournalPromise denyJournal(UUID userId, Supplier<JournalDenyRequest> requestSupplier) {
 		var promise = new JournalPromise();
 
-		var command = new JournalDenyCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new JournalDenyCommand(promise.getId(), Objects.requireNonNull(userId), Objects.requireNonNull(requestSupplier.get()));
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -93,7 +94,7 @@ public class JournalExecutor {
 	public JournalPromise close(UUID userId, Supplier<ClosingRequest> requestSupplier) {
 		var promise = new JournalPromise();
 
-		var command = new ClosingCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new ClosingCommand(promise.getId(), Objects.requireNonNull(userId), Objects.requireNonNull(requestSupplier.get()));
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -103,7 +104,7 @@ public class JournalExecutor {
 	public JournalPromise moveTransient(UUID userId, Supplier<TransientMoveRequest> requestSupplier) {
 		var promise = new JournalPromise();
 
-		var command = new TransientMoveCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new TransientMoveCommand(promise.getId(), Objects.requireNonNull(userId), Objects.requireNonNull(requestSupplier.get()));
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 

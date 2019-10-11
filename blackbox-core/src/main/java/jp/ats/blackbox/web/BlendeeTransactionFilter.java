@@ -1,6 +1,7 @@
 package jp.ats.blackbox.web;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -27,7 +28,7 @@ public class BlendeeTransactionFilter implements Filter {
 	 * @return 現在のトランザクション
 	 */
 	public static Transaction transaction() {
-		return transaction.get();
+		return Objects.requireNonNull(transaction.get());
 	}
 
 	@Override
@@ -57,5 +58,6 @@ public class BlendeeTransactionFilter implements Filter {
 	}
 
 	@Override
-	public void destroy() {}
+	public void destroy() {
+	}
 }

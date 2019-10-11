@@ -52,6 +52,7 @@ public class UnitHandler {
 			U.NULL_ID).execute();
 
 		//関連情報取得のため改めて検索
+		//unitIdで必ず取得できるためOptional.get()する
 		return U.recorder.play(() -> supplier.get()).fetch(unitId).get();
 	}
 

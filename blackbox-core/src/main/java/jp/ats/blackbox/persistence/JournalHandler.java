@@ -190,13 +190,15 @@ public class JournalHandler {
 	private UUID instanceId;
 
 	private UUID instanceId() {
+		//Blendee初期化前にインスタンスされる場合のための遅延処置
 		if (instanceId == null) instanceId = SecurityValues.currentInstanceId();
 		return instanceId;
 	}
 
 	private int nodeSeq;
 
-	private class Journal extends journals.Row implements JournalPreparer.Journal {}
+	private class Journal extends journals.Row implements JournalPreparer.Journal {
+	}
 
 	/**
 	 * journal登録処理
@@ -252,7 +254,8 @@ public class JournalHandler {
 		public String closed_at;
 	}
 
-	private class Detail extends details.Row implements JournalPreparer.Detail {}
+	private class Detail extends details.Row implements JournalPreparer.Detail {
+	}
 
 	/**
 	 * detail登録処理
@@ -283,7 +286,8 @@ public class JournalHandler {
 					r));
 	}
 
-	private class Node extends nodes.Row implements JournalPreparer.Node {}
+	private class Node extends nodes.Row implements JournalPreparer.Node {
+	}
 
 	/**
 	 * node登録処理
@@ -427,7 +431,8 @@ public class JournalHandler {
 	}
 
 	public JournalRegisterRequest pickup(UUID journalId) {
-		return pickup(journalId, r -> {}, false);
+		return pickup(journalId, r -> {
+		}, false);
 	}
 
 	private JournalRegisterRequest pickup(

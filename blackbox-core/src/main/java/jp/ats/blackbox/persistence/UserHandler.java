@@ -52,7 +52,11 @@ public class UserHandler {
 		Utils.delete(users.$TABLE, userId, revision);
 	}
 
-	public static users.Row fetch(UUID id) {
-		return new users().fetch(id).get();
+	public static users.Row get(UUID id) {
+		return optional(id).get();
+	}
+
+	public static Optional<users.Row> optional(UUID id) {
+		return new users().fetch(id);
 	}
 }

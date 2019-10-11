@@ -149,6 +149,7 @@ public class StockHandler {
 			.execute();
 
 		//関連情報取得のため改めて検索
+		//必ず存在するためOptional.get()する
 		return U.recorder.play(() -> supplier.get()).fetch(id).get();
 	}
 }

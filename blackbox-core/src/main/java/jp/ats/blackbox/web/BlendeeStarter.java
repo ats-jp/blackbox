@@ -15,11 +15,7 @@ public class BlendeeStarter {
 
 	private static boolean blendeeStarted = false;
 
-	private static synchronized void setStarted() {
-		blendeeStarted = true;
-	}
-
-	public static boolean started() {
+	public static synchronized boolean started() {
 		return blendeeStarted;
 	}
 
@@ -34,15 +30,17 @@ public class BlendeeStarter {
 	}
 
 	public static void start(Map<OptionKey<?>, Object> param) {
-		if (started()) return;
+		synchronized (BlendeeStarter.class) {
+			if (blendeeStarted) return;
+
+			blendeeStarted = true;
+		}
 
 		//アプリケーション稼働に必須の設定
 		param.put(BlendeeConstants.ERROR_CONVERTER_CLASS, PostgreSQLErrorConverter.class);
 		param.put(BlendeeConstants.TABLE_FACADE_PACKAGE, "sqlassist");
 
 		Blendee.start(param);
-
-		setStarted();
 	}
 
 	private static String removePrefix(String key) {

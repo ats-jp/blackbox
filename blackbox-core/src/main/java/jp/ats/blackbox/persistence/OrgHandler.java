@@ -47,7 +47,11 @@ public class OrgHandler {
 		Utils.delete(orgs.$TABLE, orgId, revision);
 	}
 
-	public static orgs.Row fetch(UUID id) {
-		return new orgs().fetch(id).get();
+	public static orgs.Row get(UUID id) {
+		return optional(id).get();
+	}
+
+	public static Optional<orgs.Row> optional(UUID id) {
+		return new orgs().fetch(id);
 	}
 }
