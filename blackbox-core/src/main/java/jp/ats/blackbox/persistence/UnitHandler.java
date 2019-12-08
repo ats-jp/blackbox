@@ -40,7 +40,7 @@ public class UnitHandler {
 	public static units.Row register(
 		UUID userId,
 		Supplier<units> supplier) {
-		UUID unitId = register(userId);
+		UUID unitId = registerUnit(userId);
 
 		U.recorder.play(
 			() -> new current_units().insertStatement(
@@ -52,13 +52,33 @@ public class UnitHandler {
 			U.NULL_ID).execute();
 
 		//関連情報取得のため改めて検索
-		return U.recorder.play(() -> supplier.get()).fetch(unitId).get();
+		return U.recorder.play(
+			() -> supplier.getClass(),
+			() -> supplier.get()).fetch(unitId).get();
 	}
 
 	/**
 	 * unit登録処理
 	 */
 	public static UUID register(UUID userId) {
+		UUID unitId = registerUnit(userId);
+
+		U.recorder.play(
+			() -> new current_units().insertStatement(
+				//後でjobから更新されるのでunlimitedはとりあえずfalse、totalは0
+				a -> a.INSERT(a.id, a.unlimited, a.total, a.snapshot_id).VALUES($UUID, $BOOLEAN, $INT, $UUID)),
+			unitId,
+			false,
+			0,
+			U.NULL_ID).execute();
+
+		return unitId;
+	}
+
+	/**
+	 * unit登録処理
+	 */
+	private static UUID registerUnit(UUID userId) {
 		UUID unitId = UUID.randomUUID();
 
 		U.recorder.play(

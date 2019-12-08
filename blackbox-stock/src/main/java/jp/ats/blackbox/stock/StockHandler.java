@@ -39,6 +39,7 @@ public class StockHandler {
 		//stockが既に存在すればそれを使う
 		//なければ新たに登録
 		return U.recorder.play(
+			() -> supplier.getClass(),
 			() -> supplier.get()
 				.WHERE(a -> a.group_id.eq($UUID).AND.item_id.eq($UUID).AND.owner_id.eq($UUID).AND.location_id.eq($UUID).AND.status_id.eq($UUID)),
 			components.groupId(),
@@ -149,6 +150,6 @@ public class StockHandler {
 			.execute();
 
 		//関連情報取得のため改めて検索
-		return U.recorder.play(() -> supplier.get()).fetch(id).get();
+		return U.recorder.play(() -> supplier.getClass(), () -> supplier.get()).fetch(id).get();
 	}
 }
