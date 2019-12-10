@@ -4,6 +4,7 @@ import static org.blendee.sql.Placeholder.$UUID;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -12,8 +13,8 @@ import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.InOut;
-import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.UnitHandler;
 import sqlassist.bb_stock.stocks;
 
@@ -32,6 +33,30 @@ public class StockHandler {
 		UUID statusId();
 	}
 
+	private static class RecorderCacheKey {
+
+		private final Class<?> supplierClass;
+
+		private final int position;
+
+		private RecorderCacheKey(Class<?> supplierClass, int position) {
+			this.supplierClass = supplierClass;
+			this.position = position;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(supplierClass, position);
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (object instanceof RecorderCacheKey) return false;
+			var another = (RecorderCacheKey) object;
+			return another.supplierClass.equals(supplierClass) && another.position == position;
+		}
+	}
+
 	public static stocks.Row prepareStock(
 		Supplier<stocks> supplier,
 		UUID userId,
@@ -39,7 +64,7 @@ public class StockHandler {
 		//stockが既に存在すればそれを使う
 		//なければ新たに登録
 		return U.recorder.play(
-			() -> supplier.getClass(),
+			() -> new RecorderCacheKey(supplier.getClass(), 0),
 			() -> supplier.get()
 				.WHERE(a -> a.group_id.eq($UUID).AND.item_id.eq($UUID).AND.owner_id.eq($UUID).AND.location_id.eq($UUID).AND.status_id.eq($UUID)),
 			components.groupId(),
@@ -150,6 +175,8 @@ public class StockHandler {
 			.execute();
 
 		//関連情報取得のため改めて検索
-		return U.recorder.play(() -> supplier.getClass(), () -> supplier.get()).fetch(id).get();
+		return U.recorder.play(
+			() -> new RecorderCacheKey(supplier.getClass(), 1),
+			() -> supplier.get()).fetch(id).get();
 	}
 }
