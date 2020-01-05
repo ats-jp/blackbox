@@ -6,6 +6,8 @@ public enum CommandType {
 
 	JOURNAL_DENY(Constant.JOURNAL_DENY),
 
+	OVERWRITE(Constant.JOURNAL_DENY),
+
 	CLOSING(Constant.CLOSING),
 
 	TRANSIENT_MOVE(Constant.TRANSIENT_MOVE);
@@ -15,6 +17,8 @@ public enum CommandType {
 		private static final String JOURNAL_REGISTER = "R";
 
 		private static final String JOURNAL_DENY = "D";
+
+		private static final String OVERWRITE = "O";
 
 		private static final String CLOSING = "C";
 
@@ -27,6 +31,8 @@ public enum CommandType {
 			return JOURNAL_REGISTER;
 		case Constant.JOURNAL_DENY:
 			return JOURNAL_DENY;
+		case Constant.OVERWRITE:
+			return OVERWRITE;
 		case Constant.CLOSING:
 			return CLOSING;
 		case Constant.TRANSIENT_MOVE:

@@ -22,6 +22,7 @@ import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
 import jp.ats.blackbox.persistence.JournalHandler;
 import jp.ats.blackbox.persistence.JournalHandler.JournalDenyRequest;
 import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.JournalHandler.OverwriteRequest;
 import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.TransientHandler;
 import jp.ats.blackbox.persistence.TransientHandler.TransientMoveRequest;
@@ -84,6 +85,16 @@ public class JournalExecutor {
 		var promise = new JournalPromise();
 
 		var command = new JournalDenyCommand(promise.getId(), userId, requestSupplier.get());
+
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
+
+		return promise;
+	}
+
+	public JournalPromise overwrite(UUID userId, Supplier<OverwriteRequest> requestSupplier) {
+		var promise = new JournalPromise();
+
+		var command = new OverwriteCommand(promise.getId(), userId, requestSupplier.get());
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -301,6 +312,42 @@ public class JournalExecutor {
 		@Override
 		public CommandType type() {
 			return CommandType.JOURNAL_DENY;
+		}
+	}
+
+	private class OverwriteCommand implements Command {
+
+		private final UUID journalId;
+
+		private final UUID userId;
+
+		private final OverwriteRequest request;
+
+		private OverwriteCommand(UUID journalId, UUID userId, OverwriteRequest request) {
+			this.journalId = journalId;
+			this.userId = userId;
+			this.request = request;
+		}
+
+		@Override
+		public void execute() {
+			handler.overwrite(journalId, userId, request);
+		}
+
+		@Override
+		public void doAfterCommit() {
+			//移動時刻を通知
+			JobExecutor.next(U.convert(request.fixed_at));
+		}
+
+		@Override
+		public Object request() {
+			return request;
+		}
+
+		@Override
+		public CommandType type() {
+			return CommandType.OVERWRITE;
 		}
 	}
 

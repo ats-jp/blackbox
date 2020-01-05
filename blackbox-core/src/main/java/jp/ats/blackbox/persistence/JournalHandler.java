@@ -166,6 +166,61 @@ public class JournalHandler {
 		public Optional<String> deny_reason = Optional.empty();
 	}
 
+	/**
+	 * 数量上書きに必要な情報クラス
+	 */
+	public static class OverwriteRequest {
+
+		/**
+		 * このjournalが属するグループ
+		 * 必須
+		 */
+		public UUID group_id;
+
+		/**
+		 * 移動時刻
+		 * 必須
+		 */
+		public Timestamp fixed_at;
+
+		/**
+		 * 追加情報JSON
+		 */
+		public Optional<String> journalProps = Optional.empty();
+
+		/**
+		 * 検索用タグ
+		 */
+		public Optional<String[]> tags = Optional.empty();
+
+		/**
+		 * 追加情報JSON
+		 */
+		public Optional<String> detailProps = Optional.empty();
+
+		/**
+		 * unit
+		 * 必須
+		 */
+		public UUID unit_id;
+
+		/**
+		 * 数量
+		 */
+		public BigDecimal total;
+
+		/**
+		 * これ以降数量無制限を設定するか
+		 * 数量無制限の場合、通常はunit登録時からtrueにしておく
+		 */
+		public Optional<Boolean> grants_unlimited = Optional.empty();
+
+		/**
+		 * 追加情報JSON
+		 */
+		public Optional<String> nodeProps = Optional.empty();
+	}
+
 	private final Recorder recorder;
 
 	private final List<Runnable> plusUpdaterList = new LinkedList<>();
@@ -459,6 +514,35 @@ public class JournalHandler {
 		register(journalId, U.NULL_ID, userId, request);
 
 		return request.fixed_at;
+	}
+
+	public void overwrite(UUID journalId, UUID userId, OverwriteRequest request) {
+		var snapshot = getJustBeforeSnapshot(request.unit_id, request.fixed_at, recorder);
+
+		var out = new NodeRegisterRequest();
+		out.unit_id = request.unit_id;
+		out.in_out = InOut.OUT;
+		out.quantity = snapshot.total;
+		out.grants_unlimited = Optional.of(snapshot.unlimited);
+
+		var in = new NodeRegisterRequest();
+		in.unit_id = request.unit_id;
+		in.in_out = InOut.IN;
+		in.quantity = request.total;
+		in.grants_unlimited = Optional.of(snapshot.unlimited);
+
+		var detailRequest = new DetailRegisterRequest();
+		detailRequest.nodes = new NodeRegisterRequest[] { out, in };
+		detailRequest.props = request.detailProps;
+
+		var journalRequest = new JournalRegisterRequest();
+		journalRequest.group_id = request.group_id;
+		journalRequest.fixed_at = request.fixed_at;
+		journalRequest.details = new DetailRegisterRequest[] { detailRequest };
+		journalRequest.tags = request.tags;
+		journalRequest.props = request.journalProps;
+
+		register(journalId, U.NULL_ID, userId, journalRequest);
 	}
 
 	public JournalRegisterRequest pickup(UUID journalId) {
