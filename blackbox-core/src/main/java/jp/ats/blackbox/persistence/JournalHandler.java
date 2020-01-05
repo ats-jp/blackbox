@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -167,6 +168,10 @@ public class JournalHandler {
 
 	private final Recorder recorder;
 
+	private final List<Runnable> plusUpdaterList = new LinkedList<>();
+
+	private final List<Runnable> minusUpdaterList = new LinkedList<>();
+
 	public JournalHandler(Recorder recorder) {
 		this.recorder = recorder;
 	}
@@ -196,12 +201,32 @@ public class JournalHandler {
 
 	private int nodeSeq;
 
-	private class Journal extends journals.Row implements JournalPreparer.Journal {}
+	private class Journal extends journals.Row implements JournalPreparer.Journal {
+	}
 
 	/**
 	 * journal登録処理
 	 */
 	public void register(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request) {
+		registerInternal(journalId, batchId, userId, request);
+
+		finishSnapshotUpdateProcess();
+	}
+
+	/**
+	 * journal複数件登録処理
+	 */
+	public void register(UUID[] journalIds, UUID batchId, UUID userId, JournalRegisterRequest[] requests) {
+		assert journalIds.length == requests.length;
+
+		for (int i = 0; i < journalIds.length; i++) {
+			registerInternal(journalIds[i], batchId, userId, requests[i]);
+		}
+
+		finishSnapshotUpdateProcess();
+	}
+
+	private void registerInternal(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request) {
 		//初期化
 		nodeSeq = 0;
 
@@ -252,7 +277,8 @@ public class JournalHandler {
 		public String closed_at;
 	}
 
-	private class Detail extends details.Row implements JournalPreparer.Detail {}
+	private class Detail extends details.Row implements JournalPreparer.Detail {
+	}
 
 	/**
 	 * detail登録処理
@@ -283,7 +309,8 @@ public class JournalHandler {
 					r));
 	}
 
-	private class Node extends nodes.Row implements JournalPreparer.Node {}
+	private class Node extends nodes.Row implements JournalPreparer.Node {
+	}
 
 	/**
 	 * node登録処理
@@ -301,76 +328,84 @@ public class JournalHandler {
 
 		node.insert();
 
-		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
-		JustBeforeSnapshot justBefore = getJustBeforeSnapshot(request.unit_id, fixedAt, recorder);
+		Runnable snapshotProcess = () -> {
+			//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
+			JustBeforeSnapshot justBefore = getJustBeforeSnapshot(request.unit_id, fixedAt, recorder);
 
-		BigDecimal total = request.in_out.calcurate(justBefore.total, request.quantity);
+			BigDecimal total = request.in_out.calcurate(justBefore.total, request.quantity);
 
-		//移動した結果数量がマイナスになる場合エラー
-		//ただし無制限設定がされていればOK
-		if (!justBefore.unlimited && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
+			//移動した結果数量がマイナスになる場合エラー
+			//ただし無制限設定がされていればOK
+			if (!justBefore.unlimited && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
 
-		//直前のsnapshotが無制限の場合、以降すべてのsnapshotが無制限になるので引き継ぐ
-		//そうでなければ今回のリクエストに従う
-		boolean unlimited = justBefore.unlimited ? true : request.grants_unlimited.orElse(false);
+			//直前のsnapshotが無制限の場合、以降すべてのsnapshotが無制限になるので引き継ぐ
+			//そうでなければ今回のリクエストに従う
+			boolean unlimited = justBefore.unlimited ? true : request.grants_unlimited.orElse(false);
 
-		recorder.play(
-			() -> new snapshots().insertStatement(
-				a -> a
-					.INSERT(
-						a.id,
-						a.unlimited,
-						a.total,
-						a.unit_id,
-						a.journal_group_id,
-						a.fixed_at,
-						a.created_at,
-						a.node_seq,
-						a.updated_by)
-					.VALUES(
-						$UUID,
-						$BOOLEAN,
-						$BIGDECIMAL,
-						$UUID,
-						$UUID,
-						$TIMESTAMP,
-						$TIMESTAMP,
-						$INT,
-						$UUID)),
-			nodeId,
-			unlimited,
-			total,
-			request.unit_id,
-			groupId,
-			fixedAt,
-			createdAt,
-			nodeSeq,
-			userId)
-			.execute();
-
-		//登録以降のsnapshotの数量と無制限設定を更新
-		try {
 			recorder.play(
-				() -> new snapshots().updateStatement(
-					a -> a.UPDATE(
-						//一度trueになったらずっとそのままtrue
-						a.unlimited.set("{0} OR ?", Vargs.of(a.unlimited), Vargs.of($BOOLEAN)),
-						//自身の数に今回の移動数量を正規化してプラス
-						a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of($BIGDECIMAL)))
-						.WHERE(
-							wa -> wa.id.IN(
-								new snapshots()
-									.SELECT(sa -> sa.id)
-									//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
-									.WHERE(swa -> swa.unit_id.eq($UUID).AND.fixed_at.gt($TIMESTAMP))))),
+				() -> new snapshots().insertStatement(
+					a -> a
+						.INSERT(
+							a.id,
+							a.unlimited,
+							a.total,
+							a.unit_id,
+							a.journal_group_id,
+							a.fixed_at,
+							a.created_at,
+							a.node_seq,
+							a.updated_by)
+						.VALUES(
+							$UUID,
+							$BOOLEAN,
+							$BIGDECIMAL,
+							$UUID,
+							$UUID,
+							$TIMESTAMP,
+							$TIMESTAMP,
+							$INT,
+							$UUID)),
+				nodeId,
 				unlimited,
-				request.in_out.relativize(request.quantity),
+				total,
 				request.unit_id,
-				fixedAt)
+				groupId,
+				fixedAt,
+				createdAt,
+				nodeSeq,
+				userId)
 				.execute();
-		} catch (CheckConstraintViolationException e) {
-			//未来のsnapshotで数量がマイナスになった
-			throw new MinusTotalException();
+
+			//登録以降のsnapshotの数量と無制限設定を更新
+			try {
+				recorder.play(
+					() -> new snapshots().updateStatement(
+						a -> a.UPDATE(
+							//一度trueになったらずっとそのままtrue
+							a.unlimited.set("{0} OR ?", Vargs.of(a.unlimited), Vargs.of($BOOLEAN)),
+							//自身の数に今回の移動数量を正規化してプラス
+							a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of($BIGDECIMAL)))
+							.WHERE(
+								wa -> wa.id.IN(
+									new snapshots()
+										.SELECT(sa -> sa.id)
+										//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
+										.WHERE(swa -> swa.unit_id.eq($UUID).AND.fixed_at.gt($TIMESTAMP))))),
+					unlimited,
+					request.in_out.relativize(request.quantity),
+					request.unit_id,
+					fixedAt)
+					.execute();
+			} catch (CheckConstraintViolationException e) {
+				//未来のsnapshotで数量がマイナスになった
+				throw new MinusTotalException();
+			}
+		};
+
+		if (request.in_out.relativize(request.quantity).compareTo(BigDecimal.ZERO) < 0) {
+			minusUpdaterList.add(snapshotProcess);
+		} else {
+			plusUpdaterList.add(snapshotProcess);
 		}
 	}
 
@@ -427,7 +462,8 @@ public class JournalHandler {
 	}
 
 	public JournalRegisterRequest pickup(UUID journalId) {
-		return pickup(journalId, r -> {}, false);
+		return pickup(journalId, r -> {
+		}, false);
 	}
 
 	private JournalRegisterRequest pickup(
@@ -519,5 +555,14 @@ public class JournalHandler {
 				a -> a.INSERT(a.id, a.created_by).VALUES($UUID, $UUID)),
 			batchId,
 			userId).execute();
+	}
+
+	private void finishSnapshotUpdateProcess() {
+		//追加を先に行い、この処理時点以降の数量がマイナスにならないようにする
+		plusUpdaterList.forEach(r -> r.run());
+		minusUpdaterList.forEach(r -> r.run());
+
+		plusUpdaterList.clear();
+		minusUpdaterList.clear();
 	}
 }

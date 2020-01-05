@@ -25,8 +25,8 @@ import org.blendee.sql.Updater;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
 import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
 import sqlassist.bb.closed_units;
 import sqlassist.bb.nodes;
 import sqlassist.bb.transient_details;
@@ -168,19 +168,24 @@ public class TransientHandler {
 		}
 
 		@Override
-		public void setGroup_props(Object json) {}
+		public void setGroup_props(Object json) {
+		}
 
 		@Override
-		public void setOrg_props(Object json) {}
+		public void setOrg_props(Object json) {
+		}
 
 		@Override
-		public void setUser_props(Object json) {}
+		public void setUser_props(Object json) {
+		}
 
 		@Override
-		public void setInstance_id(UUID id) {}
+		public void setInstance_id(UUID id) {
+		}
 
 		@Override
-		public void setJournal_batch_id(UUID id) {}
+		public void setJournal_batch_id(UUID id) {
+		}
 	}
 
 	public static UUID registerJournal(UUID transientId, JournalRegisterRequest request) {
@@ -280,10 +285,12 @@ public class TransientHandler {
 		}
 
 		@Override
-		public void setSeq(Integer seq) {}
+		public void setSeq(Integer seq) {
+		}
 
 		@Override
-		public void setUnit_props(Object json) {}
+		public void setUnit_props(Object json) {
+		}
 	}
 
 	public static UUID registerNode(UUID detailId, NodeRegisterRequest request) {
@@ -336,13 +343,23 @@ public class TransientHandler {
 
 		journalHandler.registerBatch(batchId, userId);
 
+		var ids = new LinkedList<UUID>();
+		var requests = new LinkedList<JournalRegisterRequest>();
 		buildJournalRegisterRequests(request.transient_id, recorder).forEach(r -> {
 			var journalId = UUID.randomUUID();
-			journalHandler.register(journalId, batchId, userId, r);
+
+			ids.add(UUID.randomUUID());
+			requests.add(r);
 
 			result.journalIds.add(journalId);
 			result.compareAndChange(r.fixed_at);
 		});
+
+		journalHandler.register(
+			ids.toArray(new UUID[ids.size()]),
+			batchId,
+			userId,
+			requests.toArray(new JournalRegisterRequest[requests.size()]));
 
 		return result;
 	}
@@ -365,7 +382,6 @@ public class TransientHandler {
 	private static List<JournalRegisterRequest> buildJournalRegisterRequests(UUID transientId, Recorder recorder) {
 		var list = new LinkedList<JournalRegisterRequest>();
 
-		var details = new LinkedList<DetailRegisterRequest>();
 
 		recorder.play(
 			() -> new transient_nodes().selectClause(
@@ -404,6 +420,8 @@ public class TransientHandler {
 				request.group_id = journal.getGroup_id();
 				request.fixed_at = journal.getFixed_at();
 				request.restored_props = Optional.of(journal.getProps());
+
+				var details = new LinkedList<DetailRegisterRequest>();
 
 				try {
 					request.tags = Optional.of(Utils.restoreTags(journal.getTags()));

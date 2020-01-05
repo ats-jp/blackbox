@@ -47,9 +47,7 @@ public class JournalHandlerTest {
 
 		var bundle = new DetailRegisterRequest();
 
-		//通常はout -> inだがMinusTotalExceptionとなるのでテストではin -> outとする
-		//bundle.nodes = new NodeRegisterRequest[] { out, in };
-		bundle.nodes = new NodeRegisterRequest[] { in, out };
+		bundle.nodes = new NodeRegisterRequest[] { out, in };
 
 		var transfer = new JournalRegisterRequest();
 		transfer.group_id = groupId;
