@@ -51,7 +51,7 @@ public class StockHandler {
 
 		@Override
 		public boolean equals(Object object) {
-			if (object instanceof RecorderCacheKey) return false;
+			if (!(object instanceof RecorderCacheKey)) return false;
 			var another = (RecorderCacheKey) object;
 			return another.supplierClass.equals(supplierClass) && another.position == position;
 		}
