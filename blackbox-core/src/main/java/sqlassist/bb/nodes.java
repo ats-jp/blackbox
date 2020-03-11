@@ -1130,7 +1130,7 @@ public class nodes
 	 * @return この {@link SelectStatement}
 	 */
 	public <R extends OnRightClauseAssist<?>> nodes CROSS_JOIN(RightTable<R> right) {
-		selectBehavior().CROSS_JOIN(right, this);
+		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
 

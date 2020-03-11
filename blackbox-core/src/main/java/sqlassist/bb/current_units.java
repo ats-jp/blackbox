@@ -977,7 +977,7 @@ public class current_units
 	 * @return この {@link SelectStatement}
 	 */
 	public <R extends OnRightClauseAssist<?>> current_units CROSS_JOIN(RightTable<R> right) {
-		selectBehavior().CROSS_JOIN(right, this);
+		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
 

@@ -1283,7 +1283,7 @@ public class transient_journals
 	 * @return この {@link SelectStatement}
 	 */
 	public <R extends OnRightClauseAssist<?>> transient_journals CROSS_JOIN(RightTable<R> right) {
-		selectBehavior().CROSS_JOIN(right, this);
+		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
 

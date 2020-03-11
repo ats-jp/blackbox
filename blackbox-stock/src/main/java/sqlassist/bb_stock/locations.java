@@ -1222,7 +1222,7 @@ public class locations
 	 * @return この {@link SelectStatement}
 	 */
 	public <R extends OnRightClauseAssist<?>> locations CROSS_JOIN(RightTable<R> right) {
-		selectBehavior().CROSS_JOIN(right, this);
+		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
 

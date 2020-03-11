@@ -1267,7 +1267,7 @@ public class users
 	 * @return この {@link SelectStatement}
 	 */
 	public <R extends OnRightClauseAssist<?>> users CROSS_JOIN(RightTable<R> right) {
-		selectBehavior().CROSS_JOIN(right, this);
+		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
 

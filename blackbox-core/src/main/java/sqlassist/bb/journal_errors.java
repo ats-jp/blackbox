@@ -141,11 +141,11 @@ public class journal_errors
 	/**
 	 * name: command_type<br>
 	 * remarks: 処理のタイプ<br>
-	 * R=transfer登録, D=transfer取消, C=closing<br>
+	 * R=journal登録, D=journal取消, C=closing<br>
 	 * type: char(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "command_type", type = 1, typeName = "char", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "処理のタイプ\nR=transfer登録, D=transfer取消, C=closing", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "command_type", type = 1, typeName = "char", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "処理のタイプ\nR=journal登録, D=journal取消, C=closing", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String command_type = "command_type";
 
 	/**
@@ -325,7 +325,7 @@ public class journal_errors
 		 * setter
 		 * name: command_type<br>
 		 * remarks: 処理のタイプ<br>
-		 * R=transfer登録, D=transfer取消, C=closing<br>
+		 * R=journal登録, D=journal取消, C=closing<br>
 		 * type: char(1)<br>
 		 * not null: true<br>
 		 * @param value java.lang.String
@@ -343,7 +343,7 @@ public class journal_errors
 		 * getter
 		 * name: command_type<br>
 		 * remarks: 処理のタイプ<br>
-		 * R=transfer登録, D=transfer取消, C=closing<br>
+		 * R=journal登録, D=journal取消, C=closing<br>
 		 * type: char(1)<br>
 		 * not null: true<br>
 		 * @return java.lang.String
@@ -1107,7 +1107,7 @@ public class journal_errors
 	 * @return この {@link SelectStatement}
 	 */
 	public <R extends OnRightClauseAssist<?>> journal_errors CROSS_JOIN(RightTable<R> right) {
-		selectBehavior().CROSS_JOIN(right, this);
+		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
 
