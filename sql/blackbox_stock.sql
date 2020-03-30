@@ -313,6 +313,62 @@ INSERT INTO bb_stock.stocks (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
+----------
+
+--部品表
+CREATE TABLE bb_stock.formulas (
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
+	name text NOT NULL,
+	revision bigint DEFAULT 0 NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
+	created_at timestamptz DEFAULT now() NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
+	updated_at timestamptz DEFAULT now() NOT NULL,
+	updated_by uuid REFERENCES bb.users NOT NULL);
+
+COMMENT ON TABLE bb_stock.formulas IS '変換式
+事前に定義されたアイテムの変換対応表';
+COMMENT ON COLUMN bb_stock.formulas.id IS 'ID';
+COMMENT ON COLUMN bb_stock.formulas.group_id IS 'グループID';
+COMMENT ON COLUMN bb_stock.formulas.name IS '名称';
+COMMENT ON COLUMN bb_stock.formulas.revision IS 'リビジョン番号';
+COMMENT ON COLUMN bb_stock.formulas.props IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb_stock.formulas.tags IS 'log保存用タグ';
+COMMENT ON COLUMN bb_stock.formulas.created_at IS '作成時刻';
+COMMENT ON COLUMN bb_stock.formulas.created_by IS '作成ユーザー';
+COMMENT ON COLUMN bb_stock.formulas.updated_at IS '更新時刻';
+COMMENT ON COLUMN bb_stock.formulas.updated_by IS '更新ユーザー';
+
+CREATE TABLE bb_stock.formulas_tags (
+	id uuid REFERENCES bb_stock.formulas ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
+
+----------
+
+CREATE TABLE bb_stock.formula_nodes (
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	formula_id uuid REFERENCES bb_stock.formulas ON DELETE CASCADE NOT NULL, --formulaが削除されたら削除
+	stock_id uuid REFERENCES bb_stock.stocks NOT NULL,
+	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL, --そのまま計算に使用できるように
+	seq integer NOT NULL,
+	quantity numeric CHECK (quantity >= 0) NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL);
+
+COMMENT ON TABLE bb_stock.formula_nodes IS '変換式ノード
+一変換式の中の入もしくは出を表す';
+COMMENT ON COLUMN bb_stock.formula_nodes.id IS 'ID';
+COMMENT ON COLUMN bb_stock.formula_nodes.formula_id IS '変換式ID';
+COMMENT ON COLUMN bb_stock.formula_nodes.stock_id IS '対象在庫ID
+構成要素がNULLデータ(00000000-0000-0000-0000-000000000000)は、指定なしとして許容されるが、実施時にstockが特定できるように指定される必要がある';
+COMMENT ON COLUMN bb_stock.formula_nodes.in_out IS '入出区分
+IN=1, OUT=-1';
+COMMENT ON COLUMN bb_stock.formula_nodes.seq IS '変換式内連番';
+COMMENT ON COLUMN bb_stock.formula_nodes.quantity IS '数量';
+COMMENT ON COLUMN bb_stock.formula_nodes.props IS '外部アプリケーション情報JSON';
+
 --===========================
 --indexes
 --===========================
@@ -345,11 +401,17 @@ CREATE INDEX ON bb_stock.stocks (owner_id);
 CREATE INDEX ON bb_stock.stocks (location_id);
 CREATE INDEX ON bb_stock.stocks (status_id);
 
+--fomulas
+CREATE INDEX ON bb_stock.formulas (group_id);
+CREATE INDEX ON bb_stock.formula_nodes (formula_id);
+CREATE INDEX ON bb_stock.formula_nodes (stock_id);
+
 --tags
 CREATE INDEX ON bb_stock.items_tags (tag_id);
 CREATE INDEX ON bb_stock.owners_tags (tag_id);
 CREATE INDEX ON bb_stock.locations_tags (tag_id);
 CREATE INDEX ON bb_stock.statuses_tags (tag_id);
+CREATE INDEX ON bb_stock.formulas_tags (tag_id);
 
 --===========================
 --privileges
@@ -368,7 +430,9 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb_stock.items,
 	bb_stock.owners,
 	bb_stock.locations,
-	bb_stock.statuses
+	bb_stock.statuses,
+	bb_stock.formulas,
+	bb_stock.formula_nodes
 TO blackbox;
 
 --tag関連はINSERT, DELETEのみ

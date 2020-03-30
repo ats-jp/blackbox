@@ -852,8 +852,8 @@ COMMENT ON COLUMN bb.journal_errors.created_at IS '登録時刻';
 --一時作業
 CREATE TABLE bb.transients (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	group_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
-	user_id uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	group_id uuid REFERENCES bb.groups ON DELETE CASCADE CHECK (owner_type = 'G' AND group_id <> '00000000-0000-0000-0000-000000000000' OR owner_type = 'U') NOT NULL,
+	user_id uuid REFERENCES bb.users ON DELETE CASCADE CHECK (owner_type = 'U' AND user_id <> '00000000-0000-0000-0000-000000000000' OR owner_type = 'G') NOT NULL,
 	owner_type "char" CHECK (owner_type IN ('G', 'U')) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,

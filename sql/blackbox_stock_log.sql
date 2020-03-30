@@ -204,6 +204,87 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.statuses_logfunction();
 
 ----------
 
+DROP TABLE IF EXISTS bb_log.formulas CASCADE;
+
+CREATE TABLE bb_log.formulas (
+	id uuid,
+	group_id uuid,
+	name text,
+	revision bigint,
+	props jsonb,
+	tags text[],
+	created_at timestamptz,
+	created_by uuid,
+	updated_at timestamptz,
+	updated_by uuid,
+	action "char",
+	log_id bigserial PRIMARY KEY,
+	txid bigint DEFAULT txid_current(),
+	logged_by name DEFAULT current_user,
+	logged_at timestamptz DEFAULT now());
+
+DROP FUNCTION IF EXISTS bb_log.formulas_logfunction CASCADE;
+
+CREATE FUNCTION bb_log.formulas_logfunction() RETURNS TRIGGER AS $formulas_logtrigger$
+	BEGIN
+		IF (TG_OP = 'DELETE') THEN
+			INSERT INTO bb_log.formulas SELECT OLD.*, 'D';
+			RETURN OLD;
+		ELSIF (TG_OP = 'UPDATE') THEN
+			INSERT INTO bb_log.formulas SELECT NEW.*, 'U';
+			RETURN NEW;
+		ELSIF (TG_OP = 'INSERT') THEN
+			INSERT INTO bb_log.formulas SELECT NEW.*, 'I';
+			RETURN NEW;
+		END IF;
+		RETURN NULL;
+	END;
+$formulas_logtrigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER formulas_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb_stock.formulas
+FOR EACH ROW EXECUTE PROCEDURE bb_log.formulas_logfunction();
+
+----------
+
+DROP TABLE IF EXISTS bb_log.formula_nodes CASCADE;
+
+CREATE TABLE bb_log.formula_nodes (
+	id uuid,
+	formula_id uuid,
+	stock_id uuid,
+	in_out smallint,
+	seq integer,
+	quantity numeric,
+	props jsonb,
+	action "char",
+	log_id bigserial PRIMARY KEY,
+	txid bigint DEFAULT txid_current(),
+	logged_by name DEFAULT current_user,
+	logged_at timestamptz DEFAULT now());
+
+DROP FUNCTION IF EXISTS bb_log.formula_nodes_logfunction CASCADE;
+
+CREATE FUNCTION bb_log.formula_nodes_logfunction() RETURNS TRIGGER AS $formula_nodes_logtrigger$
+	BEGIN
+		IF (TG_OP = 'DELETE') THEN
+			INSERT INTO bb_log.formula_nodes SELECT OLD.*, 'D';
+			RETURN OLD;
+		ELSIF (TG_OP = 'UPDATE') THEN
+			INSERT INTO bb_log.formula_nodes SELECT NEW.*, 'U';
+			RETURN NEW;
+		ELSIF (TG_OP = 'INSERT') THEN
+			INSERT INTO bb_log.formula_nodes SELECT NEW.*, 'I';
+			RETURN NEW;
+		END IF;
+		RETURN NULL;
+	END;
+$formula_nodes_logtrigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER formula_nodes_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb_stock.formula_nodes
+FOR EACH ROW EXECUTE PROCEDURE bb_log.formula_nodes_logfunction();
+
+----------
+
 --シーケンス使用権を再付与
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA bb_log TO blackbox;
 
