@@ -12,7 +12,7 @@ public class StockComponent {
 
 		public String name;
 
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 
 		public Optional<String[]> tags = Optional.empty();
 	}
@@ -27,7 +27,7 @@ public class StockComponent {
 
 		public long revision;
 
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 
 		public Optional<String[]> tags = Optional.empty();
 
@@ -42,7 +42,7 @@ public class StockComponent {
 
 		public Optional<String> name = Optional.empty();
 
-		public Optional<String> extension = Optional.empty();
+		public Optional<String> props = Optional.empty();
 
 		public Optional<String[]> tags = Optional.empty();
 
@@ -61,7 +61,7 @@ public class StockComponent {
 
 		public long revision;
 
-		public String extension;
+		public String props;
 
 		public String[] tags;
 

@@ -7,7 +7,7 @@ import sqlassist.bb.users;
 
 public class UserHandler {
 
-	public static UUID register(String name, UUID groupId, String props) {
+	public static UUID register(String name, Role role, UUID groupId, String props) {
 		var row = users.row();
 
 		UUID id = UUID.randomUUID();
@@ -16,8 +16,9 @@ public class UserHandler {
 
 		row.setId(id);
 		row.setName(name);
+		row.setRole(role.value());
 		row.setGroup_id(groupId);
-		row.setProps(props);
+		row.setProps(JsonHelper.toJson(props));
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 

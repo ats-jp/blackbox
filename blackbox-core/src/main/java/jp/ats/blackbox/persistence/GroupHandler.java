@@ -117,7 +117,7 @@ public class GroupHandler {
 			row.setOrg_id(request.org_id);
 			row.setParent_id(request.parent_id);
 			row.setName(request.name);
-			request.props.ifPresent(v -> row.setProps(v));
+			request.props.ifPresent(v -> row.setProps(JsonHelper.toJson(v)));
 			request.tags.ifPresent(v -> row.setTags(v));
 
 			UUID userId = SecurityValues.currentUserId();

@@ -1,5 +1,6 @@
 package jp.ats.blackbox.test;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,6 +27,7 @@ public class GroupHandlerTest {
 		req.name = name();
 		req.parent_id = U.NULL_ID;
 		req.org_id = U.NULL_ID;
+		req.props = Optional.of("{}");
 
 		UUID[] id = { null };
 

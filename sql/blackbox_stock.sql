@@ -348,7 +348,7 @@ CREATE TABLE bb_stock.formulas_tags (
 
 ----------
 
-CREATE TABLE bb_stock.formula_nodes (
+CREATE TABLE bb_stock.formula_details (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	formula_id uuid REFERENCES bb_stock.formulas ON DELETE CASCADE NOT NULL, --formulaが削除されたら削除
 	stock_id uuid REFERENCES bb_stock.stocks NOT NULL,
@@ -357,17 +357,17 @@ CREATE TABLE bb_stock.formula_nodes (
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL);
 
-COMMENT ON TABLE bb_stock.formula_nodes IS '変換式ノード
+COMMENT ON TABLE bb_stock.formula_details IS '変換式明細
 一変換式の中の入もしくは出を表す';
-COMMENT ON COLUMN bb_stock.formula_nodes.id IS 'ID';
-COMMENT ON COLUMN bb_stock.formula_nodes.formula_id IS '変換式ID';
-COMMENT ON COLUMN bb_stock.formula_nodes.stock_id IS '対象在庫ID
+COMMENT ON COLUMN bb_stock.formula_details.id IS 'ID';
+COMMENT ON COLUMN bb_stock.formula_details.formula_id IS '変換式ID';
+COMMENT ON COLUMN bb_stock.formula_details.stock_id IS '対象在庫ID
 構成要素がNULLデータ(00000000-0000-0000-0000-000000000000)は、指定なしとして許容されるが、実施時にstockが特定できるように指定される必要がある';
-COMMENT ON COLUMN bb_stock.formula_nodes.in_out IS '入出区分
+COMMENT ON COLUMN bb_stock.formula_details.in_out IS '入出区分
 IN=1, OUT=-1';
-COMMENT ON COLUMN bb_stock.formula_nodes.seq IS '変換式内連番';
-COMMENT ON COLUMN bb_stock.formula_nodes.quantity IS '数量';
-COMMENT ON COLUMN bb_stock.formula_nodes.props IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb_stock.formula_details.seq IS '変換式内連番';
+COMMENT ON COLUMN bb_stock.formula_details.quantity IS '数量';
+COMMENT ON COLUMN bb_stock.formula_details.props IS '外部アプリケーション情報JSON';
 
 --===========================
 --indexes
@@ -403,8 +403,8 @@ CREATE INDEX ON bb_stock.stocks (status_id);
 
 --fomulas
 CREATE INDEX ON bb_stock.formulas (group_id);
-CREATE INDEX ON bb_stock.formula_nodes (formula_id);
-CREATE INDEX ON bb_stock.formula_nodes (stock_id);
+CREATE INDEX ON bb_stock.formula_details (formula_id);
+CREATE INDEX ON bb_stock.formula_details (stock_id);
 
 --tags
 CREATE INDEX ON bb_stock.items_tags (tag_id);
@@ -432,7 +432,7 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb_stock.locations,
 	bb_stock.statuses,
 	bb_stock.formulas,
-	bb_stock.formula_nodes
+	bb_stock.formula_details
 TO blackbox;
 
 --tag関連はINSERT, DELETEのみ

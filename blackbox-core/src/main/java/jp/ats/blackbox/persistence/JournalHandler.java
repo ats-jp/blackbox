@@ -119,7 +119,7 @@ public class JournalHandler {
 		public UUID unit_id;
 
 		/**
-		 * 入出庫タイプ
+		 * 入出力タイプ
 		 */
 		public InOut in_out;
 

@@ -51,7 +51,7 @@ public class StockComponentHandler {
 
 		row.setUUID(group_id, request.group_id);
 		row.setString(name, request.name);
-		request.extension.ifPresent(v -> row.setObject(props, toJson(v)));
+		request.props.ifPresent(v -> row.setObject(props, toJson(v)));
 		request.tags.ifPresent(v -> row.setObject(tags, v));
 
 		UUID userId = SecurityValues.currentUserId();
@@ -72,16 +72,16 @@ public class StockComponentHandler {
 		int result = new GenericTable(table).UPDATE(a -> {
 			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
 			request.name.ifPresent(v -> a.col(name).set(v));
-			request.extension.ifPresent(v -> a.col(props).set(toJson(v)));
+			request.props.ifPresent(v -> a.col(props).set(toJson(v)));
 			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
 			a.col(updated_by).set(SecurityValues.currentUserId());
 			a.col(updated_at).setAny("now()");
 		}).WHERE(a -> a.col(id).eq(request.id).AND.col(revision).eq(request.revision)).execute();
 
-		request.tags.ifPresent(tags -> TagExecutor.stickTagsAgain(tags, request.id, table));
-
 		if (result != 1) throw Utils.decisionException(table, request.id);
+
+		request.tags.ifPresent(tags -> TagExecutor.stickTagsAgain(tags, request.id, table));
 	}
 
 	public static void updateForcibly(
@@ -90,7 +90,7 @@ public class StockComponentHandler {
 		int result = new GenericTable(table).UPDATE(a -> {
 			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
 			request.name.ifPresent(v -> a.col(name).set(v));
-			request.extension.ifPresent(v -> a.col(props).set(toJson(v)));
+			request.props.ifPresent(v -> a.col(props).set(toJson(v)));
 			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
 			a.col(updated_by).set(SecurityValues.currentUserId());
@@ -111,7 +111,9 @@ public class StockComponentHandler {
 		if (result != 1) throw Utils.decisionException(table, id);
 	}
 
-	public static void fetch(TablePath table, long id, Consumer<Result> consumer) {}
+	public static void fetch(TablePath table, long id, Consumer<Result> consumer) {
+	}
 
-	public static void search(TablePath table, long id, Consumer<BResultSet> consumer) {}
+	public static void search(TablePath table, long id, Consumer<BResultSet> consumer) {
+	}
 }

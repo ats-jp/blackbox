@@ -246,9 +246,9 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.formulas_logfunction();
 
 ----------
 
-DROP TABLE IF EXISTS bb_log.formula_nodes CASCADE;
+DROP TABLE IF EXISTS bb_log.formula_details CASCADE;
 
-CREATE TABLE bb_log.formula_nodes (
+CREATE TABLE bb_log.formula_details (
 	id uuid,
 	formula_id uuid,
 	stock_id uuid,
@@ -262,26 +262,26 @@ CREATE TABLE bb_log.formula_nodes (
 	logged_by name DEFAULT current_user,
 	logged_at timestamptz DEFAULT now());
 
-DROP FUNCTION IF EXISTS bb_log.formula_nodes_logfunction CASCADE;
+DROP FUNCTION IF EXISTS bb_log.formula_details_logfunction CASCADE;
 
-CREATE FUNCTION bb_log.formula_nodes_logfunction() RETURNS TRIGGER AS $formula_nodes_logtrigger$
+CREATE FUNCTION bb_log.formula_details_logfunction() RETURNS TRIGGER AS $formula_details_logtrigger$
 	BEGIN
 		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO bb_log.formula_nodes SELECT OLD.*, 'D';
+			INSERT INTO bb_log.formula_details SELECT OLD.*, 'D';
 			RETURN OLD;
 		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO bb_log.formula_nodes SELECT NEW.*, 'U';
+			INSERT INTO bb_log.formula_details SELECT NEW.*, 'U';
 			RETURN NEW;
 		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO bb_log.formula_nodes SELECT NEW.*, 'I';
+			INSERT INTO bb_log.formula_details SELECT NEW.*, 'I';
 			RETURN NEW;
 		END IF;
 		RETURN NULL;
 	END;
-$formula_nodes_logtrigger$ LANGUAGE plpgsql;
+$formula_details_logtrigger$ LANGUAGE plpgsql;
 
-CREATE TRIGGER formula_nodes_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb_stock.formula_nodes
-FOR EACH ROW EXECUTE PROCEDURE bb_log.formula_nodes_logfunction();
+CREATE TRIGGER formula_details_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb_stock.formula_details
+FOR EACH ROW EXECUTE PROCEDURE bb_log.formula_details_logfunction();
 
 ----------
 

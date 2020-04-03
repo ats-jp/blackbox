@@ -196,21 +196,12 @@ public class transient_journals
 	public static final String tags = "tags";
 
 	/**
-	 * name: revision<br>
-	 * remarks: リビジョン番号<br>
-	 * type: int8(19)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 8, notNull = true)
-	public static final String revision = "revision";
-
-	/**
 	 * name: created_at<br>
 	 * remarks: 作成時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 9, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -219,7 +210,7 @@ public class transient_journals
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 10, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 9, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -228,7 +219,7 @@ public class transient_journals
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 11, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 10, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -237,7 +228,7 @@ public class transient_journals
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 12, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 11, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -553,36 +544,6 @@ public class transient_journals
 		public java.lang.Object getTags() {
 			Binder binder = data$.getValue("tags");
 			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: revision<br>
-		 * remarks: リビジョン番号<br>
-		 * type: int8(19)<br>
-		 * not null: true<br>
-		 * @param value java.lang.Long
-		 */
-		public void setRevision(java.lang.Long value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("revision").getType());
-			data$.setValue("revision", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: revision<br>
-		 * remarks: リビジョン番号<br>
-		 * type: int8(19)<br>
-		 * not null: true<br>
-		 * @return java.lang.Long
-		 */
-		public java.lang.Long getRevision() {
-			Binder binder = data$.getValue("revision");
-			return (java.lang.Long) binder.getValue();
 		}
 
 		/**
@@ -1838,11 +1799,6 @@ public class transient_journals
 		public final T tags;
 
 		/**
-		 * 項目名 revision
-		 */
-		public final T revision;
-
-		/**
 		 * 項目名 created_at
 		 */
 		public final T created_at;
@@ -1880,7 +1836,6 @@ public class transient_journals
 			this.seq = builder$.buildColumn(this, sqlassist.bb.transient_journals.seq);
 			this.props = builder$.buildColumn(this, sqlassist.bb.transient_journals.props);
 			this.tags = builder$.buildColumn(this, sqlassist.bb.transient_journals.tags);
-			this.revision = builder$.buildColumn(this, sqlassist.bb.transient_journals.revision);
 			this.created_at = builder$.buildColumn(this, sqlassist.bb.transient_journals.created_at);
 			this.created_by = builder$.buildColumn(this, sqlassist.bb.transient_journals.created_by);
 			this.updated_at = builder$.buildColumn(this, sqlassist.bb.transient_journals.updated_at);

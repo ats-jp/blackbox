@@ -855,7 +855,7 @@ CREATE TABLE bb.transients (
 	group_id uuid REFERENCES bb.groups ON DELETE CASCADE CHECK (owner_type = 'G' AND group_id <> '00000000-0000-0000-0000-000000000000' OR owner_type = 'U') NOT NULL,
 	user_id uuid REFERENCES bb.users ON DELETE CASCADE CHECK (owner_type = 'U' AND user_id <> '00000000-0000-0000-0000-000000000000' OR owner_type = 'G') NOT NULL,
 	owner_type "char" CHECK (owner_type IN ('G', 'U')) NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
+	revision bigint DEFAULT 0 NOT NULL, --以下のテーブルのすべてのrevisionを兼ねる
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
@@ -892,7 +892,6 @@ CREATE TABLE bb.transient_journals (
 	seq bigserial NOT NULL, --DB内生成順を保証
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
@@ -907,7 +906,6 @@ COMMENT ON COLUMN bb.transient_journals.seq IS 'DB内生成順
 fixed_atが同一の場合、優先順を決定';
 COMMENT ON COLUMN bb.transient_journals.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.transient_journals.tags IS '保存用タグ';
-COMMENT ON COLUMN bb.transient_journals.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_journals.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_journals.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transient_journals.updated_at IS '更新時刻';
@@ -941,7 +939,6 @@ CREATE TABLE bb.transient_details (
 	transient_journal_id uuid REFERENCES bb.transient_journals ON DELETE CASCADE NOT NULL,
 	seq_in_journal integer NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,-- 編集でtransient_detailsだけ追加することもあるので必要
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
@@ -952,7 +949,6 @@ COMMENT ON COLUMN bb.transient_details.id IS 'ID';
 COMMENT ON COLUMN bb.transient_details.transient_journal_id IS '一時作業伝票ID';
 COMMENT ON COLUMN bb.transient_details.seq_in_journal IS '伝票内連番';
 COMMENT ON COLUMN bb.transient_details.props IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.transient_details.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_details.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_details.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transient_details.updated_at IS '更新時刻';
@@ -970,7 +966,6 @@ CREATE TABLE bb.transient_nodes (
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
@@ -985,7 +980,6 @@ COMMENT ON COLUMN bb.transient_nodes.seq_in_detail IS '伝票明細内連番';
 COMMENT ON COLUMN bb.transient_nodes.quantity IS '移動数量';
 COMMENT ON COLUMN bb.transient_nodes.grants_unlimited IS '数量無制限の許可';
 COMMENT ON COLUMN bb.transient_nodes.props IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.transient_nodes.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transient_nodes.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_nodes.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transient_nodes.updated_at IS '更新時刻';

@@ -22,7 +22,7 @@ public class StockComponetHandlerTest {
 			var req = new StockComponent.RegisterRequest();
 			req.group_id = U.NULL_ID;
 			req.name = "test";
-			req.extension = Optional.of("{}");
+			req.props = Optional.of("{}");
 			req.tags = Optional.of(new String[] { "tag1", "tag2" });
 
 			UUID registered = StockComponentHandler.register(locations.$TABLE, req);
@@ -33,7 +33,7 @@ public class StockComponetHandlerTest {
 			updateReq.id = registered;
 			updateReq.group_id = Optional.of(U.NULL_ID);
 			updateReq.name = Optional.of("test");
-			updateReq.extension = Optional.of("{}");
+			updateReq.props = Optional.of("{}");
 			updateReq.tags = Optional.of(new String[] { "tag1", "tag2" });
 			updateReq.revision = 0;
 
