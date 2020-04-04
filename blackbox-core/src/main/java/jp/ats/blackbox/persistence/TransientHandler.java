@@ -14,7 +14,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import org.blendee.assist.AnonymousTable;
-import org.blendee.assist.SelectStatement;
 import org.blendee.jdbc.BResultSet;
 import org.blendee.jdbc.BSQLException;
 import org.blendee.jdbc.Result;
@@ -111,9 +110,9 @@ public class TransientHandler {
 	}
 
 	public static UUID register(RegisterRequest request) {
-		UUID id = UUID.randomUUID();
+		var id = UUID.randomUUID();
 
-		UUID userId = SecurityValues.currentUserId();
+		var userId = SecurityValues.currentUserId();
 
 		var builder = new InsertDMLBuilder(transients.$TABLE);
 		builder.add(transients.id, id);
@@ -154,35 +153,6 @@ public class TransientHandler {
 			throw Utils.decisionException(transients.$TABLE, request.id);
 	}
 
-	private static void updateRevision(long transientRevision, SelectStatement subquery) {
-		var result = new transients().UPDATE(
-			a -> a.ls(
-				a.revision.set(transientRevision + 1),
-				a.updated_at.setAny("now()"),
-				a.updated_by.set(SecurityValues.currentUserId())))
-			.WHERE(a -> a.id.IN(subquery).AND.revision.eq(transientRevision))
-			.execute();
-
-		if (result != 1) {
-			var id = new transients().SELECT(a -> a.id).WHERE(a -> a.id.IN(subquery).AND.revision.eq(transientRevision)).willUnique().get().getId();
-			throw Utils.decisionException(transients.$TABLE, id);
-		}
-	}
-
-	private static void updateRevision(long transientRevision, UUID transientId) {
-		var result = new transients().UPDATE(
-			a -> a.ls(
-				a.revision.set(transientRevision + 1),
-				a.updated_at.setAny("now()"),
-				a.updated_by.set(SecurityValues.currentUserId())))
-			.WHERE(a -> a.id.eq(transientId).AND.revision.eq(transientRevision))
-			.execute();
-
-		if (result != 1) {
-			throw Utils.decisionException(transients.$TABLE, transientId);
-		}
-	}
-
 	public static void delete(UUID transientId, long revision) {
 		Utils.delete(transients.$TABLE, transientId, revision);
 	}
@@ -221,7 +191,7 @@ public class TransientHandler {
 	}
 
 	public static UUID registerJournal(long transientRevision, UUID transientId, JournalRegisterRequest request) {
-		updateRevision(transientRevision, transientId);
+		Utils.updateRevision(transients.$TABLE, transientRevision, transientId);
 
 		var id = UUID.randomUUID();
 
@@ -247,14 +217,15 @@ public class TransientHandler {
 		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, id, transient_journals.$TABLE));
 
 		for (int i = 0; i < request.details.length; i++) {
-			registerDetail(userId, id, request.details[i], SeqUtils.compute(i));
+			registerDetail(id, request.details[i], SeqUtils.compute(i));
 		}
 
 		return id;
 	}
 
 	public static void deleteJournal(long transientRevision, UUID journalId) {
-		updateRevision(
+		Utils.updateRevision(
+			transients.$TABLE,
 			transientRevision,
 			new transient_journals().SELECT(a -> a.$transients().id).WHERE(a -> a.id.eq(journalId)));
 
@@ -270,7 +241,8 @@ public class TransientHandler {
 	}
 
 	public static UUID registerDetail(long transientRevision, UUID journalId, DetailRegisterRequest request) {
-		updateRevision(
+		Utils.updateRevision(
+			transients.$TABLE,
 			transientRevision,
 			new transient_journals().SELECT(a -> a.$transients().id).WHERE(a -> a.id.eq(journalId)));
 
@@ -288,21 +260,24 @@ public class TransientHandler {
 				return r.getInt(1);
 			});
 
-		return registerDetail(SecurityValues.currentUserId(), journalId, request, SeqUtils.computeNextSeq(seq));
+		return registerDetail(journalId, request, SeqUtils.computeNextSeq(seq));
 	}
 
 	public static UUID registerDetail(long transientRevision, UUID journalId, DetailRegisterRequest request, int seq) {
-		updateRevision(
+		Utils.updateRevision(
+			transients.$TABLE,
 			transientRevision,
 			new transient_journals().SELECT(a -> a.$transients().id).WHERE(a -> a.id.eq(journalId)));
 
-		return registerDetail(SecurityValues.currentUserId(), journalId, request, seq);
+		return registerDetail(journalId, request, seq);
 	}
 
-	private static UUID registerDetail(UUID userId, UUID journalId, DetailRegisterRequest request, int seq) {
+	private static UUID registerDetail(UUID journalId, DetailRegisterRequest request, int seq) {
 		var detail = new Detail();
 
-		UUID id = UUID.randomUUID();
+		var id = UUID.randomUUID();
+
+		var userId = SecurityValues.currentUserId();
 
 		JournalPreparer.prepareDetail(journalId, id, request, detail);
 
@@ -313,17 +288,22 @@ public class TransientHandler {
 		detail.insert();
 
 		for (int i = 0; i < request.nodes.length; i++) {
-			registerNode(userId, id, request.nodes[i], SeqUtils.compute(i));
+			registerNode(id, request.nodes[i], SeqUtils.compute(i));
 		}
 
 		return id;
 	}
 
 	public static void deleteDetail(long transientRevision, UUID detailId) {
-		updateRevision(
+		Utils.updateRevision(
+			transients.$TABLE,
 			transientRevision,
 			new transient_details().SELECT(a -> a.$transient_journals().$transients().id).WHERE(a -> a.id.eq(detailId)));
 
+		deleteDetail(detailId);
+	}
+
+	public static void deleteDetail(UUID detailId) {
 		U.recorder.play(() -> new transient_details().DELETE().WHERE(a -> a.id.eq($UUID)), detailId).execute();
 	}
 
@@ -344,7 +324,8 @@ public class TransientHandler {
 	}
 
 	public static UUID registerNode(long transientRevision, UUID detailId, NodeRegisterRequest request) {
-		updateRevision(
+		Utils.updateRevision(
+			transients.$TABLE,
 			transientRevision,
 			new transient_details().SELECT(a -> a.$transient_journals().$transients().id).WHERE(a -> a.id.eq(detailId)));
 
@@ -362,21 +343,24 @@ public class TransientHandler {
 				return r.getInt(1);
 			});
 
-		return registerNode(SecurityValues.currentUserId(), detailId, request, SeqUtils.computeNextSeq(seq));
+		return registerNode(detailId, request, SeqUtils.computeNextSeq(seq));
 	}
 
 	public static UUID registerNode(long transientRevision, UUID detailId, NodeRegisterRequest request, int seq) {
-		updateRevision(
+		Utils.updateRevision(
+			transients.$TABLE,
 			transientRevision,
 			new transient_details().SELECT(a -> a.$transient_journals().$transients().id).WHERE(a -> a.id.eq(detailId)));
 
-		return registerNode(SecurityValues.currentUserId(), detailId, request, seq);
+		return registerNode(detailId, request, seq);
 	}
 
-	private static UUID registerNode(UUID userId, UUID detailId, NodeRegisterRequest request, int seq) {
+	private static UUID registerNode(UUID detailId, NodeRegisterRequest request, int seq) {
 		var node = new Node();
 
 		UUID id = UUID.randomUUID();
+
+		UUID userId = SecurityValues.currentUserId();
 
 		JournalPreparer.prepareNode(detailId, id, userId, request, node, seq, U.recorder);
 
@@ -390,10 +374,15 @@ public class TransientHandler {
 	}
 
 	public static void deleteNode(long transientRevision, UUID nodeId) {
-		updateRevision(
+		Utils.updateRevision(
+			transients.$TABLE,
 			transientRevision,
 			new transient_nodes().SELECT(a -> a.$transient_details().$transient_journals().$transients().id).WHERE(a -> a.id.eq(nodeId)));
 
+		deleteNode(nodeId);
+	}
+
+	private static void deleteNode(UUID nodeId) {
 		U.recorder.play(() -> new transient_nodes().DELETE().WHERE(a -> a.id.eq($UUID)), nodeId).execute();
 	}
 
@@ -686,7 +675,7 @@ public class TransientHandler {
 	 */
 	public static class JournalUpdateRequest {
 
-		public UUID journal_id;
+		public UUID id;
 
 		/**
 		 * 指定することでtransient間を移動
@@ -722,15 +711,21 @@ public class TransientHandler {
 		 * 更新detail
 		 */
 		public DetailUpdateRequest[] updateDetails = {};
+
+		/**
+		 * 削除details
+		 */
+		public UUID[] deleteDetails = {};
 	}
 
 	public static void updateJournal(long transientRevision, JournalUpdateRequest request) {
-		updateRevision(
+		Utils.updateRevision(
+			transients.$TABLE,
 			transientRevision,
-			new transient_journals().SELECT(a -> a.$transients().id).WHERE(a -> a.id.eq(request.journal_id)));
+			new transient_journals().SELECT(a -> a.$transients().id).WHERE(a -> a.id.eq(request.id)));
 
 		//移動先があればそちらのrevisionも更新
-		request.transient_id.ifPresent(v -> updateRevision(transientRevision, v));
+		request.transient_id.ifPresent(v -> Utils.updateRevision(transients.$TABLE, transientRevision, v));
 
 		int result = new transient_journals().UPDATE(a -> {
 			request.transient_id.ifPresent(v -> a.transient_id.set(v));
@@ -740,15 +735,17 @@ public class TransientHandler {
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
-		}).WHERE(a -> a.id.eq(request.journal_id)).execute();
+		}).WHERE(a -> a.id.eq(request.id)).execute();
 
-		if (result != 1) throw Utils.decisionException(transient_journals.$TABLE, request.journal_id);
+		if (result != 1) throw Utils.decisionException(transient_journals.$TABLE, request.id);
 
-		request.tags.ifPresent(tags -> TagExecutor.stickTagsAgain(tags, request.journal_id, transient_journals.$TABLE));
+		request.tags.ifPresent(tags -> TagExecutor.stickTagsAgain(tags, request.id, transient_journals.$TABLE));
 
-		Arrays.stream(request.registerDetails).forEach(r -> registerDetail(request.journal_id, r));
+		Arrays.stream(request.registerDetails).forEach(r -> registerDetail(request.id, r));
 
 		Arrays.stream(request.updateDetails).forEach(r -> updateDetail(r));
+
+		Arrays.stream(request.deleteDetails).forEach(i -> deleteDetail(i));
 	}
 
 	/**
@@ -756,7 +753,7 @@ public class TransientHandler {
 	 */
 	public static class DetailUpdateRequest {
 
-		public UUID detail_id;
+		public UUID id;
 
 		public long revision;
 
@@ -781,16 +778,23 @@ public class TransientHandler {
 		 * 更新node
 		 */
 		public NodeUpdateRequest[] updateNodes = {};
+
+		/**
+		 * 削除node
+		 */
+		public UUID[] deleteNodes = {};
 	}
 
 	public static void updateDetail(long transientRevision, DetailUpdateRequest request) {
-		updateRevision(
+		Utils.updateRevision(
+			transients.$TABLE,
 			transientRevision,
-			new transient_details().SELECT(a -> a.$transient_journals().$transients().id).WHERE(a -> a.id.eq(request.detail_id)));
+			new transient_details().SELECT(a -> a.$transient_journals().$transients().id).WHERE(a -> a.id.eq(request.id)));
 
 		//移動先があればそちらのrevisionも更新
 		request.journal_id.ifPresent(
-			v -> updateRevision(
+			v -> Utils.updateRevision(
+				transients.$TABLE,
 				transientRevision,
 				new transient_journals().SELECT(a -> a.$transients().id).WHERE(a -> a.id.eq(v))));
 
@@ -804,13 +808,15 @@ public class TransientHandler {
 			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
-		}).WHERE(a -> a.id.eq(request.detail_id)).execute();
+		}).WHERE(a -> a.id.eq(request.id)).execute();
 
-		if (result != 1) throw Utils.decisionException(transient_details.$TABLE, request.detail_id);
+		if (result != 1) throw Utils.decisionException(transient_details.$TABLE, request.id);
 
-		Arrays.stream(request.registerNodes).forEach(r -> registerNode(request.detail_id, r));
+		Arrays.stream(request.registerNodes).forEach(r -> registerNode(request.id, r));
 
 		Arrays.stream(request.updateNodes).forEach(r -> updateNode(r));
+
+		Arrays.stream(request.deleteNodes).forEach(i -> deleteNode(i));
 	}
 
 	/**
@@ -818,7 +824,7 @@ public class TransientHandler {
 	 */
 	public static class NodeUpdateRequest {
 
-		public UUID node_id;
+		public UUID id;
 
 		/**
 		 * 指定することでdetail間を移動
@@ -852,13 +858,15 @@ public class TransientHandler {
 	}
 
 	public static void updateNode(long transientRevision, NodeUpdateRequest request) {
-		updateRevision(
+		Utils.updateRevision(
+			transients.$TABLE,
 			transientRevision,
-			new transient_nodes().SELECT(a -> a.$transient_details().$transient_journals().$transients().id).WHERE(a -> a.id.eq(request.node_id)));
+			new transient_nodes().SELECT(a -> a.$transient_details().$transient_journals().$transients().id).WHERE(a -> a.id.eq(request.id)));
 
 		//移動先があればそちらのrevisionも更新
 		request.detail_id.ifPresent(
-			v -> updateRevision(
+			v -> Utils.updateRevision(
+				transients.$TABLE,
 				transientRevision,
 				new transient_details().SELECT(a -> a.$transient_journals().$transients().id).WHERE(a -> a.id.eq(v))));
 
@@ -879,8 +887,8 @@ public class TransientHandler {
 			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
-		}).WHERE(a -> a.id.eq(request.node_id)).execute();
+		}).WHERE(a -> a.id.eq(request.id)).execute();
 
-		if (result != 1) throw Utils.decisionException(transient_details.$TABLE, request.node_id);
+		if (result != 1) throw Utils.decisionException(transient_details.$TABLE, request.id);
 	}
 }

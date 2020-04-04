@@ -355,7 +355,11 @@ CREATE TABLE bb_stock.formula_details (
 	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL, --そのまま計算に使用できるように
 	seq integer NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
-	props jsonb DEFAULT '{}' NOT NULL);
+	props jsonb DEFAULT '{}' NOT NULL,
+	created_at timestamptz DEFAULT now() NOT NULL,
+	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	updated_at timestamptz DEFAULT now() NOT NULL,
+	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 
 COMMENT ON TABLE bb_stock.formula_details IS '変換式明細
 一変換式の中の入もしくは出を表す';
