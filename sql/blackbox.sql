@@ -833,7 +833,7 @@ CREATE TABLE bb.journal_errors (
 	created_at timestamptz DEFAULT now() NOT NULL);
 
 COMMENT ON TABLE bb.journal_errors IS 'journal登録時に発生したエラー';
-COMMENT ON COLUMN bb.journal_errors.abandoned_id IS 'journalもしくはclosingに使用される予定だったID';
+COMMENT ON COLUMN bb.journal_errors.abandoned_id IS 'journalもしくはclosingもしくはjournal_batchに使用される予定だったID';
 COMMENT ON COLUMN bb.journal_errors.command_type IS '処理のタイプ
 R=journal登録, D=journal取消, C=closing';
 COMMENT ON COLUMN bb.journal_errors.error_type IS 'エラーの種類';
