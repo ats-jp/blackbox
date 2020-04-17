@@ -1,7 +1,9 @@
 #dockerのpostgresqlでblackboxの準備
 
 #bb-db起動
-docker run -d --name bb-db -p 5432:5432 postgres:11.1
+#portはコンテナ外:コンテナ内
+#mysecretpasswordはpostgresユーザーの初期パスワードとなる
+docker run -d --name bb-db -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword postgres:12.2
 
 #起動確認
 docker ps
@@ -16,7 +18,7 @@ docker cp init.sql bb-db:/var/tmp/init.sql
 #コンテナにログイン
 docker exec -it bb-db bash
 su postgres
-#開発用テーブルスペース作成
+#開発用テーブルスペース作成(option)
 mkdir /var/lib/postgresql/tablespaces
 mkdir /var/lib/postgresql/tablespaces/blackbox
 mkdir /var/lib/postgresql/tablespaces/blackbox_log
@@ -27,13 +29,16 @@ psql
 \i /var/tmp/init.sql
 \q
 
+#rootに戻る
+exit
+
 rm /var/tmp/init.sql
 
 #あとはpgAdminで操作する
 
 #その他
 #psql起動
-docker run -it --rm --link bb-db:bb-db postgres:11.1 psql -h bb-db -U postgres
+docker run -it --rm --link bb-db:bb-db postgres:12.2 psql -h bb-db -U postgres
 
 #bb-db開始
 docker start bb-db
