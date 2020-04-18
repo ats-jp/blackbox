@@ -25,7 +25,7 @@ public class JournalHandlerTest {
 		Blendee.execute(t -> {
 			var handler = new JournalHandler(U.recorder);
 			IntStream.range(0, 10).forEach(i -> {
-				handler.register(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(U.NULL_ID, U.NULL_ID));
+				handler.registerLazily(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(U.NULL_ID, U.NULL_ID));
 				JobHandler.execute(LocalDateTime.now());
 
 				t.commit(); //created_atを確定するために一件毎commit

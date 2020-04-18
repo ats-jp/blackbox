@@ -4,6 +4,8 @@ public enum CommandType {
 
 	JOURNAL_REGISTER(Constant.JOURNAL_REGISTER),
 
+	JOURNAL_LAZY_REGISTER(Constant.JOURNAL_LAZY_REGISTER),
+
 	JOURNAL_DENY(Constant.JOURNAL_DENY),
 
 	OVERWRITE(Constant.JOURNAL_DENY),
@@ -15,6 +17,8 @@ public enum CommandType {
 	private static class Constant {
 
 		private static final String JOURNAL_REGISTER = "R";
+
+		private static final String JOURNAL_LAZY_REGISTER = "L";
 
 		private static final String JOURNAL_DENY = "D";
 
@@ -29,6 +33,8 @@ public enum CommandType {
 		switch (value) {
 		case Constant.JOURNAL_REGISTER:
 			return JOURNAL_REGISTER;
+		case Constant.JOURNAL_LAZY_REGISTER:
+			return JOURNAL_LAZY_REGISTER;
 		case Constant.JOURNAL_DENY:
 			return JOURNAL_DENY;
 		case Constant.OVERWRITE:

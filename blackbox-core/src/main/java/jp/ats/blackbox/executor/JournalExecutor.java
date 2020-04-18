@@ -73,12 +73,26 @@ public class JournalExecutor {
 
 		var command = new JournalRegisterCommand(promise.getId(), userId, requestSupplier.get());
 
+		registerJournalInternal(userId, promise, command);
+
+		return promise;
+	}
+
+	public JournalPromise registerJournalLazily(UUID userId, Supplier<JournalRegisterRequest> requestSupplier) {
+		var promise = new JournalPromise();
+
+		var command = new LazyJournalRegisterCommand(promise.getId(), userId, requestSupplier.get());
+
+		registerJournalInternal(userId, promise, command);
+
+		return promise;
+	}
+
+	private void registerJournalInternal(UUID userId, JournalPromise promise, Command command) {
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
 		//バッチなど、単一の処理が大量に登録しても、他のスレッドが割り込めるように
 		Thread.yield();
-
-		return promise;
 	}
 
 	public JournalPromise denyJournal(UUID userId, Supplier<JournalDenyRequest> requestSupplier) {
@@ -274,6 +288,42 @@ public class JournalExecutor {
 		@Override
 		public CommandType type() {
 			return CommandType.JOURNAL_REGISTER;
+		}
+	}
+
+	private class LazyJournalRegisterCommand implements Command {
+
+		private final UUID journalId;
+
+		private final UUID userId;
+
+		private final JournalRegisterRequest request;
+
+		private LazyJournalRegisterCommand(UUID journalId, UUID userId, JournalRegisterRequest request) {
+			this.journalId = journalId;
+			this.userId = userId;
+			this.request = request;
+		}
+
+		@Override
+		public void execute() {
+			handler.registerLazily(journalId, U.NULL_ID, userId, request);
+		}
+
+		@Override
+		public void doAfterCommit() {
+			//移動時刻を通知
+			JobExecutor.next(U.convert(request.fixed_at));
+		}
+
+		@Override
+		public Object request() {
+			return request;
+		}
+
+		@Override
+		public CommandType type() {
+			return CommandType.JOURNAL_LAZY_REGISTER;
 		}
 	}
 

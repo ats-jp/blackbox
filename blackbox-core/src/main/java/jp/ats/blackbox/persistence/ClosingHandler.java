@@ -81,7 +81,9 @@ public class ClosingHandler {
 		recorder.play(
 			() -> new snapshots().updateStatement(
 				a -> a
-					.UPDATE(a.in_search_scope.set(false))
+					.UPDATE(
+						a.in_search_scope.set(false),
+						a.updated_at.setAny("now()"))
 					.WHERE(
 						wa -> wa.in_search_scope.eq(true).AND.id.IN(
 							createRankedQuery(base -> base.SELECT(sa -> sa.id))
@@ -172,11 +174,7 @@ public class ClosingHandler {
 		var query = new snapshots()
 			.SELECT(
 				a -> a.ls(
-					a.any(
-						"RANK() OVER (ORDER BY {0} DESC, {1} DESC, {2} DESC)",
-						a.fixed_at,
-						a.created_at,
-						a.node_seq).AS("rank")))
+					a.any("RANK() OVER (ORDER BY {0} DESC)", a.seq).AS("rank")))
 			.WHERE(a -> a.journal_group_id.eq($UUID).AND.fixed_at.le($TIMESTAMP));
 
 		applyer.accept(query);
