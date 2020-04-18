@@ -22,11 +22,7 @@ public class UnitHandler {
 		var raw = new snapshots().SELECT(
 			a -> a.ls(
 				a.id,
-				a.any(
-					"RANK() OVER (ORDER BY {0} DESC, {1} DESC, {2} DESC)",
-					a.fixed_at,
-					a.created_at,
-					a.node_seq).AS("rank")))
+				a.any("RANK() OVER (ORDER BY {0} DESC)", a.seq).AS("rank")))
 			.WHERE(a -> criteriaDecorator.accept(a));
 
 		var inner = new AnonymousTable(raw, "subquery").SELECT(a -> a.any(0)).WHERE(a -> a.col("rank").eq(1));

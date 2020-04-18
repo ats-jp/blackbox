@@ -642,7 +642,7 @@ CREATE TABLE bb.nodes (
 	detail_id uuid REFERENCES bb.details NOT NULL,
 	unit_id uuid REFERENCES bb.units NOT NULL,
 	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL, --そのまま計算に使用できるように
-	seq integer NOT NULL,
+	seq integer CHECK (seq <= 999999) NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -656,7 +656,8 @@ COMMENT ON COLUMN bb.nodes.detail_id IS '明細ID';
 COMMENT ON COLUMN bb.nodes.unit_id IS '管理対象ID';
 COMMENT ON COLUMN bb.nodes.in_out IS '入出区分
 IN=1, OUT=-1';
-COMMENT ON COLUMN bb.nodes.seq IS '伝票内連番';
+COMMENT ON COLUMN bb.nodes.seq IS '伝票内連番
+最大値999999';
 COMMENT ON COLUMN bb.nodes.quantity IS '数量';
 COMMENT ON COLUMN bb.nodes.grants_unlimited IS '数量無制限の許可
 trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない';
@@ -699,8 +700,7 @@ CREATE UNLOGGED TABLE bb.snapshots (
 	journal_group_id uuid REFERENCES bb.groups NOT NULL,
 	unit_id uuid REFERENCES bb.units NOT NULL,
 	fixed_at timestamptz NOT NULL,
-	created_at timestamptz NOT NULL, --journals.created_atと同一時間をJavaから指定するためDEFAULTなし
-	node_seq integer NOT NULL,
+	seq char(36) UNIQUE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
@@ -723,10 +723,9 @@ COMMENT ON COLUMN bb.snapshots.unit_id IS '管理対象ID
 検索高速化のためnodes.unit_idをここに持つ';
 COMMENT ON COLUMN bb.snapshots.fixed_at IS '確定時刻
 検索高速化のためjournals.fixed_atをここに持つ';
-COMMENT ON COLUMN bb.snapshots.created_at IS '登録時刻
-検索高速化のためjournals.created_atをここに持つ';
-COMMENT ON COLUMN bb.snapshots.node_seq IS '伝票ノードの登録順
-検索高速化のためnodes.seqをここに持つ';
+COMMENT ON COLUMN bb.snapshots.seq IS '移動ノード状態の登録順
+検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ
+一意であり順序として使用できる';
 COMMENT ON COLUMN bb.snapshots.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
 
@@ -739,8 +738,7 @@ INSERT INTO bb.snapshots (
 	journal_group_id,
 	unit_id,
 	fixed_at,
-	created_at,
-	node_seq,
+	seq,
 	updated_by
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
@@ -750,8 +748,7 @@ INSERT INTO bb.snapshots (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'1900-1-1'::timestamptz,
-	now(),
-	0,
+	'000000000000000000000000000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
 ----------
@@ -1028,7 +1025,7 @@ CREATE INDEX ON bb.snapshots (total);
 CREATE INDEX ON bb.snapshots (journal_group_id);
 CREATE INDEX ON bb.snapshots (unit_id);
 CREATE INDEX ON bb.snapshots (fixed_at);
-CREATE INDEX ON bb.snapshots (created_at);
+CREATE INDEX ON bb.snapshots (seq);
 
 --jobs
 CREATE INDEX ON bb.jobs (completed);

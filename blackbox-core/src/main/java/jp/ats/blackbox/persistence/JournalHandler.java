@@ -2,7 +2,7 @@ package jp.ats.blackbox.persistence;
 
 import static org.blendee.sql.Placeholder.$BIGDECIMAL;
 import static org.blendee.sql.Placeholder.$BOOLEAN;
-import static org.blendee.sql.Placeholder.$INT;
+import static org.blendee.sql.Placeholder.$STRING;
 import static org.blendee.sql.Placeholder.$TIMESTAMP;
 import static org.blendee.sql.Placeholder.$UUID;
 
@@ -227,6 +227,11 @@ public class JournalHandler {
 
 	private final List<Runnable> minusUpdaterList = new LinkedList<>();
 
+	/**
+	 * 処理内で最終的に数量の整合性が取れているのであれば、一時的に数量がマイナスになっても許容するモードを表すフラグ
+	 */
+	private boolean lazyRegisterMode = false;
+
 	public JournalHandler(Recorder recorder) {
 		this.recorder = recorder;
 	}
@@ -264,8 +269,6 @@ public class JournalHandler {
 	 */
 	public void register(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request) {
 		registerInternal(journalId, batchId, userId, request);
-
-		finishSnapshotUpdateProcess();
 	}
 
 	/**
@@ -277,8 +280,40 @@ public class JournalHandler {
 		for (int i = 0; i < journalIds.length; i++) {
 			registerInternal(journalIds[i], batchId, userId, requests[i]);
 		}
+	}
 
-		finishSnapshotUpdateProcess();
+	/**
+	 * journal登録処理
+	 * nodeの実行順序で一旦マイナスになっても最終的に数量の整合性が取れるのであれば登録可能とするモード
+	 */
+	public void registerLazily(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request) {
+		try {
+			lazyRegisterMode = true;
+
+			registerInternal(journalId, batchId, userId, request);
+		} finally {
+			lazyRegisterMode = false;
+			finishSnapshotUpdateProcess();
+		}
+	}
+
+	/**
+	 * journal複数件登録処理
+	 * nodeの実行順序で一旦マイナスになっても最終的に数量の整合性が取れるのであれば登録可能とするモード
+	 */
+	public void registerLazily(UUID[] journalIds, UUID batchId, UUID userId, JournalRegisterRequest[] requests) {
+		assert journalIds.length == requests.length;
+
+		try {
+			lazyRegisterMode = true;
+
+			for (int i = 0; i < journalIds.length; i++) {
+				registerInternal(journalIds[i], batchId, userId, requests[i]);
+			}
+		} finally {
+			lazyRegisterMode = false;
+			finishSnapshotUpdateProcess();
+		}
 	}
 
 	private void registerInternal(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request) {
@@ -347,7 +382,7 @@ public class JournalHandler {
 		DetailRegisterRequest request) {
 		var detail = new Detail();
 
-		UUID detailId = UUID.randomUUID();
+		var detailId = UUID.randomUUID();
 
 		JournalPreparer.prepareDetail(journalId, detailId, request, detail);
 
@@ -379,82 +414,21 @@ public class JournalHandler {
 		NodeRegisterRequest request) {
 		UUID nodeId = UUID.randomUUID();
 		var node = new Node();
-		JournalPreparer.prepareNode(detailId, nodeId, userId, request, node, ++nodeSeq, recorder);
+
+		var nodeSeq = ++this.nodeSeq;
+
+		JournalPreparer.prepareNode(detailId, nodeId, userId, request, node, nodeSeq, recorder);
 
 		node.insert();
 
+		if (!lazyRegisterMode) {
+			storeSnapshot(nodeId, nodeSeq, userId, groupId, fixedAt, createdAt, request);
+
+			return;
+		}
+
 		Runnable snapshotProcess = () -> {
-			//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
-			JustBeforeSnapshot justBefore = getJustBeforeSnapshot(request.unit_id, fixedAt, recorder);
-
-			BigDecimal total = request.in_out.calcurate(justBefore.total, request.quantity);
-
-			//移動した結果数量がマイナスになる場合エラー
-			//ただし無制限設定がされていればOK
-			if (!justBefore.unlimited && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
-
-			//直前のsnapshotが無制限の場合、以降すべてのsnapshotが無制限になるので引き継ぐ
-			//そうでなければ今回のリクエストに従う
-			boolean unlimited = justBefore.unlimited ? true : request.grants_unlimited.orElse(false);
-
-			recorder.play(
-				() -> new snapshots().insertStatement(
-					a -> a
-						.INSERT(
-							a.id,
-							a.unlimited,
-							a.total,
-							a.unit_id,
-							a.journal_group_id,
-							a.fixed_at,
-							a.created_at,
-							a.node_seq,
-							a.updated_by)
-						.VALUES(
-							$UUID,
-							$BOOLEAN,
-							$BIGDECIMAL,
-							$UUID,
-							$UUID,
-							$TIMESTAMP,
-							$TIMESTAMP,
-							$INT,
-							$UUID)),
-				nodeId,
-				unlimited,
-				total,
-				request.unit_id,
-				groupId,
-				fixedAt,
-				createdAt,
-				nodeSeq,
-				userId)
-				.execute();
-
-			//登録以降のsnapshotの数量と無制限設定を更新
-			try {
-				recorder.play(
-					() -> new snapshots().updateStatement(
-						a -> a.UPDATE(
-							//一度trueになったらずっとそのままtrue
-							a.unlimited.set("{0} OR ?", Vargs.of(a.unlimited), Vargs.of($BOOLEAN)),
-							//自身の数に今回の移動数量を正規化してプラス
-							a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of($BIGDECIMAL)))
-							.WHERE(
-								wa -> wa.id.IN(
-									new snapshots()
-										.SELECT(sa -> sa.id)
-										//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
-										.WHERE(swa -> swa.unit_id.eq($UUID).AND.fixed_at.gt($TIMESTAMP))))),
-					unlimited,
-					request.in_out.relativize(request.quantity),
-					request.unit_id,
-					fixedAt)
-					.execute();
-			} catch (CheckConstraintViolationException e) {
-				//未来のsnapshotで数量がマイナスになった
-				throw new MinusTotalException();
-			}
+			storeSnapshot(nodeId, nodeSeq, userId, groupId, fixedAt, createdAt, request);
 		};
 
 		if (request.in_out.relativize(request.quantity).compareTo(BigDecimal.ZERO) < 0) {
@@ -464,27 +438,127 @@ public class JournalHandler {
 		}
 	}
 
-	//直近のsnapshotを取得
+	private void storeSnapshot(
+		UUID nodeId,
+		int nodeSeq,
+		UUID userId,
+		UUID groupId,
+		Timestamp fixedAt,
+		Timestamp createdAt,
+		NodeRegisterRequest request) {
+		var seq = createSnapshotSeq(fixedAt, createdAt, nodeSeq);
+
+		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
+		var justBefore = getJustBeforeSnapshot(request.unit_id, seq, recorder);
+
+		var total = request.in_out.calcurate(justBefore.total, request.quantity);
+
+		//直前のsnapshotが無制限の場合、以降すべてのsnapshotが無制限になるので引き継ぐ
+		//そうでなければ今回のリクエストに従う
+		var unlimited = justBefore.unlimited ? true : request.grants_unlimited.orElse(false);
+
+		//移動した結果数量がマイナスになる場合エラー
+		//ただし無制限設定がされていればOK
+		if (!unlimited && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
+
+		recorder.play(
+			() -> new snapshots().insertStatement(
+				a -> a
+					.INSERT(
+						a.id,
+						a.unlimited,
+						a.total,
+						a.unit_id,
+						a.journal_group_id,
+						a.fixed_at,
+						a.seq,
+						a.updated_by)
+					.VALUES(
+						$UUID,
+						$BOOLEAN,
+						$BIGDECIMAL,
+						$UUID,
+						$UUID,
+						$TIMESTAMP,
+						$STRING,
+						$UUID)),
+			nodeId,
+			unlimited,
+			total,
+			request.unit_id,
+			groupId,
+			fixedAt,
+			seq,
+			userId)
+			.execute();
+
+		//登録以降のsnapshotの数量と無制限設定を更新
+		try {
+			recorder.play(
+				() -> new snapshots().updateStatement(
+					a -> a.UPDATE(
+						//一度trueになったらずっとそのままtrue
+						a.unlimited.set("{0} OR ?", Vargs.of(a.unlimited), Vargs.of($BOOLEAN)),
+						//自身の数に今回の移動数量を正規化してプラス
+						a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of($BIGDECIMAL)),
+						a.updated_at.setAny("now()"))
+						.WHERE(
+							wa -> wa.id.IN(
+								new snapshots()
+									.SELECT(sa -> sa.id)
+									//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
+									.WHERE(swa -> swa.unit_id.eq($UUID).AND.seq.gt($STRING))))),
+				unlimited,
+				request.in_out.relativize(request.quantity),
+				request.unit_id,
+				seq)
+				.execute();
+		} catch (CheckConstraintViolationException e) {
+			//未来のsnapshotで数量がマイナスになった
+			throw new MinusTotalException();
+		}
+	}
+
+	private static final String timestampFormat;
+
+	private static final String intFormat;
+
+	static {
+		timestampFormat = "%015d";
+		intFormat = "%06d";
+	}
+
+	private static String createSnapshotSeq(Timestamp fixedAt, Timestamp createdAt, int nodeSeq) {
+		return String.format(timestampFormat, fixedAt.getTime())
+			+ String.format(timestampFormat, createdAt.getTime())
+			+ String.format(intFormat, nodeSeq);
+	}
+
+	private static final String maxSuffix = "999999999999999"//最大値33658-09-27
+		+ "999999";//nodeのseq最大値
+
 	static JustBeforeSnapshot getJustBeforeSnapshot(UUID unitId, Timestamp fixedAt, Recorder recorder) {
+		var seq = String.format(timestampFormat, fixedAt.getTime()) + maxSuffix;
+		return getJustBeforeSnapshot(unitId, seq, recorder);
+	}
+
+	//直近のsnapshotを取得
+	private static JustBeforeSnapshot getJustBeforeSnapshot(UUID unitId, String seq, Recorder recorder) {
 		return recorder.play(
 			() -> new snapshots()
 				.SELECT(a -> a.ls(a.total, a.unlimited))
 				.WHERE(
-					a -> a.unit_id.eq($UUID).AND.fixed_at.eq(
+					a -> a.unit_id.eq($UUID).AND.seq.eq(
 						new snapshots()
-							.SELECT(sa -> sa.MAX(sa.fixed_at))
-							.WHERE(sa -> sa.unit_id.eq($UUID).AND.in_search_scope.eq(true).AND.fixed_at.le($TIMESTAMP))))
-				.ORDER_BY(
-					a -> a.ls(
-						a.created_at.DESC, //同一時刻であればcreated_atが最近のもの
-						a.node_seq.DESC)), //created_atが等しければ同一伝票、同一伝票内であれば生成順
+							.SELECT(sa -> sa.MAX(sa.seq))
+							.WHERE(sa -> sa.unit_id.eq($UUID).AND.in_search_scope.eq(true).AND.seq.lt($STRING)))),
 			unitId,
 			unitId,
-			fixedAt).executeAndGet(r -> {
+			seq).executeAndGet(r -> {
 				var container = new JustBeforeSnapshot();
 				while (r.next()) {
-					container.total = r.getBigDecimal(1);
-					container.unlimited = r.getBoolean(2);
+					container.total = r.getBigDecimal(snapshots.total);
+					container.unlimited = r.getBoolean(snapshots.unlimited);
 					return container;
 				}
 

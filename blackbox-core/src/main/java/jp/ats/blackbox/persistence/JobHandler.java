@@ -39,13 +39,18 @@ public class JobHandler {
 				new snapshots()
 					.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().unit_id))
 					.WHERE(sa -> sa.$nodes().$details().journal_id.eq(row.getId()))
-					.ORDER_BY(a -> a.node_seq)
+					.ORDER_BY(a -> a.seq)
 					.execute(result -> {
 						while (result.next()) {
 							//TODO pluginで個別処理を複数スレッドで行うようにする
 							recorder.play(
 								() -> new current_units()
-									.UPDATE(a -> a.ls(a.snapshot_id.set($UUID), a.unlimited.set($BOOLEAN), a.total.set($BIGDECIMAL)))
+									.UPDATE(
+										a -> a.ls(
+											a.snapshot_id.set($UUID),
+											a.unlimited.set($BOOLEAN),
+											a.total.set($BIGDECIMAL),
+											a.updated_at.setAny("now()")))
 									.WHERE(a -> a.id.eq($UUID)),
 								(UUID) result.getObject(snapshots.id),
 								result.getBoolean(snapshots.unlimited),

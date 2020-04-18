@@ -389,6 +389,8 @@ public class TransientHandler {
 	public static class TransientMoveRequest {
 
 		public UUID transient_id;
+
+		public boolean lazy = false;
 	}
 
 	public static TransientMoveResult move(UUID batchId, UUID userId, TransientMoveRequest request, Recorder recorder) {
@@ -410,11 +412,19 @@ public class TransientHandler {
 			result.compareAndChange(r.fixed_at);
 		});
 
-		journalHandler.register(
-			ids.toArray(new UUID[ids.size()]),
-			batchId,
-			userId,
-			requests.toArray(new JournalRegisterRequest[requests.size()]));
+		if (!request.lazy) {
+			journalHandler.register(
+				ids.toArray(new UUID[ids.size()]),
+				batchId,
+				userId,
+				requests.toArray(new JournalRegisterRequest[requests.size()]));
+		} else {
+			journalHandler.registerLazily(
+				ids.toArray(new UUID[ids.size()]),
+				batchId,
+				userId,
+				requests.toArray(new JournalRegisterRequest[requests.size()]));
+		}
 
 		return result;
 	}

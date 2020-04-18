@@ -41,6 +41,7 @@ public class TransientHandlerTest {
 
 			var batchReq = new TransientMoveRequest();
 			batchReq.transient_id = transientId;
+			batchReq.lazy = true;
 
 			TransientHandler.move(batchId, U.NULL_ID, batchReq, U.recorder);
 
