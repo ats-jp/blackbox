@@ -421,14 +421,36 @@ public class JournalHandler {
 
 		node.insert();
 
+		var grantsUnlimited = request.grants_unlimited.orElse(false);
+
 		if (!lazyRegisterMode) {
-			storeSnapshot(nodeId, nodeSeq, userId, groupId, fixedAt, createdAt, request);
+			storeSnapshot(
+				nodeId,
+				nodeSeq,
+				userId,
+				groupId,
+				fixedAt,
+				createdAt,
+				request.unit_id,
+				grantsUnlimited,
+				request.in_out,
+				request.quantity);
 
 			return;
 		}
 
 		Runnable snapshotProcess = () -> {
-			storeSnapshot(nodeId, nodeSeq, userId, groupId, fixedAt, createdAt, request);
+			storeSnapshot(
+				nodeId,
+				nodeSeq,
+				userId,
+				groupId,
+				fixedAt,
+				createdAt,
+				request.unit_id,
+				grantsUnlimited,
+				request.in_out,
+				request.quantity);
 		};
 
 		if (request.in_out.relativize(request.quantity).compareTo(BigDecimal.ZERO) < 0) {
@@ -445,17 +467,20 @@ public class JournalHandler {
 		UUID groupId,
 		Timestamp fixedAt,
 		Timestamp createdAt,
-		NodeRegisterRequest request) {
+		UUID unitId,
+		boolean grantsUnlimited,
+		InOut inOut,
+		BigDecimal quantity) {
 		var seq = createSnapshotSeq(fixedAt, createdAt, nodeSeq);
 
 		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
-		var justBefore = getJustBeforeSnapshot(request.unit_id, seq, recorder);
-
-		var total = request.in_out.calcurate(justBefore.total, request.quantity);
+		var justBefore = getJustBeforeSnapshot(unitId, seq, recorder);
 
 		//直前のsnapshotが無制限の場合、以降すべてのsnapshotが無制限になるので引き継ぐ
 		//そうでなければ今回のリクエストに従う
-		var unlimited = justBefore.unlimited ? true : request.grants_unlimited.orElse(false);
+		var unlimited = justBefore.unlimited ? true : grantsUnlimited;
+
+		var total = inOut.calcurate(justBefore.total, quantity);
 
 		//移動した結果数量がマイナスになる場合エラー
 		//ただし無制限設定がされていればOK
@@ -485,7 +510,7 @@ public class JournalHandler {
 			nodeId,
 			unlimited,
 			total,
-			request.unit_id,
+			unitId,
 			groupId,
 			fixedAt,
 			seq,
@@ -509,8 +534,8 @@ public class JournalHandler {
 									//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
 									.WHERE(swa -> swa.unit_id.eq($UUID).AND.seq.gt($STRING))))),
 				unlimited,
-				request.in_out.relativize(request.quantity),
-				request.unit_id,
+				inOut.relativize(quantity),
+				unitId,
 				seq)
 				.execute();
 		} catch (CheckConstraintViolationException e) {

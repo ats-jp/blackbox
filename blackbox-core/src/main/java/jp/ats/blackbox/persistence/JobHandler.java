@@ -2,12 +2,14 @@ package jp.ats.blackbox.persistence;
 
 import static org.blendee.sql.Placeholder.$BIGDECIMAL;
 import static org.blendee.sql.Placeholder.$BOOLEAN;
+import static org.blendee.sql.Placeholder.$TIMESTAMP;
 import static org.blendee.sql.Placeholder.$UUID;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.blendee.jdbc.Batch;
 import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
@@ -31,15 +33,18 @@ public class JobHandler {
 		//トランザクション内の他の検索で参照されない、数が多い可能性があるのでbatchで実行
 		var batch = BlendeeManager.getConnection().getBatch();
 
-		new jobs()
-			.SELECT(a -> a.id)
-			.WHERE(a -> a.completed.eq(false).AND.$journals().fixed_at.le(Timestamp.valueOf(time)))
-			.ORDER_BY(a -> a.ls(a.$journals().fixed_at, a.$journals().created_at))
-			.forEach(row -> {
-				new snapshots()
-					.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().unit_id))
-					.WHERE(sa -> sa.$nodes().$details().journal_id.eq(row.getId()))
-					.ORDER_BY(a -> a.seq)
+		recorder.play(
+			() -> new jobs()
+				.SELECT(a -> a.id)
+				.WHERE(a -> a.completed.eq(false).AND.$journals().fixed_at.le($TIMESTAMP))
+				.ORDER_BY(a -> a.ls(a.$journals().fixed_at, a.$journals().created_at)),
+			Timestamp.valueOf(time)).forEach(row -> {
+				recorder.play(
+					() -> new snapshots()
+						.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().unit_id))
+						.WHERE(sa -> sa.$nodes().$details().journal_id.eq($UUID))
+						.ORDER_BY(a -> a.seq),
+					row.getId())
 					.execute(result -> {
 						while (result.next()) {
 							//TODO pluginで個別処理を複数スレッドで行うようにする
@@ -64,6 +69,38 @@ public class JobHandler {
 				row.setCompleted(true);
 
 				row.update(batch);
+			});
+
+		batch.execute();
+
+		updateFutureRows(batch);
+	}
+
+	//過去へと登録されたjournalが原因でcurrent_unitとsnapshotのtotalに食い違いがあるデータを修復する
+	private static void updateFutureRows(Batch batch) {
+		recorder.play(
+			() -> new current_units()
+				.SELECT(
+					a -> a.ls(
+						a.id,
+						a.$snapshots().total,
+						a.$snapshots().unlimited))
+				.WHERE(a -> a.total.ne(a.$snapshots().total).OR.unlimited.ne(a.$snapshots().unlimited)))
+			.execute(r -> {
+				while (r.next()) {
+					recorder.play(
+						() -> new current_units()
+							.UPDATE(
+								a -> a.ls(
+									a.unlimited.set($BOOLEAN),
+									a.total.set($BIGDECIMAL),
+									a.updated_at.setAny("now()")))
+							.WHERE(a -> a.id.eq($UUID)),
+						r.getBoolean(snapshots.unlimited),
+						r.getBigDecimal(snapshots.total),
+						U.uuid(r, current_units.id))
+						.execute(batch);
+				}
 			});
 
 		batch.execute();
