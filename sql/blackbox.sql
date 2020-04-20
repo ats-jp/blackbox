@@ -758,7 +758,7 @@ CREATE UNLOGGED TABLE bb.current_units (
 	id uuid PRIMARY KEY REFERENCES bb.units, --unitは削除されないのでCASCADEなし
 	unlimited boolean NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
-	snapshot_id uuid REFERENCES bb.snapshots NOT NULL,
+	snapshot_id uuid REFERENCES bb.snapshots ON DELETE CASCADE NOT NULL, --snapshot再作成のためsnapshotを削除した際に削除
 	updated_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時journalsから復元する必要あり
@@ -1090,7 +1090,6 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb.groups,
 	bb.relationships,
 	bb.users,
-	bb.snapshots,
 	bb.transients,
 	bb.transient_journals,
 	bb.transient_details,
@@ -1101,6 +1100,7 @@ GRANT INSERT, UPDATE ON TABLE
 	bb.last_closings,
 	bb.current_units,
 	bb.closed_units,
+	bb.snapshots,
 	bb.jobs
 TO blackbox;
 

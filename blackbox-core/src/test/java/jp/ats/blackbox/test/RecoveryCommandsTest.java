@@ -5,9 +5,9 @@ import org.blendee.util.Blendee;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.SnapshotHandler;
+import jp.ats.blackbox.persistence.RecoveryCommands;
 
-public class SnapshotHandlerTest {
+public class RecoveryCommandsTest {
 
 	public static void main(String[] args) {
 		Common.startWithLog();
@@ -16,8 +16,10 @@ public class SnapshotHandlerTest {
 		JobExecutor.start();
 
 		Blendee.execute(t -> {
-			SnapshotHandler.refreshSnapshots(t, s -> {
-				s.WHERE(a -> a.id.ne(U.NULL_ID));
+			RecoveryCommands.recreateSnapshots(t);
+			RecoveryCommands.recreateCurrentUnits();
+
+			RecoveryCommands.linkCurrentUnitsToSnapshots(a -> {
 			});
 		});
 

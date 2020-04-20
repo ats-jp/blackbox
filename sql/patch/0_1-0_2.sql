@@ -76,7 +76,7 @@ CREATE UNLOGGED TABLE bb.current_units (
 	id uuid PRIMARY KEY REFERENCES bb.units, --unitは削除されないのでCASCADEなし
 	unlimited boolean NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
-	snapshot_id uuid REFERENCES bb.snapshots NOT NULL,
+	snapshot_id uuid REFERENCES bb.snapshots ON DELETE CASCADE NOT NULL, --snapshot再作成のためsnapshotを削除した際に削除
 	updated_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時journalsから復元する必要あり
@@ -93,10 +93,6 @@ COMMENT ON COLUMN bb.current_units.snapshot_id IS 'スナップショットID
 現時点の数量を変更した伝票';
 COMMENT ON COLUMN bb.current_units.updated_at IS '更新時刻';
 
-GRANT INSERT, UPDATE, DELETE ON TABLE
-	bb.snapshots
-TO blackbox;
-
 --snapshots
 CREATE INDEX ON bb.snapshots (in_search_scope);
 CREATE INDEX ON bb.snapshots (total);
@@ -107,19 +103,3 @@ CREATE INDEX ON bb.snapshots (seq);
 
 --current_units
 CREATE INDEX ON bb.current_units (snapshot_id);
-
-INSERT INTO bb.current_units (
-	id,
-	unlimited,
-	total,
-	snapshot_id,
-	updated_at
-)
-SELECT
-	id,
-	false,
-	0,
-	'00000000-0000-0000-0000-000000000000',
-	now()
-FROM
-	bb.units;
