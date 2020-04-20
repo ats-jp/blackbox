@@ -775,6 +775,20 @@ COMMENT ON COLUMN bb.current_units.snapshot_id IS 'スナップショットID
 現時点の数量を変更した伝票';
 COMMENT ON COLUMN bb.current_units.updated_at IS '更新時刻';
 
+--NULLの代用(id=0)
+INSERT INTO bb.current_units (
+	id,
+	unlimited,
+	total,
+	snapshot_id,
+	updated_at
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	false,
+	0,
+	'00000000-0000-0000-0000-000000000000',
+	now());
+
 ----------
 
 --締め管理対象

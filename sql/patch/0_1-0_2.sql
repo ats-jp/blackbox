@@ -107,3 +107,19 @@ CREATE INDEX ON bb.snapshots (seq);
 
 --current_units
 CREATE INDEX ON bb.current_units (snapshot_id);
+
+INSERT INTO bb.current_units (
+	id,
+	unlimited,
+	total,
+	snapshot_id,
+	updated_at
+)
+SELECT
+	id,
+	false,
+	0,
+	'00000000-0000-0000-0000-000000000000',
+	now()
+FROM
+	bb.units;
