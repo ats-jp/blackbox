@@ -38,14 +38,7 @@ public class UnitHandler {
 		Supplier<units> supplier) {
 		UUID unitId = registerUnit(userId);
 
-		U.recorder.play(
-			() -> new current_units().insertStatement(
-				//後でjobから更新されるのでunlimitedはとりあえずfalse、totalは0
-				a -> a.INSERT(a.id, a.unlimited, a.total, a.snapshot_id).VALUES($UUID, $BOOLEAN, $INT, $UUID)),
-			unitId,
-			false,
-			0,
-			U.NULL_ID).execute();
+		registerCurrentUnit(unitId);
 
 		//関連情報取得のため改めて検索
 		return U.recorder.play(
@@ -59,14 +52,7 @@ public class UnitHandler {
 	public static UUID register(UUID userId) {
 		UUID unitId = registerUnit(userId);
 
-		U.recorder.play(
-			() -> new current_units().insertStatement(
-				//後でjobから更新されるのでunlimitedはとりあえずfalse、totalは0
-				a -> a.INSERT(a.id, a.unlimited, a.total, a.snapshot_id).VALUES($UUID, $BOOLEAN, $INT, $UUID)),
-			unitId,
-			false,
-			0,
-			U.NULL_ID).execute();
+		registerCurrentUnit(unitId);
 
 		return unitId;
 	}
@@ -91,5 +77,16 @@ public class UnitHandler {
 			.execute();
 
 		return unitId;
+	}
+
+	private static void registerCurrentUnit(UUID unitId) {
+		U.recorder.play(
+			() -> new current_units().insertStatement(
+				//後でjobから更新されるのでunlimitedはとりあえずfalse、totalは0
+				a -> a.INSERT(a.id, a.unlimited, a.total, a.snapshot_id).VALUES($UUID, $BOOLEAN, $INT, $UUID)),
+			unitId,
+			false,
+			0,
+			U.NULL_ID).execute();
 	}
 }

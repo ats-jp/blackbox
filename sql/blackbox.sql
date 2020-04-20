@@ -1079,6 +1079,7 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb.groups,
 	bb.relationships,
 	bb.users,
+	bb.snapshots,
 	bb.transients,
 	bb.transient_journals,
 	bb.transient_details,
@@ -1088,7 +1089,6 @@ TO blackbox;
 GRANT INSERT, UPDATE ON TABLE
 	bb.last_closings,
 	bb.current_units,
-	bb.snapshots,
 	bb.closed_units,
 	bb.jobs
 TO blackbox;

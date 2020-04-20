@@ -316,7 +316,7 @@ public class TransientHandler {
 
 		UUID id = UUID.randomUUID();
 
-		JournalPreparer.prepareNode(detailId, id, userId, request, node, seq, U.recorder);
+		JournalPreparer.prepareNode(detailId, id, request, node, seq, U.recorder);
 
 		node.setSeq_in_detail(seq);
 		node.setCreated_by(userId);

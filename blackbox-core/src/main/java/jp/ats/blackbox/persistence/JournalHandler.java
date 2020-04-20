@@ -25,6 +25,7 @@ import org.blendee.sql.Recorder;
 import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TagExecutor;
 import sqlassist.bb.details;
 import sqlassist.bb.jobs;
@@ -261,6 +262,8 @@ public class JournalHandler {
 
 	private int nodeSeq;
 
+	private boolean updateDifferentTotalCurrentUnits;
+
 	private class Journal extends journals.Row implements JournalPreparer.Journal {
 	}
 
@@ -319,6 +322,7 @@ public class JournalHandler {
 	private void registerInternal(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request) {
 		//初期化
 		nodeSeq = 0;
+		updateDifferentTotalCurrentUnits = false;
 
 		var journal = new Journal();
 
@@ -354,6 +358,8 @@ public class JournalHandler {
 
 		//jobを登録し、別プロセスで現在数量を更新させる
 		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($UUID), journalId).execute();
+
+		if (updateDifferentTotalCurrentUnits) JobExecutor.updateDifferentRows();
 	}
 
 	public static class ClosedCheckError {
@@ -417,14 +423,15 @@ public class JournalHandler {
 
 		var nodeSeq = ++this.nodeSeq;
 
-		JournalPreparer.prepareNode(detailId, nodeId, userId, request, node, nodeSeq, recorder);
+		JournalPreparer.prepareNode(detailId, nodeId, request, node, nodeSeq, recorder);
 
 		node.insert();
 
 		var grantsUnlimited = request.grants_unlimited.orElse(false);
 
 		if (!lazyRegisterMode) {
-			storeSnapshot(
+			updateDifferentTotalCurrentUnits |= storeSnapshot(
+				recorder,
 				nodeId,
 				nodeSeq,
 				userId,
@@ -440,7 +447,8 @@ public class JournalHandler {
 		}
 
 		Runnable snapshotProcess = () -> {
-			storeSnapshot(
+			updateDifferentTotalCurrentUnits |= storeSnapshot(
+				recorder,
 				nodeId,
 				nodeSeq,
 				userId,
@@ -460,7 +468,8 @@ public class JournalHandler {
 		}
 	}
 
-	private void storeSnapshot(
+	static boolean storeSnapshot(
+		Recorder recorder,
 		UUID nodeId,
 		int nodeSeq,
 		UUID userId,
@@ -519,7 +528,7 @@ public class JournalHandler {
 
 		//登録以降のsnapshotの数量と無制限設定を更新
 		try {
-			recorder.play(
+			int result = recorder.play(
 				() -> new snapshots().updateStatement(
 					a -> a.UPDATE(
 						//一度trueになったらずっとそのままtrue
@@ -538,6 +547,8 @@ public class JournalHandler {
 				unitId,
 				seq)
 				.execute();
+
+			return result > 0;
 		} catch (CheckConstraintViolationException e) {
 			//未来のsnapshotで数量がマイナスになった
 			throw new MinusTotalException();

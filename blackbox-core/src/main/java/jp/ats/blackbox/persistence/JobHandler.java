@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.blendee.jdbc.Batch;
 import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
@@ -72,12 +71,12 @@ public class JobHandler {
 			});
 
 		batch.execute();
-
-		updateFutureRows(batch);
 	}
 
 	//過去へと登録されたjournalが原因でcurrent_unitとsnapshotのtotalに食い違いがあるデータを修復する
-	private static void updateFutureRows(Batch batch) {
+	public static void updateDifferentRows() {
+		var batch = BlendeeManager.getConnection().getBatch();
+
 		recorder.play(
 			() -> new current_units()
 				.SELECT(
