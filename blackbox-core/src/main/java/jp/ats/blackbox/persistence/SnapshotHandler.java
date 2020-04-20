@@ -48,20 +48,15 @@ public class SnapshotHandler {
 					a.$details().$journals().created_at,
 					a.seq))
 			.forEach(node -> {
-				var id = node.getId();
-				new snapshots().DELETE().WHERE(a -> a.id.eq(id)).execute();
-
 				var journal = node.$details().$journals();
-
-				var fixedAt = journal.getFixed_at();
 
 				JournalHandler.storeSnapshot(
 					U.recorder,
-					id,
+					node.getId(),
 					node.getSeq(),
 					SecurityValues.currentUserId(),
 					journal.getGroup_id(),
-					fixedAt,
+					journal.getFixed_at(),
 					journal.getCreated_at(),
 					node.getUnit_id(),
 					node.getGrants_unlimited(),

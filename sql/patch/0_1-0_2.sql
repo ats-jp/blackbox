@@ -76,7 +76,7 @@ CREATE UNLOGGED TABLE bb.current_units (
 	id uuid PRIMARY KEY REFERENCES bb.units, --unitは削除されないのでCASCADEなし
 	unlimited boolean NOT NULL,
 	total numeric CHECK (unlimited OR total >= 0) NOT NULL,
-	snapshot_id uuid REFERENCES bb.snapshots NOT NULL,
+	snapshot_id uuid REFERENCES bb.snapshots ON DELETE CASCADE NOT NULL, --snapshot再作成のためsnapshotを削除した際に削除
 	updated_at timestamptz DEFAULT now() NOT NULL);
 --log対象外
 --WAL対象外のため、クラッシュ時journalsから復元する必要あり
