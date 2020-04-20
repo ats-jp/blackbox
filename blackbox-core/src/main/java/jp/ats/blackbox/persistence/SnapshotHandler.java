@@ -1,22 +1,35 @@
 package jp.ats.blackbox.persistence;
 
-import java.util.function.Consumer;
-
 import org.blendee.jdbc.Transaction;
 
 import jp.ats.blackbox.common.U;
 import sqlassist.bb.current_units;
 import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
+import sqlassist.bb.units;
 
 public class SnapshotHandler {
 
-	public static void refreshSnapshots(Transaction transaction, Consumer<snapshots> snapshotDecorator) {
-		var snapshotQuery = new snapshots().SELECT(a -> a.id);
-		snapshotDecorator.accept(snapshotQuery);
+	public static void recreateCurrentUnits() {
+		new current_units().INSERT(
+			a -> a.ls(
+				a.id,
+				a.unlimited,
+				a.total,
+				a.snapshot_id,
+				a.updated_at),
+			new units().SELECT(
+				a -> a.ls(
+					a.id,
+					a.any("false"),
+					a.any(0),
+					a.any("'" + U.NULL_ID.toString() + "'"),
+					a.any("now()")))
+				.WHERE(a -> a.NOT_EXISTS(new current_units().SELECT(ea -> ea.any(0)).WHERE(ea -> ea.id.eq(a.id)))))
+			.execute();
+	}
 
-		new current_units().UPDATE(a -> a.snapshot_id.set(U.NULL_ID)).WHERE(a -> a.snapshot_id.IN(snapshotQuery)).execute();
-
+	public static void recreateSnapshots(Transaction transaction) {
 		new nodes().SELECT(
 			a -> a.ls(
 				a.id,
@@ -28,7 +41,12 @@ public class SnapshotHandler {
 				a.grants_unlimited,
 				a.in_out,
 				a.quantity))
-			.WHERE(a -> a.id.IN(snapshotQuery))
+			.WHERE(a -> a.NOT_EXISTS(new snapshots().SELECT(ea -> ea.any(0)).WHERE(ea -> ea.id.eq(a.id))))
+			.ORDER_BY(
+				a -> a.ls(
+					a.$details().$journals().fixed_at,
+					a.$details().$journals().created_at,
+					a.seq))
 			.forEach(node -> {
 				var id = node.getId();
 				new snapshots().DELETE().WHERE(a -> a.id.eq(id)).execute();

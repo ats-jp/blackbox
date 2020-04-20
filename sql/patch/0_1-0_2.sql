@@ -93,10 +93,6 @@ COMMENT ON COLUMN bb.current_units.snapshot_id IS 'スナップショットID
 現時点の数量を変更した伝票';
 COMMENT ON COLUMN bb.current_units.updated_at IS '更新時刻';
 
-GRANT INSERT, UPDATE, DELETE ON TABLE
-	bb.snapshots
-TO blackbox;
-
 --snapshots
 CREATE INDEX ON bb.snapshots (in_search_scope);
 CREATE INDEX ON bb.snapshots (total);
@@ -107,43 +103,3 @@ CREATE INDEX ON bb.snapshots (seq);
 
 --current_units
 CREATE INDEX ON bb.current_units (snapshot_id);
-
-INSERT INTO bb.snapshots (
-	id,
-	unlimited,
-	total,
-	journal_group_id,
-	unit_id,
-	fixed_at,
-	seq,
-	updated_by
-)
-SELECT
-	nodes.id,
-	false,
-	0,
-	'00000000-0000-0000-0000-000000000000',
-	nodes.unit_id,
-	journals.fixed_at,
-	nodes.id, --暫定として重複しない値をセット
-	'00000000-0000-0000-0000-000000000000'
-FROM
-	bb.nodes
-	JOIN bb.details ON nodes.detail_id = details.id
-	JOIN bb.journals ON details.journal_id = journals.id;
-
-INSERT INTO bb.current_units (
-	id,
-	unlimited,
-	total,
-	snapshot_id,
-	updated_at
-)
-SELECT
-	id,
-	false,
-	0,
-	'00000000-0000-0000-0000-000000000000',
-	now()
-FROM
-	bb.units;

@@ -16,9 +16,8 @@ public class SnapshotHandlerTest {
 		JobExecutor.start();
 
 		Blendee.execute(t -> {
-			SnapshotHandler.refreshSnapshots(t, s -> {
-				s.WHERE(a -> a.id.ne(U.NULL_ID));
-			});
+			SnapshotHandler.recreateSnapshots(t);
+			SnapshotHandler.recreateCurrentUnits();
 		});
 
 		SecurityValues.end();
