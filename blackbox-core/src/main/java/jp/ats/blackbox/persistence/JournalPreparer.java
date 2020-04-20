@@ -72,7 +72,6 @@ class JournalPreparer {
 	static void prepareNode(
 		UUID detailId,
 		UUID nodeId,
-		UUID userId,
 		NodeRegisterRequest request,
 		Node node,
 		int nodeSeq,

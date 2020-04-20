@@ -25,6 +25,7 @@ import org.blendee.sql.Recorder;
 import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TagExecutor;
 import sqlassist.bb.details;
 import sqlassist.bb.jobs;
@@ -261,6 +262,8 @@ public class JournalHandler {
 
 	private int nodeSeq;
 
+	private boolean updateDifferentTotalCurrentUnits;
+
 	private class Journal extends journals.Row implements JournalPreparer.Journal {
 	}
 
@@ -319,6 +322,7 @@ public class JournalHandler {
 	private void registerInternal(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request) {
 		//初期化
 		nodeSeq = 0;
+		updateDifferentTotalCurrentUnits = false;
 
 		var journal = new Journal();
 
@@ -354,6 +358,8 @@ public class JournalHandler {
 
 		//jobを登録し、別プロセスで現在数量を更新させる
 		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($UUID), journalId).execute();
+
+		if (updateDifferentTotalCurrentUnits) JobExecutor.updateDifferentRows();
 	}
 
 	public static class ClosedCheckError {
@@ -417,18 +423,42 @@ public class JournalHandler {
 
 		var nodeSeq = ++this.nodeSeq;
 
-		JournalPreparer.prepareNode(detailId, nodeId, userId, request, node, nodeSeq, recorder);
+		JournalPreparer.prepareNode(detailId, nodeId, request, node, nodeSeq, recorder);
 
 		node.insert();
 
+		var grantsUnlimited = request.grants_unlimited.orElse(false);
+
 		if (!lazyRegisterMode) {
-			storeSnapshot(nodeId, nodeSeq, userId, groupId, fixedAt, createdAt, request);
+			updateDifferentTotalCurrentUnits |= storeSnapshot(
+				recorder,
+				nodeId,
+				nodeSeq,
+				userId,
+				groupId,
+				fixedAt,
+				createdAt,
+				request.unit_id,
+				grantsUnlimited,
+				request.in_out,
+				request.quantity);
 
 			return;
 		}
 
 		Runnable snapshotProcess = () -> {
-			storeSnapshot(nodeId, nodeSeq, userId, groupId, fixedAt, createdAt, request);
+			updateDifferentTotalCurrentUnits |= storeSnapshot(
+				recorder,
+				nodeId,
+				nodeSeq,
+				userId,
+				groupId,
+				fixedAt,
+				createdAt,
+				request.unit_id,
+				grantsUnlimited,
+				request.in_out,
+				request.quantity);
 		};
 
 		if (request.in_out.relativize(request.quantity).compareTo(BigDecimal.ZERO) < 0) {
@@ -438,24 +468,28 @@ public class JournalHandler {
 		}
 	}
 
-	private void storeSnapshot(
+	static boolean storeSnapshot(
+		Recorder recorder,
 		UUID nodeId,
 		int nodeSeq,
 		UUID userId,
 		UUID groupId,
 		Timestamp fixedAt,
 		Timestamp createdAt,
-		NodeRegisterRequest request) {
+		UUID unitId,
+		boolean grantsUnlimited,
+		InOut inOut,
+		BigDecimal quantity) {
 		var seq = createSnapshotSeq(fixedAt, createdAt, nodeSeq);
 
 		//この在庫の数量と無制限タイプの在庫かを知るため、直近のsnapshotを取得
-		var justBefore = getJustBeforeSnapshot(request.unit_id, seq, recorder);
-
-		var total = request.in_out.calcurate(justBefore.total, request.quantity);
+		var justBefore = getJustBeforeSnapshot(unitId, seq, recorder);
 
 		//直前のsnapshotが無制限の場合、以降すべてのsnapshotが無制限になるので引き継ぐ
 		//そうでなければ今回のリクエストに従う
-		var unlimited = justBefore.unlimited ? true : request.grants_unlimited.orElse(false);
+		var unlimited = justBefore.unlimited ? true : grantsUnlimited;
+
+		var total = inOut.calcurate(justBefore.total, quantity);
 
 		//移動した結果数量がマイナスになる場合エラー
 		//ただし無制限設定がされていればOK
@@ -485,7 +519,7 @@ public class JournalHandler {
 			nodeId,
 			unlimited,
 			total,
-			request.unit_id,
+			unitId,
 			groupId,
 			fixedAt,
 			seq,
@@ -494,7 +528,7 @@ public class JournalHandler {
 
 		//登録以降のsnapshotの数量と無制限設定を更新
 		try {
-			recorder.play(
+			int result = recorder.play(
 				() -> new snapshots().updateStatement(
 					a -> a.UPDATE(
 						//一度trueになったらずっとそのままtrue
@@ -509,10 +543,12 @@ public class JournalHandler {
 									//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
 									.WHERE(swa -> swa.unit_id.eq($UUID).AND.seq.gt($STRING))))),
 				unlimited,
-				request.in_out.relativize(request.quantity),
-				request.unit_id,
+				inOut.relativize(quantity),
+				unitId,
 				seq)
 				.execute();
+
+			return result > 0;
 		} catch (CheckConstraintViolationException e) {
 			//未来のsnapshotで数量がマイナスになった
 			throw new MinusTotalException();

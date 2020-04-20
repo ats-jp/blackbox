@@ -360,11 +360,11 @@ public class TransientHandler {
 
 		UUID id = UUID.randomUUID();
 
-		UUID userId = SecurityValues.currentUserId();
-
-		JournalPreparer.prepareNode(detailId, id, userId, request, node, seq, U.recorder);
+		JournalPreparer.prepareNode(detailId, id, request, node, seq, U.recorder);
 
 		node.setSeq_in_detail(seq);
+
+		UUID userId = SecurityValues.currentUserId();
 		node.setCreated_by(userId);
 		node.setUpdated_by(userId);
 
