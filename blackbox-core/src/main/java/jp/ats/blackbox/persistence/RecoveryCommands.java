@@ -1,5 +1,9 @@
 package jp.ats.blackbox.persistence;
 
+import java.sql.Timestamp;
+import java.util.function.Consumer;
+
+import org.blendee.jdbc.BlendeeManager;
 import org.blendee.jdbc.Transaction;
 
 import jp.ats.blackbox.common.U;
@@ -8,7 +12,36 @@ import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
 import sqlassist.bb.units;
 
-public class SnapshotHandler {
+public class RecoveryCommands {
+
+	public static void linkCurrentUnitsToSnapshots(Consumer<units.WhereAssist> criteriaDecorator) {
+		var updatedAt = new Timestamp(System.currentTimeMillis());
+
+		var batch = BlendeeManager.getConnection().getBatch();
+
+		new current_units()
+			.SELECT(a -> a.id)
+			.WHERE(a -> a.id.IN(new units().SELECT(sa -> sa.id).WHERE(criteriaDecorator)))
+			.forEach(r -> {
+				UnitHandler.buildQuery(a -> a.unit_id.eq(r.getId()))
+					.SELECT(
+						a -> a.ls(
+							a.id,
+							a.total,
+							a.unlimited))
+					.willUnique()
+					.ifPresent(s -> {
+						r.setSnapshot_id(s.getId());
+						r.setTotal(s.getTotal());
+						r.setUnlimited(s.getUnlimited());
+						r.setUpdated_at(updatedAt);
+
+						r.update(batch);
+					});
+			});
+
+		batch.execute();
+	}
 
 	public static void recreateCurrentUnits() {
 		new current_units().INSERT(

@@ -17,8 +17,7 @@ import sqlassist.bb.units;
 
 public class UnitHandler {
 
-	public static snapshots buildQuery(
-		Consumer<snapshots.WhereAssist> criteriaDecorator) {
+	public static snapshots buildQuery(Consumer<snapshots.WhereAssist> criteriaDecorator) {
 		var raw = new snapshots().SELECT(
 			a -> a.ls(
 				a.id,
