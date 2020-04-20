@@ -1033,6 +1033,9 @@ CREATE INDEX ON bb.snapshots (unit_id);
 CREATE INDEX ON bb.snapshots (fixed_at);
 CREATE INDEX ON bb.snapshots (seq);
 
+--current_units
+CREATE INDEX ON bb.current_units (snapshot_id);
+
 --jobs
 CREATE INDEX ON bb.jobs (completed);
 --worker_idで検索することはないのでindex不要
