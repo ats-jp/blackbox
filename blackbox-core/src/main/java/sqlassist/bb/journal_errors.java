@@ -131,11 +131,11 @@ public class journal_errors
 
 	/**
 	 * name: abandoned_id<br>
-	 * remarks: journalもしくはclosingに使用される予定だったID<br>
+	 * remarks: journalもしくはclosingもしくはjournal_batchに使用される予定だったID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "abandoned_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "journalもしくはclosingに使用される予定だったID", defaultValue = "null", ordinalPosition = 1, notNull = true)
+	@Column(name = "abandoned_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "journalもしくはclosingもしくはjournal_batchに使用される予定だったID", defaultValue = "null", ordinalPosition = 1, notNull = true)
 	public static final String abandoned_id = "abandoned_id";
 
 	/**
@@ -294,7 +294,7 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: abandoned_id<br>
-		 * remarks: journalもしくはclosingに使用される予定だったID<br>
+		 * remarks: journalもしくはclosingもしくはjournal_batchに使用される予定だったID<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.util.UUID
@@ -311,7 +311,7 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: abandoned_id<br>
-		 * remarks: journalもしくはclosingに使用される予定だったID<br>
+		 * remarks: journalもしくはclosingもしくはjournal_batchに使用される予定だったID<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.util.UUID

@@ -41,8 +41,9 @@ SET default_tablespace = 'blackbox_log';
 
 CREATE TABLE bb_log.orgs (
 	id uuid,
-	name text,
 	instance_id uuid,
+	seq bigint,
+	name text,
 	revision bigint,
 	props jsonb,
 	active boolean,
@@ -80,6 +81,7 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.orgs_logfunction();
 CREATE TABLE bb_log.groups (
 	id uuid,
 	org_id uuid,
+	seq bigint,
 	name text,
 	parent_id uuid,
 	revision bigint,
@@ -120,6 +122,7 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.groups_logfunction();
 CREATE TABLE bb_log.users (
 	id uuid,
 	group_id uuid,
+	seq bigint,
 	name text,
 	role smallint,
 	revision bigint,
@@ -160,6 +163,7 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.users_logfunction();
 CREATE TABLE bb_log.closings (
 	id uuid,
 	group_id uuid,
+	seq bigint,
 	closed_at timestamptz,
 	props jsonb,
 	created_at timestamptz,
@@ -194,7 +198,9 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.closings_logfunction();
 CREATE TABLE bb_log.transients (
 	id uuid,
 	group_id uuid,
+	seq_in_group bigint,
 	user_id uuid,
+	seq_in_user bigint,
 	owner_type "char",
 	revision bigint,
 	created_at timestamptz,
@@ -231,9 +237,10 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.transients_logfunction();
 CREATE TABLE bb_log.transient_journals (
 	id uuid,
 	transient_id uuid,
+	seq_in_transient bigint,
 	group_id uuid,
 	fixed_at timestamptz,
-	seq bigint,
+	seq_in_db bigint,
 	props jsonb,
 	tags text[],
 	created_at timestamptz,

@@ -206,11 +206,11 @@ public class snapshots
 	 * name: seq<br>
 	 * remarks: 移動ノード状態の登録順<br>
 	 * 検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ<br>
-	 * 一意であり順序として使用できる<br>
-	 * type: bpchar(40)<br>
+	 * グループ内で一意であり順序として使用できる<br>
+	 * type: bpchar(36)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = 1, typeName = "bpchar", size = 40, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ノード状態の登録順\n検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ\n一意であり順序として使用できる", defaultValue = "null", ordinalPosition = 8, notNull = true)
+	@Column(name = "seq", type = 1, typeName = "bpchar", size = 36, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ノード状態の登録順\n検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ\nグループ内で一意であり順序として使用できる", defaultValue = "null", ordinalPosition = 8, notNull = true)
 	public static final String seq = "seq";
 
 	/**
@@ -563,8 +563,8 @@ public class snapshots
 		 * name: seq<br>
 		 * remarks: 移動ノード状態の登録順<br>
 		 * 検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ<br>
-		 * 一意であり順序として使用できる<br>
-		 * type: bpchar(40)<br>
+		 * グループ内で一意であり順序として使用できる<br>
+		 * type: bpchar(36)<br>
 		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
@@ -582,8 +582,8 @@ public class snapshots
 		 * name: seq<br>
 		 * remarks: 移動ノード状態の登録順<br>
 		 * 検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ<br>
-		 * 一意であり順序として使用できる<br>
-		 * type: bpchar(40)<br>
+		 * グループ内で一意であり順序として使用できる<br>
+		 * type: bpchar(36)<br>
 		 * not null: true<br>
 		 * @return java.lang.String
 		 */

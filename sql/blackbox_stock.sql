@@ -37,7 +37,7 @@ blackbox Blackbox利用者 一般権限
 
 CREATE SCHEMA bb_stock;
 
-COMMENT ON SCHEMA bb_stock IS 'Blackbox Stock Schema';
+COMMENT ON SCHEMA bb_stock IS 'Blackbox Stock Schema Ver. 0.3';
 
 /*
 --postgresql tablespace
@@ -54,6 +54,7 @@ SET default_tablespace = 'blackbox';
 CREATE TABLE bb_stock.items (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
+	seq bigint NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -69,6 +70,7 @@ COMMENT ON TABLE bb_stock.items IS 'アイテム
 在庫管理する対象となる「もの」、SKU、個品など';
 COMMENT ON COLUMN bb_stock.items.id IS 'ID';
 COMMENT ON COLUMN bb_stock.items.group_id IS 'グループID';
+COMMENT ON COLUMN bb_stock.items.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.items.name IS '名称';
 COMMENT ON COLUMN bb_stock.items.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.items.props IS '外部アプリケーション情報JSON';
@@ -83,6 +85,7 @@ COMMENT ON COLUMN bb_stock.items.updated_by IS '更新ユーザー';
 INSERT INTO bb_stock.items (
 	id,
 	group_id,
+	seq,
 	name,
 	revision,
 	props,
@@ -91,6 +94,7 @@ INSERT INTO bb_stock.items (
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
+	0,
 	'NULL',
 	0,
 	'{}',
@@ -109,6 +113,7 @@ CREATE TABLE bb_stock.items_tags (
 CREATE TABLE bb_stock.owners (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
+	seq bigint NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -124,6 +129,7 @@ COMMENT ON TABLE bb_stock.owners IS '所有者
 アイテムの所有者';
 COMMENT ON COLUMN bb_stock.owners.id IS 'ID';
 COMMENT ON COLUMN bb_stock.owners.group_id IS 'グループID';
+COMMENT ON COLUMN bb_stock.owners.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.owners.name IS '名称';
 COMMENT ON COLUMN bb_stock.owners.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.owners.props IS '外部アプリケーション情報JSON';
@@ -138,6 +144,7 @@ COMMENT ON COLUMN bb_stock.owners.updated_by IS '更新ユーザー';
 INSERT INTO bb_stock.owners (
 	id,
 	group_id,
+	seq,
 	name,
 	revision,
 	props,
@@ -146,6 +153,7 @@ INSERT INTO bb_stock.owners (
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
+	0,
 	'NULL',
 	0,
 	'{}',
@@ -164,6 +172,7 @@ CREATE TABLE bb_stock.owners_tags (
 CREATE TABLE bb_stock.locations (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
+	seq bigint NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -179,6 +188,7 @@ COMMENT ON TABLE bb_stock.locations IS '置き場
 アイテムの置き場';
 COMMENT ON COLUMN bb_stock.locations.id IS 'ID';
 COMMENT ON COLUMN bb_stock.locations.group_id IS 'グループID';
+COMMENT ON COLUMN bb_stock.locations.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.locations.name IS '名称';
 COMMENT ON COLUMN bb_stock.locations.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.locations.props IS '外部アプリケーション情報JSON';
@@ -193,6 +203,7 @@ COMMENT ON COLUMN bb_stock.locations.updated_by IS '更新ユーザー';
 INSERT INTO bb_stock.locations (
 	id,
 	group_id,
+	seq,
 	name,
 	revision,
 	props,
@@ -201,6 +212,7 @@ INSERT INTO bb_stock.locations (
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
+	0,
 	'NULL',
 	0,
 	'{}',
@@ -218,6 +230,7 @@ CREATE TABLE bb_stock.locations_tags (
 CREATE TABLE bb_stock.statuses (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
+	seq bigint NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -233,6 +246,7 @@ COMMENT ON TABLE bb_stock.statuses IS '状態
 Blackbox内でのアイテムの状態';
 COMMENT ON COLUMN bb_stock.statuses.id IS 'ID';
 COMMENT ON COLUMN bb_stock.statuses.group_id IS 'グループID';
+COMMENT ON COLUMN bb_stock.statuses.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.statuses.name IS '名称';
 COMMENT ON COLUMN bb_stock.statuses.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.statuses.props IS '外部アプリケーション情報JSON';
@@ -247,6 +261,7 @@ COMMENT ON COLUMN bb_stock.statuses.updated_by IS '更新ユーザー';
 INSERT INTO bb_stock.statuses (
 	id,
 	group_id,
+	seq,
 	name,
 	revision,
 	props,
@@ -255,6 +270,7 @@ INSERT INTO bb_stock.statuses (
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
+	0,
 	'NULL',
 	0,
 	'{}',
@@ -319,6 +335,7 @@ INSERT INTO bb_stock.stocks (
 CREATE TABLE bb_stock.formulas (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
+	seq bigint NOT NULL,
 	name text NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -332,6 +349,7 @@ COMMENT ON TABLE bb_stock.formulas IS '変換式
 事前に定義されたアイテムの変換対応表';
 COMMENT ON COLUMN bb_stock.formulas.id IS 'ID';
 COMMENT ON COLUMN bb_stock.formulas.group_id IS 'グループID';
+COMMENT ON COLUMN bb_stock.formulas.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.formulas.name IS '名称';
 COMMENT ON COLUMN bb_stock.formulas.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.formulas.props IS '外部アプリケーション情報JSON';
@@ -384,18 +402,22 @@ SET default_tablespace = 'blackbox_index';
 
 --items
 CREATE INDEX ON bb_stock.items (group_id);
+CREATE INDEX ON bb_stock.items (seq);
 CREATE INDEX ON bb_stock.items (active);
 
 --owners
 CREATE INDEX ON bb_stock.owners (group_id);
+CREATE INDEX ON bb_stock.owners (seq);
 CREATE INDEX ON bb_stock.owners (active);
 
 --locations
 CREATE INDEX ON bb_stock.locations (group_id);
+CREATE INDEX ON bb_stock.locations (seq);
 CREATE INDEX ON bb_stock.locations (active);
 
 --statuses
 CREATE INDEX ON bb_stock.statuses (group_id);
+CREATE INDEX ON bb_stock.statuses (seq);
 CREATE INDEX ON bb_stock.statuses (active);
 
 --stocks

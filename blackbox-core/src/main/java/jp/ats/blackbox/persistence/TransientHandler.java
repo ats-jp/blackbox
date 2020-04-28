@@ -468,7 +468,7 @@ public class TransientHandler {
 				.WHERE(a -> a.$transient_details().$transient_journals().transient_id.eq($UUID))
 				.ORDER_BY(
 					a -> a.ls(
-						a.$transient_details().$transient_journals().seq,
+						a.$transient_details().$transient_journals().seq_in_db,
 						a.$transient_details().seq_in_journal,
 						a.seq_in_detail))
 				.assist()
@@ -664,7 +664,7 @@ public class TransientHandler {
 							a.any(
 								"RANK() OVER (ORDER BY {0}, {1})",
 								a.$transient_details().$transient_journals().fixed_at,
-								a.$transient_details().$transient_journals().seq) //fixed_atが同一であれば生成順
+								a.$transient_details().$transient_journals().seq_in_db) //fixed_atが同一であれば生成順
 								.AS("seq")))
 					.WHERE(a -> a.$transient_details().$transient_journals().transient_id.eq($UUID)))
 			.ORDER_BY(

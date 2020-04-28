@@ -151,14 +151,32 @@ public class transients
 	public static final String group_id = "group_id";
 
 	/**
+	 * name: seq_in_group<br>
+	 * remarks: グループ内連番<br>
+	 * type: int8(19)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "seq_in_group", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループ内連番", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String seq_in_group = "seq_in_group";
+
+	/**
 	 * name: user_id<br>
 	 * remarks: この一時作業のオーナーユーザー<br>
 	 * 0の場合、オーナーユーザーはいない<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "この一時作業のオーナーユーザー\n0の場合、オーナーユーザーはいない", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "この一時作業のオーナーユーザー\n0の場合、オーナーユーザーはいない", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String user_id = "user_id";
+
+	/**
+	 * name: seq_in_user<br>
+	 * remarks: ユーザー内連番<br>
+	 * type: int8(19)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "seq_in_user", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "ユーザー内連番", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	public static final String seq_in_user = "seq_in_user";
 
 	/**
 	 * name: owner_type<br>
@@ -168,7 +186,7 @@ public class transients
 	 * type: char(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "owner_type", type = 1, typeName = "char", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "オーナータイプ\ngroup_idとuser_idどちらに値が入っているかを表す\nG=GROUP, U=USER", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "owner_type", type = 1, typeName = "char", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "オーナータイプ\ngroup_idとuser_idどちらに値が入っているかを表す\nG=GROUP, U=USER", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String owner_type = "owner_type";
 
 	/**
@@ -177,7 +195,7 @@ public class transients
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 5, notNull = true)
+	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 7, notNull = true)
 	public static final String revision = "revision";
 
 	/**
@@ -186,7 +204,7 @@ public class transients
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 6, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -195,7 +213,7 @@ public class transients
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 7, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 9, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -204,7 +222,7 @@ public class transients
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 8, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 10, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -213,7 +231,7 @@ public class transients
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 9, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 11, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -383,6 +401,36 @@ public class transients
 
 		/**
 		 * setter
+		 * name: seq_in_group<br>
+		 * remarks: グループ内連番<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @param value java.lang.Long
+		 */
+		public void setSeq_in_group(java.lang.Long value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("seq_in_group").getType());
+			data$.setValue("seq_in_group", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: seq_in_group<br>
+		 * remarks: グループ内連番<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @return java.lang.Long
+		 */
+		public java.lang.Long getSeq_in_group() {
+			Binder binder = data$.getValue("seq_in_group");
+			return (java.lang.Long) binder.getValue();
+		}
+
+		/**
+		 * setter
 		 * name: user_id<br>
 		 * remarks: この一時作業のオーナーユーザー<br>
 		 * 0の場合、オーナーユーザーはいない<br>
@@ -411,6 +459,36 @@ public class transients
 		public java.util.UUID getUser_id() {
 			Binder binder = data$.getValue("user_id");
 			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: seq_in_user<br>
+		 * remarks: ユーザー内連番<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @param value java.lang.Long
+		 */
+		public void setSeq_in_user(java.lang.Long value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("seq_in_user").getType());
+			data$.setValue("seq_in_user", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: seq_in_user<br>
+		 * remarks: ユーザー内連番<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @return java.lang.Long
+		 */
+		public java.lang.Long getSeq_in_user() {
+			Binder binder = data$.getValue("seq_in_user");
+			return (java.lang.Long) binder.getValue();
 		}
 
 		/**
@@ -1705,9 +1783,19 @@ public class transients
 		public final T group_id;
 
 		/**
+		 * 項目名 seq_in_group
+		 */
+		public final T seq_in_group;
+
+		/**
 		 * 項目名 user_id
 		 */
 		public final T user_id;
+
+		/**
+		 * 項目名 seq_in_user
+		 */
+		public final T seq_in_user;
 
 		/**
 		 * 項目名 owner_type
@@ -1752,7 +1840,9 @@ public class transients
 
 			this.id = builder$.buildColumn(this, sqlassist.bb.transients.id);
 			this.group_id = builder$.buildColumn(this, sqlassist.bb.transients.group_id);
+			this.seq_in_group = builder$.buildColumn(this, sqlassist.bb.transients.seq_in_group);
 			this.user_id = builder$.buildColumn(this, sqlassist.bb.transients.user_id);
+			this.seq_in_user = builder$.buildColumn(this, sqlassist.bb.transients.seq_in_user);
 			this.owner_type = builder$.buildColumn(this, sqlassist.bb.transients.owner_type);
 			this.revision = builder$.buildColumn(this, sqlassist.bb.transients.revision);
 			this.created_at = builder$.buildColumn(this, sqlassist.bb.transients.created_at);

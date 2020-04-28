@@ -172,10 +172,11 @@ public class nodes
 	/**
 	 * name: seq<br>
 	 * remarks: 伝票内連番<br>
+	 * 最大値999999<br>
 	 * type: int4(10)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票内連番", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票内連番\n最大値999999", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String seq = "seq";
 
 	/**
@@ -428,6 +429,7 @@ public class nodes
 		 * setter
 		 * name: seq<br>
 		 * remarks: 伝票内連番<br>
+		 * 最大値999999<br>
 		 * type: int4(10)<br>
 		 * not null: true<br>
 		 * @param value java.lang.Integer
@@ -445,6 +447,7 @@ public class nodes
 		 * getter
 		 * name: seq<br>
 		 * remarks: 伝票内連番<br>
+		 * 最大値999999<br>
 		 * type: int4(10)<br>
 		 * not null: true<br>
 		 * @return java.lang.Integer

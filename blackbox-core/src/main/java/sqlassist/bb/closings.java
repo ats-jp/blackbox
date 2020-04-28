@@ -150,12 +150,21 @@ public class closings
 	public static final String group_id = "group_id";
 
 	/**
+	 * name: seq<br>
+	 * remarks: グループ内連番<br>
+	 * type: int8(19)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "seq", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループ内連番", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String seq = "seq";
+
+	/**
 	 * name: closed_at<br>
 	 * remarks: 締め時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "closed_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "締め時刻", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "closed_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "締め時刻", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String closed_at = "closed_at";
 
 	/**
@@ -164,7 +173,7 @@ public class closings
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 4, notNull = true)
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 5, notNull = true)
 	public static final String props = "props";
 
 	/**
@@ -173,7 +182,7 @@ public class closings
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 5, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 6, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -182,7 +191,7 @@ public class closings
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 7, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -330,6 +339,36 @@ public class closings
 		public java.util.UUID getGroup_id() {
 			Binder binder = data$.getValue("group_id");
 			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: seq<br>
+		 * remarks: グループ内連番<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @param value java.lang.Long
+		 */
+		public void setSeq(java.lang.Long value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("seq").getType());
+			data$.setValue("seq", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: seq<br>
+		 * remarks: グループ内連番<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @return java.lang.Long
+		 */
+		public java.lang.Long getSeq() {
+			Binder binder = data$.getValue("seq");
+			return (java.lang.Long) binder.getValue();
 		}
 
 		/**
@@ -1536,6 +1575,11 @@ public class closings
 		public final T group_id;
 
 		/**
+		 * 項目名 seq
+		 */
+		public final T seq;
+
+		/**
 		 * 項目名 closed_at
 		 */
 		public final T closed_at;
@@ -1568,6 +1612,7 @@ public class closings
 
 			this.id = builder$.buildColumn(this, sqlassist.bb.closings.id);
 			this.group_id = builder$.buildColumn(this, sqlassist.bb.closings.group_id);
+			this.seq = builder$.buildColumn(this, sqlassist.bb.closings.seq);
 			this.closed_at = builder$.buildColumn(this, sqlassist.bb.closings.closed_at);
 			this.props = builder$.buildColumn(this, sqlassist.bb.closings.props);
 			this.created_at = builder$.buildColumn(this, sqlassist.bb.closings.created_at);

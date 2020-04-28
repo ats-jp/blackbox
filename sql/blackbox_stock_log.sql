@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS bb_log.items CASCADE;
 CREATE TABLE bb_log.items (
 	id uuid,
 	group_id uuid,
+	seq bigint,
 	name text,
 	revision bigint,
 	props jsonb,
@@ -80,6 +81,7 @@ DROP TABLE IF EXISTS bb_log.owners CASCADE;
 CREATE TABLE bb_log.owners (
 	id uuid,
 	group_id uuid,
+	seq bigint,
 	name text,
 	revision bigint,
 	props jsonb,
@@ -123,6 +125,7 @@ DROP TABLE IF EXISTS bb_log.locations CASCADE;
 CREATE TABLE bb_log.locations (
 	id uuid,
 	group_id uuid,
+	seq bigint,
 	name text,
 	revision bigint,
 	props jsonb,
@@ -166,6 +169,7 @@ DROP TABLE IF EXISTS bb_log.statuses CASCADE;
 CREATE TABLE bb_log.statuses (
 	id uuid,
 	group_id uuid,
+	seq bigint,
 	name text,
 	revision bigint,
 	props jsonb,
@@ -209,6 +213,7 @@ DROP TABLE IF EXISTS bb_log.formulas CASCADE;
 CREATE TABLE bb_log.formulas (
 	id uuid,
 	group_id uuid,
+	seq bigint,
 	name text,
 	revision bigint,
 	props jsonb,
