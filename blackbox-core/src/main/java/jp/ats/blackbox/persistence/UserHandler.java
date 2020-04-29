@@ -42,14 +42,12 @@ public class UserHandler {
 		UUID id,
 		long revision,
 		Optional<String> name,
-		Optional<UUID> groupId,
 		Optional<String> props,
 		Optional<String[]> tags,
 		Optional<Boolean> active) {
 		int result = new users().UPDATE(a -> {
 			a.revision.set(revision + 1);
 			name.ifPresent(v -> a.name.set(v));
-			groupId.ifPresent(v -> a.group_id.set(v));
 			props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 			tags.ifPresent(v -> a.tags.set((Object) v));
 			active.ifPresent(v -> a.active.set(v));

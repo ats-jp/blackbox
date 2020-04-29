@@ -31,7 +31,6 @@ public class StockComponetHandlerTest {
 
 			var updateReq = new StockComponent.UpdateRequest();
 			updateReq.id = registered;
-			updateReq.group_id = Optional.of(U.NULL_ID);
 			updateReq.name = Optional.of("test");
 			updateReq.props = Optional.of("{}");
 			updateReq.tags = Optional.of(new String[] { "tag1", "tag2" });

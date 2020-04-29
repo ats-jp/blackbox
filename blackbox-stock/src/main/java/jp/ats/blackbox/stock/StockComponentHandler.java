@@ -13,6 +13,7 @@ import org.blendee.util.GenericTable;
 
 import jp.ats.blackbox.executor.TagExecutor;
 import jp.ats.blackbox.persistence.SecurityValues;
+import jp.ats.blackbox.persistence.SeqHandler;
 import jp.ats.blackbox.persistence.Utils;
 import jp.ats.blackbox.stock.StockComponent.ForcibleUpdateRequest;
 import jp.ats.blackbox.stock.StockComponent.RegisterRequest;
@@ -23,6 +24,8 @@ public class StockComponentHandler {
 	private static final String id = "id";
 
 	private static final String group_id = "group_id";
+
+	private static final String seq = "seq";
 
 	private static final String name = "name";
 
@@ -43,6 +46,18 @@ public class StockComponentHandler {
 	public static UUID register(
 		TablePath table,
 		RegisterRequest request) {
+		var seqRequest = new SeqHandler.Request();
+		seqRequest.table = table;
+		seqRequest.dependsColumn = group_id;
+		seqRequest.dependsId = request.group_id;
+
+		return SeqHandler.getInstance().nextSeqAndGet(seqRequest, seq -> registerInternal(table, request, seq));
+	}
+
+	private static UUID registerInternal(
+		TablePath table,
+		RegisterRequest request,
+		long seqValue) {
 		var row = new GenericTable(table).row();
 
 		UUID uuid = UUID.randomUUID();
@@ -50,6 +65,7 @@ public class StockComponentHandler {
 		row.setUUID(id, uuid);
 
 		row.setUUID(group_id, request.group_id);
+		row.setLong(seq, seqValue);
 		row.setString(name, request.name);
 		request.props.ifPresent(v -> row.setObject(props, toJson(v)));
 		request.tags.ifPresent(v -> row.setObject(tags, v));

@@ -21,6 +21,7 @@ import jp.ats.blackbox.persistence.JournalHandler;
 import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
 import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.SecurityValues;
+import jp.ats.blackbox.persistence.SeqHandler;
 import jp.ats.blackbox.persistence.SeqInJournalUtils;
 import jp.ats.blackbox.persistence.Utils;
 import sqlassist.bb.transient_details;
@@ -63,8 +64,6 @@ public class FormulaHandler {
 
 		public UUID id;
 
-		public Optional<UUID> group_id = Optional.empty();
-
 		public Optional<String> name = Optional.empty();
 
 		public Optional<String> props = Optional.empty();
@@ -96,6 +95,14 @@ public class FormulaHandler {
 	}
 
 	public static UUID register(RegisterRequest request) {
+		var seqRequest = new SeqHandler.Request();
+		seqRequest.table = formulas.$TABLE;
+		seqRequest.dependsColumn = formulas.group_id;
+		seqRequest.dependsId = request.group_id;
+		return SeqHandler.getInstance().nextSeqAndGet(seqRequest, seq -> registerInternal(request, seq));
+	}
+
+	public static UUID registerInternal(RegisterRequest request, long seq) {
 		UUID id = UUID.randomUUID();
 
 		var userId = SecurityValues.currentUserId();
@@ -104,6 +111,7 @@ public class FormulaHandler {
 
 		formula.setId(id);
 		formula.setGroup_id(request.group_id);
+		formula.setSeq(seq);
 		formula.setName(request.name);
 		request.props.ifPresent(v -> formula.setProps(toJson(v)));
 		request.tags.ifPresent(v -> formula.setTags(v));
@@ -171,7 +179,6 @@ public class FormulaHandler {
 
 	public static void update(UpdateRequest request) {
 		int result = new formulas().UPDATE(a -> {
-			request.group_id.ifPresent(v -> a.group_id.set(v));
 			request.name.ifPresent(v -> a.name.set(v));
 			a.revision.set(request.revision + 1);
 			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));

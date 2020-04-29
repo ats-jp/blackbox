@@ -21,8 +21,6 @@ public class StockComponent {
 
 		public UUID id;
 
-		public Optional<UUID> group_id = Optional.empty();
-
 		public Optional<String> name = Optional.empty();
 
 		public long revision;
