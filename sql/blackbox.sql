@@ -891,11 +891,10 @@ COMMENT ON COLUMN bb.journal_errors.created_at IS '登録時刻';
 --一時作業
 CREATE TABLE bb.transients (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	group_id uuid REFERENCES bb.groups ON DELETE CASCADE CHECK (owner_type = 'G' AND group_id <> '00000000-0000-0000-0000-000000000000' OR owner_type = 'U') NOT NULL,
+	group_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
 	seq_in_group bigint NOT NULL,
-	user_id uuid REFERENCES bb.users ON DELETE CASCADE CHECK (owner_type = 'U' AND user_id <> '00000000-0000-0000-0000-000000000000' OR owner_type = 'G') NOT NULL,
+	user_id uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	seq_in_user bigint NOT NULL,
-	owner_type "char" CHECK (owner_type IN ('G', 'U')) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL, --以下のテーブルのすべてのrevisionを兼ねる
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
@@ -906,15 +905,10 @@ CREATE TABLE bb.transients (
 
 COMMENT ON TABLE bb.transients IS '一時作業';
 COMMENT ON COLUMN bb.transients.id IS 'ID';
-COMMENT ON COLUMN bb.transients.group_id IS 'この一時作業のオーナーグループ
-0の場合、オーナーグループはいない';
+COMMENT ON COLUMN bb.transients.group_id IS 'この一時作業のオーナーグループ';
 COMMENT ON COLUMN bb.transients.seq_in_group IS 'グループ内連番';
-COMMENT ON COLUMN bb.transients.user_id IS 'この一時作業のオーナーユーザー
-0の場合、オーナーユーザーはいない';
+COMMENT ON COLUMN bb.transients.user_id IS 'この一時作業のオーナーユーザー';
 COMMENT ON COLUMN bb.transients.seq_in_user IS 'ユーザー内連番';
-COMMENT ON COLUMN bb.transients.owner_type IS 'オーナータイプ
-group_idとuser_idどちらに値が入っているかを表す
-G=GROUP, U=USER';
 COMMENT ON COLUMN bb.transients.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transients.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transients.created_by IS '作成ユーザー';

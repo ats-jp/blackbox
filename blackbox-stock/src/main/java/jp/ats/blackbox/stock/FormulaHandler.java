@@ -21,7 +21,7 @@ import jp.ats.blackbox.persistence.JournalHandler;
 import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
 import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.SeqUtils;
+import jp.ats.blackbox.persistence.SeqInJournalUtils;
 import jp.ats.blackbox.persistence.Utils;
 import sqlassist.bb.transient_details;
 import sqlassist.bb.transients;
@@ -115,7 +115,7 @@ public class FormulaHandler {
 		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, id, formulas.$TABLE));
 
 		for (int i = 0; i < request.details.length; i++) {
-			registerDetail(id, request.details[i], SeqUtils.compute(i));
+			registerDetail(id, request.details[i], SeqInJournalUtils.compute(i));
 		}
 
 		return id;
@@ -138,7 +138,7 @@ public class FormulaHandler {
 				return r.getInt(1);
 			});
 
-		return registerDetail(formulaId, request, SeqUtils.computeNextSeq(seq));
+		return registerDetail(formulaId, request, SeqInJournalUtils.computeNextSeq(seq));
 	}
 
 	public static UUID registerDetail(long formulaRevision, UUID formulaId, DetailRegisterRequest request, int seq) {

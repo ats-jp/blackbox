@@ -28,10 +28,19 @@ public class ClosingHandler {
 	private static final Recorder recorder = U.recorder;
 
 	public static void close(UUID closingId, UUID userId, ClosingRequest request) {
+		var seqRequest = new SeqHandler.Request();
+		seqRequest.table = closings.$TABLE;
+		seqRequest.dependsColumn = closings.group_id;
+		seqRequest.dependsId = request.group_id;
+		SeqHandler.getInstance().nextSeq(seqRequest, seq -> closeInternal(closingId, userId, request, seq));
+	}
+
+	private static void closeInternal(UUID closingId, UUID userId, ClosingRequest request, long seq) {
 		var closing = closings.row();
 
 		closing.setId(closingId);
 		closing.setGroup_id(request.group_id);
+		closing.setSeq(seq);
 		closing.setClosed_at(request.closed_at);
 		request.props.ifPresent(v -> closing.setProps(toJson(v)));
 		closing.setCreated_by(userId);

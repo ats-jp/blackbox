@@ -11,16 +11,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 import org.blendee.assist.AnonymousTable;
 import org.blendee.jdbc.BResultSet;
 import org.blendee.jdbc.BSQLException;
 import org.blendee.jdbc.Result;
-import org.blendee.sql.InsertDMLBuilder;
 import org.blendee.sql.Recorder;
-import org.blendee.sql.UpdateDMLBuilder;
-import org.blendee.sql.Updater;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
@@ -36,121 +32,51 @@ import sqlassist.bb.transients;
 
 public class TransientHandler {
 
-	public static enum OwnerType {
-
-		GROUP {
-
-			@Override
-			void set(UUID ownerId, Updater updater) {
-				updater.add(transients.owner_type, Constant.GROUP);
-				updater.add(transients.group_id, ownerId);
-				updater.add(transients.user_id, U.NULL_ID);
-			}
-
-			@Override
-			UUID getOwnerId(transients.Row row) {
-				return row.getGroup_id();
-			}
-		},
-
-		USER {
-
-			@Override
-			void set(UUID ownerId, Updater updater) {
-				updater.add(transients.owner_type, Constant.USER);
-				updater.add(transients.group_id, U.NULL_ID);
-				updater.add(transients.user_id, ownerId);
-			}
-
-			@Override
-			UUID getOwnerId(transients.Row row) {
-				return row.getUser_id();
-			}
-		};
-
-		private static class Constant {
-
-			private static final String GROUP = "G";
-
-			private static final String USER = "U";
-		}
-
-		private static OwnerType of(String value) {
-			switch (value) {
-			case Constant.GROUP:
-				return GROUP;
-			case Constant.USER:
-				return USER;
-			default:
-				throw new Error();
-			}
-		}
-
-		abstract void set(UUID ownerId, Updater updater);
-
-		abstract UUID getOwnerId(transients.Row row);
-	}
-
 	public static class RegisterRequest {
 
-		public UUID transient_owner_id;
+		public UUID group_id;
 
-		public OwnerType owner_type;
-	}
-
-	public static class UpdateRequest {
-
-		public UUID id;
-
-		public Optional<UUID> transient_owner_id;
-
-		public Optional<OwnerType> owner_type;
-
-		public long revision;
+		public Optional<UUID> user_id = Optional.empty();
 	}
 
 	public static UUID register(RegisterRequest request) {
+		var handler = SeqHandler.getInstance();
+
+		var groupRequest = new SeqHandler.Request();
+		groupRequest.table = transients.$TABLE;
+		groupRequest.dependsColumn = transients.group_id;
+		groupRequest.dependsId = request.group_id;
+		groupRequest.seqColumn = transients.seq_in_group;
+
+		return handler.nextSeqAndGet(groupRequest, seqInGroup -> {
+			var userRequest = new SeqHandler.Request();
+			userRequest.table = transients.$TABLE;
+			userRequest.dependsColumn = transients.user_id;
+			userRequest.dependsId = request.user_id.orElseGet(() -> SecurityValues.currentUserId());
+			userRequest.seqColumn = transients.seq_in_user;
+
+			return handler.nextSeqAndGet(userRequest, seqInUser -> registerInternal(request, seqInGroup, seqInUser));
+		});
+	}
+
+	private static UUID registerInternal(RegisterRequest request, long seqInGroup, long seqInUser) {
 		var id = UUID.randomUUID();
 
 		var userId = SecurityValues.currentUserId();
 
-		var builder = new InsertDMLBuilder(transients.$TABLE);
-		builder.add(transients.id, id);
-		builder.add(transients.created_by, userId);
-		builder.add(transients.updated_by, userId);
+		var row = transients.row();
 
-		request.owner_type.set(request.transient_owner_id, builder);
+		row.setId(id);
+		row.setGroup_id(request.group_id);
+		row.setSeq_in_group(seqInGroup);
+		row.setUser_id(request.user_id.orElse(userId));
+		row.setSeq_in_user(seqInUser);
+		row.setCreated_by(userId);
+		row.setUpdated_by(userId);
 
-		builder.executeUpdate();
+		row.insert();
 
 		return id;
-	}
-
-	public static void update(UpdateRequest request) {
-		UUID userId = SecurityValues.currentUserId();
-
-		var builder = new UpdateDMLBuilder(transients.$TABLE);
-		builder.addSQLFragment(transients.updated_at, "now()");
-		builder.add(transients.updated_by, userId);
-
-		transients.Row[] cache = { null };
-		Supplier<transients.Row> row = () -> {
-			if (cache[0] == null)
-				cache[0] = new transients().fetch(request.id).get();
-			return cache[0];
-		};
-
-		OwnerType type = request.owner_type.orElseGet(() -> OwnerType.of(row.get().getOwner_type()));
-		UUID ownerId = request.transient_owner_id.orElseGet(() -> type.getOwnerId(row.get()));
-
-		type.set(ownerId, builder);
-
-		builder.add(transients.revision, request.revision + 1);
-
-		builder.setCriteria(new transients().createWhereCriteria(a -> a.id.eq(request.id).AND.revision.eq(request.revision)));
-
-		if (builder.executeUpdate() != 1)
-			throw Utils.decisionException(transients.$TABLE, request.id);
 	}
 
 	public static void delete(UUID transientId, long revision) {
@@ -191,6 +117,16 @@ public class TransientHandler {
 	}
 
 	public static UUID registerJournal(long transientRevision, UUID transientId, JournalRegisterRequest request) {
+		var seqRequest = new SeqHandler.Request();
+		seqRequest.table = transient_journals.$TABLE;
+		seqRequest.dependsColumn = transient_journals.transient_id;
+		seqRequest.dependsId = transientId;
+		seqRequest.seqColumn = transient_journals.seq_in_transient;
+
+		return SeqHandler.getInstance().nextSeqAndGet(seqRequest, seq -> registerJournalInternal(transientRevision, transientId, seq, request));
+	}
+
+	private static UUID registerJournalInternal(long transientRevision, UUID transientId, long seqInTransient, JournalRegisterRequest request) {
 		Utils.updateRevision(transients.$TABLE, transientRevision, transientId);
 
 		var id = UUID.randomUUID();
@@ -210,6 +146,7 @@ public class TransientHandler {
 			U.recorder);
 
 		journal.setTransient_id(transientId);
+		journal.setSeq_in_transient(seqInTransient);
 		journal.setUpdated_by(userId);
 
 		journal.insert();
@@ -217,7 +154,7 @@ public class TransientHandler {
 		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, id, transient_journals.$TABLE));
 
 		for (int i = 0; i < request.details.length; i++) {
-			registerDetail(id, request.details[i], SeqUtils.compute(i));
+			registerDetail(id, request.details[i], SeqInJournalUtils.compute(i));
 		}
 
 		return id;
@@ -260,7 +197,7 @@ public class TransientHandler {
 				return r.getInt(1);
 			});
 
-		return registerDetail(journalId, request, SeqUtils.computeNextSeq(seq));
+		return registerDetail(journalId, request, SeqInJournalUtils.computeNextSeq(seq));
 	}
 
 	public static UUID registerDetail(long transientRevision, UUID journalId, DetailRegisterRequest request, int seq) {
@@ -288,7 +225,7 @@ public class TransientHandler {
 		detail.insert();
 
 		for (int i = 0; i < request.nodes.length; i++) {
-			registerNode(id, request.nodes[i], SeqUtils.compute(i));
+			registerNode(id, request.nodes[i], SeqInJournalUtils.compute(i));
 		}
 
 		return id;
@@ -343,7 +280,7 @@ public class TransientHandler {
 				return r.getInt(1);
 			});
 
-		return registerNode(detailId, request, SeqUtils.computeNextSeq(seq));
+		return registerNode(detailId, request, SeqInJournalUtils.computeNextSeq(seq));
 	}
 
 	public static UUID registerNode(long transientRevision, UUID detailId, NodeRegisterRequest request, int seq) {

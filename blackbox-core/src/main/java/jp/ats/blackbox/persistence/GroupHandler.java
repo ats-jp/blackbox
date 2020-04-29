@@ -107,6 +107,16 @@ public class GroupHandler {
 	}
 
 	public static UUID register(RegisterRequest request) {
+		var seqRequest = new SeqHandler.Request();
+		seqRequest.table = groups.$TABLE;
+		seqRequest.dependsColumn = groups.org_id;
+		seqRequest.dependsId = request.org_id;
+		return SeqHandler.getInstance().nextSeqAndGet(seqRequest, seq -> {
+			return registerInternal(request, seq);
+		});
+	}
+
+	private static UUID registerInternal(RegisterRequest request, long seq) {
 		lockParents(request.parent_id);
 		try {
 			var row = groups.row();
@@ -115,6 +125,7 @@ public class GroupHandler {
 
 			row.setId(id);
 			row.setOrg_id(request.org_id);
+			row.setSeq(seq);
 			row.setParent_id(request.parent_id);
 			row.setName(request.name);
 			request.props.ifPresent(v -> row.setProps(JsonHelper.toJson(v)));
@@ -153,10 +164,12 @@ public class GroupHandler {
 		//active=falseでも一応relationshipは構築しておくために除外しない
 		recorder.play(
 			() -> new groups().SELECT(a -> a.parent_id).WHERE(a -> a.id.eq($UUID).AND.parent_id.ne(U.NULL_ID)),
-			parentId).forEach(r -> {
-				//parent_idがNULLではない（親がある）場合、再帰的に登録
-				registerRelationships(r.getParent_id(), groupId, id);
-			});
+			parentId)
+			.forEach(
+				r -> {
+					//parent_idがNULLではない（親がある）場合、再帰的に登録
+					registerRelationships(r.getParent_id(), groupId, id);
+				});
 	}
 
 	private static UUID getParentId(UUID id) {
@@ -175,6 +188,7 @@ public class GroupHandler {
 				.UPDATE(a -> {
 					request.name.ifPresent(v -> a.name.set(v));
 					request.parent_id.ifPresent(v -> a.parent_id.set(v));
+					a.revision.set(request.revision + 1);
 					request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 					request.tags.ifPresent(v -> a.tags.set((Object) v));
 					request.active.ifPresent(v -> a.active.set(v));

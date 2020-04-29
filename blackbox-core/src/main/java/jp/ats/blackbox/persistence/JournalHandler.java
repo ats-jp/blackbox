@@ -228,6 +228,8 @@ public class JournalHandler {
 
 	private final List<Runnable> minusUpdaterList = new LinkedList<>();
 
+	private final SeqHandler.Request seqRequest = new SeqHandler.Request();
+
 	/**
 	 * 処理内で最終的に数量の整合性が取れているのであれば、一時的に数量がマイナスになっても許容するモードを表すフラグ
 	 */
@@ -235,6 +237,8 @@ public class JournalHandler {
 
 	public JournalHandler(Recorder recorder) {
 		this.recorder = recorder;
+		seqRequest.table = journals.$TABLE;
+		seqRequest.dependsColumn = journals.group_id;
 	}
 
 	private long time = System.currentTimeMillis();
@@ -320,6 +324,11 @@ public class JournalHandler {
 	}
 
 	private void registerInternal(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request) {
+		seqRequest.dependsId = request.group_id;
+		SeqHandler.getInstance().nextSeq(seqRequest, seq -> registerInternal(journalId, batchId, userId, request, seq));
+	}
+
+	private void registerInternal(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request, long seq) {
 		//初期化
 		nodeSeq = 0;
 		updateDifferentTotalCurrentUnits = false;

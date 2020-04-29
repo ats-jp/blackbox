@@ -1,6 +1,6 @@
 package jp.ats.blackbox.persistence;
 
-public class SeqUtils {
+public class SeqInJournalUtils {
 
 	private static final int sequenceIncrement = 100;
 

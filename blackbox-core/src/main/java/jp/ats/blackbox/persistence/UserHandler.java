@@ -8,6 +8,16 @@ import sqlassist.bb.users;
 public class UserHandler {
 
 	public static UUID register(String name, Role role, UUID groupId, String props) {
+		var request = new SeqHandler.Request();
+		request.table = users.$TABLE;
+		request.dependsColumn = users.group_id;
+		request.dependsId = groupId;
+		return SeqHandler.getInstance().nextSeqAndGet(request, seq -> {
+			return registerInternal(name, role, groupId, seq, props);
+		});
+	}
+
+	private static UUID registerInternal(String name, Role role, UUID groupId, long seq, String props) {
 		var row = users.row();
 
 		UUID id = UUID.randomUUID();
@@ -18,6 +28,7 @@ public class UserHandler {
 		row.setName(name);
 		row.setRole(role.value());
 		row.setGroup_id(groupId);
+		row.setSeq(seq);
 		row.setProps(JsonHelper.toJson(props));
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);

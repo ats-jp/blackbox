@@ -7,7 +7,17 @@ import sqlassist.bb.orgs;
 
 public class OrgHandler {
 
-	public static UUID register(String name, String props) {
+	public static UUID register(UUID instanceId, String name, String props) {
+		var request = new SeqHandler.Request();
+		request.table = orgs.$TABLE;
+		request.dependsColumn = orgs.instance_id;
+		request.dependsId = instanceId;
+		return SeqHandler.getInstance().nextSeqAndGet(request, seq -> {
+			return registerInternal(seq, instanceId, name, props);
+		});
+	}
+
+	private static UUID registerInternal(long seq, UUID instanceId, String name, String props) {
 		var row = orgs.row();
 
 		UUID id = UUID.randomUUID();
@@ -15,6 +25,8 @@ public class OrgHandler {
 		UUID userId = SecurityValues.currentUserId();
 
 		row.setId(id);
+		row.setInstance_id(instanceId);
+		row.setSeq(seq);
 		row.setName(name);
 		row.setProps(props);
 		row.setCreated_by(userId);
