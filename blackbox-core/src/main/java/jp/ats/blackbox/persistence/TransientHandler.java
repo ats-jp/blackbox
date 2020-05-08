@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.blendee.assist.AnonymousTable;
 import org.blendee.jdbc.BResultSet;
@@ -330,7 +331,21 @@ public class TransientHandler {
 		public boolean lazy = false;
 	}
 
-	public static TransientMoveResult move(UUID batchId, UUID userId, TransientMoveRequest request, Recorder recorder) {
+	public static TransientMoveResult move(
+		UUID batchId,
+		UUID userId,
+		TransientMoveRequest request,
+		Recorder recorder) {
+		return move(batchId, userId, request, recorder, r -> {
+		});
+	}
+
+	public static TransientMoveResult move(
+		UUID batchId,
+		UUID userId,
+		TransientMoveRequest request,
+		Recorder recorder,
+		Consumer<JournalRegisterRequest> checker) {
 		var journalHandler = new JournalHandler(recorder);
 
 		var result = new TransientMoveResult();
@@ -340,6 +355,8 @@ public class TransientHandler {
 		var ids = new LinkedList<UUID>();
 		var requests = new LinkedList<JournalRegisterRequest>();
 		buildJournalRegisterRequests(request.transient_id, recorder).forEach(r -> {
+			checker.accept(r);
+
 			var journalId = UUID.randomUUID();
 
 			ids.add(UUID.randomUUID());

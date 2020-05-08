@@ -862,7 +862,16 @@ COMMENT ON COLUMN bb.jobs.updated_at IS '更新時刻';
 --journal登録時に発生したエラー
 CREATE TABLE bb.journal_errors (
 	abandoned_id uuid NOT NULL,
-	command_type "char" CHECK (command_type IN ('R', 'D', 'C')) NOT NULL,
+	command_type text CHECK (command_type IN (
+		'JOURNAL_REGISTER',
+		'JOURNAL_LAZY_REGISTER',
+		'JOURNAL_DENY',
+		'OVERWRITE',
+		'PAUSE',
+		'RESUME',
+		'GET_PAUSING_GROUPS',
+		'CLOSE',
+		'TRANSIENT_MOVE')) NOT NULL,
 	error_type text NOT NULL,
 	message text NOT NULL,
 	stack_trace text NOT NULL,
@@ -874,7 +883,14 @@ CREATE TABLE bb.journal_errors (
 COMMENT ON TABLE bb.journal_errors IS 'journal登録時に発生したエラー';
 COMMENT ON COLUMN bb.journal_errors.abandoned_id IS 'journalもしくはclosingもしくはjournal_batchに使用される予定だったID';
 COMMENT ON COLUMN bb.journal_errors.command_type IS '処理のタイプ
-R=journal登録, D=journal取消, C=closing';
+JOURNAL_REGISTER=journal登録
+JOURNAL_LAZY_REGISTER=journal数量整合性チェック遅延登録
+JOURNAL_DENY=journal取消
+OVERWRITE=journal書き換え
+PAUSE=仮締め
+RESUME=仮締めキャンセル
+GET_PAUSING_GROUPS=仮締め中グループの取得
+CLOSE=締め';
 COMMENT ON COLUMN bb.journal_errors.error_type IS 'エラーの種類';
 COMMENT ON COLUMN bb.journal_errors.message IS 'エラーメッセージ';
 COMMENT ON COLUMN bb.journal_errors.stack_trace IS 'スタックトレース';

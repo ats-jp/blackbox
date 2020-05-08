@@ -27,8 +27,6 @@ public class JournalHandlerTest {
 	public static void main(String[] args) {
 		Common.startWithLog();
 
-		SecurityValues.start(U.NULL_ID);
-
 		Blendee.execute(t -> {
 			var handler = new JournalHandler(U.recorder);
 			IntStream.range(0, 10).forEach(i -> {
@@ -97,6 +95,6 @@ public class JournalHandlerTest {
 		req.parent_id = U.NULL_ID;
 		req.org_id = U.NULL_ID;
 
-		return GroupHandler.register(req);
+		return GroupHandler.register(req, U.NULL_ID);
 	}
 }

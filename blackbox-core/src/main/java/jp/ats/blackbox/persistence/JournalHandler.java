@@ -625,10 +625,17 @@ public class JournalHandler {
 	}
 
 	public Timestamp deny(UUID journalId, UUID userId, JournalDenyRequest denyRequest) {
+		return deny(journalId, userId, denyRequest, r -> {
+		});
+	}
+
+	public Timestamp deny(UUID journalId, UUID userId, JournalDenyRequest denyRequest, Consumer<JournalRegisterRequest> checker) {
 		var request = pickup(denyRequest.deny_id, r -> {
 			r.denied_id = Optional.of(denyRequest.deny_id);
 			r.deny_reason = denyRequest.deny_reason;
 		}, true);
+
+		checker.accept(request);
 
 		register(journalId, U.NULL_ID, userId, request);
 
@@ -636,6 +643,11 @@ public class JournalHandler {
 	}
 
 	public void overwrite(UUID journalId, UUID userId, OverwriteRequest request) {
+		overwrite(journalId, userId, request, r -> {
+		});
+	}
+
+	public void overwrite(UUID journalId, UUID userId, OverwriteRequest request, Consumer<JournalRegisterRequest> checker) {
 		var snapshot = getJustBeforeSnapshot(request.unit_id, request.fixed_at, recorder);
 
 		var out = new NodeRegisterRequest();
@@ -660,6 +672,8 @@ public class JournalHandler {
 		journalRequest.details = new DetailRegisterRequest[] { detailRequest };
 		journalRequest.tags = request.tags;
 		journalRequest.props = request.journalProps;
+
+		checker.accept(journalRequest);
 
 		register(journalId, U.NULL_ID, userId, journalRequest);
 	}

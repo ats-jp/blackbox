@@ -14,8 +14,6 @@ public class RelationshipTest {
 	public static void main(String[] args) {
 		Common.startWithLog();
 
-		SecurityValues.start(U.NULL_ID);
-
 		register();
 
 		update();
@@ -49,7 +47,7 @@ public class RelationshipTest {
 		req.id = group1;
 
 		Blendee.execute(t -> {
-			GroupHandler.update(req);
+			GroupHandler.update(req, U.NULL_ID);
 		});
 	}
 
@@ -67,9 +65,10 @@ public class RelationshipTest {
 
 		Blendee.execute(t -> {
 			try {
-				GroupHandler.update(req);
+				GroupHandler.update(req, U.NULL_ID);
 				throw new Error();
-			} catch (CycleGroupException e) {}
+			} catch (CycleGroupException e) {
+			}
 		});
 	}
 
@@ -86,7 +85,7 @@ public class RelationshipTest {
 		req.id = group1;
 
 		Blendee.execute(t -> {
-			GroupHandler.update(req);
+			GroupHandler.update(req, U.NULL_ID);
 		});
 	}
 }
