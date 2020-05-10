@@ -1016,7 +1016,8 @@ CREATE TABLE bb.transient_details (
 	created_at timestamptz DEFAULT now() NOT NULL,-- 編集でtransient_detailsだけ追加することもあるので必要
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
+	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	UNIQUE (transient_journal_id, seq_in_journal));
 
 COMMENT ON TABLE bb.transient_details IS '一時作業伝票明細';
 COMMENT ON COLUMN bb.transient_details.id IS 'ID';
@@ -1043,7 +1044,8 @@ CREATE TABLE bb.transient_nodes (
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
+	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	UNIQUE (transient_detail_id, seq_in_detail));
 
 COMMENT ON TABLE bb.transient_nodes IS '一時作業伝票ノード';
 COMMENT ON COLUMN bb.transient_nodes.id IS 'ID';

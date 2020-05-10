@@ -63,7 +63,8 @@ CREATE TABLE bb_stock.items (
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL,
+	UNIQUE (group_id, seq));
 --log対象
 
 COMMENT ON TABLE bb_stock.items IS 'アイテム
@@ -122,7 +123,8 @@ CREATE TABLE bb_stock.owners (
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL,
+	UNIQUE (group_id, seq));
 --log対象
 
 COMMENT ON TABLE bb_stock.owners IS '所有者
@@ -181,7 +183,8 @@ CREATE TABLE bb_stock.locations (
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL,
+	UNIQUE (group_id, seq));
 --log対象
 
 COMMENT ON TABLE bb_stock.locations IS '置き場
@@ -239,7 +242,8 @@ CREATE TABLE bb_stock.statuses (
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL,
+	UNIQUE (group_id, seq));
 --log対象
 
 COMMENT ON TABLE bb_stock.statuses IS '状態
@@ -343,7 +347,8 @@ CREATE TABLE bb_stock.formulas (
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users NOT NULL);
+	updated_by uuid REFERENCES bb.users NOT NULL,
+	UNIQUE (group_id, seq));
 
 COMMENT ON TABLE bb_stock.formulas IS '変換式
 事前に定義されたアイテムの変換対応表';
@@ -371,13 +376,14 @@ CREATE TABLE bb_stock.formula_details (
 	formula_id uuid REFERENCES bb_stock.formulas ON DELETE CASCADE NOT NULL, --formulaが削除されたら削除
 	stock_id uuid REFERENCES bb_stock.stocks NOT NULL,
 	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL, --そのまま計算に使用できるように
-	seq integer NOT NULL,
+	seq_in_formula integer NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
+	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	UNIQUE (formula_id, seq_in_formula));
 
 COMMENT ON TABLE bb_stock.formula_details IS '変換式明細
 一変換式の中の入もしくは出を表す';
@@ -387,7 +393,7 @@ COMMENT ON COLUMN bb_stock.formula_details.stock_id IS '対象在庫ID
 構成要素がNULLデータ(00000000-0000-0000-0000-000000000000)は、指定なしとして許容されるが、実施時にstockが特定できるように指定される必要がある';
 COMMENT ON COLUMN bb_stock.formula_details.in_out IS '入出区分
 IN=1, OUT=-1';
-COMMENT ON COLUMN bb_stock.formula_details.seq IS '変換式内連番';
+COMMENT ON COLUMN bb_stock.formula_details.seq_in_formula IS '変換式内連番';
 COMMENT ON COLUMN bb_stock.formula_details.quantity IS '数量';
 COMMENT ON COLUMN bb_stock.formula_details.props IS '外部アプリケーション情報JSON';
 

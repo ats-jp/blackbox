@@ -138,7 +138,7 @@ public class FormulaHandler {
 	private static UUID registerDetail(UUID formulaId, DetailRegisterRequest request) {
 		int seq = U.recorder.play(
 			() -> new formula_details()
-				.SELECT(a -> a.MAX(a.seq))
+				.SELECT(a -> a.MAX(a.seq_in_formula))
 				.WHERE(a -> a.formula_id.eq($UUID)),
 			formulaId)
 			.executeAndGet(r -> {
@@ -166,7 +166,7 @@ public class FormulaHandler {
 		detail.setFormula_id(formulaId);
 		detail.setStock_id(request.stock_id);
 		detail.setIn_out(request.in_out.intValue);
-		detail.setSeq(seq);
+		detail.setSeq_in_formula(seq);
 		detail.setQuantity(request.quantity);
 		detail.setCreated_by(userId);
 
