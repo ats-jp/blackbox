@@ -72,8 +72,9 @@ public class ClosingHandler {
 					new journals()
 						.SELECT(a -> a.ls(a.id, a.any(a.expr($UUID))))
 						.WHERE(
-							a -> a.NOT_EXISTS(new closed_journals().SELECT(sa -> sa.any(0)).WHERE(sa -> sa.id.eq(a.id))),
-							a -> a.EXISTS(new relationships().SELECT(sa -> sa.any(0)).WHERE(sa -> sa.parent_id.eq($UUID).AND.child_id.eq(a.group_id))))),
+							a -> a.fixed_at.lt(request.closed_at),
+							a -> a.EXISTS(new relationships().SELECT(sa -> sa.any(0)).WHERE(sa -> sa.parent_id.eq($UUID).AND.child_id.eq(a.group_id))),
+							a -> a.NOT_EXISTS(new closed_journals().SELECT(sa -> sa.any(0)).WHERE(sa -> sa.id.eq(a.id))))),
 			closingId,
 			request.group_id)
 			.execute(batch);
