@@ -17,8 +17,10 @@ import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.common.U;
+import sqlassist.bb.closed_journals;
 import sqlassist.bb.closed_units;
 import sqlassist.bb.closings;
+import sqlassist.bb.journals;
 import sqlassist.bb.last_closings;
 import sqlassist.bb.relationships;
 import sqlassist.bb.snapshots;
@@ -62,6 +64,19 @@ public class ClosingHandler {
 					closeGroup(groupId, request.closed_at, closingId, userId, batch);
 				}
 			});
+
+		//journalとclosingを紐づけ
+		recorder.play(
+			() -> new closed_journals()
+				.INSERT(
+					new journals()
+						.SELECT(a -> a.ls(a.id, a.any(a.expr($UUID))))
+						.WHERE(
+							a -> a.NOT_EXISTS(new closed_journals().SELECT(sa -> sa.any(0)).WHERE(sa -> sa.id.eq(a.id))),
+							a -> a.EXISTS(new relationships().SELECT(sa -> sa.any(0)).WHERE(sa -> sa.parent_id.eq($UUID).AND.child_id.eq(a.group_id))))),
+			closingId,
+			request.group_id)
+			.execute(batch);
 
 		batch.execute();
 	}

@@ -829,7 +829,7 @@ CREATE TABLE bb.closed_units (
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
 --締め完了後の在庫数を保持
---クラッシュ時、ここからsnapshotsとcurrent_unitsを復元する
+--クラッシュ時、過去のsnapshotが削除されていた場合ここからsnapshotとcurrent_unitを復元する
 
 COMMENT ON TABLE bb.closed_units IS '締め在庫';
 COMMENT ON COLUMN bb.closed_units.id IS 'ID
@@ -840,6 +840,22 @@ trueの場合、totalがマイナスでもエラーとならない';
 COMMENT ON COLUMN bb.closed_units.total IS '締め後の在庫総数';
 COMMENT ON COLUMN bb.closed_units.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.closed_units.updated_by IS '更新ユーザー';
+
+----------
+
+CREATE TABLE bb.closed_journals (
+	id uuid PRIMARY KEY REFERENCES bb.journals,
+	closing_id uuid REFERENCES bb.closings
+);
+--log対象外
+--伝票がどの締めに属するかを表す
+
+COMMENT ON TABLE bb.closed_journals IS '締め済み伝票';
+COMMENT ON COLUMN bb.closed_journals.id IS 'ID
+journals.idに従属';
+COMMENT ON COLUMN bb.closed_journals.closing_id IS '締めID';
+
+----------
 
 --現在在庫数量反映ジョブ
 CREATE TABLE bb.jobs (
@@ -1064,6 +1080,7 @@ CREATE INDEX ON bb.groups (active);
 
 --relationships
 CREATE INDEX ON bb.relationships (parent_id);
+CREATE INDEX ON bb.relationships (child_id);
 
 --users
 CREATE INDEX ON bb.users (group_id);
@@ -1094,6 +1111,9 @@ CREATE INDEX ON bb.snapshots (seq);
 
 --current_units
 CREATE INDEX ON bb.current_units (snapshot_id);
+
+--closed_journals
+CREATE INDEX ON bb.closed_journals (closing_id);
 
 --jobs
 CREATE INDEX ON bb.jobs (completed);
@@ -1178,5 +1198,6 @@ GRANT INSERT ON TABLE
 	bb.journals,
 	bb.details,
 	bb.nodes,
+	bb.closed_journals,
 	bb.journal_errors
 TO blackbox;
