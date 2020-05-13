@@ -97,6 +97,7 @@ COMMENT ON COLUMN bb.instances.id IS 'ID';
 COMMENT ON COLUMN bb.instances.name IS '名称';
 COMMENT ON COLUMN bb.instances.principal IS 'この実行インスタンスを表す行
 一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse';
+COMMENT ON COLUMN bb.instances.description IS '補足事項';
 
 INSERT INTO bb.instances VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', false, 'nullの代用、移行不可');
 INSERT INTO bb.instances VALUES (
