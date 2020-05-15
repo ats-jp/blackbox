@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration><!-- Eclipse対策：DTDが無いことを警告する問題の回避 -->
+<Configuration status="off">
+	<Appenders>
+		<!-- ファイル出力 -->
+		<RollingRandomAccessFile name="main-log"
+			fileName="/[log_directory]/blackbox.log" filePattern="/[log_directory]/blackbox-%d{yyyy-MM-dd}-%i.zip">
+			<PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] - %msg%n" />
+			<Policies>
+				<!-- ファイルサイズで切り替え -->
+				<SizeBasedTriggeringPolicy size="100MB" />
+				<!-- 日付が変わったときに切り替え -->
+				<TimeBasedTriggeringPolicy />
+			</Policies>
+			<!-- 保管する過去ログの件数 -->
+			<!-- この数値を超えた過去ログは削除される -->
+			<DefaultRolloverStrategy max="100" />
+		</RollingRandomAccessFile>
+	</Appenders>
+	<Loggers>
+		<Root level="error">
+			<AppenderRef ref="main-log" />
+		</Root>
+	</Loggers>
+</Configuration>
