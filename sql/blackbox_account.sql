@@ -56,6 +56,7 @@ CREATE TABLE bb_account.accounts (
 	seq bigint NOT NULL,
 	code text NOT NULL,
 	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	type text CHECK (type IN (
 		'AS', --Assets
 		'LI', --Liabilities
@@ -81,6 +82,7 @@ COMMENT ON COLUMN bb_account.accounts.org_id IS '組織ID';
 COMMENT ON COLUMN bb_account.accounts.seq IS '組織内連番';
 COMMENT ON COLUMN bb_account.accounts.code IS '外部アプリケーション指定コード';
 COMMENT ON COLUMN bb_account.accounts.name IS '名称';
+COMMENT ON COLUMN bb_account.accounts.description IS '補足事項';
 COMMENT ON COLUMN bb_account.accounts.type IS '勘定科目分類
 AS=資産 (Assets)
 LI=負債 (Liabilities)
@@ -112,6 +114,7 @@ CREATE TABLE bb_account.subaccounts (
 	seq_in_account bigint NOT NULL,
 	code text NOT NULL,
 	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -130,6 +133,7 @@ COMMENT ON COLUMN bb_account.subaccounts.account_id IS '勘定科目ID';
 COMMENT ON COLUMN bb_account.subaccounts.seq_in_account IS '勘定科目内連番';
 COMMENT ON COLUMN bb_account.subaccounts.code IS '外部アプリケーション指定サブコード';
 COMMENT ON COLUMN bb_account.subaccounts.name IS '名称';
+COMMENT ON COLUMN bb_account.subaccounts.description IS '補足事項';
 COMMENT ON COLUMN bb_account.subaccounts.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_account.subaccounts.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_account.subaccounts.tags IS 'log保存用タグ';

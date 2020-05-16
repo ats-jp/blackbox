@@ -670,6 +670,11 @@ public class TransientHandler {
 		public Optional<Timestamp> fixed_at = Optional.empty();
 
 		/**
+		 * 補足事項
+		 */
+		public Optional<String> description = Optional.empty();
+
+		/**
 		 * 追加情報JSON
 		 */
 		public Optional<String> props = Optional.empty();
@@ -708,6 +713,7 @@ public class TransientHandler {
 			request.transient_id.ifPresent(v -> a.transient_id.set(v));
 			request.group_id.ifPresent(v -> a.group_id.set(v));
 			request.fixed_at.ifPresent(v -> a.fixed_at.set(v));
+			request.description.ifPresent(v -> a.description.set(v));
 			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			a.updated_by.set(SecurityValues.currentUserId());

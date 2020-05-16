@@ -58,6 +58,11 @@ public class JournalHandler {
 		public Timestamp fixed_at;
 
 		/**
+		 * 補足事項
+		 */
+		public Optional<String> description = Optional.empty();
+
+		/**
 		 * 打消し元のjournal_id
 		 */
 		public Optional<UUID> denied_id = Optional.empty();
@@ -183,6 +188,11 @@ public class JournalHandler {
 		 * 必須
 		 */
 		public Timestamp fixed_at;
+
+		/**
+		 * 補足事項
+		 */
+		public Optional<String> description = Optional.empty();
 
 		/**
 		 * 追加情報JSON
@@ -669,6 +679,7 @@ public class JournalHandler {
 		var journalRequest = new JournalRegisterRequest();
 		journalRequest.group_id = request.group_id;
 		journalRequest.fixed_at = request.fixed_at;
+		journalRequest.description = request.description;
 		journalRequest.details = new DetailRegisterRequest[] { detailRequest };
 		journalRequest.tags = request.tags;
 		journalRequest.props = request.journalProps;

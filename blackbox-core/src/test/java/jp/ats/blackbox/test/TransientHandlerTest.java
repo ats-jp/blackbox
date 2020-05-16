@@ -24,7 +24,15 @@ public class TransientHandlerTest {
 			var req = new TransientHandler.RegisterRequest();
 
 			req.group_id = U.NULL_ID;
-			req.user_id = Optional.of(UserHandler.register("test", Role.USER, U.NULL_ID, Optional.of("{}"), Optional.empty()));
+
+			var userReq = new UserHandler.RegisterRequest();
+			userReq.name = "test";
+			userReq.role = Role.USER;
+			userReq.groupId = U.NULL_ID;
+			userReq.props = Optional.of("{}");
+			userReq.tags = Optional.of(new String[] {});
+
+			req.user_id = Optional.of(UserHandler.register(userReq));
 
 			UUID transientId = TransientHandler.register(req);
 

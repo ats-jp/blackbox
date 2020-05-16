@@ -47,6 +47,8 @@ public class AccountHandler {
 
 		public String name;
 
+		public Optional<String> description = Optional.empty();
+
 		public AccountType type;
 
 		public Optional<String> props = Optional.empty();
@@ -76,6 +78,7 @@ public class AccountHandler {
 		row.setSeq(seq);
 		row.setCode(request.code);
 		row.setName(request.name);
+		request.description.ifPresent(v -> row.setDescription(v));
 		row.setType(request.type.name());
 		request.props.ifPresent(v -> row.setProps(JsonHelper.toJson(v)));
 		request.tags.ifPresent(v -> row.setTags(v));

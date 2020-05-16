@@ -12,6 +12,8 @@ public class StockComponent {
 
 		public String name;
 
+		public Optional<String> description = Optional.empty();
+
 		public Optional<String> props = Optional.empty();
 
 		public Optional<String[]> tags = Optional.empty();
@@ -23,22 +25,9 @@ public class StockComponent {
 
 		public Optional<String> name = Optional.empty();
 
+		public Optional<String> description = Optional.empty();
+
 		public long revision;
-
-		public Optional<String> props = Optional.empty();
-
-		public Optional<String[]> tags = Optional.empty();
-
-		public Optional<Boolean> active = Optional.empty();
-	}
-
-	public static class ForcibleUpdateRequest {
-
-		public UUID id;
-
-		public Optional<UUID> group_id = Optional.empty();
-
-		public Optional<String> name = Optional.empty();
 
 		public Optional<String> props = Optional.empty();
 

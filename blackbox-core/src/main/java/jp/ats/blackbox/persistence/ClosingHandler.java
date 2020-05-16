@@ -42,6 +42,7 @@ public class ClosingHandler {
 
 		closing.setId(closingId);
 		closing.setGroup_id(request.group_id);
+		request.description.ifPresent(v -> closing.setDescription(v));
 		closing.setSeq(seq);
 		closing.setClosed_at(request.closed_at);
 		request.props.ifPresent(v -> closing.setProps(toJson(v)));
@@ -214,6 +215,8 @@ public class ClosingHandler {
 		public UUID group_id;
 
 		public Timestamp closed_at;
+
+		public Optional<String> description = Optional.empty();
 
 		/**
 		 * 追加情報JSON

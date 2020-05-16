@@ -150,12 +150,21 @@ public class closings
 	public static final String group_id = "group_id";
 
 	/**
+	 * name: description<br>
+	 * remarks: 補足事項<br>
+	 * type: text(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "補足事項", defaultValue = "''::text", ordinalPosition = 3, notNull = true)
+	public static final String description = "description";
+
+	/**
 	 * name: seq<br>
 	 * remarks: グループ内連番<br>
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループ内連番", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "seq", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループ内連番", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String seq = "seq";
 
 	/**
@@ -164,7 +173,7 @@ public class closings
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "closed_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "締め時刻", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "closed_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "締め時刻", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String closed_at = "closed_at";
 
 	/**
@@ -173,7 +182,7 @@ public class closings
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 5, notNull = true)
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 6, notNull = true)
 	public static final String props = "props";
 
 	/**
@@ -182,7 +191,7 @@ public class closings
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 6, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 7, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -191,7 +200,7 @@ public class closings
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 7, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 8, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -339,6 +348,36 @@ public class closings
 		public java.util.UUID getGroup_id() {
 			Binder binder = data$.getValue("group_id");
 			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: description<br>
+		 * remarks: 補足事項<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
+		 * @param value java.lang.String
+		 */
+		public void setDescription(java.lang.String value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("description").getType());
+			data$.setValue("description", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: description<br>
+		 * remarks: 補足事項<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
+		 * @return java.lang.String
+		 */
+		public java.lang.String getDescription() {
+			Binder binder = data$.getValue("description");
+			return (java.lang.String) binder.getValue();
 		}
 
 		/**
@@ -1575,6 +1614,11 @@ public class closings
 		public final T group_id;
 
 		/**
+		 * 項目名 description
+		 */
+		public final T description;
+
+		/**
 		 * 項目名 seq
 		 */
 		public final T seq;
@@ -1612,6 +1656,7 @@ public class closings
 
 			this.id = builder$.buildColumn(this, sqlassist.bb.closings.id);
 			this.group_id = builder$.buildColumn(this, sqlassist.bb.closings.group_id);
+			this.description = builder$.buildColumn(this, sqlassist.bb.closings.description);
 			this.seq = builder$.buildColumn(this, sqlassist.bb.closings.seq);
 			this.closed_at = builder$.buildColumn(this, sqlassist.bb.closings.closed_at);
 			this.props = builder$.buildColumn(this, sqlassist.bb.closings.props);

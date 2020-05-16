@@ -143,6 +143,7 @@ public class GroupHandler {
 			row.setSeq(seq);
 			row.setParent_id(request.parent_id);
 			row.setName(request.name);
+			request.description.ifPresent(v -> row.setDescription(v));
 			request.props.ifPresent(v -> row.setProps(JsonHelper.toJson(v)));
 			request.tags.ifPresent(v -> row.setTags(v));
 
@@ -198,6 +199,7 @@ public class GroupHandler {
 			int result = new groups()
 				.UPDATE(a -> {
 					request.name.ifPresent(v -> a.name.set(v));
+					request.description.ifPresent(v -> a.description.set(v));
 					request.parent_id.ifPresent(v -> a.parent_id.set(v));
 					a.revision.set(request.revision + 1);
 					request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
@@ -262,6 +264,8 @@ public class GroupHandler {
 
 		public String name;
 
+		public Optional<String> description = Optional.empty();
+
 		public UUID org_id;
 
 		public UUID parent_id;
@@ -276,6 +280,8 @@ public class GroupHandler {
 		public UUID id;
 
 		public Optional<String> name = Optional.empty();
+
+		public Optional<String> description = Optional.empty();
 
 		public Optional<UUID> parent_id = Optional.empty();
 

@@ -56,6 +56,7 @@ CREATE TABLE bb_stock.items (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -73,6 +74,7 @@ COMMENT ON COLUMN bb_stock.items.id IS 'ID';
 COMMENT ON COLUMN bb_stock.items.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.items.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.items.name IS '名称';
+COMMENT ON COLUMN bb_stock.items.description IS '補足事項';
 COMMENT ON COLUMN bb_stock.items.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.items.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.items.tags IS 'log保存用タグ';
@@ -116,6 +118,7 @@ CREATE TABLE bb_stock.owners (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -133,6 +136,7 @@ COMMENT ON COLUMN bb_stock.owners.id IS 'ID';
 COMMENT ON COLUMN bb_stock.owners.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.owners.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.owners.name IS '名称';
+COMMENT ON COLUMN bb_stock.owners.description IS '補足事項';
 COMMENT ON COLUMN bb_stock.owners.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.owners.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.owners.tags IS 'log保存用タグ';
@@ -176,6 +180,7 @@ CREATE TABLE bb_stock.locations (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -193,6 +198,7 @@ COMMENT ON COLUMN bb_stock.locations.id IS 'ID';
 COMMENT ON COLUMN bb_stock.locations.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.locations.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.locations.name IS '名称';
+COMMENT ON COLUMN bb_stock.locations.description IS '補足事項';
 COMMENT ON COLUMN bb_stock.locations.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.locations.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.locations.tags IS 'log保存用タグ';
@@ -235,6 +241,7 @@ CREATE TABLE bb_stock.statuses (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -252,6 +259,7 @@ COMMENT ON COLUMN bb_stock.statuses.id IS 'ID';
 COMMENT ON COLUMN bb_stock.statuses.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.statuses.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.statuses.name IS '名称';
+COMMENT ON COLUMN bb_stock.statuses.description IS '補足事項';
 COMMENT ON COLUMN bb_stock.statuses.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.statuses.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.statuses.tags IS 'log保存用タグ';
@@ -341,6 +349,7 @@ CREATE TABLE bb_stock.formulas (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -356,6 +365,7 @@ COMMENT ON COLUMN bb_stock.formulas.id IS 'ID';
 COMMENT ON COLUMN bb_stock.formulas.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.formulas.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.formulas.name IS '名称';
+COMMENT ON COLUMN bb_stock.formulas.description IS '補足事項';
 COMMENT ON COLUMN bb_stock.formulas.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.formulas.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.formulas.tags IS 'log保存用タグ';

@@ -178,11 +178,11 @@ public class transients
 
 	/**
 	 * name: description<br>
-	 * remarks: 説明<br>
+	 * remarks: 補足事項<br>
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "説明", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "補足事項", defaultValue = "''::text", ordinalPosition = 6, notNull = true)
 	public static final String description = "description";
 
 	/**
@@ -486,7 +486,7 @@ public class transients
 		/**
 		 * setter
 		 * name: description<br>
-		 * remarks: 説明<br>
+		 * remarks: 補足事項<br>
 		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.lang.String
@@ -503,7 +503,7 @@ public class transients
 		/**
 		 * getter
 		 * name: description<br>
-		 * remarks: 説明<br>
+		 * remarks: 補足事項<br>
 		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.lang.String
