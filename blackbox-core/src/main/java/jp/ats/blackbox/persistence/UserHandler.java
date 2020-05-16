@@ -3,21 +3,22 @@ package jp.ats.blackbox.persistence;
 import java.util.Optional;
 import java.util.UUID;
 
+import jp.ats.blackbox.executor.TagExecutor;
 import sqlassist.bb.users;
 
 public class UserHandler {
 
-	public static UUID register(String name, Role role, UUID groupId, String props) {
+	public static UUID register(String name, Role role, UUID groupId, Optional<String> props, Optional<String[]> tags) {
 		var request = new SeqHandler.Request();
 		request.table = users.$TABLE;
 		request.dependsColumn = users.group_id;
 		request.dependsId = groupId;
 		return SeqHandler.getInstance().nextSeqAndGet(request, seq -> {
-			return registerInternal(name, role, groupId, seq, props);
+			return registerInternal(name, role, groupId, seq, props, tags);
 		});
 	}
 
-	private static UUID registerInternal(String name, Role role, UUID groupId, long seq, String props) {
+	private static UUID registerInternal(String name, Role role, UUID groupId, long seq, Optional<String> props, Optional<String[]> tags) {
 		var row = users.row();
 
 		UUID id = UUID.randomUUID();
@@ -29,11 +30,13 @@ public class UserHandler {
 		row.setRole(role.value());
 		row.setGroup_id(groupId);
 		row.setSeq(seq);
-		row.setProps(JsonHelper.toJson(props));
+		props.ifPresent(v -> row.setProps(JsonHelper.toJson(v)));
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 
 		row.insert();
+
+		tags.ifPresent(v -> TagExecutor.stickTags(v, id, users.$TABLE));
 
 		return id;
 	}
@@ -56,6 +59,8 @@ public class UserHandler {
 		}).WHERE(a -> a.id.eq(id).AND.revision.eq(revision)).execute();
 
 		if (result != 1) throw Utils.decisionException(users.$TABLE, id);
+
+		tags.ifPresent(v -> TagExecutor.stickTagsAgain(v, id, users.$TABLE));
 	}
 
 	public static void delete(UUID userId, long revision) {

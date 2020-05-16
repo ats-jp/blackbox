@@ -37,6 +37,8 @@ public class TransientHandler {
 
 		public UUID group_id;
 
+		public Optional<String> description = Optional.empty();
+
 		public Optional<UUID> user_id = Optional.empty();
 	}
 
@@ -72,12 +74,23 @@ public class TransientHandler {
 		row.setSeq_in_group(seqInGroup);
 		row.setUser_id(request.user_id.orElse(userId));
 		row.setSeq_in_user(seqInUser);
+		request.description.ifPresent(v -> row.setDescription(v));
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 
 		row.insert();
 
 		return id;
+	}
+
+	public static void updateDescription(UUID transientId, String description, long revision) {
+		int result = new transients().UPDATE(a -> {
+			a.description.set(description);
+			a.updated_by.set(SecurityValues.currentUserId());
+			a.updated_at.setAny("now()");
+		}).WHERE(a -> a.id.eq(transientId).AND.revision.eq(revision)).execute();
+
+		if (result != 1) throw Utils.decisionException(transients.$TABLE, transientId);
 	}
 
 	public static void delete(UUID transientId, long revision) {

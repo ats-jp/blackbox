@@ -143,11 +143,10 @@ public class transients
 	/**
 	 * name: group_id<br>
 	 * remarks: この一時作業のオーナーグループ<br>
-	 * 0の場合、オーナーグループはいない<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "この一時作業のオーナーグループ\n0の場合、オーナーグループはいない", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "この一時作業のオーナーグループ", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String group_id = "group_id";
 
 	/**
@@ -162,11 +161,10 @@ public class transients
 	/**
 	 * name: user_id<br>
 	 * remarks: この一時作業のオーナーユーザー<br>
-	 * 0の場合、オーナーユーザーはいない<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "この一時作業のオーナーユーザー\n0の場合、オーナーユーザーはいない", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "user_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "この一時作業のオーナーユーザー", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String user_id = "user_id";
 
 	/**
@@ -179,15 +177,13 @@ public class transients
 	public static final String seq_in_user = "seq_in_user";
 
 	/**
-	 * name: owner_type<br>
-	 * remarks: オーナータイプ<br>
-	 * group_idとuser_idどちらに値が入っているかを表す<br>
-	 * G=GROUP, U=USER<br>
-	 * type: char(1)<br>
+	 * name: description<br>
+	 * remarks: 説明<br>
+	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "owner_type", type = 1, typeName = "char", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "オーナータイプ\ngroup_idとuser_idどちらに値が入っているかを表す\nG=GROUP, U=USER", defaultValue = "null", ordinalPosition = 6, notNull = true)
-	public static final String owner_type = "owner_type";
+	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "説明", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	public static final String description = "description";
 
 	/**
 	 * name: revision<br>
@@ -371,7 +367,6 @@ public class transients
 		 * setter
 		 * name: group_id<br>
 		 * remarks: この一時作業のオーナーグループ<br>
-		 * 0の場合、オーナーグループはいない<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.util.UUID
@@ -389,7 +384,6 @@ public class transients
 		 * getter
 		 * name: group_id<br>
 		 * remarks: この一時作業のオーナーグループ<br>
-		 * 0の場合、オーナーグループはいない<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.util.UUID
@@ -433,7 +427,6 @@ public class transients
 		 * setter
 		 * name: user_id<br>
 		 * remarks: この一時作業のオーナーユーザー<br>
-		 * 0の場合、オーナーユーザーはいない<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.util.UUID
@@ -451,7 +444,6 @@ public class transients
 		 * getter
 		 * name: user_id<br>
 		 * remarks: この一時作業のオーナーユーザー<br>
-		 * 0の場合、オーナーユーザーはいない<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.util.UUID
@@ -493,35 +485,31 @@ public class transients
 
 		/**
 		 * setter
-		 * name: owner_type<br>
-		 * remarks: オーナータイプ<br>
-		 * group_idとuser_idどちらに値が入っているかを表す<br>
-		 * G=GROUP, U=USER<br>
-		 * type: char(1)<br>
+		 * name: description<br>
+		 * remarks: 説明<br>
+		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
-		public void setOwner_type(java.lang.String value) {
+		public void setDescription(java.lang.String value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("owner_type").getType());
-			data$.setValue("owner_type", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("description").getType());
+			data$.setValue("description", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: owner_type<br>
-		 * remarks: オーナータイプ<br>
-		 * group_idとuser_idどちらに値が入っているかを表す<br>
-		 * G=GROUP, U=USER<br>
-		 * type: char(1)<br>
+		 * name: description<br>
+		 * remarks: 説明<br>
+		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.lang.String
 		 */
-		public java.lang.String getOwner_type() {
-			Binder binder = data$.getValue("owner_type");
+		public java.lang.String getDescription() {
+			Binder binder = data$.getValue("description");
 			return (java.lang.String) binder.getValue();
 		}
 
@@ -1798,9 +1786,9 @@ public class transients
 		public final T seq_in_user;
 
 		/**
-		 * 項目名 owner_type
+		 * 項目名 description
 		 */
-		public final T owner_type;
+		public final T description;
 
 		/**
 		 * 項目名 revision
@@ -1843,7 +1831,7 @@ public class transients
 			this.seq_in_group = builder$.buildColumn(this, sqlassist.bb.transients.seq_in_group);
 			this.user_id = builder$.buildColumn(this, sqlassist.bb.transients.user_id);
 			this.seq_in_user = builder$.buildColumn(this, sqlassist.bb.transients.seq_in_user);
-			this.owner_type = builder$.buildColumn(this, sqlassist.bb.transients.owner_type);
+			this.description = builder$.buildColumn(this, sqlassist.bb.transients.description);
 			this.revision = builder$.buildColumn(this, sqlassist.bb.transients.revision);
 			this.created_at = builder$.buildColumn(this, sqlassist.bb.transients.created_at);
 			this.created_by = builder$.buildColumn(this, sqlassist.bb.transients.created_by);

@@ -160,11 +160,11 @@ public class instances
 
 	/**
 	 * name: description<br>
-	 * remarks: <br>
+	 * remarks: 補足事項<br>
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "補足事項", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String description = "description";
 
 	/**
@@ -333,7 +333,7 @@ public class instances
 		/**
 		 * setter
 		 * name: description<br>
-		 * remarks: <br>
+		 * remarks: 補足事項<br>
 		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.lang.String
@@ -350,7 +350,7 @@ public class instances
 		/**
 		 * getter
 		 * name: description<br>
-		 * remarks: <br>
+		 * remarks: 補足事項<br>
 		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.lang.String

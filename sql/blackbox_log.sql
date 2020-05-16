@@ -201,6 +201,7 @@ CREATE TABLE bb_log.transients (
 	seq_in_group bigint,
 	user_id uuid,
 	seq_in_user bigint,
+	description text,
 	revision bigint,
 	created_at timestamptz,
 	created_by uuid,

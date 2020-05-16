@@ -3,36 +3,36 @@
 --===========================
 
 /*
-‚±‚ÌDDL‚ğÀs‚·‚é‚½‚ß‚É•K—v‚È‚à‚Ì
+ã“ã®DDLã‚’å®Ÿè¡Œã™ã‚‹ãŸã‚ã«å¿…è¦ãªã‚‚ã®
 role
-	blackbox_admin BlackboxŠÇ—Ò SUPERUSERŒ ŒÀ
-	blackbox Blackbox—˜—pÒ ˆê”ÊŒ ŒÀ
+	blackbox_admin Blackboxç®¡ç†è€… SUPERUSERæ¨©é™
+	blackbox Blackboxåˆ©ç”¨è€… ä¸€èˆ¬æ¨©é™
 tablespace
 	blackbox
-		BlackboxƒAƒvƒŠƒP[ƒVƒ‡ƒ“—p
+		Blackboxã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ç”¨
 		owner: blackbox
 	blackbox_index
-		Blackbox index—p
+		Blackbox indexç”¨
 		owner: blackbox
 	log
-		Blackbox log—p
+		Blackbox logç”¨
 		owner: blackbox
 database
 	blackbox
-		BlackboxƒAƒvƒŠƒP[ƒVƒ‡ƒ“—pAtablespace‚ğblackbox‚É‚·‚é
+		Blackboxã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ã€tablespaceã‚’blackboxã«ã™ã‚‹
 		owner: blackbox
 */
 
---‘Síœ
+--å…¨å‰Šé™¤
 DROP SCHEMA IF EXISTS bb_account CASCADE;
 
 /*
 postgresql role
-blackbox_admin BlackboxŠÇ—Ò SUPERUSERŒ ŒÀ
-blackbox Blackbox—˜—pÒ ˆê”ÊŒ ŒÀ
-ˆÈ‰º‚ÌDDL‚Í‘S‚Äblackbox_admin‚ÅÀs‚·‚é‚±‚Æ
-ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Íblackboxƒ[ƒ‹‚ÅÀs‚·‚é‚±‚Æ‚ğ‘z’è‚µ‚Ä‚¢‚é
-ŠO•”ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÅŠù‚Éƒ†[ƒU[‚ª‘¶İ‚·‚éê‡‚ÍAblackbox‚Æ“¯‚¶GRANT•¶‚ğÀs‚·‚é‚±‚Æ
+blackbox_admin Blackboxç®¡ç†è€… SUPERUSERæ¨©é™
+blackbox Blackboxåˆ©ç”¨è€… ä¸€èˆ¬æ¨©é™
+ä»¥ä¸‹ã®DDLã¯å…¨ã¦blackbox_adminã§å®Ÿè¡Œã™ã‚‹ã“ã¨
+ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã¯blackboxãƒ­ãƒ¼ãƒ«ã§å®Ÿè¡Œã™ã‚‹ã“ã¨ã‚’æƒ³å®šã—ã¦ã„ã‚‹
+å¤–éƒ¨ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã§æ—¢ã«ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒå­˜åœ¨ã™ã‚‹å ´åˆã¯ã€blackboxã¨åŒã˜GRANTæ–‡ã‚’å®Ÿè¡Œã™ã‚‹ã“ã¨
 */
 
 CREATE SCHEMA bb_account;
@@ -41,7 +41,7 @@ COMMENT ON SCHEMA bb_account IS 'Blackbox Account Schema Ver. 0.3';
 
 /*
 --postgresql tablespace
---ŠJ”­ŠÂ‹«AƒNƒ‰ƒEƒhŠÂ‹«“™ƒfƒtƒHƒ‹ƒgtablespace‚Ì‚Ü‚ÜCREATE‚·‚éê‡A‚±‚Ìs‚ğƒRƒƒ“ƒgƒAƒEƒg
+--é–‹ç™ºç’°å¢ƒã€ã‚¯ãƒ©ã‚¦ãƒ‰ç’°å¢ƒç­‰ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆtablespaceã®ã¾ã¾CREATEã™ã‚‹å ´åˆã€ã“ã®è¡Œã‚’ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆ
 SET default_tablespace = 'blackbox';
 */
 
@@ -49,7 +49,7 @@ SET default_tablespace = 'blackbox';
 --account tables
 --===========================
 
---Š¨’è‰È–Ú
+--å‹˜å®šç§‘ç›®
 CREATE TABLE bb_account.accounts (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	org_id uuid REFERENCES bb.orgs NOT NULL,
@@ -73,30 +73,30 @@ CREATE TABLE bb_account.accounts (
 	updated_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (org_id, seq),
 	UNIQUE (org_id, code));
---log‘ÎÛ
+--logå¯¾è±¡
 
-COMMENT ON TABLE bb_account.accounts IS 'Š¨’è‰È–Ú';
+COMMENT ON TABLE bb_account.accounts IS 'å‹˜å®šç§‘ç›®';
 COMMENT ON COLUMN bb_account.accounts.id IS 'ID';
-COMMENT ON COLUMN bb_account.accounts.org_id IS '‘gDID';
-COMMENT ON COLUMN bb_account.accounts.seq IS '‘gD“à˜A”Ô';
-COMMENT ON COLUMN bb_account.accounts.code IS 'ŠO•”ƒAƒvƒŠƒP[ƒVƒ‡ƒ“w’èƒR[ƒh';
-COMMENT ON COLUMN bb_account.accounts.name IS '–¼Ì';
-COMMENT ON COLUMN bb_account.accounts.type IS 'Š¨’è‰È–Ú•ª—Ş
-AS=‘Y (Assets)
-LI=•‰Â (Liabilities)
-EQ=ƒ‘Y (Equity)
-RE=û‰v (Revenue)
-EX=”ï—p (Expenses)';
-COMMENT ON COLUMN bb_account.accounts.revision IS 'ƒŠƒrƒWƒ‡ƒ“”Ô†';
-COMMENT ON COLUMN bb_account.accounts.props IS 'ŠO•”ƒAƒvƒŠƒP[ƒVƒ‡ƒ“î•ñJSON';
-COMMENT ON COLUMN bb_account.accounts.tags IS 'log•Û‘¶—pƒ^ƒO';
-COMMENT ON COLUMN bb_account.accounts.active IS 'ƒAƒNƒeƒBƒuƒtƒ‰ƒO';
-COMMENT ON COLUMN bb_account.accounts.created_at IS 'ì¬';
-COMMENT ON COLUMN bb_account.accounts.created_by IS 'ì¬ƒ†[ƒU[';
-COMMENT ON COLUMN bb_account.accounts.updated_at IS 'XV';
-COMMENT ON COLUMN bb_account.accounts.updated_by IS 'XVƒ†[ƒU[';
+COMMENT ON COLUMN bb_account.accounts.org_id IS 'çµ„ç¹”ID';
+COMMENT ON COLUMN bb_account.accounts.seq IS 'çµ„ç¹”å†…é€£ç•ª';
+COMMENT ON COLUMN bb_account.accounts.code IS 'å¤–éƒ¨ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³æŒ‡å®šã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN bb_account.accounts.name IS 'åç§°';
+COMMENT ON COLUMN bb_account.accounts.type IS 'å‹˜å®šç§‘ç›®åˆ†é¡
+AS=è³‡ç”£ (Assets)
+LI=è² å‚µ (Liabilities)
+EQ=ç´”è³‡ç”£ (Equity)
+RE=åç›Š (Revenue)
+EX=è²»ç”¨ (Expenses)';
+COMMENT ON COLUMN bb_account.accounts.revision IS 'ãƒªãƒ“ã‚¸ãƒ§ãƒ³ç•ªå·';
+COMMENT ON COLUMN bb_account.accounts.props IS 'å¤–éƒ¨ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³æƒ…å ±JSON';
+COMMENT ON COLUMN bb_account.accounts.tags IS 'logä¿å­˜ç”¨ã‚¿ã‚°';
+COMMENT ON COLUMN bb_account.accounts.active IS 'ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN bb_account.accounts.created_at IS 'ä½œæˆæ™‚åˆ»';
+COMMENT ON COLUMN bb_account.accounts.created_by IS 'ä½œæˆãƒ¦ãƒ¼ã‚¶ãƒ¼';
+COMMENT ON COLUMN bb_account.accounts.updated_at IS 'æ›´æ–°æ™‚åˆ»';
+COMMENT ON COLUMN bb_account.accounts.updated_by IS 'æ›´æ–°ãƒ¦ãƒ¼ã‚¶ãƒ¼';
 
---È—ª•s‰Â‚È‚Ì‚ÅNULLs•s—v
+--çœç•¥ä¸å¯ãªã®ã§NULLè¡Œä¸è¦
 
 CREATE TABLE bb_account.accounts_tags (
 	id uuid REFERENCES bb_account.accounts ON DELETE CASCADE NOT NULL,
@@ -105,7 +105,7 @@ CREATE TABLE bb_account.accounts_tags (
 
 ----------
 
---¬Š¨’è‰È–Ú
+--å°å‹˜å®šç§‘ç›®
 CREATE TABLE bb_account.subaccounts (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	account_id uuid REFERENCES bb_account.accounts NOT NULL,
@@ -122,24 +122,24 @@ CREATE TABLE bb_account.subaccounts (
 	updated_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (account_id, seq_in_account),
 	UNIQUE (account_id, code));
---log‘ÎÛ
+--logå¯¾è±¡
 
-COMMENT ON TABLE bb_account.subaccounts IS '¬Š¨’è‰È–Ú';
+COMMENT ON TABLE bb_account.subaccounts IS 'å°å‹˜å®šç§‘ç›®';
 COMMENT ON COLUMN bb_account.subaccounts.id IS 'ID';
-COMMENT ON COLUMN bb_account.subaccounts.account_id IS 'Š¨’è‰È–ÚID';
-COMMENT ON COLUMN bb_account.subaccounts.seq_in_account IS 'Š¨’è‰È–Ú“à˜A”Ô';
-COMMENT ON COLUMN bb_account.subaccounts.code IS 'ŠO•”ƒAƒvƒŠƒP[ƒVƒ‡ƒ“w’èƒTƒuƒR[ƒh';
-COMMENT ON COLUMN bb_account.subaccounts.name IS '–¼Ì';
-COMMENT ON COLUMN bb_account.subaccounts.revision IS 'ƒŠƒrƒWƒ‡ƒ“”Ô†';
-COMMENT ON COLUMN bb_account.subaccounts.props IS 'ŠO•”ƒAƒvƒŠƒP[ƒVƒ‡ƒ“î•ñJSON';
-COMMENT ON COLUMN bb_account.subaccounts.tags IS 'log•Û‘¶—pƒ^ƒO';
-COMMENT ON COLUMN bb_account.subaccounts.active IS 'ƒAƒNƒeƒBƒuƒtƒ‰ƒO';
-COMMENT ON COLUMN bb_account.subaccounts.created_at IS 'ì¬';
-COMMENT ON COLUMN bb_account.subaccounts.created_by IS 'ì¬ƒ†[ƒU[';
-COMMENT ON COLUMN bb_account.subaccounts.updated_at IS 'XV';
-COMMENT ON COLUMN bb_account.subaccounts.updated_by IS 'XVƒ†[ƒU[';
+COMMENT ON COLUMN bb_account.subaccounts.account_id IS 'å‹˜å®šç§‘ç›®ID';
+COMMENT ON COLUMN bb_account.subaccounts.seq_in_account IS 'å‹˜å®šç§‘ç›®å†…é€£ç•ª';
+COMMENT ON COLUMN bb_account.subaccounts.code IS 'å¤–éƒ¨ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³æŒ‡å®šã‚µãƒ–ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN bb_account.subaccounts.name IS 'åç§°';
+COMMENT ON COLUMN bb_account.subaccounts.revision IS 'ãƒªãƒ“ã‚¸ãƒ§ãƒ³ç•ªå·';
+COMMENT ON COLUMN bb_account.subaccounts.props IS 'å¤–éƒ¨ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³æƒ…å ±JSON';
+COMMENT ON COLUMN bb_account.subaccounts.tags IS 'logä¿å­˜ç”¨ã‚¿ã‚°';
+COMMENT ON COLUMN bb_account.subaccounts.active IS 'ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN bb_account.subaccounts.created_at IS 'ä½œæˆæ™‚åˆ»';
+COMMENT ON COLUMN bb_account.subaccounts.created_by IS 'ä½œæˆãƒ¦ãƒ¼ã‚¶ãƒ¼';
+COMMENT ON COLUMN bb_account.subaccounts.updated_at IS 'æ›´æ–°æ™‚åˆ»';
+COMMENT ON COLUMN bb_account.subaccounts.updated_by IS 'æ›´æ–°ãƒ¦ãƒ¼ã‚¶ãƒ¼';
 
---È—ª•s‰Â‚È‚Ì‚ÅNULLs•s—v
+--çœç•¥ä¸å¯ãªã®ã§NULLè¡Œä¸è¦
 
 CREATE TABLE bb_account.subaccounts_tags (
 	id uuid REFERENCES bb_account.subaccounts ON DELETE CASCADE NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE bb_account.subaccounts_tags (
 
 ----------
 
---ƒOƒ‹[ƒv•ÊŠ¨’è‰È–Ú
+--ã‚°ãƒ«ãƒ¼ãƒ—åˆ¥å‹˜å®šç§‘ç›®
 CREATE TABLE bb_account.group_accounts (
 	id uuid REFERENCES bb.units PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
@@ -156,25 +156,25 @@ CREATE TABLE bb_account.group_accounts (
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, subaccount_id));
---log‘ÎÛŠO
---ˆê“x“o˜^‚³‚ê‚½‚ç•ÏX‚³‚ê‚È‚¢
+--logå¯¾è±¡å¤–
+--ä¸€åº¦ç™»éŒ²ã•ã‚ŒãŸã‚‰å¤‰æ›´ã•ã‚Œãªã„
 
-COMMENT ON TABLE bb_account.group_accounts IS 'ƒOƒ‹[ƒv•ÊŠ¨’è‰È–Ú';
+COMMENT ON TABLE bb_account.group_accounts IS 'ã‚°ãƒ«ãƒ¼ãƒ—åˆ¥å‹˜å®šç§‘ç›®';
 COMMENT ON COLUMN bb_account.group_accounts.id IS 'ID
-ŠÇ—‘ÎÛID‚É]‘®';
-COMMENT ON COLUMN bb_account.group_accounts.group_id IS 'ƒOƒ‹[ƒvID';
-COMMENT ON COLUMN bb_account.group_accounts.subaccount_id IS '¬Š¨’è‰È–ÚID';
-COMMENT ON COLUMN bb_account.group_accounts.created_at IS 'ì¬';
-COMMENT ON COLUMN bb_account.group_accounts.created_by IS 'ì¬ƒ†[ƒU[';
+ç®¡ç†å¯¾è±¡IDã«å¾“å±';
+COMMENT ON COLUMN bb_account.group_accounts.group_id IS 'ã‚°ãƒ«ãƒ¼ãƒ—ID';
+COMMENT ON COLUMN bb_account.group_accounts.subaccount_id IS 'å°å‹˜å®šç§‘ç›®ID';
+COMMENT ON COLUMN bb_account.group_accounts.created_at IS 'ä½œæˆæ™‚åˆ»';
+COMMENT ON COLUMN bb_account.group_accounts.created_by IS 'ä½œæˆãƒ¦ãƒ¼ã‚¶ãƒ¼';
 
---È—ª•s‰Â‚È‚Ì‚ÅNULLs•s—v
+--çœç•¥ä¸å¯ãªã®ã§NULLè¡Œä¸è¦
 
 --===========================
 --indexes
 --===========================
 
 /*
---ŠJ”­ŠÂ‹«AƒNƒ‰ƒEƒhŠÂ‹«“™ƒfƒtƒHƒ‹ƒgtablespace‚Ì‚Ü‚ÜCREATE‚·‚éê‡A‚±‚Ìs‚ğƒRƒƒ“ƒgƒAƒEƒg
+--é–‹ç™ºç’°å¢ƒã€ã‚¯ãƒ©ã‚¦ãƒ‰ç’°å¢ƒç­‰ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆtablespaceã®ã¾ã¾CREATEã™ã‚‹å ´åˆã€ã“ã®è¡Œã‚’ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆ
 SET default_tablespace = 'blackbox_index';
 */
 
@@ -200,13 +200,13 @@ CREATE INDEX ON bb_account.subaccounts_tags (tag_id);
 --privileges
 --===========================
 
---ƒXƒL[ƒ}g—pŒ ‚ğ•t—^
+--ã‚¹ã‚­ãƒ¼ãƒä½¿ç”¨æ¨©ã‚’ä»˜ä¸
 GRANT USAGE ON SCHEMA bb_account TO blackbox;
 
---ƒV[ƒPƒ“ƒXg—pŒ ‚ğ•t—^
+--ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ä½¿ç”¨æ¨©ã‚’ä»˜ä¸
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA bb_account TO blackbox;
 
---‘Sƒe[ƒuƒ‹SELECT‰Â”\
+--å…¨ãƒ†ãƒ¼ãƒ–ãƒ«SELECTå¯èƒ½
 GRANT SELECT ON ALL TABLES IN SCHEMA bb_account TO blackbox;
 
 GRANT INSERT, UPDATE, DELETE ON TABLE
@@ -214,13 +214,13 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb_account.subaccounts
 TO blackbox;
 
---tagŠÖ˜A‚ÍINSERT, DELETE‚Ì‚İ
+--tagé–¢é€£ã¯INSERT, DELETEã®ã¿
 GRANT INSERT, DELETE ON TABLE
 	bb_account.accounts_tags,
 	bb_account.subaccounts_tags
 TO blackbox;
 
---group_accounts‚ÍINSERT‚Ì‚İ
+--group_accountsã¯INSERTã®ã¿
 GRANT INSERT ON TABLE
 	bb_account.group_accounts
 TO blackbox;

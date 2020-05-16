@@ -928,6 +928,7 @@ CREATE TABLE bb.transients (
 	seq_in_group bigint NOT NULL,
 	user_id uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	seq_in_user bigint NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL, --以下のテーブルのすべてのrevisionを兼ねる
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
@@ -942,16 +943,12 @@ COMMENT ON COLUMN bb.transients.group_id IS 'この一時作業のオーナー�
 COMMENT ON COLUMN bb.transients.seq_in_group IS 'グループ内連番';
 COMMENT ON COLUMN bb.transients.user_id IS 'この一時作業のオーナーユーザー';
 COMMENT ON COLUMN bb.transients.seq_in_user IS 'ユーザー内連番';
+COMMENT ON COLUMN bb.transients.description IS '説明';
 COMMENT ON COLUMN bb.transients.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transients.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transients.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transients.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transients.updated_by IS '更新ユーザー';
-
-CREATE TABLE bb.transients_tags (
-	id uuid REFERENCES bb.transients ON DELETE CASCADE NOT NULL,
-	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
-	UNIQUE (id, tag_id));
 
 ----------
 
@@ -1147,7 +1144,6 @@ CREATE INDEX ON bb.transient_nodes (unit_id);
 CREATE INDEX ON bb.groups_tags (tag_id);
 CREATE INDEX ON bb.users_tags (tag_id);
 CREATE INDEX ON bb.journals_tags (tag_id);
-CREATE INDEX ON bb.transients_tags (tag_id);
 CREATE INDEX ON bb.transient_journals_tags (tag_id);
 
 --===========================
@@ -1189,7 +1185,6 @@ GRANT INSERT, DELETE ON TABLE
 	bb.groups_tags,
 	bb.users_tags,
 	bb.journals_tags,
-	bb.transients_tags,
 	bb.transient_journals_tags
 TO blackbox;
 
