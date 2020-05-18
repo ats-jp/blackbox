@@ -41,8 +41,8 @@ public class JournalHandlerTest {
 	static JournalRegisterRequest createRequest(int i, UUID groupId) {
 		var journal = new AccountingJournal();
 
-		journal.add(groupId, registerSubaccount(AccountType.AS, i, 1), DebitCredit.DEBIT, new BigDecimal(10000));
-		journal.add(groupId, registerSubaccount(AccountType.RE, 100000 + i, 2), DebitCredit.CREDIT, new BigDecimal(10000));
+		journal.add(groupId, registerSubaccount(AccountType.AS, UUID.randomUUID().toString(), "01"), DebitCredit.DEBIT, new BigDecimal(10000));
+		journal.add(groupId, registerSubaccount(AccountType.RE, UUID.randomUUID().toString(), "02"), DebitCredit.CREDIT, new BigDecimal(10000));
 
 		var r = new JournalRegisterRequest();
 
@@ -54,10 +54,10 @@ public class JournalHandlerTest {
 		return r;
 	}
 
-	public static UUID registerSubaccount(AccountType type, int i, int ii) {
+	public static UUID registerSubaccount(AccountType type, String code, String subcode) {
 		return AccountHandlerTest.registerSubaccount(
-			AccountHandlerTest.registerAccount(String.valueOf(i), type),
-			String.valueOf(ii));
+			AccountHandlerTest.registerAccount(code, type),
+			subcode);
 	}
 
 	public static UUID registerGroup() {
