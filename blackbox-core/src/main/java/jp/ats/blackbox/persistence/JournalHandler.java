@@ -480,7 +480,7 @@ public class JournalHandler {
 				request.quantity);
 		};
 
-		if (request.in_out.relativize(request.quantity).compareTo(BigDecimal.ZERO) < 0) {
+		if (request.in_out.normalize(request.quantity).compareTo(BigDecimal.ZERO) < 0) {
 			minusUpdaterList.add(snapshotProcess);
 		} else {
 			plusUpdaterList.add(snapshotProcess);
@@ -562,7 +562,7 @@ public class JournalHandler {
 									//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
 									.WHERE(swa -> swa.unit_id.eq($UUID).AND.seq.gt($STRING))))),
 				unlimited,
-				inOut.relativize(quantity),
+				inOut.normalize(quantity),
 				unitId,
 				seq)
 				.execute();

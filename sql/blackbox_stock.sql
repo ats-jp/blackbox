@@ -84,14 +84,13 @@ COMMENT ON COLUMN bb_stock.items.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb_stock.items.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb_stock.items.updated_by IS '更新ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb_stock.items (
 	id,
 	group_id,
 	seq,
 	name,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -100,7 +99,6 @@ INSERT INTO bb_stock.items (
 	0,
 	'NULL',
 	0,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
@@ -146,14 +144,13 @@ COMMENT ON COLUMN bb_stock.owners.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb_stock.owners.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb_stock.owners.updated_by IS '更新ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb_stock.owners (
 	id,
 	group_id,
 	seq,
 	name,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -162,7 +159,6 @@ INSERT INTO bb_stock.owners (
 	0,
 	'NULL',
 	0,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
@@ -208,14 +204,13 @@ COMMENT ON COLUMN bb_stock.locations.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb_stock.locations.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb_stock.locations.updated_by IS '更新ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb_stock.locations (
 	id,
 	group_id,
 	seq,
 	name,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -224,7 +219,6 @@ INSERT INTO bb_stock.locations (
 	0,
 	'NULL',
 	0,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
@@ -269,14 +263,13 @@ COMMENT ON COLUMN bb_stock.statuses.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb_stock.statuses.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb_stock.statuses.updated_by IS '更新ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb_stock.statuses (
 	id,
 	group_id,
 	seq,
 	name,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -285,7 +278,6 @@ INSERT INTO bb_stock.statuses (
 	0,
 	'NULL',
 	0,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
@@ -323,7 +315,7 @@ COMMENT ON COLUMN bb_stock.stocks.status_id IS '状態ID';
 COMMENT ON COLUMN bb_stock.stocks.created_at IS '作成時刻';
 COMMENT ON COLUMN bb_stock.stocks.created_by IS '作成ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb_stock.stocks (
 	id,
 	group_id,

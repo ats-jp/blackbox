@@ -148,7 +148,6 @@ INSERT INTO bb.orgs (
 	seq,
 	name,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -157,7 +156,6 @@ INSERT INTO bb.orgs (
 	0,
 	'NULL',
 	0,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
@@ -169,7 +167,6 @@ INSERT INTO bb.orgs (
 	name,
 	description,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -179,7 +176,6 @@ INSERT INTO bb.orgs (
 	'Blackbox',
 	'Blackboxシステム管理',
 	0,
-	'{}',
 	'11111111-1111-1111-1111-111111111111',
 	'11111111-1111-1111-1111-111111111111');
 
@@ -239,7 +235,6 @@ INSERT INTO bb.groups (
 	name,
 	parent_id,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -249,7 +244,6 @@ INSERT INTO bb.groups (
 	'NULL',
 	'00000000-0000-0000-0000-000000000000',
 	0,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
@@ -262,7 +256,6 @@ INSERT INTO bb.groups (
 	description,
 	parent_id,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -273,7 +266,6 @@ INSERT INTO bb.groups (
 	'Blackboxシステム管理者グループ',
 	'00000000-0000-0000-0000-000000000000',
 	0,
-	'{}',
 	'11111111-1111-1111-1111-111111111111',
 	'11111111-1111-1111-1111-111111111111');
 
@@ -401,7 +393,7 @@ COMMENT ON COLUMN bb.users.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.users.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.users.updated_by IS '更新ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.users (
 	id,
 	group_id,
@@ -409,7 +401,6 @@ INSERT INTO bb.users (
 	name,
 	role,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -419,7 +410,6 @@ INSERT INTO bb.users (
 	'NULL',
 	9,
 	0,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
@@ -432,7 +422,6 @@ INSERT INTO bb.users (
 	description,
 	role,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -443,7 +432,6 @@ INSERT INTO bb.users (
 	'Blackbox管理者',
 	0,
 	0,
-	'{}',
 	'11111111-1111-1111-1111-111111111111',
 	'11111111-1111-1111-1111-111111111111');
 
@@ -540,7 +528,7 @@ COMMENT ON COLUMN bb.units.id IS 'ID';
 COMMENT ON COLUMN bb.units.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.units.created_by IS '作成ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.units (id, created_by) VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
 
 --===========================
@@ -559,6 +547,7 @@ COMMENT ON COLUMN bb.journal_batches.id IS 'ID';
 COMMENT ON COLUMN bb.journal_batches.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.journal_batches.created_by IS '作成ユーザー';
 
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.journal_batches (id, created_by) VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
 
 ----------
@@ -608,13 +597,12 @@ COMMENT ON COLUMN bb.journals.user_props IS '作成ユーザーのprops';
 COMMENT ON COLUMN bb.journals.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.journals.created_by IS '作成ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.journals (
 	id,
 	group_id,
 	journal_batch_id,
 	fixed_at,
-	props,
 	instance_id,
 	org_props,
 	group_props,
@@ -626,7 +614,6 @@ INSERT INTO bb.journals (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'1900-1-1'::timestamptz,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'{}',
 	'{}',
@@ -670,7 +657,7 @@ COMMENT ON COLUMN bb.details.id IS 'ID';
 COMMENT ON COLUMN bb.details.journal_id IS '伝票ID';
 COMMENT ON COLUMN bb.details.props IS '外部アプリケーション情報JSON';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.details (
 	id,
 	journal_id
@@ -708,7 +695,7 @@ trueの場合、以降のsnapshotは数量がマイナスになってもエラ�
 COMMENT ON COLUMN bb.nodes.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.nodes.unit_props IS '管理対象のprops';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.nodes (
 	id,
 	detail_id,
@@ -774,7 +761,7 @@ COMMENT ON COLUMN bb.snapshots.seq IS '移動ノード状態の登録順
 COMMENT ON COLUMN bb.snapshots.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.snapshots (
 	id,
 	unlimited,
@@ -820,7 +807,7 @@ COMMENT ON COLUMN bb.current_units.snapshot_id IS 'スナップショットID
 現時点の数量を変更した伝票';
 COMMENT ON COLUMN bb.current_units.updated_at IS '更新時刻';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.current_units (
 	id,
 	unlimited,

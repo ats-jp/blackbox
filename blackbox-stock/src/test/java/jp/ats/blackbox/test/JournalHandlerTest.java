@@ -11,11 +11,10 @@ import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.GroupHandler;
+import jp.ats.blackbox.persistence.GroupHandler.RegisterRequest;
 import jp.ats.blackbox.persistence.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
 import jp.ats.blackbox.persistence.JournalHandler;
-import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.GroupHandler.RegisterRequest;
 import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
 import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
 import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
@@ -36,8 +35,6 @@ public class JournalHandlerTest {
 				t.commit(); //created_atを確定するために一件毎commit
 			});
 		});
-
-		SecurityValues.end();
 	}
 
 	static JournalRegisterRequest createRequest(UUID groupId) {
@@ -91,7 +88,7 @@ public class JournalHandlerTest {
 
 	public static UUID registerGroup() {
 		var req = new RegisterRequest();
-		req.name = "stock group";
+		req.name = "test group";
 		req.parent_id = U.NULL_ID;
 		req.org_id = U.NULL_ID;
 
