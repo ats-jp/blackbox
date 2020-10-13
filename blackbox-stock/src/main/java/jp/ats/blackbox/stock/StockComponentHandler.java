@@ -3,11 +3,8 @@ package jp.ats.blackbox.stock;
 import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.blendee.assist.Vargs;
-import org.blendee.jdbc.BResultSet;
-import org.blendee.jdbc.Result;
 import org.blendee.jdbc.TablePath;
 import org.blendee.util.GenericTable;
 
@@ -15,7 +12,6 @@ import jp.ats.blackbox.executor.TagExecutor;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.SeqHandler;
 import jp.ats.blackbox.persistence.Utils;
-import jp.ats.blackbox.stock.StockComponent.ForcibleUpdateRequest;
 import jp.ats.blackbox.stock.StockComponent.RegisterRequest;
 import jp.ats.blackbox.stock.StockComponent.UpdateRequest;
 
@@ -28,6 +24,8 @@ public class StockComponentHandler {
 	private static final String seq = "seq";
 
 	private static final String name = "name";
+
+	private static final String description = "description";
 
 	private static final String revision = "revision";
 
@@ -67,6 +65,7 @@ public class StockComponentHandler {
 		row.setUUID(group_id, request.group_id);
 		row.setLong(seq, seqValue);
 		row.setString(name, request.name);
+		request.description.ifPresent(v -> row.setString(description, v));
 		request.props.ifPresent(v -> row.setObject(props, toJson(v)));
 		request.tags.ifPresent(v -> row.setObject(tags, v));
 
@@ -88,6 +87,7 @@ public class StockComponentHandler {
 		int result = new GenericTable(table).UPDATE(a -> {
 			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
 			request.name.ifPresent(v -> a.col(name).set(v));
+			request.description.ifPresent(v -> a.col(description).set(v));
 			request.props.ifPresent(v -> a.col(props).set(toJson(v)));
 			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
@@ -100,24 +100,6 @@ public class StockComponentHandler {
 		request.tags.ifPresent(tags -> TagExecutor.stickTagsAgain(tags, request.id, table));
 	}
 
-	public static void updateForcibly(
-		TablePath table,
-		ForcibleUpdateRequest request) {
-		int result = new GenericTable(table).UPDATE(a -> {
-			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
-			request.name.ifPresent(v -> a.col(name).set(v));
-			request.props.ifPresent(v -> a.col(props).set(toJson(v)));
-			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
-			request.active.ifPresent(v -> a.col(active).set(v));
-			a.col(updated_by).set(SecurityValues.currentUserId());
-			a.col(updated_at).setAny("now()");
-		}).WHERE(a -> a.col(id).eq(request.id)).execute();
-
-		request.tags.ifPresent(tags -> TagExecutor.stickTags(tags, request.id, table));
-
-		if (result != 1) throw Utils.decisionException(table, request.id);
-	}
-
 	public static void delete(TablePath table, UUID id, long revision) {
 		int result = new GenericTable(table)
 			.DELETE()
@@ -125,11 +107,5 @@ public class StockComponentHandler {
 			.execute();
 
 		if (result != 1) throw Utils.decisionException(table, id);
-	}
-
-	public static void fetch(TablePath table, long id, Consumer<Result> consumer) {
-	}
-
-	public static void search(TablePath table, long id, Consumer<BResultSet> consumer) {
 	}
 }

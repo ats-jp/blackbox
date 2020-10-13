@@ -1,6 +1,13 @@
 package jp.ats.blackbox.executor;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -19,6 +26,7 @@ import jp.ats.blackbox.common.BlackboxException;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.ClosingHandler;
 import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
+import jp.ats.blackbox.persistence.GroupHandler;
 import jp.ats.blackbox.persistence.JournalHandler;
 import jp.ats.blackbox.persistence.JournalHandler.JournalDenyRequest;
 import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
@@ -33,8 +41,6 @@ public class JournalExecutor {
 
 	private static final Logger logger = LogManager.getLogger(JournalExecutor.class);
 
-	private static final int bufferSize = 256;
-
 	private static final int deadlockRetryCount = 10;
 
 	private final Disruptor<Event> disruptor;
@@ -45,7 +51,13 @@ public class JournalExecutor {
 
 	private final JournalHandler handler = new JournalHandler(recorder);
 
+	private final Map<UUID, PausingGroup> pausingGroups = new HashMap<>();
+
 	public JournalExecutor() {
+		this(256);
+	}
+
+	public JournalExecutor(int bufferSize) {//bufferSize must be a power of 2
 		disruptor = new Disruptor<>(Event::new, bufferSize, DaemonThreadFactory.INSTANCE);
 
 		disruptor.handleEventsWith((event, sequence, endOfBatch) -> {
@@ -65,7 +77,7 @@ public class JournalExecutor {
 	}
 
 	public boolean isEmpty() {
-		return bufferSize - ringBuffer.remainingCapacity() == 0;
+		return disruptor.getBufferSize() - ringBuffer.remainingCapacity() == 0;
 	}
 
 	public JournalPromise registerJournal(UUID userId, Supplier<JournalRegisterRequest> requestSupplier) {
@@ -115,10 +127,84 @@ public class JournalExecutor {
 		return promise;
 	}
 
+	public static class PausingGroup {
+
+		public final UUID groupId;
+
+		public final Timestamp willCloseAt;
+
+		private PausingGroup(UUID groupId, Timestamp willCloseAt) {
+			this.groupId = Objects.requireNonNull(groupId);
+			this.willCloseAt = Objects.requireNonNull(willCloseAt);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof PausingGroup)) return false;
+			var another = (PausingGroup) obj;
+			return groupId.equals(another.groupId) && willCloseAt.equals(another.willCloseAt);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(groupId, willCloseAt);
+		}
+
+		@Override
+		public String toString() {
+			return "group id; " + groupId + ", will close at: " + willCloseAt;
+		}
+	}
+
+	//仮締め開始
+	public PausingGroup[] pauseGroups(UUID userId, UUID groupId, Timestamp willCloseAt) throws CommandFailedException, InterruptedException {
+		var promise = new JournalPromise();
+
+		var command = new PauseCommand(groupId, willCloseAt, userId);
+
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
+
+		promise.waitUntilFinished();
+
+		synchronized (command.groups) {
+			return command.groups.toArray(new PausingGroup[command.groups.size()]);
+		}
+	}
+
+	//仮締めキャンセル
+	public PausingGroup[] resumeGroups(UUID userId, UUID groupId) throws CommandFailedException, InterruptedException {
+		var promise = new JournalPromise();
+
+		var command = new ResumeCommand(groupId);
+
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
+
+		promise.waitUntilFinished();
+
+		synchronized (command.groups) {
+			return command.groups.toArray(new PausingGroup[command.groups.size()]);
+		}
+	}
+
+	//現在仮締め中グループ取得
+	public PausingGroup[] getPausingGroups(UUID userId, UUID groupId) throws CommandFailedException, InterruptedException {
+		var promise = new JournalPromise();
+
+		var command = new GetPausingGroupsCommand(groupId);
+
+		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
+
+		promise.waitUntilFinished();
+
+		synchronized (command.groups) {
+			return command.groups.toArray(new PausingGroup[command.groups.size()]);
+		}
+	}
+
 	public JournalPromise close(UUID userId, Supplier<ClosingRequest> requestSupplier) {
 		var promise = new JournalPromise();
 
-		var command = new ClosingCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new CloseCommand(promise.getId(), userId, requestSupplier.get());
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -147,7 +233,7 @@ public class JournalExecutor {
 
 					event.command.doAfterCommit();
 
-					//publishスレッドに新IDを通知
+					//publishスレッドに終了を通知
 					event.promise.notifyFinished();
 				});
 
@@ -164,15 +250,7 @@ public class JournalExecutor {
 
 				logger.fatal("Deadlock retry count exceeded " + deadlockRetryCount);
 
-				try {
-					Blendee.execute(t -> {
-						event.insertErrorLog(deadlockException);
-					});
-				} catch (Throwable errorsError) {
-					logger.fatal(errorsError.getMessage(), errorsError);
-					event.promise.notifyError(errorsError);
-					return;
-				}
+				insertErrorLog(event, deadlockException);
 
 				event.promise.notifyError(deadlockException);
 
@@ -180,18 +258,37 @@ public class JournalExecutor {
 			} catch (Throwable error) {
 				logger.fatal(error.getMessage(), error);
 
-				try {
-					Blendee.execute(t -> {
-						event.insertErrorLog(error);
-					});
-				} catch (Throwable errorsError) {
-					logger.fatal(errorsError.getMessage(), errorsError);
-				}
+				insertErrorLog(event, error);
 
 				event.promise.notifyError(error);
 
 				return;
 			}
+		}
+	}
+
+	@SuppressWarnings("serial")
+	public static class GroupPausingException extends BlackboxException {
+
+		private GroupPausingException(PausingGroup group) {
+			super(group.toString());
+		}
+	}
+
+	private void checkPausing(UUID groupId, Timestamp willCloseAt) {
+		var group = pausingGroups.get(groupId);
+		if (group == null) return;
+
+		if (group.willCloseAt.getTime() > willCloseAt.getTime()) new GroupPausingException(group);
+	}
+
+	private static void insertErrorLog(Event event, Throwable error) {
+		try {
+			Blendee.execute(t -> {
+				event.insertErrorLog(error);
+			});
+		} catch (Throwable errorsError) {
+			logger.fatal(errorsError.getMessage(), errorsError);
 		}
 	}
 
@@ -223,7 +320,7 @@ public class JournalExecutor {
 						a.request)
 					.VALUES(
 						promise.getId(),
-						command.type().value,
+						command.type().name(),
 						errorType(error),
 						error.getMessage(),
 						U.getStackTrace(error),
@@ -271,6 +368,8 @@ public class JournalExecutor {
 
 		@Override
 		public void execute() {
+			checkPausing(request.group_id, request.fixed_at);
+
 			handler.register(journalId, U.NULL_ID, userId, request);
 		}
 
@@ -307,6 +406,8 @@ public class JournalExecutor {
 
 		@Override
 		public void execute() {
+			checkPausing(request.group_id, request.fixed_at);
+
 			handler.registerLazily(journalId, U.NULL_ID, userId, request);
 		}
 
@@ -345,7 +446,7 @@ public class JournalExecutor {
 
 		@Override
 		public void execute() {
-			fixedAt = handler.deny(journalId, userId, request);
+			fixedAt = handler.deny(journalId, userId, request, r -> checkPausing(r.group_id, r.fixed_at));
 		}
 
 		@Override
@@ -381,7 +482,7 @@ public class JournalExecutor {
 
 		@Override
 		public void execute() {
-			handler.overwrite(journalId, userId, request);
+			handler.overwrite(journalId, userId, request, r -> checkPausing(r.group_id, r.fixed_at));
 		}
 
 		@Override
@@ -401,7 +502,128 @@ public class JournalExecutor {
 		}
 	}
 
-	private class ClosingCommand implements Command {
+	private class PauseCommand implements Command {
+
+		private final PausingGroup origin;
+
+		private final Set<PausingGroup> groups = new LinkedHashSet<>();
+
+		private final UUID userId;
+
+		private PauseCommand(UUID groupId, Timestamp willCloseAt, UUID userId) {
+			this.origin = new PausingGroup(groupId, willCloseAt);
+			this.userId = userId;
+		}
+
+		@Override
+		public void execute() {
+			GroupHandler.lockChildren(origin.groupId, userId);
+
+			synchronized (groups) {
+				pausingGroups.put(origin.groupId, origin);
+				groups.add(origin);
+				GroupHandler.children(origin.groupId).forEach(id -> {
+					var child = new PausingGroup(id, origin.willCloseAt);
+					pausingGroups.put(id, child);
+					groups.add(child);
+				});
+			}
+		}
+
+		@Override
+		public void doAfterCommit() {
+		}
+
+		@Override
+		public Object request() {
+			return origin;
+		}
+
+		@Override
+		public CommandType type() {
+			return CommandType.PAUSE;
+		}
+	}
+
+	private class ResumeCommand implements Command {
+
+		private final UUID groupId;
+
+		private final List<PausingGroup> groups = new LinkedList<>();
+
+		private ResumeCommand(UUID groupId) {
+			this.groupId = groupId;
+		}
+
+		@Override
+		public void execute() {
+			synchronized (groups) {
+				var group = pausingGroups.remove(groupId);
+				if (group != null) groups.add(group);
+
+				GroupHandler.children(groupId).forEach(id -> {
+					var g = pausingGroups.remove(id);
+					if (g != null) groups.add(g);
+				});
+			}
+
+			GroupHandler.unlock(groupId);
+		}
+
+		@Override
+		public void doAfterCommit() {
+		}
+
+		@Override
+		public Object request() {
+			return groupId;
+		}
+
+		@Override
+		public CommandType type() {
+			return CommandType.RESUME;
+		}
+	}
+
+	private class GetPausingGroupsCommand implements Command {
+
+		private final UUID groupId;
+
+		private final List<PausingGroup> groups = new LinkedList<>();
+
+		private GetPausingGroupsCommand(UUID groupId) {
+			this.groupId = groupId;
+		}
+
+		@Override
+		public void execute() {
+			synchronized (groups) {
+				var group = pausingGroups.remove(groupId);
+				if (pausingGroups.containsKey(groupId)) groups.add(group);
+
+				GroupHandler.children(groupId).forEach(id -> {
+					var g = pausingGroups.get(id);
+					if (g != null) groups.add(g);
+				});
+			}
+		}
+
+		@Override
+		public void doAfterCommit() {
+		}
+
+		@Override
+		public Object request() {
+			return groupId;
+		}
+
+		@Override
+		public CommandType type() {
+			return CommandType.GET_PAUSING_GROUPS;
+		}
+	}
+
+	private class CloseCommand implements Command {
 
 		private final UUID closingId;
 
@@ -409,7 +631,7 @@ public class JournalExecutor {
 
 		private final ClosingRequest request;
 
-		private ClosingCommand(UUID closingId, UUID userId, ClosingRequest request) {
+		private CloseCommand(UUID closingId, UUID userId, ClosingRequest request) {
 			this.closingId = closingId;
 			this.userId = userId;
 			this.request = request;
@@ -417,7 +639,18 @@ public class JournalExecutor {
 
 		@Override
 		public void execute() {
-			ClosingHandler.close(closingId, userId, request);
+			try {
+				GroupHandler.lockChildren(request.group_id, userId);
+				ClosingHandler.close(closingId, userId, request);
+
+				pausingGroups.remove(request.group_id);
+
+				GroupHandler.children(request.group_id).forEach(e -> {
+					pausingGroups.remove(e);
+				});
+			} finally {
+				GroupHandler.unlock(request.group_id);
+			}
 		}
 
 		@Override
@@ -431,7 +664,7 @@ public class JournalExecutor {
 
 		@Override
 		public CommandType type() {
-			return CommandType.CLOSING;
+			return CommandType.CLOSE;
 		}
 	}
 
@@ -453,7 +686,7 @@ public class JournalExecutor {
 
 		@Override
 		public void execute() {
-			result = TransientHandler.move(batchId, userId, request, recorder);
+			result = TransientHandler.move(batchId, userId, request, recorder, r -> checkPausing(r.group_id, r.fixed_at));
 		}
 
 		@Override

@@ -58,6 +58,11 @@ public class JournalHandler {
 		public Timestamp fixed_at;
 
 		/**
+		 * 補足事項
+		 */
+		public Optional<String> description = Optional.empty();
+
+		/**
 		 * 打消し元のjournal_id
 		 */
 		public Optional<UUID> denied_id = Optional.empty();
@@ -183,6 +188,11 @@ public class JournalHandler {
 		 * 必須
 		 */
 		public Timestamp fixed_at;
+
+		/**
+		 * 補足事項
+		 */
+		public Optional<String> description = Optional.empty();
 
 		/**
 		 * 追加情報JSON
@@ -470,7 +480,7 @@ public class JournalHandler {
 				request.quantity);
 		};
 
-		if (request.in_out.relativize(request.quantity).compareTo(BigDecimal.ZERO) < 0) {
+		if (request.in_out.normalize(request.quantity).compareTo(BigDecimal.ZERO) < 0) {
 			minusUpdaterList.add(snapshotProcess);
 		} else {
 			plusUpdaterList.add(snapshotProcess);
@@ -552,7 +562,7 @@ public class JournalHandler {
 									//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
 									.WHERE(swa -> swa.unit_id.eq($UUID).AND.seq.gt($STRING))))),
 				unlimited,
-				inOut.relativize(quantity),
+				inOut.normalize(quantity),
 				unitId,
 				seq)
 				.execute();
@@ -625,10 +635,17 @@ public class JournalHandler {
 	}
 
 	public Timestamp deny(UUID journalId, UUID userId, JournalDenyRequest denyRequest) {
+		return deny(journalId, userId, denyRequest, r -> {
+		});
+	}
+
+	public Timestamp deny(UUID journalId, UUID userId, JournalDenyRequest denyRequest, Consumer<JournalRegisterRequest> checker) {
 		var request = pickup(denyRequest.deny_id, r -> {
 			r.denied_id = Optional.of(denyRequest.deny_id);
 			r.deny_reason = denyRequest.deny_reason;
 		}, true);
+
+		checker.accept(request);
 
 		register(journalId, U.NULL_ID, userId, request);
 
@@ -636,6 +653,11 @@ public class JournalHandler {
 	}
 
 	public void overwrite(UUID journalId, UUID userId, OverwriteRequest request) {
+		overwrite(journalId, userId, request, r -> {
+		});
+	}
+
+	public void overwrite(UUID journalId, UUID userId, OverwriteRequest request, Consumer<JournalRegisterRequest> checker) {
 		var snapshot = getJustBeforeSnapshot(request.unit_id, request.fixed_at, recorder);
 
 		var out = new NodeRegisterRequest();
@@ -657,9 +679,12 @@ public class JournalHandler {
 		var journalRequest = new JournalRegisterRequest();
 		journalRequest.group_id = request.group_id;
 		journalRequest.fixed_at = request.fixed_at;
+		journalRequest.description = request.description;
 		journalRequest.details = new DetailRegisterRequest[] { detailRequest };
 		journalRequest.tags = request.tags;
 		journalRequest.props = request.journalProps;
+
+		checker.accept(journalRequest);
 
 		register(journalId, U.NULL_ID, userId, journalRequest);
 	}

@@ -141,11 +141,18 @@ public class journal_errors
 	/**
 	 * name: command_type<br>
 	 * remarks: 処理のタイプ<br>
-	 * R=journal登録, D=journal取消, C=closing<br>
-	 * type: char(1)<br>
+	 * JOURNAL_REGISTER=journal登録<br>
+	 * JOURNAL_LAZY_REGISTER=journal数量整合性チェック遅延登録<br>
+	 * JOURNAL_DENY=journal取消<br>
+	 * OVERWRITE=journal書き換え<br>
+	 * PAUSE=仮締め<br>
+	 * RESUME=仮締めキャンセル<br>
+	 * GET_PAUSING_GROUPS=仮締め中グループの取得<br>
+	 * CLOSE=締め<br>
+	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "command_type", type = 1, typeName = "char", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "処理のタイプ\nR=journal登録, D=journal取消, C=closing", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "command_type", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "処理のタイプ\nJOURNAL_REGISTER=journal登録\nJOURNAL_LAZY_REGISTER=journal数量整合性チェック遅延登録\nJOURNAL_DENY=journal取消\nOVERWRITE=journal書き換え\nPAUSE=仮締め\nRESUME=仮締めキャンセル\nGET_PAUSING_GROUPS=仮締め中グループの取得\nCLOSE=締め", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String command_type = "command_type";
 
 	/**
@@ -325,8 +332,15 @@ public class journal_errors
 		 * setter
 		 * name: command_type<br>
 		 * remarks: 処理のタイプ<br>
-		 * R=journal登録, D=journal取消, C=closing<br>
-		 * type: char(1)<br>
+		 * JOURNAL_REGISTER=journal登録<br>
+		 * JOURNAL_LAZY_REGISTER=journal数量整合性チェック遅延登録<br>
+		 * JOURNAL_DENY=journal取消<br>
+		 * OVERWRITE=journal書き換え<br>
+		 * PAUSE=仮締め<br>
+		 * RESUME=仮締めキャンセル<br>
+		 * GET_PAUSING_GROUPS=仮締め中グループの取得<br>
+		 * CLOSE=締め<br>
+		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
@@ -343,8 +357,15 @@ public class journal_errors
 		 * getter
 		 * name: command_type<br>
 		 * remarks: 処理のタイプ<br>
-		 * R=journal登録, D=journal取消, C=closing<br>
-		 * type: char(1)<br>
+		 * JOURNAL_REGISTER=journal登録<br>
+		 * JOURNAL_LAZY_REGISTER=journal数量整合性チェック遅延登録<br>
+		 * JOURNAL_DENY=journal取消<br>
+		 * OVERWRITE=journal書き換え<br>
+		 * PAUSE=仮締め<br>
+		 * RESUME=仮締めキャンセル<br>
+		 * GET_PAUSING_GROUPS=仮締め中グループの取得<br>
+		 * CLOSE=締め<br>
+		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.lang.String
 		 */

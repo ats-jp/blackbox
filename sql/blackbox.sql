@@ -88,22 +88,23 @@ SET default_tablespace = 'blackbox';
 CREATE TABLE bb.instances (
 	id uuid PRIMARY KEY,
 	name text NOT NULL,
-	principal boolean NOT NULL,
-	description text NOT NULL);
+	description text DEFAULT '' NOT NULL,
+	principal boolean NOT NULL);
 
 COMMENT ON TABLE bb.instances IS 'Blackbox運用インスタンス
 org単位でデータを移行する際の発生元を表す';
 COMMENT ON COLUMN bb.instances.id IS 'ID';
 COMMENT ON COLUMN bb.instances.name IS '名称';
+COMMENT ON COLUMN bb.instances.description IS '補足事項';
 COMMENT ON COLUMN bb.instances.principal IS 'この実行インスタンスを表す行
 一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse';
 
-INSERT INTO bb.instances VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', false, 'nullの代用、移行不可');
+INSERT INTO bb.instances VALUES ('00000000-0000-0000-0000-000000000000', 'NULL', 'nullの代用、移行不可', false);
 INSERT INTO bb.instances VALUES (
 	gen_random_uuid(),
 	COALESCE(current_database(), 'unknown_database') || ' [' || COALESCE(inet_server_addr()::text, 'unknown_addr') || ':' || COALESCE(inet_server_port()::text, 'unknown_port') || ']',
-	true,
-	'');
+	'',
+	true);
 
 ----------
 
@@ -113,6 +114,7 @@ CREATE TABLE bb.orgs (
 	instance_id uuid REFERENCES bb.instances NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
@@ -130,6 +132,7 @@ COMMENT ON COLUMN bb.orgs.id IS 'ID';
 COMMENT ON COLUMN bb.orgs.instance_id IS '発生元インスタンスのID';
 COMMENT ON COLUMN bb.orgs.seq IS 'インスタンス内連番';
 COMMENT ON COLUMN bb.orgs.name IS '名称';
+COMMENT ON COLUMN bb.orgs.description IS '補足事項';
 COMMENT ON COLUMN bb.orgs.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.orgs.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.orgs.active IS 'アクティブフラグ';
@@ -145,7 +148,6 @@ INSERT INTO bb.orgs (
 	seq,
 	name,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -154,7 +156,6 @@ INSERT INTO bb.orgs (
 	0,
 	'NULL',
 	0,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
@@ -164,8 +165,8 @@ INSERT INTO bb.orgs (
 	instance_id,
 	seq,
 	name,
+	description,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -173,8 +174,8 @@ INSERT INTO bb.orgs (
 	'00000000-0000-0000-0000-000000000000',
 	1,
 	'Blackbox',
+	'Blackboxシステム管理',
 	0,
-	'{}',
 	'11111111-1111-1111-1111-111111111111',
 	'11111111-1111-1111-1111-111111111111');
 
@@ -192,6 +193,7 @@ CREATE TABLE bb.groups (
 	org_id uuid REFERENCES bb.orgs NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	parent_id uuid REFERENCES bb.groups NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -214,6 +216,7 @@ COMMENT ON COLUMN bb.groups.id IS 'ID';
 COMMENT ON COLUMN bb.groups.org_id IS '組織ID';
 COMMENT ON COLUMN bb.groups.seq IS '組織内連番';
 COMMENT ON COLUMN bb.groups.name IS '名称';
+COMMENT ON COLUMN bb.groups.description IS '補足事項';
 COMMENT ON COLUMN bb.groups.parent_id IS '親グループID';
 COMMENT ON COLUMN bb.groups.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.groups.props IS '外部アプリケーション情報JSON';
@@ -232,7 +235,6 @@ INSERT INTO bb.groups (
 	name,
 	parent_id,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -242,7 +244,6 @@ INSERT INTO bb.groups (
 	'NULL',
 	'00000000-0000-0000-0000-000000000000',
 	0,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
@@ -252,9 +253,9 @@ INSERT INTO bb.groups (
 	org_id,
 	seq,
 	name,
+	description,
 	parent_id,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -262,9 +263,9 @@ INSERT INTO bb.groups (
 	'11111111-1111-1111-1111-111111111111',
 	0,
 	'Superusers',
+	'Blackboxシステム管理者グループ',
 	'00000000-0000-0000-0000-000000000000',
 	0,
-	'{}',
 	'11111111-1111-1111-1111-111111111111',
 	'11111111-1111-1111-1111-111111111111');
 
@@ -360,6 +361,7 @@ CREATE TABLE bb.users (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	role smallint CHECK (role IN (0, 1, 2, 3, 9)) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -378,6 +380,7 @@ COMMENT ON COLUMN bb.users.id IS 'ID';
 COMMENT ON COLUMN bb.users.group_id IS 'グループID';
 COMMENT ON COLUMN bb.users.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb.users.name IS '名称';
+COMMENT ON COLUMN bb.users.description IS '補足事項';
 COMMENT ON COLUMN bb.users.role IS '役割
 値の小さいほうが強い権限となる
 0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE';
@@ -390,7 +393,7 @@ COMMENT ON COLUMN bb.users.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.users.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.users.updated_by IS '更新ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.users (
 	id,
 	group_id,
@@ -398,7 +401,6 @@ INSERT INTO bb.users (
 	name,
 	role,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -408,7 +410,6 @@ INSERT INTO bb.users (
 	'NULL',
 	9,
 	0,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
 
@@ -418,9 +419,9 @@ INSERT INTO bb.users (
 	group_id,
 	seq,
 	name,
+	description,
 	role,
 	revision,
-	props,
 	created_by,
 	updated_by
 ) VALUES (
@@ -428,9 +429,9 @@ INSERT INTO bb.users (
 	'11111111-1111-1111-1111-111111111111',
 	0,
 	'superuser',
+	'Blackbox管理者',
 	0,
 	0,
-	'{}',
 	'11111111-1111-1111-1111-111111111111',
 	'11111111-1111-1111-1111-111111111111');
 
@@ -476,6 +477,7 @@ ALTER TABLE bb.locking_groups ADD CONSTRAINT locking_groups_cascade_id_fkey FORE
 CREATE TABLE bb.closings (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	seq bigint NOT NULL,
 	closed_at timestamptz NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -487,6 +489,7 @@ CREATE TABLE bb.closings (
 COMMENT ON TABLE bb.closings IS '締め';
 COMMENT ON COLUMN bb.closings.id IS 'ID';
 COMMENT ON COLUMN bb.closings.group_id IS 'グループID';
+COMMENT ON COLUMN bb.closings.description IS '補足事項';
 COMMENT ON COLUMN bb.closings.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb.closings.closed_at IS '締め時刻';
 COMMENT ON COLUMN bb.closings.props IS '外部アプリケーション情報JSON';
@@ -525,7 +528,7 @@ COMMENT ON COLUMN bb.units.id IS 'ID';
 COMMENT ON COLUMN bb.units.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.units.created_by IS '作成ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.units (id, created_by) VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
 
 --===========================
@@ -544,6 +547,7 @@ COMMENT ON COLUMN bb.journal_batches.id IS 'ID';
 COMMENT ON COLUMN bb.journal_batches.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.journal_batches.created_by IS '作成ユーザー';
 
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.journal_batches (id, created_by) VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
 
 ----------
@@ -555,6 +559,7 @@ CREATE TABLE bb.journals (
 	seq bigserial NOT NULL,
 	journal_batch_id uuid REFERENCES bb.journal_batches NOT NULL,
 	fixed_at timestamptz NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	instance_id uuid REFERENCES bb.instances NOT NULL,
@@ -578,6 +583,7 @@ COMMENT ON COLUMN bb.journals.group_id IS 'グループID
 COMMENT ON COLUMN bb.journals.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb.journals.journal_batch_id IS '移動伝票一括登録ID';
 COMMENT ON COLUMN bb.journals.fixed_at IS '確定時刻';
+COMMENT ON COLUMN bb.journals.description IS '補足事項';
 COMMENT ON COLUMN bb.journals.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.journals.tags IS '保存用タグ';
 COMMENT ON COLUMN bb.journals.instance_id IS '発生元インスタンスのID';
@@ -591,13 +597,12 @@ COMMENT ON COLUMN bb.journals.user_props IS '作成ユーザーのprops';
 COMMENT ON COLUMN bb.journals.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.journals.created_by IS '作成ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.journals (
 	id,
 	group_id,
 	journal_batch_id,
 	fixed_at,
-	props,
 	instance_id,
 	org_props,
 	group_props,
@@ -609,7 +614,6 @@ INSERT INTO bb.journals (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'1900-1-1'::timestamptz,
-	'{}',
 	'00000000-0000-0000-0000-000000000000',
 	'{}',
 	'{}',
@@ -653,7 +657,7 @@ COMMENT ON COLUMN bb.details.id IS 'ID';
 COMMENT ON COLUMN bb.details.journal_id IS '伝票ID';
 COMMENT ON COLUMN bb.details.props IS '外部アプリケーション情報JSON';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.details (
 	id,
 	journal_id
@@ -691,7 +695,7 @@ trueの場合、以降のsnapshotは数量がマイナスになってもエラ�
 COMMENT ON COLUMN bb.nodes.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.nodes.unit_props IS '管理対象のprops';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.nodes (
 	id,
 	detail_id,
@@ -757,7 +761,7 @@ COMMENT ON COLUMN bb.snapshots.seq IS '移動ノード状態の登録順
 COMMENT ON COLUMN bb.snapshots.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.snapshots (
 	id,
 	unlimited,
@@ -803,7 +807,7 @@ COMMENT ON COLUMN bb.current_units.snapshot_id IS 'スナップショットID
 現時点の数量を変更した伝票';
 COMMENT ON COLUMN bb.current_units.updated_at IS '更新時刻';
 
---NULLの代用(id=0)
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.current_units (
 	id,
 	unlimited,
@@ -829,7 +833,7 @@ CREATE TABLE bb.closed_units (
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
 --log対象外
 --締め完了後の在庫数を保持
---クラッシュ時、ここからsnapshotsとcurrent_unitsを復元する
+--クラッシュ時、過去のsnapshotが削除されていた場合ここからsnapshotとcurrent_unitを復元する
 
 COMMENT ON TABLE bb.closed_units IS '締め在庫';
 COMMENT ON COLUMN bb.closed_units.id IS 'ID
@@ -840,6 +844,22 @@ trueの場合、totalがマイナスでもエラーとならない';
 COMMENT ON COLUMN bb.closed_units.total IS '締め後の在庫総数';
 COMMENT ON COLUMN bb.closed_units.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.closed_units.updated_by IS '更新ユーザー';
+
+----------
+
+CREATE TABLE bb.closed_journals (
+	id uuid PRIMARY KEY REFERENCES bb.journals,
+	closing_id uuid REFERENCES bb.closings
+);
+--log対象外
+--伝票がどの締めに属するかを表す
+
+COMMENT ON TABLE bb.closed_journals IS '締め済み伝票';
+COMMENT ON COLUMN bb.closed_journals.id IS 'ID
+journals.idに従属';
+COMMENT ON COLUMN bb.closed_journals.closing_id IS '締めID';
+
+----------
 
 --現在在庫数量反映ジョブ
 CREATE TABLE bb.jobs (
@@ -862,7 +882,16 @@ COMMENT ON COLUMN bb.jobs.updated_at IS '更新時刻';
 --journal登録時に発生したエラー
 CREATE TABLE bb.journal_errors (
 	abandoned_id uuid NOT NULL,
-	command_type "char" CHECK (command_type IN ('R', 'D', 'C')) NOT NULL,
+	command_type text CHECK (command_type IN (
+		'JOURNAL_REGISTER',
+		'JOURNAL_LAZY_REGISTER',
+		'JOURNAL_DENY',
+		'OVERWRITE',
+		'PAUSE',
+		'RESUME',
+		'GET_PAUSING_GROUPS',
+		'CLOSE',
+		'TRANSIENT_MOVE')) NOT NULL,
 	error_type text NOT NULL,
 	message text NOT NULL,
 	stack_trace text NOT NULL,
@@ -874,7 +903,14 @@ CREATE TABLE bb.journal_errors (
 COMMENT ON TABLE bb.journal_errors IS 'journal登録時に発生したエラー';
 COMMENT ON COLUMN bb.journal_errors.abandoned_id IS 'journalもしくはclosingもしくはjournal_batchに使用される予定だったID';
 COMMENT ON COLUMN bb.journal_errors.command_type IS '処理のタイプ
-R=journal登録, D=journal取消, C=closing';
+JOURNAL_REGISTER=journal登録
+JOURNAL_LAZY_REGISTER=journal数量整合性チェック遅延登録
+JOURNAL_DENY=journal取消
+OVERWRITE=journal書き換え
+PAUSE=仮締め
+RESUME=仮締めキャンセル
+GET_PAUSING_GROUPS=仮締め中グループの取得
+CLOSE=締め';
 COMMENT ON COLUMN bb.journal_errors.error_type IS 'エラーの種類';
 COMMENT ON COLUMN bb.journal_errors.message IS 'エラーメッセージ';
 COMMENT ON COLUMN bb.journal_errors.stack_trace IS 'スタックトレース';
@@ -895,6 +931,7 @@ CREATE TABLE bb.transients (
 	seq_in_group bigint NOT NULL,
 	user_id uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	seq_in_user bigint NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL, --以下のテーブルのすべてのrevisionを兼ねる
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
@@ -909,16 +946,12 @@ COMMENT ON COLUMN bb.transients.group_id IS 'この一時作業のオーナー�
 COMMENT ON COLUMN bb.transients.seq_in_group IS 'グループ内連番';
 COMMENT ON COLUMN bb.transients.user_id IS 'この一時作業のオーナーユーザー';
 COMMENT ON COLUMN bb.transients.seq_in_user IS 'ユーザー内連番';
+COMMENT ON COLUMN bb.transients.description IS '補足事項';
 COMMENT ON COLUMN bb.transients.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.transients.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transients.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transients.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transients.updated_by IS '更新ユーザー';
-
-CREATE TABLE bb.transients_tags (
-	id uuid REFERENCES bb.transients ON DELETE CASCADE NOT NULL,
-	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
-	UNIQUE (id, tag_id));
 
 ----------
 
@@ -929,6 +962,7 @@ CREATE TABLE bb.transient_journals (
 	seq_in_transient bigint NOT NULL,
 	group_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
 	fixed_at timestamptz NOT NULL,
+	description text DEFAULT '' NOT NULL,
 	seq_in_db bigserial NOT NULL, --DB内生成順を保証
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -944,6 +978,7 @@ COMMENT ON COLUMN bb.transient_journals.transient_id IS '一時作業ID';
 COMMENT ON COLUMN bb.transient_journals.seq_in_transient IS '一時作業内連番';
 COMMENT ON COLUMN bb.transient_journals.group_id IS 'グループID';
 COMMENT ON COLUMN bb.transient_journals.fixed_at IS '移動時刻';
+COMMENT ON COLUMN bb.transient_journals.description IS '補足事項';
 COMMENT ON COLUMN bb.transient_journals.seq_in_db IS 'DB内生成順
 fixed_atが同一の場合、優先順を決定';
 COMMENT ON COLUMN bb.transient_journals.props IS '外部アプリケーション情報JSON';
@@ -984,7 +1019,8 @@ CREATE TABLE bb.transient_details (
 	created_at timestamptz DEFAULT now() NOT NULL,-- 編集でtransient_detailsだけ追加することもあるので必要
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
+	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	UNIQUE (transient_journal_id, seq_in_journal));
 
 COMMENT ON TABLE bb.transient_details IS '一時作業伝票明細';
 COMMENT ON COLUMN bb.transient_details.id IS 'ID';
@@ -1011,7 +1047,8 @@ CREATE TABLE bb.transient_nodes (
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL);
+	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
+	UNIQUE (transient_detail_id, seq_in_detail));
 
 COMMENT ON TABLE bb.transient_nodes IS '一時作業伝票ノード';
 COMMENT ON COLUMN bb.transient_nodes.id IS 'ID';
@@ -1048,6 +1085,7 @@ CREATE INDEX ON bb.groups (active);
 
 --relationships
 CREATE INDEX ON bb.relationships (parent_id);
+CREATE INDEX ON bb.relationships (child_id);
 
 --users
 CREATE INDEX ON bb.users (group_id);
@@ -1079,6 +1117,9 @@ CREATE INDEX ON bb.snapshots (seq);
 --current_units
 CREATE INDEX ON bb.current_units (snapshot_id);
 
+--closed_journals
+CREATE INDEX ON bb.closed_journals (closing_id);
+
 --jobs
 CREATE INDEX ON bb.jobs (completed);
 --worker_idで検索することはないのでindex不要
@@ -1108,7 +1149,6 @@ CREATE INDEX ON bb.transient_nodes (unit_id);
 CREATE INDEX ON bb.groups_tags (tag_id);
 CREATE INDEX ON bb.users_tags (tag_id);
 CREATE INDEX ON bb.journals_tags (tag_id);
-CREATE INDEX ON bb.transients_tags (tag_id);
 CREATE INDEX ON bb.transient_journals_tags (tag_id);
 
 --===========================
@@ -1150,7 +1190,6 @@ GRANT INSERT, DELETE ON TABLE
 	bb.groups_tags,
 	bb.users_tags,
 	bb.journals_tags,
-	bb.transients_tags,
 	bb.transient_journals_tags
 TO blackbox;
 
@@ -1162,5 +1201,6 @@ GRANT INSERT ON TABLE
 	bb.journals,
 	bb.details,
 	bb.nodes,
+	bb.closed_journals,
 	bb.journal_errors
 TO blackbox;

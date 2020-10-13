@@ -1,0 +1,15 @@
+#
+#Thu May 14 01:48:26 JST 2020
+tableFacadeParentClass=
+schemaNames=bb_account
+outputPackageName=sqlassist
+useNumberClass=
+columnRepositoryFactoryClass=
+rowParentClass=
+transactionFactoryClass=
+codeFormatterClass=
+metadataFactoryClass=
+notUseNullGuard=
+jdbcDriverClass=
+columnRepositoryFile=
+queryParentClass=

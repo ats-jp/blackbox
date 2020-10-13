@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.blendee.assist.AnonymousTable;
 import org.blendee.jdbc.BResultSet;
@@ -35,6 +36,8 @@ public class TransientHandler {
 	public static class RegisterRequest {
 
 		public UUID group_id;
+
+		public Optional<String> description = Optional.empty();
 
 		public Optional<UUID> user_id = Optional.empty();
 	}
@@ -71,12 +74,23 @@ public class TransientHandler {
 		row.setSeq_in_group(seqInGroup);
 		row.setUser_id(request.user_id.orElse(userId));
 		row.setSeq_in_user(seqInUser);
+		request.description.ifPresent(v -> row.setDescription(v));
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 
 		row.insert();
 
 		return id;
+	}
+
+	public static void updateDescription(UUID transientId, String description, long revision) {
+		int result = new transients().UPDATE(a -> {
+			a.description.set(description);
+			a.updated_by.set(SecurityValues.currentUserId());
+			a.updated_at.setAny("now()");
+		}).WHERE(a -> a.id.eq(transientId).AND.revision.eq(revision)).execute();
+
+		if (result != 1) throw Utils.decisionException(transients.$TABLE, transientId);
 	}
 
 	public static void delete(UUID transientId, long revision) {
@@ -330,7 +344,21 @@ public class TransientHandler {
 		public boolean lazy = false;
 	}
 
-	public static TransientMoveResult move(UUID batchId, UUID userId, TransientMoveRequest request, Recorder recorder) {
+	public static TransientMoveResult move(
+		UUID batchId,
+		UUID userId,
+		TransientMoveRequest request,
+		Recorder recorder) {
+		return move(batchId, userId, request, recorder, r -> {
+		});
+	}
+
+	public static TransientMoveResult move(
+		UUID batchId,
+		UUID userId,
+		TransientMoveRequest request,
+		Recorder recorder,
+		Consumer<JournalRegisterRequest> checker) {
 		var journalHandler = new JournalHandler(recorder);
 
 		var result = new TransientMoveResult();
@@ -340,6 +368,8 @@ public class TransientHandler {
 		var ids = new LinkedList<UUID>();
 		var requests = new LinkedList<JournalRegisterRequest>();
 		buildJournalRegisterRequests(request.transient_id, recorder).forEach(r -> {
+			checker.accept(r);
+
 			var journalId = UUID.randomUUID();
 
 			ids.add(UUID.randomUUID());
@@ -640,6 +670,11 @@ public class TransientHandler {
 		public Optional<Timestamp> fixed_at = Optional.empty();
 
 		/**
+		 * 補足事項
+		 */
+		public Optional<String> description = Optional.empty();
+
+		/**
 		 * 追加情報JSON
 		 */
 		public Optional<String> props = Optional.empty();
@@ -678,6 +713,7 @@ public class TransientHandler {
 			request.transient_id.ifPresent(v -> a.transient_id.set(v));
 			request.group_id.ifPresent(v -> a.group_id.set(v));
 			request.fixed_at.ifPresent(v -> a.fixed_at.set(v));
+			request.description.ifPresent(v -> a.description.set(v));
 			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			a.updated_by.set(SecurityValues.currentUserId());

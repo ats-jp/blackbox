@@ -171,13 +171,13 @@ public class formula_details
 	public static final String in_out = "in_out";
 
 	/**
-	 * name: seq<br>
+	 * name: seq_in_formula<br>
 	 * remarks: 変換式内連番<br>
 	 * type: int4(10)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "変換式内連番", defaultValue = "null", ordinalPosition = 5, notNull = true)
-	public static final String seq = "seq";
+	@Column(name = "seq_in_formula", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "変換式内連番", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	public static final String seq_in_formula = "seq_in_formula";
 
 	/**
 	 * name: quantity<br>
@@ -462,31 +462,31 @@ public class formula_details
 
 		/**
 		 * setter
-		 * name: seq<br>
+		 * name: seq_in_formula<br>
 		 * remarks: 変換式内連番<br>
 		 * type: int4(10)<br>
 		 * not null: true<br>
 		 * @param value java.lang.Integer
 		 */
-		public void setSeq(java.lang.Integer value) {
+		public void setSeq_in_formula(java.lang.Integer value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("seq").getType());
-			data$.setValue("seq", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("seq_in_formula").getType());
+			data$.setValue("seq_in_formula", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: seq<br>
+		 * name: seq_in_formula<br>
 		 * remarks: 変換式内連番<br>
 		 * type: int4(10)<br>
 		 * not null: true<br>
 		 * @return java.lang.Integer
 		 */
-		public java.lang.Integer getSeq() {
-			Binder binder = data$.getValue("seq");
+		public java.lang.Integer getSeq_in_formula() {
+			Binder binder = data$.getValue("seq_in_formula");
 			return (java.lang.Integer) binder.getValue();
 		}
 
@@ -1788,9 +1788,9 @@ public class formula_details
 		public final T in_out;
 
 		/**
-		 * 項目名 seq
+		 * 項目名 seq_in_formula
 		 */
-		public final T seq;
+		public final T seq_in_formula;
 
 		/**
 		 * 項目名 quantity
@@ -1837,7 +1837,7 @@ public class formula_details
 			this.formula_id = builder$.buildColumn(this, sqlassist.bb_stock.formula_details.formula_id);
 			this.stock_id = builder$.buildColumn(this, sqlassist.bb_stock.formula_details.stock_id);
 			this.in_out = builder$.buildColumn(this, sqlassist.bb_stock.formula_details.in_out);
-			this.seq = builder$.buildColumn(this, sqlassist.bb_stock.formula_details.seq);
+			this.seq_in_formula = builder$.buildColumn(this, sqlassist.bb_stock.formula_details.seq_in_formula);
 			this.quantity = builder$.buildColumn(this, sqlassist.bb_stock.formula_details.quantity);
 			this.props = builder$.buildColumn(this, sqlassist.bb_stock.formula_details.props);
 			this.created_at = builder$.buildColumn(this, sqlassist.bb_stock.formula_details.created_at);

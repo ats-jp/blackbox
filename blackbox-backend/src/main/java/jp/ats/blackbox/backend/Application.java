@@ -41,7 +41,7 @@ public class Application {
 		context.setInitParameter("blendee-jdbc-user", config.getProperty("jdbc-user"));
 		context.setInitParameter("blendee-jdbc-password", config.getProperty("jdbc-password"));
 
-		var server = new Server(8080);
+		var server = new Server(Integer.parseInt(config.getProperty("server-port")));
 
 		server.setHandler(context);
 

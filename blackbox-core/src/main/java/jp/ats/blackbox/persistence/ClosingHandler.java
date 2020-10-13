@@ -17,8 +17,10 @@ import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.common.U;
+import sqlassist.bb.closed_journals;
 import sqlassist.bb.closed_units;
 import sqlassist.bb.closings;
+import sqlassist.bb.journals;
 import sqlassist.bb.last_closings;
 import sqlassist.bb.relationships;
 import sqlassist.bb.snapshots;
@@ -40,6 +42,7 @@ public class ClosingHandler {
 
 		closing.setId(closingId);
 		closing.setGroup_id(request.group_id);
+		request.description.ifPresent(v -> closing.setDescription(v));
 		closing.setSeq(seq);
 		closing.setClosed_at(request.closed_at);
 		request.props.ifPresent(v -> closing.setProps(toJson(v)));
@@ -62,6 +65,20 @@ public class ClosingHandler {
 					closeGroup(groupId, request.closed_at, closingId, userId, batch);
 				}
 			});
+
+		//journalとclosingを紐づけ
+		recorder.play(
+			() -> new closed_journals()
+				.INSERT(
+					new journals()
+						.SELECT(a -> a.ls(a.id, a.any(a.expr($UUID))))
+						.WHERE(
+							a -> a.fixed_at.lt(request.closed_at),
+							a -> a.EXISTS(new relationships().SELECT(sa -> sa.any(0)).WHERE(sa -> sa.parent_id.eq($UUID).AND.child_id.eq(a.group_id))),
+							a -> a.NOT_EXISTS(new closed_journals().SELECT(sa -> sa.any(0)).WHERE(sa -> sa.id.eq(a.id))))),
+			closingId,
+			request.group_id)
+			.execute(batch);
 
 		batch.execute();
 	}
@@ -198,6 +215,8 @@ public class ClosingHandler {
 		public UUID group_id;
 
 		public Timestamp closed_at;
+
+		public Optional<String> description = Optional.empty();
 
 		/**
 		 * 追加情報JSON

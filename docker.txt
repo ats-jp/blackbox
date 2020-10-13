@@ -3,7 +3,7 @@
 #bb-db起動
 #portはコンテナ外:コンテナ内
 #mysecretpasswordはpostgresユーザーの初期パスワードとなる
-docker run -d --name bb-db -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword postgres:12.2
+docker run -d --name bb-db -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword postgres:12.3
 
 #起動確認
 docker ps

@@ -9,8 +9,8 @@ import java.util.UUID;
 import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
 import sqlassist.bb.groups;
 import sqlassist.bb.users;
 
@@ -42,6 +42,8 @@ class JournalPreparer {
 		request.deny_reason.ifPresent(v -> journal.setDeny_reason(v));
 
 		journal.setFixed_at(request.fixed_at);
+
+		request.description.ifPresent(v -> journal.setDescription(v));
 
 		journal.setCreated_at(createdAt);
 
@@ -106,6 +108,8 @@ class JournalPreparer {
 		void setDeny_reason(String reason);
 
 		void setFixed_at(Timestamp fixedAt);
+
+		void setDescription(String string);
 
 		void setCreated_at(Timestamp createdAt);
 
