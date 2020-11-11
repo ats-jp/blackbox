@@ -41,7 +41,7 @@ public class JobHandler {
 				recorder.play(
 					() -> new snapshots()
 						.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().unit_id))
-						.WHERE(sa -> sa.$nodes().$details().journal_id.eq($UUID))
+						.WHERE(a -> a.$nodes().$details().journal_id.eq($UUID))
 						.ORDER_BY(a -> a.seq),
 					row.getId())
 					.execute(result -> {
