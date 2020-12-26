@@ -348,8 +348,9 @@ public class TransientHandler {
 		UUID batchId,
 		UUID userId,
 		TransientMoveRequest request,
-		Recorder recorder) {
-		return move(batchId, userId, request, recorder, r -> {
+		Recorder recorder,
+		Runnable currentUnitsUpdater) {
+		return move(batchId, userId, request, recorder, currentUnitsUpdater, r -> {
 		});
 	}
 
@@ -358,8 +359,9 @@ public class TransientHandler {
 		UUID userId,
 		TransientMoveRequest request,
 		Recorder recorder,
+		Runnable currentUnitsUpdater,
 		Consumer<JournalRegisterRequest> checker) {
-		var journalHandler = new JournalHandler(recorder);
+		var journalHandler = new JournalHandler(recorder, currentUnitsUpdater);
 
 		var result = new TransientMoveResult();
 

@@ -25,7 +25,6 @@ import org.blendee.sql.Recorder;
 import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.TagExecutor;
 import sqlassist.bb.details;
 import sqlassist.bb.jobs;
@@ -240,13 +239,20 @@ public class JournalHandler {
 
 	private final SeqHandler.Request seqRequest = new SeqHandler.Request();
 
+	private final Runnable currentUnitsUpdater;
+
 	/**
 	 * 処理内で最終的に数量の整合性が取れているのであれば、一時的に数量がマイナスになっても許容するモードを表すフラグ
 	 */
 	private boolean lazyRegisterMode = false;
 
-	public JournalHandler(Recorder recorder) {
+	/**
+	 * @param recorder
+	 * @param currentUnitsUpdater Journalの登録によってそのJournalの先の時点のJournalの総数が更新された場合の処理
+	 */
+	public JournalHandler(Recorder recorder, Runnable currentUnitsUpdater) {
 		this.recorder = recorder;
+		this.currentUnitsUpdater = currentUnitsUpdater;
 		seqRequest.table = journals.$TABLE;
 		seqRequest.dependsColumn = journals.group_id;
 	}
@@ -378,7 +384,8 @@ public class JournalHandler {
 		//jobを登録し、別プロセスで現在数量を更新させる
 		recorder.play(() -> new jobs().INSERT(a -> a.id).VALUES($UUID), journalId).execute();
 
-		if (updateDifferentTotalCurrentUnits) JobExecutor.updateDifferentRows();
+		//このJournalの先のJournalの数量を更新した場合
+		if (updateDifferentTotalCurrentUnits) currentUnitsUpdater.run();
 	}
 
 	public static class ClosedCheckError {
@@ -652,11 +659,17 @@ public class JournalHandler {
 		return request.fixed_at;
 	}
 
+	/**
+	 * 数量を強制的に上書きする処理
+	 */
 	public void overwrite(UUID journalId, UUID userId, OverwriteRequest request) {
 		overwrite(journalId, userId, request, r -> {
 		});
 	}
 
+	/**
+	 * 数量を強制的に上書きする処理
+	 */
 	public void overwrite(UUID journalId, UUID userId, OverwriteRequest request, Consumer<JournalRegisterRequest> checker) {
 		var snapshot = getJustBeforeSnapshot(request.unit_id, request.fixed_at, recorder);
 

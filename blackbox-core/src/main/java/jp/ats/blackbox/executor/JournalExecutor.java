@@ -43,13 +43,15 @@ public class JournalExecutor {
 
 	private static final int deadlockRetryCount = 10;
 
+	private static final Runnable currentUnitsUpdater = () -> JobExecutor.updateDifferentRows();
+
 	private final Disruptor<Event> disruptor;
 
 	private final RingBuffer<Event> ringBuffer;
 
 	private final Recorder recorder = Recorder.newAsyncInstance();
 
-	private final JournalHandler handler = new JournalHandler(recorder);
+	private final JournalHandler handler = new JournalHandler(recorder, currentUnitsUpdater);
 
 	private final Map<UUID, PausingGroup> pausingGroups = new HashMap<>();
 
@@ -686,7 +688,7 @@ public class JournalExecutor {
 
 		@Override
 		public void execute() {
-			result = TransientHandler.move(batchId, userId, request, recorder, r -> checkPausing(r.group_id, r.fixed_at));
+			result = TransientHandler.move(batchId, userId, request, recorder, currentUnitsUpdater, r -> checkPausing(r.group_id, r.fixed_at));
 		}
 
 		@Override

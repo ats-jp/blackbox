@@ -23,7 +23,8 @@ public class JournalHandlerLazyTest {
 		Common.startWithLog();
 
 		Blendee.execute(t -> {
-			var handler = new JournalHandler(U.recorder);
+			var handler = new JournalHandler(U.recorder, () -> {
+			});
 			IntStream.range(0, 10).forEach(i -> {
 				handler.registerLazily(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(U.NULL_ID, U.NULL_ID));
 				JobHandler.execute(LocalDateTime.now());
