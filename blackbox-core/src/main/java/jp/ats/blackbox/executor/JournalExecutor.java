@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.blendee.jdbc.BlendeeManager;
 import org.blendee.jdbc.exception.DeadlockDetectedException;
 import org.blendee.sql.Recorder;
 import org.blendee.util.Blendee;
@@ -32,6 +33,7 @@ import jp.ats.blackbox.persistence.JournalHandler.JournalDenyRequest;
 import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
 import jp.ats.blackbox.persistence.JournalHandler.OverwriteRequest;
 import jp.ats.blackbox.persistence.JsonHelper;
+import jp.ats.blackbox.persistence.MinusTotalException;
 import jp.ats.blackbox.persistence.TransientHandler;
 import jp.ats.blackbox.persistence.TransientHandler.TransientMoveRequest;
 import jp.ats.blackbox.persistence.TransientHandler.TransientMoveResult;
@@ -119,10 +121,10 @@ public class JournalExecutor {
 		return promise;
 	}
 
-	public JournalPromise overwrite(UUID userId, Supplier<OverwriteRequest> requestSupplier) {
-		var promise = new JournalPromise();
+	public OverwritePromise overwrite(UUID userId, Supplier<OverwriteRequest> requestSupplier) {
+		var promise = new OverwritePromise();
 
-		var command = new OverwriteCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new OverwriteCommand(promise, userId, requestSupplier.get());
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -470,27 +472,69 @@ public class JournalExecutor {
 
 	private class OverwriteCommand implements Command {
 
+		private final OverwritePromise promise;
+
 		private final UUID journalId;
 
 		private final UUID userId;
 
 		private final OverwriteRequest request;
 
-		private OverwriteCommand(UUID journalId, UUID userId, OverwriteRequest request) {
-			this.journalId = journalId;
+		private final List<UUID> deniedJournals = new LinkedList<>();
+
+		private OverwriteCommand(OverwritePromise promise, UUID userId, OverwriteRequest request) {
+			this.promise = promise;
+			this.journalId = promise.getId();
 			this.userId = userId;
 			this.request = request;
 		}
 
 		@Override
 		public void execute() {
-			handler.overwrite(journalId, userId, request, r -> checkPausing(r.group_id, r.fixed_at));
+			overwrite();
+		}
+
+		private void overwrite() {
+			try {
+				handler.overwrite(journalId, userId, request, r -> checkPausing(r.group_id, r.fixed_at));
+			} catch (MinusTotalException e) {
+				var journalIds = e.getMinusTotalJournalIds();
+
+				//自身がマイナスになった場合
+				if (journalIds.length == 0) throw e;
+
+				//再度実行するためロールバック
+				BlendeeManager.get().getCurrentTransaction().rollback();
+
+				//マイナスを起こしたjournalを取消
+				denyMinusJournals(journalIds[0], deniedJournals);
+
+				//whileではなく再起呼び出しにすることで無限ループを回避
+				overwrite();
+			}
+		}
+
+		private void denyMinusJournals(UUID journalId, List<UUID> deniedJournals) {
+			var denyRequest = new JournalDenyRequest();
+			denyRequest.deny_id = journalId;
+
+			try {
+				handler.deny(UUID.randomUUID(), userId, denyRequest, r -> checkPausing(r.group_id, r.fixed_at));
+			} catch (MinusTotalException e) {
+				//打消し自身はマイナスにはならないので、この例外が出ているということは未来のjournalで発生している
+				//その未来のjournalを打消し
+				denyMinusJournals(e.getMinusTotalJournalIds()[0], deniedJournals);
+			}
+
+			deniedJournals.add(journalId);
 		}
 
 		@Override
 		public void doAfterCommit() {
 			//移動時刻を通知
 			JobExecutor.next(U.convert(request.fixed_at));
+
+			promise.setDeniedJournalIds(deniedJournals.toArray(new UUID[deniedJournals.size()]));
 		}
 
 		@Override

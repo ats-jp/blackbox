@@ -519,7 +519,7 @@ public class JournalHandler {
 
 		//移動した結果数量がマイナスになる場合エラー
 		//ただし無制限設定がされていればOK
-		if (!unlimited && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException();
+		if (!unlimited && total.compareTo(BigDecimal.ZERO) < 0) throw new MinusTotalException(new UUID[] {});
 
 		recorder.play(
 			() -> new snapshots().insertStatement(
@@ -563,11 +563,11 @@ public class JournalHandler {
 						a.total.set("{0} + ?", Vargs.of(a.total), Vargs.of($BIGDECIMAL)),
 						a.updated_at.setAny("now()"))
 						.WHERE(
-							wa -> wa.id.IN(
+							wa -> wa.EXISTS(
 								new snapshots()
-									.SELECT(sa -> sa.id)
+									.SELECT(sa -> sa.any(1))
 									//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
-									.WHERE(swa -> swa.unit_id.eq($UUID).AND.seq.gt($STRING))))),
+									.WHERE(swa -> swa.id.eq(wa.id).AND.unit_id.eq($UUID).AND.seq.gt($STRING))))),
 				unlimited,
 				inOut.normalize(quantity),
 				unitId,
@@ -577,7 +577,23 @@ public class JournalHandler {
 			return result > 0;
 		} catch (CheckConstraintViolationException e) {
 			//未来のsnapshotで数量がマイナスになった
-			throw new MinusTotalException();
+
+			List<UUID> journalIds = new LinkedList<>();
+
+			//マイナスを引き起こしたsnapshotを含む、journalを取得
+			recorder.play(
+				() -> new snapshots().SELECT(a -> a.$nodes().$details().journal_id)
+					.WHERE(
+						a -> a.EXISTS(
+							new snapshots()
+								.SELECT(sa -> sa.any(1))
+								.WHERE(sa -> sa.id.eq(a.id).AND.unit_id.eq($UUID).AND.seq.gt($STRING).AND.expr("{0} + ? < 0", Vargs.of(sa.total), $BIGDECIMAL))))
+					.ORDER_BY(a -> a.fixed_at),
+				unitId,
+				seq,
+				inOut.normalize(quantity)).forEach(r -> journalIds.add(r.$nodes().$details().getJournal_id()));
+
+			throw new MinusTotalException(journalIds.toArray(new UUID[journalIds.size()]));
 		}
 	}
 
