@@ -33,7 +33,7 @@ public class SeqHandler {
 	private final Map<SeqKey, SeqContainer> cache = new HashMap<>();
 
 	public void nextSeq(Request request, Consumer<Long> seqConsumer) {
-		SeqContainer value = container(request);
+		var value = container(request);
 		synchronized (value.lock) {
 			var next = value.next();
 			seqConsumer.accept(next);
@@ -44,7 +44,7 @@ public class SeqHandler {
 	}
 
 	public <T> T nextSeqAndGet(Request request, Function<Long, T> seqFunction) {
-		SeqContainer value = container(request);
+		var value = container(request);
 		synchronized (value.lock) {
 			var next = value.next();
 			T result = seqFunction.apply(next);

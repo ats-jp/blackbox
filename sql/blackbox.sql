@@ -449,6 +449,63 @@ CREATE TABLE bb.users_tags (
 
 ----------
 
+--journal登録executor
+CREATE TABLE bb.executors (
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	org_id uuid REFERENCES bb.orgs NOT NULL,
+	seq bigint NOT NULL,
+	name text NOT NULL,
+	description text DEFAULT '' NOT NULL,
+	revision bigint DEFAULT 0 NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
+	active boolean DEFAULT true NOT NULL,
+	created_at timestamptz DEFAULT now() NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
+	updated_at timestamptz DEFAULT now() NOT NULL,
+	updated_by uuid REFERENCES bb.users NOT NULL,
+	UNIQUE (org_id, seq));
+
+COMMENT ON TABLE bb.executors IS 'journal登録executor';
+COMMENT ON COLUMN bb.executors.id IS 'ID';
+COMMENT ON COLUMN bb.executors.org_id IS '組織ID';
+COMMENT ON COLUMN bb.executors.seq IS '組織内連番';
+COMMENT ON COLUMN bb.executors.name IS '名称';
+COMMENT ON COLUMN bb.executors.description IS '補足事項';
+COMMENT ON COLUMN bb.executors.revision IS 'リビジョン番号';
+COMMENT ON COLUMN bb.executors.props IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.executors.active IS 'アクティブフラグ';
+COMMENT ON COLUMN bb.executors.created_at IS '作成時刻';
+COMMENT ON COLUMN bb.executors.created_by IS '作成ユーザー';
+COMMENT ON COLUMN bb.executors.updated_at IS '更新時刻';
+COMMENT ON COLUMN bb.executors.updated_by IS '更新ユーザー';
+
+--NULLの代用(id=0)
+INSERT INTO bb.executors (
+	id,
+	org_id,
+	seq,
+	name,
+	revision,
+	created_by,
+	updated_by
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	0,
+	'NULL',
+	0,
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
+
+----------
+
+CREATE TABLE bb.executors_groups (
+	id uuid REFERENCES bb.executors ON DELETE CASCADE NOT NULL,
+	group_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, group_id));
+
+----------
+
 --ロック中グループ
 CREATE UNLOGGED TABLE bb.locking_groups (
 	id uuid PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,

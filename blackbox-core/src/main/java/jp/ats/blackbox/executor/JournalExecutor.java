@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
@@ -57,6 +58,8 @@ public class JournalExecutor {
 
 	private final Map<UUID, PausingGroup> pausingGroups = new HashMap<>();
 
+	private AtomicBoolean started = new AtomicBoolean(false);
+
 	public JournalExecutor() {
 		this(256);
 	}
@@ -72,11 +75,21 @@ public class JournalExecutor {
 	}
 
 	public void start() {
+		synchronized (started) {
+			if (started.get()) return;
+			started.set(true);
+		}
+
 		disruptor.start();
 
 	}
 
 	public void stop() {
+		synchronized (started) {
+			if (!started.get()) return;
+			started.set(false);
+		}
+
 		disruptor.shutdown();
 	}
 

@@ -28,7 +28,8 @@ public class JournalHandlerTest {
 		SecurityValues.start(U.NULL_ID);
 
 		Blendee.execute(t -> {
-			var handler = new JournalHandler(U.recorder);
+			var handler = new JournalHandler(U.recorder, () -> {
+			});
 			IntStream.range(0, 10).forEach(i -> {
 				handler.register(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(i, registerGroup()));
 				JobHandler.execute(LocalDateTime.now());
