@@ -1,6 +1,6 @@
 package jp.ats.blackbox.stock;
 
-import static jp.ats.blackbox.persistence.JsonHelper.toJson;
+import static jp.ats.blackbox.common.U.toPGObject;
 
 import java.util.UUID;
 
@@ -66,7 +66,7 @@ public class StockComponentHandler {
 		row.setLong(seq, seqValue);
 		row.setString(name, request.name);
 		request.description.ifPresent(v -> row.setString(description, v));
-		request.props.ifPresent(v -> row.setObject(props, toJson(v)));
+		request.props.ifPresent(v -> row.setObject(props, toPGObject(v)));
 		request.tags.ifPresent(v -> row.setObject(tags, v));
 
 		UUID userId = SecurityValues.currentUserId();
@@ -88,7 +88,7 @@ public class StockComponentHandler {
 			a.col(revision).set("{0} + 1", Vargs.of(a.col(revision)), Vargs.of());
 			request.name.ifPresent(v -> a.col(name).set(v));
 			request.description.ifPresent(v -> a.col(description).set(v));
-			request.props.ifPresent(v -> a.col(props).set(toJson(v)));
+			request.props.ifPresent(v -> a.col(props).set(toPGObject(v)));
 			request.tags.ifPresent(v -> a.col(tags).set((Object) v));
 			request.active.ifPresent(v -> a.col(active).set(v));
 			a.col(updated_by).set(SecurityValues.currentUserId());

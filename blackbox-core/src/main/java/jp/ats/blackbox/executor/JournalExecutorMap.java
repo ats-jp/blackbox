@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
 import sqlassist.bb.executors;
@@ -37,10 +38,10 @@ public class JournalExecutorMap {
 	//key: group_id, value: executor
 	private static final Map<UUID, JournalExecutor> executors = new HashMap<>();
 
-	public static JournalExecutor map(UUID groupId) {
+	public static JournalExecutor get(UUID groupId) {
 		try {
 			return service.submit(() -> {
-				initializeIfUnInitialized();
+				initializeIfUninitialized();
 
 				return executors.get(groupId);
 			}).get();
@@ -56,8 +57,11 @@ public class JournalExecutorMap {
 	//組織のすべてのexecutorを再設定する
 	public static void reloadOrg(UUID orgId) {
 		service.submit(() -> {
-			initializeIfUnInitialized();
-			reloadOrgInternal(orgId);
+			initializeIfUninitialized();
+
+			Blendee.execute(t -> {
+				reloadOrgInternal(orgId);
+			});
 		});
 	}
 
@@ -69,15 +73,17 @@ public class JournalExecutorMap {
 		});
 	}
 
-	private static void initializeIfUnInitialized() {
+	private static void initializeIfUninitialized() {
 		if (initialized) return;
 		initialized = true;
 
-		new orgs()
-			.SELECT(a -> a.id)
-			.WHERE(a -> a.active.eq(true))
-			.ORDER_BY(a -> a.seq)
-			.forEach(r -> reloadOrgInternal(r.getId()));
+		Blendee.execute(t -> {
+			new orgs()
+				.SELECT(a -> a.id)
+				.WHERE(a -> a.active.eq(true))
+				.ORDER_BY(a -> a.seq)
+				.forEach(r -> reloadOrgInternal(r.getId()));
+		});
 	}
 
 	private static void reloadOrgInternal(UUID orgId) {
@@ -111,7 +117,9 @@ public class JournalExecutorMap {
 			() -> new groups().SELECT(a -> a.id).WHERE(a -> a.org_id.eq($UUID).AND.active.eq(true)),
 			orgId).forEach(r -> {
 				var groupId = r.getId();
-				orgGroups.putIfAbsent(orgId, new LinkedList<>()).add(groupId);
+
+				orgGroups.putIfAbsent(orgId, new LinkedList<>());
+				orgGroups.get(orgId).add(groupId);
 
 				if (!executors.containsKey(groupId)) {
 					executors.put(groupId, orgExecutor);

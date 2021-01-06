@@ -7,10 +7,10 @@ import java.util.stream.IntStream;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.persistence.Requests.TransientMoveRequest;
 import jp.ats.blackbox.persistence.Role;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.TransientHandler;
-import jp.ats.blackbox.persistence.TransientHandler.TransientMoveRequest;
 import jp.ats.blackbox.persistence.UserHandler;
 
 public class TransientHandlerTest {

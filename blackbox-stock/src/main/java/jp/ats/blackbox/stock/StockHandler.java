@@ -13,8 +13,7 @@ import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.InOut;
-import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
-import jp.ats.blackbox.persistence.JsonHelper;
+import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.UnitHandler;
 import sqlassist.bb_stock.stocks;
 
@@ -108,11 +107,11 @@ public class StockHandler {
 
 		var props = new UnitProps();
 
-		props.group_props = gson.fromJson(JsonHelper.toString(stock.$groups().getProps()), Map.class);
-		props.item_props = gson.fromJson(JsonHelper.toString(stock.$items().getProps()), Map.class);
-		props.owner_props = gson.fromJson(JsonHelper.toString(stock.$owners().getProps()), Map.class);
-		props.location_props = gson.fromJson(JsonHelper.toString(stock.$locations().getProps()), Map.class);
-		props.status_props = gson.fromJson(JsonHelper.toString(stock.$statuses().getProps()), Map.class);
+		props.group_props = gson.fromJson(U.fromPGObject(stock.$groups().getProps()), Map.class);
+		props.item_props = gson.fromJson(U.fromPGObject(stock.$items().getProps()), Map.class);
+		props.owner_props = gson.fromJson(U.fromPGObject(stock.$owners().getProps()), Map.class);
+		props.location_props = gson.fromJson(U.fromPGObject(stock.$locations().getProps()), Map.class);
+		props.status_props = gson.fromJson(U.fromPGObject(stock.$statuses().getProps()), Map.class);
 
 		request.unit_props = Optional.of(gson.toJson(props));
 

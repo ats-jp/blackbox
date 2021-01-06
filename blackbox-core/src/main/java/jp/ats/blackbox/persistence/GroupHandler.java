@@ -144,7 +144,7 @@ public class GroupHandler {
 			row.setParent_id(request.parent_id);
 			row.setName(request.name);
 			request.description.ifPresent(v -> row.setDescription(v));
-			request.props.ifPresent(v -> row.setProps(JsonHelper.toJson(v)));
+			request.props.ifPresent(v -> row.setProps(U.toPGObject(v)));
 			request.tags.ifPresent(v -> row.setTags(v));
 
 			row.setCreated_by(userId);
@@ -202,7 +202,7 @@ public class GroupHandler {
 					request.description.ifPresent(v -> a.description.set(v));
 					request.parent_id.ifPresent(v -> a.parent_id.set(v));
 					a.revision.set(request.revision + 1);
-					request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+					request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 					request.tags.ifPresent(v -> a.tags.set((Object) v));
 					request.active.ifPresent(v -> a.active.set(v));
 					a.updated_by.set(userId);

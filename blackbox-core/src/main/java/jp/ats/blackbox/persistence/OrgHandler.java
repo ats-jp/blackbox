@@ -3,6 +3,7 @@ package jp.ats.blackbox.persistence;
 import java.util.Optional;
 import java.util.UUID;
 
+import jp.ats.blackbox.common.U;
 import sqlassist.bb.instances;
 import sqlassist.bb.orgs;
 
@@ -44,7 +45,7 @@ public class OrgHandler {
 		row.setSeq(seq);
 		row.setName(name);
 		description.ifPresent(v -> row.setDescription(v));
-		props.ifPresent(v -> row.setProps(JsonHelper.toJson(v)));
+		props.ifPresent(v -> row.setProps(U.toPGObject(v)));
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 

@@ -3,6 +3,7 @@ package jp.ats.blackbox.persistence;
 import java.util.Optional;
 import java.util.UUID;
 
+import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
 import sqlassist.bb.users;
 
@@ -47,7 +48,7 @@ public class UserHandler {
 		row.setGroup_id(request.groupId);
 		row.setSeq(seq);
 		request.tags.ifPresent(v -> row.setTags(v));
-		request.props.ifPresent(v -> row.setProps(JsonHelper.toJson(v)));
+		request.props.ifPresent(v -> row.setProps(U.toPGObject(v)));
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 
@@ -80,7 +81,7 @@ public class UserHandler {
 			a.revision.set(request.revision + 1);
 			request.name.ifPresent(v -> a.name.set(v));
 			request.description.ifPresent(v -> a.name.set(v));
-			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+			request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			request.active.ifPresent(v -> a.active.set(v));
 			a.updated_by.set(SecurityValues.currentUserId());

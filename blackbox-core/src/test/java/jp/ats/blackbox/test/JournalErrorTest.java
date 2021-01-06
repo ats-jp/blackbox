@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.JournalExecutor;
-import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
+import jp.ats.blackbox.persistence.Requests.ClosingRequest;
 import jp.ats.blackbox.persistence.SecurityValues;
 
 public class JournalErrorTest {
@@ -35,17 +35,15 @@ public class JournalErrorTest {
 			IntStream.range(0, transfers).forEach(i -> {
 
 				try {
-					var closePromise = executor.close(U.NULL_ID, () -> {
-						var req = new ClosingRequest();
-						req.group_id = groupId;
-						req.closed_at = new Timestamp(System.currentTimeMillis() + 1000000);
+					var req = new ClosingRequest();
+					req.group_id = groupId;
+					req.closed_at = new Timestamp(System.currentTimeMillis() + 1000000);
 
-						return req;
-					});
+					var closePromise = executor.close(U.NULL_ID, req);
 
 					closePromise.waitUntilFinished();
 
-					var promise = executor.registerJournal(U.NULL_ID, () -> JournalHandlerTest.createRequest(groupId, unitId));
+					var promise = executor.registerJournal(U.NULL_ID, JournalHandlerTest.createRequest(groupId, unitId));
 
 					promise.waitUntilFinished();
 				} catch (Exception e) {

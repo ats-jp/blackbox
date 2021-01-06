@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.JobExecutor;
 import jp.ats.blackbox.executor.JournalExecutor;
-import jp.ats.blackbox.persistence.JournalHandler.JournalDenyRequest;
+import jp.ats.blackbox.persistence.Requests.JournalDenyRequest;
 import jp.ats.blackbox.persistence.SecurityValues;
 
 public class DeadlockTest {
@@ -56,7 +56,7 @@ public class DeadlockTest {
 			IntStream.range(0, journals).forEach(i -> {
 				logger.trace("##### " + i);
 
-				var promise = executor.registerJournal(U.NULL_ID, () -> JournalHandlerTest.createRequest(groupId, unitId));
+				var promise = executor.registerJournal(U.NULL_ID, JournalHandlerTest.createRequest(groupId, unitId));
 
 				try {
 					UUID newId = promise.getId();
@@ -64,11 +64,10 @@ public class DeadlockTest {
 
 					promise.waitUntilFinished();
 
-					var denyPromise = executor.denyJournal(U.NULL_ID, () -> {
-						var req = new JournalDenyRequest();
-						req.deny_id = newId;
-						return req;
-					});
+					var req = new JournalDenyRequest();
+					req.deny_id = newId;
+
+					var denyPromise = executor.denyJournal(U.NULL_ID, req);
 
 					logger.trace("deny    : " + denyPromise.getId() + " " + Thread.currentThread());
 

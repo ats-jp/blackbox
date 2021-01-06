@@ -14,6 +14,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import jp.ats.blackbox.backend.web.CORSFilter;
+import jp.ats.blackbox.backend.web.SecurityValuesFilter;
 import jp.ats.blackbox.web.BlendeeTransactionFilter;
 
 public class Application {
@@ -28,7 +29,7 @@ public class Application {
 		var context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
 		context.setContextPath("/");
 
-		context.setInitParameter("blendee-schema-names", "bb bb_stock");
+		context.setInitParameter("blendee-schema-names", "bb");
 		context.setInitParameter("blendee-log-stacktrace-filter", ".");
 		context.setInitParameter("blendee-transaction-factory-class", "org.blendee.util.DriverManagerTransactionFactory");
 		context.setInitParameter("blendee-error-converter-class", "org.blendee.dialect.postgresql.PostgreSQLErrorConverter");
@@ -49,10 +50,15 @@ public class Application {
 		servletHolder.setInitParameter("jersey.config.server.provider.packages", "jp.ats.blackbox.backend.api.core");
 		servletHolder.setInitParameter("jersey.config.server.provider.scanning.recursive", "false");
 
-		var cors = context.addFilter(CORSFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
-		cors.setInitParameter("cors-allowed-origins", config.getProperty("cors-allowed-origins"));
+		//CORSをOFF テスト用
+		if (!"off".equals(config.getProperty("cors-filter"))) {
+			var cors = context.addFilter(CORSFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+			cors.setInitParameter("cors-allowed-origins", config.getProperty("cors-allowed-origins"));
+		}
 
 		context.addFilter(BlendeeTransactionFilter.class, "/api/*", EnumSet.of(DispatcherType.REQUEST));
+
+		context.addFilter(SecurityValuesFilter.class, "/api/*", EnumSet.of(DispatcherType.REQUEST));
 
 		server.start();
 		server.join();

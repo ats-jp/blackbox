@@ -13,9 +13,9 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
 import jp.ats.blackbox.persistence.JournalHandler;
-import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
 
 public class JournalHandlerTest {
 

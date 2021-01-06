@@ -3,8 +3,8 @@ package jp.ats.blackbox.account;
 import java.util.Optional;
 import java.util.UUID;
 
+import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
-import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.SeqHandler;
 import jp.ats.blackbox.persistence.Utils;
@@ -54,7 +54,7 @@ public class AccountHandler {
 		row.setName(request.name);
 		request.description.ifPresent(v -> row.setDescription(v));
 		row.setType(request.type.name());
-		request.props.ifPresent(v -> row.setProps(JsonHelper.toJson(v)));
+		request.props.ifPresent(v -> row.setProps(U.toPGObject(v)));
 		request.tags.ifPresent(v -> row.setTags(v));
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
@@ -94,7 +94,7 @@ public class AccountHandler {
 			request.name.ifPresent(v -> a.name.set(v));
 			request.description.ifPresent(v -> a.name.set(v));
 			request.type.ifPresent(v -> a.type.set(v.name()));
-			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+			request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			request.active.ifPresent(v -> a.active.set(v));
 			a.updated_by.set(SecurityValues.currentUserId());
@@ -149,7 +149,7 @@ public class AccountHandler {
 		row.setCode(request.code);
 		row.setName(request.name);
 		request.description.ifPresent(v -> row.setDescription(v));
-		request.props.ifPresent(v -> row.setProps(JsonHelper.toJson(v)));
+		request.props.ifPresent(v -> row.setProps(U.toPGObject(v)));
 		request.tags.ifPresent(v -> row.setTags(v));
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
@@ -186,7 +186,7 @@ public class AccountHandler {
 			request.code.ifPresent(v -> a.code.set(v));
 			request.name.ifPresent(v -> a.name.set(v));
 			request.description.ifPresent(v -> a.name.set(v));
-			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+			request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			request.active.ifPresent(v -> a.active.set(v));
 			a.updated_by.set(SecurityValues.currentUserId());

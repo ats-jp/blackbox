@@ -15,9 +15,9 @@ import jp.ats.blackbox.persistence.GroupHandler.RegisterRequest;
 import jp.ats.blackbox.persistence.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
 import jp.ats.blackbox.persistence.JournalHandler;
-import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
 import jp.ats.blackbox.stock.StockHandler;
 import jp.ats.blackbox.stock.StockHandler.StockComponents;
 

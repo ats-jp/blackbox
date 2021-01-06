@@ -26,6 +26,11 @@ import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
+import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.JournalDenyRequest;
+import jp.ats.blackbox.persistence.Requests.JournalOverwriteRequest;
+import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
 import sqlassist.bb.details;
 import sqlassist.bb.jobs;
 import sqlassist.bb.journal_batches;
@@ -38,198 +43,6 @@ import sqlassist.bb.snapshots;
  * journal操作クラス
  */
 public class JournalHandler {
-
-	/**
-	 * journal登録に必要な情報クラス
-	 */
-	public static class JournalRegisterRequest {
-
-		/**
-		 * このjournalが属するグループ
-		 * 必須
-		 */
-		public UUID group_id;
-
-		/**
-		 * 移動時刻
-		 * 必須
-		 */
-		public Timestamp fixed_at;
-
-		/**
-		 * 補足事項
-		 */
-		public Optional<String> description = Optional.empty();
-
-		/**
-		 * 打消し元のjournal_id
-		 */
-		public Optional<UUID> denied_id = Optional.empty();
-
-		public Optional<String> deny_reason = Optional.empty();
-
-		/**
-		 * 追加情報JSON
-		 */
-		public Optional<String> props = Optional.empty();
-
-		/**
-		 * DBから復元した追加情報JSON
-		 */
-		Optional<Object> restored_props = Optional.empty();
-
-		/**
-		 * 検索用タグ
-		 */
-		public Optional<String[]> tags = Optional.empty();
-
-		/**
-		 * 配下のdetail
-		 * 必須
-		 */
-		public DetailRegisterRequest[] details;
-	}
-
-	/**
-	 * detail登録に必要な情報クラス
-	 */
-	public static class DetailRegisterRequest {
-
-		/**
-		 * 追加情報JSON
-		 */
-		public Optional<String> props = Optional.empty();
-
-		/**
-		 * DBから復元した追加情報JSON
-		 */
-		Optional<Object> restored_props = Optional.empty();
-
-		/**
-		 * 配下のnode
-		 * 必須
-		 */
-		public NodeRegisterRequest[] nodes;
-	}
-
-	/**
-	 * node登録に必要な情報クラス
-	 */
-	public static class NodeRegisterRequest {
-
-		/**
-		 * unit
-		 * 必須
-		 */
-		public UUID unit_id;
-
-		/**
-		 * 入出力タイプ
-		 */
-		public InOut in_out;
-
-		/**
-		 * 数量
-		 */
-		public BigDecimal quantity;
-
-		/**
-		 * これ以降数量無制限を設定するか
-		 * 数量無制限の場合、通常はunit登録時からtrueにしておく
-		 */
-		public Optional<Boolean> grants_unlimited = Optional.empty();
-
-		/**
-		 * 追加情報JSON
-		 */
-		public Optional<String> props = Optional.empty();
-
-		/**
-		 * DBから復元した追加情報JSON
-		 */
-		Optional<Object> restored_props = Optional.empty();
-
-		/**
-		 * unit追加情報JSON
-		 */
-		public Optional<String> unit_props = Optional.empty();
-
-		/**
-		 * DBから復元した追加情報JSON
-		 */
-		Optional<Object> restored_unit_props = Optional.empty();
-	}
-
-	/**
-	 * journal打消し
-	 *
-	 */
-	public static class JournalDenyRequest {
-
-		public UUID deny_id;
-
-		public Optional<String> deny_reason = Optional.empty();
-	}
-
-	/**
-	 * 数量上書きに必要な情報クラス
-	 */
-	public static class OverwriteRequest {
-
-		/**
-		 * このjournalが属するグループ
-		 * 必須
-		 */
-		public UUID group_id;
-
-		/**
-		 * 移動時刻
-		 * 必須
-		 */
-		public Timestamp fixed_at;
-
-		/**
-		 * 補足事項
-		 */
-		public Optional<String> description = Optional.empty();
-
-		/**
-		 * 追加情報JSON
-		 */
-		public Optional<String> journalProps = Optional.empty();
-
-		/**
-		 * 検索用タグ
-		 */
-		public Optional<String[]> tags = Optional.empty();
-
-		/**
-		 * 追加情報JSON
-		 */
-		public Optional<String> detailProps = Optional.empty();
-
-		/**
-		 * unit
-		 * 必須
-		 */
-		public UUID unit_id;
-
-		/**
-		 * 数量
-		 */
-		public BigDecimal total;
-
-		/**
-		 * これ以降数量無制限を設定するか
-		 * 数量無制限の場合、通常はunit登録時からtrueにしておく
-		 */
-		public Optional<Boolean> grants_unlimited = Optional.empty();
-
-		/**
-		 * 追加情報JSON
-		 */
-		public Optional<String> nodeProps = Optional.empty();
-	}
 
 	private final Recorder recorder;
 
@@ -678,7 +491,7 @@ public class JournalHandler {
 	/**
 	 * 数量を強制的に上書きする処理
 	 */
-	public void overwrite(UUID journalId, UUID userId, OverwriteRequest request) {
+	public void overwrite(UUID journalId, UUID userId, JournalOverwriteRequest request) {
 		overwrite(journalId, userId, request, r -> {
 		});
 	}
@@ -686,7 +499,7 @@ public class JournalHandler {
 	/**
 	 * 数量を強制的に上書きする処理
 	 */
-	public void overwrite(UUID journalId, UUID userId, OverwriteRequest request, Consumer<JournalRegisterRequest> checker) {
+	public void overwrite(UUID journalId, UUID userId, JournalOverwriteRequest request, Consumer<JournalRegisterRequest> checker) {
 		var snapshot = getJustBeforeSnapshot(request.unit_id, request.fixed_at, recorder);
 
 		var out = new NodeRegisterRequest();

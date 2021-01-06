@@ -1,6 +1,5 @@
 package jp.ats.blackbox.stock;
 
-import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 import static org.blendee.sql.Placeholder.$UUID;
 
 import java.math.BigDecimal;
@@ -17,9 +16,8 @@ import jp.ats.blackbox.common.BlackboxException;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
 import jp.ats.blackbox.persistence.InOut;
-import jp.ats.blackbox.persistence.JournalHandler;
-import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
-import jp.ats.blackbox.persistence.JsonHelper;
+import jp.ats.blackbox.persistence.Requests;
+import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.SeqHandler;
 import jp.ats.blackbox.persistence.SeqInJournalUtils;
@@ -113,7 +111,7 @@ public class FormulaHandler {
 		formula.setGroup_id(request.group_id);
 		formula.setSeq(seq);
 		formula.setName(request.name);
-		request.props.ifPresent(v -> formula.setProps(toJson(v)));
+		request.props.ifPresent(v -> formula.setProps(U.toPGObject(v)));
 		request.tags.ifPresent(v -> formula.setTags(v));
 		formula.setCreated_by(userId);
 		formula.setUpdated_by(userId);
@@ -170,7 +168,7 @@ public class FormulaHandler {
 		detail.setQuantity(request.quantity);
 		detail.setCreated_by(userId);
 
-		request.props.ifPresent(v -> detail.setProps(JsonHelper.toJson(v)));
+		request.props.ifPresent(v -> detail.setProps(U.toPGObject(v)));
 
 		detail.insert();
 
@@ -181,7 +179,7 @@ public class FormulaHandler {
 		int result = new formulas().UPDATE(a -> {
 			request.name.ifPresent(v -> a.name.set(v));
 			a.revision.set(request.revision + 1);
-			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+			request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
@@ -209,7 +207,7 @@ public class FormulaHandler {
 			request.stock_id.ifPresent(v -> a.stock_id.set(v));
 			request.in_out.ifPresent(v -> a.in_out.set(v.intValue));
 			request.quantity.ifPresent(v -> a.quantity.set(v));
-			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+			request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
 		}).WHERE(a -> a.id.eq(request.id)).execute();
@@ -265,12 +263,12 @@ public class FormulaHandler {
 
 	public static interface JournalDetailRequestComplementer {
 
-		void complement(formulas.Row formula, JournalHandler.DetailRegisterRequest request);
+		void complement(formulas.Row formula, Requests.DetailRegisterRequest request);
 	}
 
 	public static interface JournalNodeRequestComplementer {
 
-		void complement(formula_details.Row detail, JournalHandler.NodeRegisterRequest request);
+		void complement(formula_details.Row detail, Requests.NodeRegisterRequest request);
 	}
 
 	public static JournalRegisterRequest buildJournalRegisterRequest(MoveRequest request) {
@@ -280,7 +278,7 @@ public class FormulaHandler {
 		journalRequest.props = request.props;
 		journalRequest.tags = request.tags;
 
-		var detailRequests = new LinkedList<JournalHandler.DetailRegisterRequest>();
+		var detailRequests = new LinkedList<Requests.DetailRegisterRequest>();
 		Arrays.stream(request.formulaIds).forEach(i -> {
 			var result = new formula_details()
 				.SELECT(a -> a.all(a, a.$formulas(), a.$stocks()))
@@ -293,13 +291,13 @@ public class FormulaHandler {
 
 			var formula = result.get();
 
-			var detailRequest = new JournalHandler.DetailRegisterRequest();
+			var detailRequest = new Requests.DetailRegisterRequest();
 
-			var nodeRequests = new LinkedList<JournalHandler.NodeRegisterRequest>();
+			var nodeRequests = new LinkedList<Requests.NodeRegisterRequest>();
 			result.many().forEach(d -> {
 				var detail = d.get();
 
-				var nodeRequest = new JournalHandler.NodeRegisterRequest();
+				var nodeRequest = new Requests.NodeRegisterRequest();
 
 				nodeRequest.quantity = nodeRequest.quantity;
 				nodeRequest.in_out = InOut.of(detail.getIn_out());
@@ -327,12 +325,12 @@ public class FormulaHandler {
 
 			request.journalDetailRequestComplementer.complement(formula, detailRequest);
 
-			detailRequest.nodes = nodeRequests.toArray(new JournalHandler.NodeRegisterRequest[nodeRequests.size()]);
+			detailRequest.nodes = nodeRequests.toArray(new Requests.NodeRegisterRequest[nodeRequests.size()]);
 
 			detailRequests.add(detailRequest);
 		});
 
-		journalRequest.details = detailRequests.toArray(new JournalHandler.DetailRegisterRequest[detailRequests.size()]);
+		journalRequest.details = detailRequests.toArray(new Requests.DetailRegisterRequest[detailRequests.size()]);
 
 		return journalRequest;
 	}

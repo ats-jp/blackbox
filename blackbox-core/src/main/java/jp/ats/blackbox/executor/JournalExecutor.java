@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,16 +26,17 @@ import com.lmax.disruptor.util.DaemonThreadFactory;
 import jp.ats.blackbox.common.BlackboxException;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.ClosingHandler;
-import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
 import jp.ats.blackbox.persistence.GroupHandler;
 import jp.ats.blackbox.persistence.JournalHandler;
-import jp.ats.blackbox.persistence.JournalHandler.JournalDenyRequest;
-import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.OverwriteRequest;
-import jp.ats.blackbox.persistence.JsonHelper;
 import jp.ats.blackbox.persistence.MinusTotalException;
+import jp.ats.blackbox.persistence.Requests.ClosingRequest;
+import jp.ats.blackbox.persistence.Requests.GroupPauseRequest;
+import jp.ats.blackbox.persistence.Requests.GroupProcessRequest;
+import jp.ats.blackbox.persistence.Requests.JournalDenyRequest;
+import jp.ats.blackbox.persistence.Requests.JournalOverwriteRequest;
+import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.TransientMoveRequest;
 import jp.ats.blackbox.persistence.TransientHandler;
-import jp.ats.blackbox.persistence.TransientHandler.TransientMoveRequest;
 import jp.ats.blackbox.persistence.TransientHandler.TransientMoveResult;
 import sqlassist.bb.journal_errors;
 
@@ -97,20 +97,20 @@ public class JournalExecutor {
 		return disruptor.getBufferSize() - ringBuffer.remainingCapacity() == 0;
 	}
 
-	public JournalPromise registerJournal(UUID userId, Supplier<JournalRegisterRequest> requestSupplier) {
+	public JournalPromise registerJournal(UUID userId, JournalRegisterRequest request) {
 		var promise = new JournalPromise();
 
-		var command = new JournalRegisterCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new JournalRegisterCommand(promise.getId(), userId, request);
 
 		registerJournalInternal(userId, promise, command);
 
 		return promise;
 	}
 
-	public JournalPromise registerJournalLazily(UUID userId, Supplier<JournalRegisterRequest> requestSupplier) {
+	public JournalPromise registerJournalLazily(UUID userId, JournalRegisterRequest request) {
 		var promise = new JournalPromise();
 
-		var command = new LazyJournalRegisterCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new LazyJournalRegisterCommand(promise.getId(), userId, request);
 
 		registerJournalInternal(userId, promise, command);
 
@@ -124,20 +124,20 @@ public class JournalExecutor {
 		Thread.yield();
 	}
 
-	public JournalPromise denyJournal(UUID userId, Supplier<JournalDenyRequest> requestSupplier) {
+	public JournalPromise denyJournal(UUID userId, JournalDenyRequest request) {
 		var promise = new JournalPromise();
 
-		var command = new JournalDenyCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new JournalDenyCommand(promise.getId(), userId, request);
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
 		return promise;
 	}
 
-	public OverwritePromise overwrite(UUID userId, Supplier<OverwriteRequest> requestSupplier) {
+	public OverwritePromise overwriteJournal(UUID userId, JournalOverwriteRequest request) {
 		var promise = new OverwritePromise();
 
-		var command = new OverwriteCommand(promise, userId, requestSupplier.get());
+		var command = new OverwriteCommand(promise, userId, request);
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -174,10 +174,10 @@ public class JournalExecutor {
 	}
 
 	//仮締め開始
-	public PausingGroup[] pauseGroups(UUID userId, UUID groupId, Timestamp willCloseAt) throws CommandFailedException, InterruptedException {
+	public PausingGroup[] pauseGroups(UUID userId, GroupPauseRequest request) throws CommandFailedException, InterruptedException {
 		var promise = new JournalPromise();
 
-		var command = new PauseCommand(groupId, willCloseAt, userId);
+		var command = new PauseCommand(request.group_id, request.will_close_at, userId);
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -189,10 +189,10 @@ public class JournalExecutor {
 	}
 
 	//仮締めキャンセル
-	public PausingGroup[] resumeGroups(UUID userId, UUID groupId) throws CommandFailedException, InterruptedException {
+	public PausingGroup[] resumeGroups(UUID userId, GroupProcessRequest request) throws CommandFailedException, InterruptedException {
 		var promise = new JournalPromise();
 
-		var command = new ResumeCommand(groupId);
+		var command = new ResumeCommand(request.group_id);
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -204,10 +204,10 @@ public class JournalExecutor {
 	}
 
 	//現在仮締め中グループ取得
-	public PausingGroup[] getPausingGroups(UUID userId, UUID groupId) throws CommandFailedException, InterruptedException {
+	public PausingGroup[] getPausingGroups(UUID userId, GroupProcessRequest request) throws CommandFailedException, InterruptedException {
 		var promise = new JournalPromise();
 
-		var command = new GetPausingGroupsCommand(groupId);
+		var command = new GetPausingGroupsCommand(request.group_id);
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -218,20 +218,20 @@ public class JournalExecutor {
 		}
 	}
 
-	public JournalPromise close(UUID userId, Supplier<ClosingRequest> requestSupplier) {
+	public JournalPromise close(UUID userId, ClosingRequest request) {
 		var promise = new JournalPromise();
 
-		var command = new CloseCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new CloseCommand(promise.getId(), userId, request);
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
 		return promise;
 	}
 
-	public JournalPromise moveTransient(UUID userId, Supplier<TransientMoveRequest> requestSupplier) {
+	public JournalPromise moveTransient(UUID userId, TransientMoveRequest request) {
 		var promise = new JournalPromise();
 
-		var command = new TransientMoveCommand(promise.getId(), userId, requestSupplier.get());
+		var command = new TransientMoveCommand(promise.getId(), userId, request);
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -343,7 +343,7 @@ public class JournalExecutor {
 						U.getStackTrace(error),
 						U.getSQLState(error).orElse(""),
 						userId,
-						JsonHelper.toJson(new Gson().toJson(command.request()))))
+						U.toPGObject(new Gson().toJson(command.request()))))
 				.execute();
 		}
 	}
@@ -491,11 +491,11 @@ public class JournalExecutor {
 
 		private final UUID userId;
 
-		private final OverwriteRequest request;
+		private final JournalOverwriteRequest request;
 
 		private final List<UUID> deniedJournals = new LinkedList<>();
 
-		private OverwriteCommand(OverwritePromise promise, UUID userId, OverwriteRequest request) {
+		private OverwriteCommand(OverwritePromise promise, UUID userId, JournalOverwriteRequest request) {
 			this.promise = promise;
 			this.journalId = promise.getId();
 			this.userId = userId;

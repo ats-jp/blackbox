@@ -1,13 +1,11 @@
 package jp.ats.blackbox.persistence;
 
-import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 import static org.blendee.sql.Placeholder.$BIGDECIMAL;
 import static org.blendee.sql.Placeholder.$BOOLEAN;
 import static org.blendee.sql.Placeholder.$TIMESTAMP;
 import static org.blendee.sql.Placeholder.$UUID;
 
 import java.sql.Timestamp;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -17,6 +15,7 @@ import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.persistence.Requests.ClosingRequest;
 import sqlassist.bb.closed_journals;
 import sqlassist.bb.closed_units;
 import sqlassist.bb.closings;
@@ -45,7 +44,7 @@ public class ClosingHandler {
 		request.description.ifPresent(v -> closing.setDescription(v));
 		closing.setSeq(seq);
 		closing.setClosed_at(request.closed_at);
-		request.props.ifPresent(v -> closing.setProps(toJson(v)));
+		request.props.ifPresent(v -> closing.setProps(U.toPGObject(v)));
 		closing.setCreated_by(userId);
 
 		closing.insert();
@@ -208,19 +207,5 @@ public class ClosingHandler {
 		return new AnonymousTable(
 			query,
 			"ranked");
-	}
-
-	public static class ClosingRequest {
-
-		public UUID group_id;
-
-		public Timestamp closed_at;
-
-		public Optional<String> description = Optional.empty();
-
-		/**
-		 * 追加情報JSON
-		 */
-		public Optional<String> props = Optional.empty();
 	}
 }

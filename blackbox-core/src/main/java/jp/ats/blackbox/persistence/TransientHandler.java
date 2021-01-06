@@ -21,9 +21,10 @@ import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
-import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.TransientMoveRequest;
 import sqlassist.bb.closed_units;
 import sqlassist.bb.nodes;
 import sqlassist.bb.transient_details;
@@ -335,13 +336,6 @@ public class TransientHandler {
 
 	private static void deleteNode(UUID nodeId) {
 		U.recorder.play(() -> new transient_nodes().DELETE().WHERE(a -> a.id.eq($UUID)), nodeId).execute();
-	}
-
-	public static class TransientMoveRequest {
-
-		public UUID transient_id;
-
-		public boolean lazy = false;
 	}
 
 	public static TransientMoveResult move(
@@ -716,7 +710,7 @@ public class TransientHandler {
 			request.group_id.ifPresent(v -> a.group_id.set(v));
 			request.fixed_at.ifPresent(v -> a.fixed_at.set(v));
 			request.description.ifPresent(v -> a.description.set(v));
-			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+			request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
@@ -790,7 +784,7 @@ public class TransientHandler {
 		int result = new transient_details().UPDATE(a -> {
 			request.journal_id.ifPresent(v -> a.transient_journal_id.set(v));
 			request.seq_in_journal.ifPresent(v -> a.seq_in_journal.set(v));
-			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+			request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
 		}).WHERE(a -> a.id.eq(request.id)).execute();
@@ -869,7 +863,7 @@ public class TransientHandler {
 			request.in_out.ifPresent(v -> a.in_out.set(v.intValue));
 			request.quantity.ifPresent(v -> a.quantity.set(v));
 			request.grants_unlimited.ifPresent(v -> a.grants_unlimited.set(v));
-			request.props.ifPresent(v -> a.props.set(JsonHelper.toJson(v)));
+			request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 			a.updated_by.set(SecurityValues.currentUserId());
 			a.updated_at.setAny("now()");
 		}).WHERE(a -> a.id.eq(request.id)).execute();
