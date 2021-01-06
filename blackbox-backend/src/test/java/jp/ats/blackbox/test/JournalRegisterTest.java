@@ -9,19 +9,18 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import org.blendee.util.Blendee;
 
 import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.GroupHandler;
-import jp.ats.blackbox.persistence.GroupHandler.RegisterRequest;
 import jp.ats.blackbox.persistence.InOut;
-import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
 import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
 import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.UnitHandler;
 
 public class JournalRegisterTest {
@@ -33,7 +32,7 @@ public class JournalRegisterTest {
 		SecurityValues.start(U.NULL_ID);
 
 		var json = Blendee.executeAndGet(t -> {
-			return new Gson().toJson(createRequest(registerGroup()));
+			return new Gson().toJson(createRequest(U.NULL_ID));
 		});
 
 		var c = HttpClient.newHttpClient();
@@ -43,14 +42,20 @@ public class JournalRegisterTest {
 			.uri(URI.create("http://localhost:8080/api/journals/register"))
 			.build();
 
-		System.out.println(c.send(req, BodyHandlers.ofString()).body());
+		IntStream.range(0, 100).forEach(i -> {
+			try {
+				System.out.println(i + "\t" + c.send(req, BodyHandlers.ofString()).body());
+			} catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+		});
 	}
 
 	private static JournalRegisterRequest createRequest(UUID groupId) {
 		var out = new NodeRegisterRequest();
 		var in = new NodeRegisterRequest();
 
-		var unit = registerUnit();
+		var unit = UnitHandler.register(U.NULL_ID);
 
 		out.in_out = InOut.OUT;
 		out.quantity = BigDecimal.ONE;
@@ -73,18 +78,5 @@ public class JournalRegisterTest {
 		journal.details = new DetailRegisterRequest[] { bundle };
 
 		return journal;
-	}
-
-	public static UUID registerGroup() {
-		var req = new RegisterRequest();
-		req.name = "test group";
-		req.parent_id = U.NULL_ID;
-		req.org_id = U.NULL_ID;
-
-		return GroupHandler.register(req, U.NULL_ID);
-	}
-
-	public static UUID registerUnit() {
-		return UnitHandler.register(U.NULL_ID);
 	}
 }
