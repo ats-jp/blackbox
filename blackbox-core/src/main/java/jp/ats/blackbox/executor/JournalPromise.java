@@ -56,6 +56,14 @@ public class JournalPromise {
 		}
 	}
 
+	void lock() {
+		lock.lock();
+	}
+
+	void unlock() {
+		lock.unlock();
+	}
+
 	private void checkError() throws CommandFailedException {
 		if (error != null) throw new CommandFailedException(error);
 	}

@@ -203,24 +203,15 @@ public class snapshots
 	public static final String fixed_at = "fixed_at";
 
 	/**
-	 * name: created_at<br>
-	 * remarks: 登録時刻<br>
-	 * 検索高速化のためjournals.created_atをここに持つ<br>
-	 * type: timestamptz(35, 6)<br>
+	 * name: seq<br>
+	 * remarks: 移動ノード状態の登録順<br>
+	 * 検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ<br>
+	 * グループ内で一意であり順序として使用できる<br>
+	 * type: bpchar(36)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "登録時刻\n検索高速化のためjournals.created_atをここに持つ", defaultValue = "null", ordinalPosition = 8, notNull = true)
-	public static final String created_at = "created_at";
-
-	/**
-	 * name: node_seq<br>
-	 * remarks: 伝票ノードの登録順<br>
-	 * 検索高速化のためnodes.seqをここに持つ<br>
-	 * type: int4(10)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "node_seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票ノードの登録順\n検索高速化のためnodes.seqをここに持つ", defaultValue = "null", ordinalPosition = 9, notNull = true)
-	public static final String node_seq = "node_seq";
+	@Column(name = "seq", type = 1, typeName = "bpchar", size = 36, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ノード状態の登録順\n検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ\nグループ内で一意であり順序として使用できる", defaultValue = "null", ordinalPosition = 8, notNull = true)
+	public static final String seq = "seq";
 
 	/**
 	 * name: updated_at<br>
@@ -228,7 +219,7 @@ public class snapshots
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 10, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 9, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -237,7 +228,7 @@ public class snapshots
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 11, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 10, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -569,66 +560,36 @@ public class snapshots
 
 		/**
 		 * setter
-		 * name: created_at<br>
-		 * remarks: 登録時刻<br>
-		 * 検索高速化のためjournals.created_atをここに持つ<br>
-		 * type: timestamptz(35, 6)<br>
+		 * name: seq<br>
+		 * remarks: 移動ノード状態の登録順<br>
+		 * 検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ<br>
+		 * グループ内で一意であり順序として使用できる<br>
+		 * type: bpchar(36)<br>
 		 * not null: true<br>
-		 * @param value java.sql.Timestamp
+		 * @param value java.lang.String
 		 */
-		public void setCreated_at(java.sql.Timestamp value) {
+		public void setSeq(java.lang.String value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("created_at").getType());
-			data$.setValue("created_at", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("seq").getType());
+			data$.setValue("seq", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: created_at<br>
-		 * remarks: 登録時刻<br>
-		 * 検索高速化のためjournals.created_atをここに持つ<br>
-		 * type: timestamptz(35, 6)<br>
+		 * name: seq<br>
+		 * remarks: 移動ノード状態の登録順<br>
+		 * 検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ<br>
+		 * グループ内で一意であり順序として使用できる<br>
+		 * type: bpchar(36)<br>
 		 * not null: true<br>
-		 * @return java.sql.Timestamp
+		 * @return java.lang.String
 		 */
-		public java.sql.Timestamp getCreated_at() {
-			Binder binder = data$.getValue("created_at");
-			return (java.sql.Timestamp) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: node_seq<br>
-		 * remarks: 伝票ノードの登録順<br>
-		 * 検索高速化のためnodes.seqをここに持つ<br>
-		 * type: int4(10)<br>
-		 * not null: true<br>
-		 * @param value java.lang.Integer
-		 */
-		public void setNode_seq(java.lang.Integer value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("node_seq").getType());
-			data$.setValue("node_seq", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: node_seq<br>
-		 * remarks: 伝票ノードの登録順<br>
-		 * 検索高速化のためnodes.seqをここに持つ<br>
-		 * type: int4(10)<br>
-		 * not null: true<br>
-		 * @return java.lang.Integer
-		 */
-		public java.lang.Integer getNode_seq() {
-			Binder binder = data$.getValue("node_seq");
-			return (java.lang.Integer) binder.getValue();
+		public java.lang.String getSeq() {
+			Binder binder = data$.getValue("seq");
+			return (java.lang.String) binder.getValue();
 		}
 
 		/**
@@ -1269,7 +1230,7 @@ public class snapshots
 	 * @return この {@link SelectStatement}
 	 */
 	public <R extends OnRightClauseAssist<?>> snapshots CROSS_JOIN(RightTable<R> right) {
-		selectBehavior().CROSS_JOIN(right, this);
+		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
 
@@ -1824,14 +1785,9 @@ public class snapshots
 		public final T fixed_at;
 
 		/**
-		 * 項目名 created_at
+		 * 項目名 seq
 		 */
-		public final T created_at;
-
-		/**
-		 * 項目名 node_seq
-		 */
-		public final T node_seq;
+		public final T seq;
 
 		/**
 		 * 項目名 updated_at
@@ -1861,8 +1817,7 @@ public class snapshots
 			this.journal_group_id = builder$.buildColumn(this, sqlassist.bb.snapshots.journal_group_id);
 			this.unit_id = builder$.buildColumn(this, sqlassist.bb.snapshots.unit_id);
 			this.fixed_at = builder$.buildColumn(this, sqlassist.bb.snapshots.fixed_at);
-			this.created_at = builder$.buildColumn(this, sqlassist.bb.snapshots.created_at);
-			this.node_seq = builder$.buildColumn(this, sqlassist.bb.snapshots.node_seq);
+			this.seq = builder$.buildColumn(this, sqlassist.bb.snapshots.seq);
 			this.updated_at = builder$.buildColumn(this, sqlassist.bb.snapshots.updated_at);
 			this.updated_by = builder$.buildColumn(this, sqlassist.bb.snapshots.updated_by);
 		}

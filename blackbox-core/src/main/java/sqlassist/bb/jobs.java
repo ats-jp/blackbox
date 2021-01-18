@@ -134,11 +134,11 @@ public class jobs
 	/**
 	 * name: id<br>
 	 * remarks: ID<br>
-	 * transfers.transfers_idに従属<br>
+	 * journals.journal_idに従属<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID\ntransfers.transfers_idに従属", defaultValue = "null", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID\njournals.journal_idに従属", defaultValue = "null", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
@@ -242,7 +242,7 @@ public class jobs
 		 * setter
 		 * name: id<br>
 		 * remarks: ID<br>
-		 * transfers.transfers_idに従属<br>
+		 * journals.journal_idに従属<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.util.UUID
@@ -260,7 +260,7 @@ public class jobs
 		 * getter
 		 * name: id<br>
 		 * remarks: ID<br>
-		 * transfers.transfers_idに従属<br>
+		 * journals.journal_idに従属<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.util.UUID
@@ -872,7 +872,7 @@ public class jobs
 	 * @return この {@link SelectStatement}
 	 */
 	public <R extends OnRightClauseAssist<?>> jobs CROSS_JOIN(RightTable<R> right) {
-		selectBehavior().CROSS_JOIN(right, this);
+		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
 

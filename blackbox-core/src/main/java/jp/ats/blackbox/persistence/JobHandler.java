@@ -2,6 +2,7 @@ package jp.ats.blackbox.persistence;
 
 import static org.blendee.sql.Placeholder.$BIGDECIMAL;
 import static org.blendee.sql.Placeholder.$BOOLEAN;
+import static org.blendee.sql.Placeholder.$TIMESTAMP;
 import static org.blendee.sql.Placeholder.$UUID;
 
 import java.sql.Timestamp;
@@ -31,21 +32,29 @@ public class JobHandler {
 		//トランザクション内の他の検索で参照されない、数が多い可能性があるのでbatchで実行
 		var batch = BlendeeManager.getConnection().getBatch();
 
-		new jobs()
-			.SELECT(a -> a.id)
-			.WHERE(a -> a.completed.eq(false).AND.$journals().fixed_at.le(Timestamp.valueOf(time)))
-			.ORDER_BY(a -> a.ls(a.$journals().fixed_at, a.$journals().created_at))
-			.forEach(row -> {
-				new snapshots()
-					.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().unit_id))
-					.WHERE(sa -> sa.$nodes().$details().journal_id.eq(row.getId()))
-					.ORDER_BY(a -> a.node_seq)
+		recorder.play(
+			() -> new jobs()
+				.SELECT(a -> a.id)
+				.WHERE(a -> a.completed.eq(false).AND.$journals().fixed_at.le($TIMESTAMP))
+				.ORDER_BY(a -> a.ls(a.$journals().fixed_at, a.$journals().created_at)),
+			Timestamp.valueOf(time)).forEach(row -> {
+				recorder.play(
+					() -> new snapshots()
+						.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().unit_id))
+						.WHERE(a -> a.$nodes().$details().journal_id.eq($UUID))
+						.ORDER_BY(a -> a.seq),
+					row.getId())
 					.execute(result -> {
 						while (result.next()) {
 							//TODO pluginで個別処理を複数スレッドで行うようにする
 							recorder.play(
 								() -> new current_units()
-									.UPDATE(a -> a.ls(a.snapshot_id.set($UUID), a.unlimited.set($BOOLEAN), a.total.set($BIGDECIMAL)))
+									.UPDATE(
+										a -> a.ls(
+											a.snapshot_id.set($UUID),
+											a.unlimited.set($BOOLEAN),
+											a.total.set($BIGDECIMAL),
+											a.updated_at.setAny("now()")))
 									.WHERE(a -> a.id.eq($UUID)),
 								(UUID) result.getObject(snapshots.id),
 								result.getBoolean(snapshots.unlimited),
@@ -59,6 +68,38 @@ public class JobHandler {
 				row.setCompleted(true);
 
 				row.update(batch);
+			});
+
+		batch.execute();
+	}
+
+	//過去へと登録されたjournalが原因でcurrent_unitとsnapshotのtotalに食い違いがあるデータを修復する
+	public static void updateDifferentRows() {
+		var batch = BlendeeManager.getConnection().getBatch();
+
+		recorder.play(
+			() -> new current_units()
+				.SELECT(
+					a -> a.ls(
+						a.id,
+						a.$snapshots().total,
+						a.$snapshots().unlimited))
+				.WHERE(a -> a.total.ne(a.$snapshots().total).OR.unlimited.ne(a.$snapshots().unlimited)))
+			.execute(r -> {
+				while (r.next()) {
+					recorder.play(
+						() -> new current_units()
+							.UPDATE(
+								a -> a.ls(
+									a.unlimited.set($BOOLEAN),
+									a.total.set($BIGDECIMAL),
+									a.updated_at.setAny("now()")))
+							.WHERE(a -> a.id.eq($UUID)),
+						r.getBoolean(snapshots.unlimited),
+						r.getBigDecimal(snapshots.total),
+						U.uuid(r, current_units.id))
+						.execute(batch);
+				}
 			});
 
 		batch.execute();

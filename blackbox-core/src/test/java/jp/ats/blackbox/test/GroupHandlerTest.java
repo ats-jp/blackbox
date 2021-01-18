@@ -1,5 +1,6 @@
 package jp.ats.blackbox.test;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,7 +17,6 @@ public class GroupHandlerTest {
 
 	public static void main(String[] args) {
 		JournalCommon.startWithLog();
-		SecurityValues.start(U.NULL_ID);
 		register();
 		SecurityValues.end();
 	}
@@ -26,11 +26,12 @@ public class GroupHandlerTest {
 		req.name = name();
 		req.parent_id = U.NULL_ID;
 		req.org_id = U.NULL_ID;
+		req.props = Optional.of("{}");
 
 		UUID[] id = { null };
 
 		Blendee.execute(t -> {
-			id[0] = GroupHandler.register(req);
+			id[0] = GroupHandler.register(req, U.NULL_ID);
 		});
 
 		return id[0];
@@ -45,7 +46,7 @@ public class GroupHandlerTest {
 		UUID[] id = { null };
 
 		Blendee.execute(t -> {
-			id[0] = GroupHandler.register(req);
+			id[0] = GroupHandler.register(req, U.NULL_ID);
 		});
 
 		return id[0];

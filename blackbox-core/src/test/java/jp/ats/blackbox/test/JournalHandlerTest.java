@@ -13,9 +13,9 @@ import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
 import jp.ats.blackbox.persistence.JournalHandler;
-import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
 
 public class JournalHandlerTest {
 
@@ -23,9 +23,10 @@ public class JournalHandlerTest {
 		Common.startWithLog();
 
 		Blendee.execute(t -> {
-			var handler = new JournalHandler(U.recorder);
+			var handler = new JournalHandler(U.recorder, () -> {
+			});
 			IntStream.range(0, 10).forEach(i -> {
-				handler.register(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(U.NULL_ID, U.NULL_ID));
+				handler.registerLazily(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(U.NULL_ID, U.NULL_ID));
 				JobHandler.execute(LocalDateTime.now());
 
 				t.commit(); //created_atを確定するために一件毎commit
@@ -47,9 +48,7 @@ public class JournalHandlerTest {
 
 		var bundle = new DetailRegisterRequest();
 
-		//通常はout -> inだがMinusTotalExceptionとなるのでテストではin -> outとする
-		//bundle.nodes = new NodeRegisterRequest[] { out, in };
-		bundle.nodes = new NodeRegisterRequest[] { in, out };
+		bundle.nodes = new NodeRegisterRequest[] { out, in };
 
 		var transfer = new JournalRegisterRequest();
 		transfer.group_id = groupId;

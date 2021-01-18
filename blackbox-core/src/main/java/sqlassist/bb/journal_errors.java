@@ -131,21 +131,28 @@ public class journal_errors
 
 	/**
 	 * name: abandoned_id<br>
-	 * remarks: journalもしくはclosingに使用される予定だったID<br>
+	 * remarks: journalもしくはclosingもしくはjournal_batchに使用される予定だったID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "abandoned_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "journalもしくはclosingに使用される予定だったID", defaultValue = "null", ordinalPosition = 1, notNull = true)
+	@Column(name = "abandoned_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "journalもしくはclosingもしくはjournal_batchに使用される予定だったID", defaultValue = "null", ordinalPosition = 1, notNull = true)
 	public static final String abandoned_id = "abandoned_id";
 
 	/**
 	 * name: command_type<br>
 	 * remarks: 処理のタイプ<br>
-	 * R=transfer登録, D=transfer取消, C=closing<br>
-	 * type: char(1)<br>
+	 * JOURNAL_REGISTER=journal登録<br>
+	 * JOURNAL_LAZY_REGISTER=journal数量整合性チェック遅延登録<br>
+	 * JOURNAL_DENY=journal取消<br>
+	 * OVERWRITE=journal書き換え<br>
+	 * PAUSE=仮締め<br>
+	 * RESUME=仮締めキャンセル<br>
+	 * GET_PAUSING_GROUPS=仮締め中グループの取得<br>
+	 * CLOSE=締め<br>
+	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "command_type", type = 1, typeName = "char", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "処理のタイプ\nR=transfer登録, D=transfer取消, C=closing", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	@Column(name = "command_type", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "処理のタイプ\nJOURNAL_REGISTER=journal登録\nJOURNAL_LAZY_REGISTER=journal数量整合性チェック遅延登録\nJOURNAL_DENY=journal取消\nOVERWRITE=journal書き換え\nPAUSE=仮締め\nRESUME=仮締めキャンセル\nGET_PAUSING_GROUPS=仮締め中グループの取得\nCLOSE=締め", defaultValue = "null", ordinalPosition = 2, notNull = true)
 	public static final String command_type = "command_type";
 
 	/**
@@ -294,7 +301,7 @@ public class journal_errors
 		/**
 		 * setter
 		 * name: abandoned_id<br>
-		 * remarks: journalもしくはclosingに使用される予定だったID<br>
+		 * remarks: journalもしくはclosingもしくはjournal_batchに使用される予定だったID<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.util.UUID
@@ -311,7 +318,7 @@ public class journal_errors
 		/**
 		 * getter
 		 * name: abandoned_id<br>
-		 * remarks: journalもしくはclosingに使用される予定だったID<br>
+		 * remarks: journalもしくはclosingもしくはjournal_batchに使用される予定だったID<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.util.UUID
@@ -325,8 +332,15 @@ public class journal_errors
 		 * setter
 		 * name: command_type<br>
 		 * remarks: 処理のタイプ<br>
-		 * R=transfer登録, D=transfer取消, C=closing<br>
-		 * type: char(1)<br>
+		 * JOURNAL_REGISTER=journal登録<br>
+		 * JOURNAL_LAZY_REGISTER=journal数量整合性チェック遅延登録<br>
+		 * JOURNAL_DENY=journal取消<br>
+		 * OVERWRITE=journal書き換え<br>
+		 * PAUSE=仮締め<br>
+		 * RESUME=仮締めキャンセル<br>
+		 * GET_PAUSING_GROUPS=仮締め中グループの取得<br>
+		 * CLOSE=締め<br>
+		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
@@ -343,8 +357,15 @@ public class journal_errors
 		 * getter
 		 * name: command_type<br>
 		 * remarks: 処理のタイプ<br>
-		 * R=transfer登録, D=transfer取消, C=closing<br>
-		 * type: char(1)<br>
+		 * JOURNAL_REGISTER=journal登録<br>
+		 * JOURNAL_LAZY_REGISTER=journal数量整合性チェック遅延登録<br>
+		 * JOURNAL_DENY=journal取消<br>
+		 * OVERWRITE=journal書き換え<br>
+		 * PAUSE=仮締め<br>
+		 * RESUME=仮締めキャンセル<br>
+		 * GET_PAUSING_GROUPS=仮締め中グループの取得<br>
+		 * CLOSE=締め<br>
+		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.lang.String
 		 */
@@ -1107,7 +1128,7 @@ public class journal_errors
 	 * @return この {@link SelectStatement}
 	 */
 	public <R extends OnRightClauseAssist<?>> journal_errors CROSS_JOIN(RightTable<R> right) {
-		selectBehavior().CROSS_JOIN(right, this);
+		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
 

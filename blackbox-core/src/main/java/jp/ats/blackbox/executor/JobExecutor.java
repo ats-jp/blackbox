@@ -27,6 +27,8 @@ public class JobExecutor {
 
 	private static LocalDateTime next = LocalDateTime.now();
 
+	private static boolean doUpdateDifferentRows;
+
 	public static void start() {
 		service.scheduleWithFixedDelay(JobExecutor::execute, 0, 100, TimeUnit.MILLISECONDS);
 	}
@@ -43,16 +45,44 @@ public class JobExecutor {
 		}
 	}
 
-	private static void execute() {
-		var now = LocalDateTime.now();
+	public static void updateDifferentRows() {
 		lock.lock();
 		try {
-			if (!next.isBefore(now)) return;
+			doUpdateDifferentRows = true;
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	private static void execute() {
+		var now = LocalDateTime.now();
+
+		var update = false;
+		var execute = false;
+
+		lock.lock();
+		try {
+			update = doUpdateDifferentRows;
+			doUpdateDifferentRows = false;
+
+			execute = next.isBefore(now);
 		} finally {
 			lock.unlock();
 		}
 
-		executeJob(now);
+		if (update) executeUpdateDifferentRows();
+
+		if (execute) executeJob(now);
+	}
+
+	private static void executeUpdateDifferentRows() {
+		try {
+			Blendee.execute(t -> {
+				JobHandler.updateDifferentRows();
+			});
+		} catch (Throwable t) {
+			logger.fatal(t.getMessage(), t);
+		}
 	}
 
 	private static void executeJob(LocalDateTime time) {

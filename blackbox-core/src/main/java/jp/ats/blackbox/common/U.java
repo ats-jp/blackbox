@@ -14,6 +14,11 @@ import java.util.UUID;
 
 import org.blendee.jdbc.Result;
 import org.blendee.sql.Recorder;
+import org.postgresql.util.PGobject;
+
+import com.google.gson.Gson;
+
+import jp.ats.blackbox.persistence.IllegalJsonException;
 
 public class U {
 
@@ -26,6 +31,8 @@ public class U {
 	public static final UUID PRIVILEGE_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
 	public static final Recorder recorder = Recorder.instance();
+
+	private static final Gson gson = new Gson();
 
 	public static LocalDateTime convert(Timestamp timestamp) {
 		return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
@@ -62,5 +69,30 @@ public class U {
 		if (cause == null) return Optional.empty();
 
 		return getSQLState(cause);
+	}
+
+	//JDBC URLに?stringtype=unspecifiedとつけてもJSONを変換してくれるようになるが、JDBC URLはソース管理に含まれないので直接変換してセットすることとする
+	public static Object toPGObject(String json) {
+		var object = new PGobject();
+		object.setType("json");
+		try {
+			object.setValue(json);
+		} catch (SQLException e) {
+			throw new IllegalJsonException();
+		}
+
+		return object;
+	}
+
+	public static String fromPGObject(Object json) {
+		return ((PGobject) json).getValue();
+	}
+
+	public static <T> T fromJson(String json, Class<T> clazz) {
+		return gson.fromJson(json, clazz);
+	}
+
+	public static String toJson(Object object) {
+		return gson.toJson(object);
 	}
 }

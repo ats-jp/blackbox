@@ -17,16 +17,11 @@ import sqlassist.bb.units;
 
 public class UnitHandler {
 
-	public static snapshots buildQuery(
-		Consumer<snapshots.WhereAssist> criteriaDecorator) {
+	public static snapshots buildQuery(Consumer<snapshots.WhereAssist> criteriaDecorator) {
 		var raw = new snapshots().SELECT(
 			a -> a.ls(
 				a.id,
-				a.any(
-					"RANK() OVER (ORDER BY {0} DESC, {1} DESC, {2} DESC)",
-					a.fixed_at,
-					a.created_at,
-					a.node_seq).AS("rank")))
+				a.any("RANK() OVER (ORDER BY {0} DESC)", a.seq).AS("rank")))
 			.WHERE(a -> criteriaDecorator.accept(a));
 
 		var inner = new AnonymousTable(raw, "subquery").SELECT(a -> a.any(0)).WHERE(a -> a.col("rank").eq(1));
@@ -40,26 +35,32 @@ public class UnitHandler {
 	public static units.Row register(
 		UUID userId,
 		Supplier<units> supplier) {
-		UUID unitId = register(userId);
+		UUID unitId = registerUnit(userId);
 
-		U.recorder.play(
-			() -> new current_units().insertStatement(
-				//後でjobから更新されるのでunlimitedはとりあえずfalse、totalは0
-				a -> a.INSERT(a.id, a.unlimited, a.total, a.snapshot_id).VALUES($UUID, $BOOLEAN, $INT, $UUID)),
-			unitId,
-			false,
-			0,
-			U.NULL_ID).execute();
+		registerCurrentUnit(unitId);
 
 		//関連情報取得のため改めて検索
 		//unitIdで必ず取得できるためOptional.get()する
-		return U.recorder.play(() -> supplier.get()).fetch(unitId).get();
+		return U.recorder.play(
+			() -> supplier.getClass(),
+			() -> supplier.get()).fetch(unitId).get();
 	}
 
 	/**
 	 * unit登録処理
 	 */
 	public static UUID register(UUID userId) {
+		UUID unitId = registerUnit(userId);
+
+		registerCurrentUnit(unitId);
+
+		return unitId;
+	}
+
+	/**
+	 * unit登録処理
+	 */
+	private static UUID registerUnit(UUID userId) {
 		UUID unitId = UUID.randomUUID();
 
 		U.recorder.play(
@@ -76,5 +77,16 @@ public class UnitHandler {
 			.execute();
 
 		return unitId;
+	}
+
+	private static void registerCurrentUnit(UUID unitId) {
+		U.recorder.play(
+			() -> new current_units().insertStatement(
+				//後でjobから更新されるのでunlimitedはとりあえずfalse、totalは0
+				a -> a.INSERT(a.id, a.unlimited, a.total, a.snapshot_id).VALUES($UUID, $BOOLEAN, $INT, $UUID)),
+			unitId,
+			false,
+			0,
+			U.NULL_ID).execute();
 	}
 }

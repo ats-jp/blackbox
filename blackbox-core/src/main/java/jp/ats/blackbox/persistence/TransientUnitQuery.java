@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import org.blendee.assist.AnonymousTable;
 import org.blendee.assist.Vargs;
 import org.blendee.jdbc.BResultSet;
+import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.common.U;
 import sqlassist.bb.snapshots;
@@ -20,6 +21,8 @@ import sqlassist.bb.transient_nodes;
 public class TransientUnitQuery {
 
 	private final AnonymousTable query;
+
+	private final Recorder recorder = Recorder.newAsyncInstance();
 
 	public TransientUnitQuery(
 		Consumer<transient_nodes> transientNodeDecorator,
@@ -68,6 +71,7 @@ public class TransientUnitQuery {
 
 		snapshotPlaceholderValues.stream().forEach(values::add);
 
-		U.recorder.play(() -> query, values.toArray(new Object[values.size()])).execute(resultConsumer);
+		//この時点ではクエリは固定されているので、このインスタンス固有のRecorderでキャッシュできる
+		recorder.play(() -> query, values.toArray(new Object[values.size()])).execute(resultConsumer);
 	}
 }

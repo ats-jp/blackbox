@@ -149,23 +149,23 @@ public class instances
 	public static final String name = "name";
 
 	/**
+	 * name: description<br>
+	 * remarks: 補足事項<br>
+	 * type: text(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "補足事項", defaultValue = "''::text", ordinalPosition = 3, notNull = true)
+	public static final String description = "description";
+
+	/**
 	 * name: principal<br>
 	 * remarks: この実行インスタンスを表す行<br>
 	 * 一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse<br>
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "principal", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "この実行インスタンスを表す行\n一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	@Column(name = "principal", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "この実行インスタンスを表す行\n一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse", defaultValue = "null", ordinalPosition = 4, notNull = true)
 	public static final String principal = "principal";
-
-	/**
-	 * name: description<br>
-	 * remarks: <br>
-	 * type: text(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 4, notNull = true)
-	public static final String description = "description";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -300,6 +300,36 @@ public class instances
 
 		/**
 		 * setter
+		 * name: description<br>
+		 * remarks: 補足事項<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
+		 * @param value java.lang.String
+		 */
+		public void setDescription(java.lang.String value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("description").getType());
+			data$.setValue("description", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: description<br>
+		 * remarks: 補足事項<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
+		 * @return java.lang.String
+		 */
+		public java.lang.String getDescription() {
+			Binder binder = data$.getValue("description");
+			return (java.lang.String) binder.getValue();
+		}
+
+		/**
+		 * setter
 		 * name: principal<br>
 		 * remarks: この実行インスタンスを表す行<br>
 		 * 一行のみtrueでなければならず、他から移設してきたインスタンスデータはfalse<br>
@@ -328,36 +358,6 @@ public class instances
 		public java.lang.Boolean getPrincipal() {
 			Binder binder = data$.getValue("principal");
 			return (java.lang.Boolean) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: description<br>
-		 * remarks: <br>
-		 * type: text(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.lang.String
-		 */
-		public void setDescription(java.lang.String value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("description").getType());
-			data$.setValue("description", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: description<br>
-		 * remarks: <br>
-		 * type: text(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.lang.String
-		 */
-		public java.lang.String getDescription() {
-			Binder binder = data$.getValue("description");
-			return (java.lang.String) binder.getValue();
 		}
 
 	}
@@ -891,7 +891,7 @@ public class instances
 	 * @return この {@link SelectStatement}
 	 */
 	public <R extends OnRightClauseAssist<?>> instances CROSS_JOIN(RightTable<R> right) {
-		selectBehavior().CROSS_JOIN(right, this);
+		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
 
@@ -1421,14 +1421,14 @@ public class instances
 		public final T name;
 
 		/**
-		 * 項目名 principal
-		 */
-		public final T principal;
-
-		/**
 		 * 項目名 description
 		 */
 		public final T description;
+
+		/**
+		 * 項目名 principal
+		 */
+		public final T principal;
 
 		private Assist(
 			instances table$,
@@ -1443,8 +1443,8 @@ public class instances
 
 			this.id = builder$.buildColumn(this, sqlassist.bb.instances.id);
 			this.name = builder$.buildColumn(this, sqlassist.bb.instances.name);
-			this.principal = builder$.buildColumn(this, sqlassist.bb.instances.principal);
 			this.description = builder$.buildColumn(this, sqlassist.bb.instances.description);
+			this.principal = builder$.buildColumn(this, sqlassist.bb.instances.principal);
 		}
 
 		/**

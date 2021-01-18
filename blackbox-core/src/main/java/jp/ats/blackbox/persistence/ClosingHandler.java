@@ -1,13 +1,11 @@
 package jp.ats.blackbox.persistence;
 
-import static jp.ats.blackbox.persistence.JsonHelper.toJson;
 import static org.blendee.sql.Placeholder.$BIGDECIMAL;
 import static org.blendee.sql.Placeholder.$BOOLEAN;
 import static org.blendee.sql.Placeholder.$TIMESTAMP;
 import static org.blendee.sql.Placeholder.$UUID;
 
 import java.sql.Timestamp;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -17,8 +15,11 @@ import org.blendee.jdbc.BlendeeManager;
 import org.blendee.sql.Recorder;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.persistence.Requests.ClosingRequest;
+import sqlassist.bb.closed_journals;
 import sqlassist.bb.closed_units;
 import sqlassist.bb.closings;
+import sqlassist.bb.journals;
 import sqlassist.bb.last_closings;
 import sqlassist.bb.relationships;
 import sqlassist.bb.snapshots;
@@ -28,12 +29,22 @@ public class ClosingHandler {
 	private static final Recorder recorder = U.recorder;
 
 	public static void close(UUID closingId, UUID userId, ClosingRequest request) {
+		var seqRequest = new SeqHandler.Request();
+		seqRequest.table = closings.$TABLE;
+		seqRequest.dependsColumn = closings.group_id;
+		seqRequest.dependsId = request.group_id;
+		SeqHandler.getInstance().nextSeq(seqRequest, seq -> closeInternal(closingId, userId, request, seq));
+	}
+
+	private static void closeInternal(UUID closingId, UUID userId, ClosingRequest request, long seq) {
 		var closing = closings.row();
 
 		closing.setId(closingId);
 		closing.setGroup_id(request.group_id);
+		request.description.ifPresent(v -> closing.setDescription(v));
+		closing.setSeq(seq);
 		closing.setClosed_at(request.closed_at);
-		request.props.ifPresent(v -> closing.setProps(toJson(v)));
+		request.props.ifPresent(v -> closing.setProps(U.toPGObject(v)));
 		closing.setCreated_by(userId);
 
 		closing.insert();
@@ -53,6 +64,20 @@ public class ClosingHandler {
 					closeGroup(groupId, request.closed_at, closingId, userId, batch);
 				}
 			});
+
+		//journalとclosingを紐づけ
+		recorder.play(
+			() -> new closed_journals()
+				.INSERT(
+					new journals()
+						.SELECT(a -> a.ls(a.id, a.any(a.expr($UUID))))
+						.WHERE(
+							a -> a.fixed_at.lt(request.closed_at),
+							a -> a.EXISTS(new relationships().SELECT(sa -> sa.any(0)).WHERE(sa -> sa.parent_id.eq($UUID).AND.child_id.eq(a.group_id))),
+							a -> a.NOT_EXISTS(new closed_journals().SELECT(sa -> sa.any(0)).WHERE(sa -> sa.id.eq(a.id))))),
+			closingId,
+			request.group_id)
+			.execute(batch);
 
 		batch.execute();
 	}
@@ -81,7 +106,9 @@ public class ClosingHandler {
 		recorder.play(
 			() -> new snapshots().updateStatement(
 				a -> a
-					.UPDATE(a.in_search_scope.set(false))
+					.UPDATE(
+						a.in_search_scope.set(false),
+						a.updated_at.setAny("now()"))
 					.WHERE(
 						wa -> wa.in_search_scope.eq(true).AND.id.IN(
 							createRankedQuery(base -> base.SELECT(sa -> sa.id))
@@ -172,11 +199,7 @@ public class ClosingHandler {
 		var query = new snapshots()
 			.SELECT(
 				a -> a.ls(
-					a.any(
-						"RANK() OVER (ORDER BY {0} DESC, {1} DESC, {2} DESC)",
-						a.fixed_at,
-						a.created_at,
-						a.node_seq).AS("rank")))
+					a.any("RANK() OVER (ORDER BY {0} DESC)", a.seq).AS("rank")))
 			.WHERE(a -> a.journal_group_id.eq($UUID).AND.fixed_at.le($TIMESTAMP));
 
 		applyer.accept(query);
@@ -184,17 +207,5 @@ public class ClosingHandler {
 		return new AnonymousTable(
 			query,
 			"ranked");
-	}
-
-	public static class ClosingRequest {
-
-		public UUID group_id;
-
-		public Timestamp closed_at;
-
-		/**
-		 * 追加情報JSON
-		 */
-		public Optional<String> props = Optional.empty();
 	}
 }

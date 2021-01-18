@@ -11,14 +11,13 @@ import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.GroupHandler;
+import jp.ats.blackbox.persistence.GroupHandler.RegisterRequest;
 import jp.ats.blackbox.persistence.InOut;
 import jp.ats.blackbox.persistence.JobHandler;
 import jp.ats.blackbox.persistence.JournalHandler;
-import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.GroupHandler.RegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
 import jp.ats.blackbox.stock.StockHandler;
 import jp.ats.blackbox.stock.StockHandler.StockComponents;
 
@@ -27,10 +26,9 @@ public class JournalHandlerTest {
 	public static void main(String[] args) {
 		Common.startWithLog();
 
-		SecurityValues.start(U.NULL_ID);
-
 		Blendee.execute(t -> {
-			var handler = new JournalHandler(U.recorder);
+			var handler = new JournalHandler(U.recorder, () -> {
+			});
 			IntStream.range(0, 10).forEach(i -> {
 				handler.register(UUID.randomUUID(), U.NULL_ID, U.NULL_ID, createRequest(registerGroup()));
 				JobHandler.execute(LocalDateTime.now());
@@ -38,8 +36,6 @@ public class JournalHandlerTest {
 				t.commit(); //created_atを確定するために一件毎commit
 			});
 		});
-
-		SecurityValues.end();
 	}
 
 	static JournalRegisterRequest createRequest(UUID groupId) {
@@ -93,10 +89,10 @@ public class JournalHandlerTest {
 
 	public static UUID registerGroup() {
 		var req = new RegisterRequest();
-		req.name = "stock group";
+		req.name = "test group";
 		req.parent_id = U.NULL_ID;
 		req.org_id = U.NULL_ID;
 
-		return GroupHandler.register(req);
+		return GroupHandler.register(req, U.NULL_ID);
 	}
 }

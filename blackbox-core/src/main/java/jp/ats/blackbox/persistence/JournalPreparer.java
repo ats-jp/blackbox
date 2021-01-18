@@ -1,6 +1,6 @@
 package jp.ats.blackbox.persistence;
 
-import static jp.ats.blackbox.persistence.JsonHelper.toJson;
+import static jp.ats.blackbox.common.U.toPGObject;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -8,9 +8,9 @@ import java.util.UUID;
 
 import org.blendee.sql.Recorder;
 
-import jp.ats.blackbox.persistence.JournalHandler.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.NodeRegisterRequest;
-import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
 import sqlassist.bb.groups;
 import sqlassist.bb.users;
 
@@ -43,11 +43,13 @@ class JournalPreparer {
 
 		journal.setFixed_at(request.fixed_at);
 
+		request.description.ifPresent(v -> journal.setDescription(v));
+
 		journal.setCreated_at(createdAt);
 
 		request.restored_props.ifPresentOrElse(
 			v -> journal.setProps(v),
-			() -> request.props.ifPresent(v -> journal.setProps(toJson(v))));
+			() -> request.props.ifPresent(v -> journal.setProps(toPGObject(v))));
 
 		journal.setGroup_props(group.getProps());
 		journal.setOrg_props(group.$orgs().getProps());
@@ -66,13 +68,12 @@ class JournalPreparer {
 		request.restored_props
 			.ifPresentOrElse(
 				v -> detail.setProps(v),
-				() -> request.props.ifPresent(v -> detail.setProps(toJson(v))));
+				() -> request.props.ifPresent(v -> detail.setProps(toPGObject(v))));
 	}
 
 	static void prepareNode(
 		UUID detailId,
 		UUID nodeId,
-		UUID userId,
 		NodeRegisterRequest request,
 		Node node,
 		int nodeSeq,
@@ -89,9 +90,9 @@ class JournalPreparer {
 		request.restored_props
 			.ifPresentOrElse(
 				v -> node.setProps(v),
-				() -> request.props.ifPresent(v -> node.setProps(toJson(v))));
+				() -> request.props.ifPresent(v -> node.setProps(toPGObject(v))));
 
-		request.unit_props.ifPresent(v -> node.setUnit_props(JsonHelper.toJson(v)));
+		request.unit_props.ifPresent(v -> node.setUnit_props(toPGObject(v)));
 	}
 
 	static interface Journal {
@@ -107,6 +108,8 @@ class JournalPreparer {
 		void setDeny_reason(String reason);
 
 		void setFixed_at(Timestamp fixedAt);
+
+		void setDescription(String string);
 
 		void setCreated_at(Timestamp createdAt);
 

@@ -9,7 +9,7 @@ import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.ClosingHandler;
-import jp.ats.blackbox.persistence.ClosingHandler.ClosingRequest;
+import jp.ats.blackbox.persistence.Requests.ClosingRequest;
 
 public class ClosingHandlerTest {
 

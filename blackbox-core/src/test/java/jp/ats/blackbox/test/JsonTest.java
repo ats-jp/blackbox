@@ -3,7 +3,7 @@ package jp.ats.blackbox.test;
 import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.JournalHandler.JournalRegisterRequest;
+import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
 
 public class JsonTest {
 

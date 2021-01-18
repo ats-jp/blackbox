@@ -1,6 +1,7 @@
 package jp.ats.blackbox.test;
 
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import org.blendee.util.Blendee;
 
@@ -16,7 +17,9 @@ public class UnitHandlerTest {
 		//TransferCommon.startWithLog();
 
 		SecurityValues.start(U.NULL_ID);
-		register();
+
+		IntStream.range(0, 9).forEach(i -> System.out.println(register()));
+
 		SecurityValues.end();
 	}
 

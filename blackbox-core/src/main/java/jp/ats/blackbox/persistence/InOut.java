@@ -48,10 +48,10 @@ public enum InOut {
 	}
 
 	public BigDecimal calcurate(BigDecimal total, BigDecimal quantity) {
-		return total.add(relativize(quantity));
+		return total.add(normalize(quantity));
 	}
 
-	public BigDecimal relativize(BigDecimal quantity) {
+	public BigDecimal normalize(BigDecimal quantity) {
 		return quantity.multiply(value);
 	}
 
