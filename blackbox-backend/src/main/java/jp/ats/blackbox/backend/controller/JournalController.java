@@ -1,6 +1,5 @@
 package jp.ats.blackbox.backend.controller;
 
-import jp.ats.blackbox.backend.api.JsonParser.JsonProcessingException;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.CommandFailedException;
 import jp.ats.blackbox.executor.JournalExecutor.PausingGroup;
@@ -54,7 +53,7 @@ public class JournalController {
 		return JournalExecutorMap.get(request.group_id).close(SecurityValues.currentUserId(), request);
 	}
 
-	public static JournalPromise moveTransient(TransientMoveRequest request) throws JsonProcessingException, JournalNotFoundException {
+	public static JournalPromise moveTransient(TransientMoveRequest request) throws JournalNotFoundException {
 		var groupId = U.recorder.play(() -> new transients().SELECT(a -> a.group_id)).fetch(request.transient_id).orElseThrow(() -> new JournalNotFoundException()).getGroup_id();
 
 		return JournalExecutorMap.get(groupId).moveTransient(SecurityValues.currentUserId(), request);

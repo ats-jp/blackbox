@@ -1,7 +1,7 @@
 package jp.ats.blackbox.backend.api.core;
 
-import static jp.ats.blackbox.backend.api.JsonParser.parse;
-import static jp.ats.blackbox.backend.api.core.Utils.handleError;
+import static jp.ats.blackbox.backend.api.Utils.handleError;
+import static jp.ats.blackbox.backend.api.Utils.parse;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -13,7 +13,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import jp.ats.blackbox.backend.api.JsonParser.JsonProcessingException;
+import jp.ats.blackbox.backend.api.Utils.JsonProcessingException;
 import jp.ats.blackbox.backend.controller.JournalController;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.CommandFailedException;
