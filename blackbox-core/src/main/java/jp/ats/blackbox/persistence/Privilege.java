@@ -1,12 +1,12 @@
 package jp.ats.blackbox.persistence;
 
-public enum Role {
+public enum Privilege {
 
-	SYSTEM_ADMIN(0),
+	SYSTEM(0),
 
-	ORG_ADMIN(1),
+	ORG(1),
 
-	GROUP_ADMIN(2),
+	GROUP(2),
 
 	USER(3),
 
@@ -14,7 +14,7 @@ public enum Role {
 
 	private final int value;
 
-	private Role(int value) {
+	private Privilege(int value) {
 		this.value = value;
 	}
 

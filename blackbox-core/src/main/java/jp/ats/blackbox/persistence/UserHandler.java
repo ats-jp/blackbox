@@ -15,7 +15,7 @@ public class UserHandler {
 
 		public Optional<String> description = Optional.empty();
 
-		public Role role;
+		public Privilege privilege;
 
 		public UUID groupId;
 
@@ -44,7 +44,7 @@ public class UserHandler {
 		row.setId(id);
 		row.setName(request.name);
 		request.description.ifPresent(v -> row.setDescription(v));
-		row.setRole(request.role.value());
+		row.setPrivilege(request.privilege.value());
 		row.setGroup_id(request.groupId);
 		row.setSeq(seq);
 		request.tags.ifPresent(v -> row.setTags(v));

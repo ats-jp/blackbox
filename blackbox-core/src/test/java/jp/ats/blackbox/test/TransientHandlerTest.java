@@ -7,8 +7,8 @@ import java.util.stream.IntStream;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.persistence.Privilege;
 import jp.ats.blackbox.persistence.Requests.TransientMoveRequest;
-import jp.ats.blackbox.persistence.Role;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.TransientHandler;
 import jp.ats.blackbox.persistence.UserHandler;
@@ -27,7 +27,7 @@ public class TransientHandlerTest {
 
 			var userReq = new UserHandler.RegisterRequest();
 			userReq.name = "test";
-			userReq.role = Role.USER;
+			userReq.privilege = Privilege.USER;
 			userReq.groupId = U.NULL_ID;
 			userReq.props = Optional.of("{}");
 			userReq.tags = Optional.of(new String[] {});

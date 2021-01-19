@@ -319,7 +319,7 @@ cascade_idの用途は、世代が離れた連携を削除するために、一�
 	(9, 子, 曾孫, 8)
 	(10, 親, 曾孫, 9)
 親 <- 子の連携を変更する場合、一旦子の関係する連携を削除し、その後再度子以下の連携を登録することで実現する
-削除のフェーズにおいて、relationshipsのid、parent_idに子のIDを持つ全行を削除すると
+削除のフェーズにおいて、relationshipsのparent_id、child_idに子のIDを持つ全行を削除すると
 2, 3, 5, 9が削除される
 5が削除された際、カスケードで6も削除
 9が削除された際、カスケードで10も削除される
@@ -362,7 +362,7 @@ CREATE TABLE bb.users (
 	seq bigint NOT NULL,
 	name text NOT NULL,
 	description text DEFAULT '' NOT NULL,
-	role smallint CHECK (role IN (0, 1, 2, 3, 9)) NOT NULL,
+	privilege smallint CHECK (privilege IN (0, 1, 2, 3, 9)) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -381,9 +381,9 @@ COMMENT ON COLUMN bb.users.group_id IS 'グループID';
 COMMENT ON COLUMN bb.users.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb.users.name IS '名称';
 COMMENT ON COLUMN bb.users.description IS '補足事項';
-COMMENT ON COLUMN bb.users.role IS '役割
+COMMENT ON COLUMN bb.users.privilege IS '権限
 値の小さいほうが強い権限となる
-0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE';
+0=SYSTEM, 1=ORG, 2=GROUP, 3=USER, 9=NONE';
 COMMENT ON COLUMN bb.users.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.users.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.users.tags IS 'log保存用タグ';
@@ -399,7 +399,7 @@ INSERT INTO bb.users (
 	group_id,
 	seq,
 	name,
-	role,
+	privilege,
 	revision,
 	created_by,
 	updated_by
@@ -420,7 +420,7 @@ INSERT INTO bb.users (
 	seq,
 	name,
 	description,
-	role,
+	privilege,
 	revision,
 	created_by,
 	updated_by
@@ -1147,7 +1147,7 @@ CREATE INDEX ON bb.relationships (child_id);
 --users
 CREATE INDEX ON bb.users (group_id);
 CREATE INDEX ON bb.users (seq);
-CREATE INDEX ON bb.users (role);
+CREATE INDEX ON bb.users (privilege);
 CREATE INDEX ON bb.users (active);
 
 --journals

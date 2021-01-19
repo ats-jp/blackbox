@@ -178,15 +178,15 @@ public class users
 	public static final String description = "description";
 
 	/**
-	 * name: role<br>
-	 * remarks: 役割<br>
+	 * name: privilege<br>
+	 * remarks: 権限<br>
 	 * 値の小さいほうが強い権限となる<br>
-	 * 0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE<br>
+	 * 0=SYSTEM, 1=ORG, 2=GROUP, 3=USER, 9=NONE<br>
 	 * type: int2(5)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "role", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "役割\n値の小さいほうが強い権限となる\n0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE", defaultValue = "null", ordinalPosition = 6, notNull = true)
-	public static final String role = "role";
+	@Column(name = "privilege", type = 5, typeName = "int2", size = 5, hasDecimalDigits = true, decimalDigits = 0, remarks = "権限\n値の小さいほうが強い権限となる\n0=SYSTEM, 1=ORG, 2=GROUP, 3=USER, 9=NONE", defaultValue = "null", ordinalPosition = 6, notNull = true)
+	public static final String privilege = "privilege";
 
 	/**
 	 * name: revision<br>
@@ -507,35 +507,35 @@ public class users
 
 		/**
 		 * setter
-		 * name: role<br>
-		 * remarks: 役割<br>
+		 * name: privilege<br>
+		 * remarks: 権限<br>
 		 * 値の小さいほうが強い権限となる<br>
-		 * 0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE<br>
+		 * 0=SYSTEM, 1=ORG, 2=GROUP, 3=USER, 9=NONE<br>
 		 * type: int2(5)<br>
 		 * not null: true<br>
 		 * @param value java.lang.Integer
 		 */
-		public void setRole(java.lang.Integer value) {
+		public void setPrivilege(java.lang.Integer value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("role").getType());
-			data$.setValue("role", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("privilege").getType());
+			data$.setValue("privilege", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: role<br>
-		 * remarks: 役割<br>
+		 * name: privilege<br>
+		 * remarks: 権限<br>
 		 * 値の小さいほうが強い権限となる<br>
-		 * 0=SYSTEM_ADMIN, 1=ORG_ADMIN, 2=GROUP_ADMIN, 3=USER, 9=NONE<br>
+		 * 0=SYSTEM, 1=ORG, 2=GROUP, 3=USER, 9=NONE<br>
 		 * type: int2(5)<br>
 		 * not null: true<br>
 		 * @return java.lang.Integer
 		 */
-		public java.lang.Integer getRole() {
-			Binder binder = data$.getValue("role");
+		public java.lang.Integer getPrivilege() {
+			Binder binder = data$.getValue("privilege");
 			return (java.lang.Integer) binder.getValue();
 		}
 
@@ -1890,9 +1890,9 @@ public class users
 		public final T description;
 
 		/**
-		 * 項目名 role
+		 * 項目名 privilege
 		 */
-		public final T role;
+		public final T privilege;
 
 		/**
 		 * 項目名 revision
@@ -1950,7 +1950,7 @@ public class users
 			this.seq = builder$.buildColumn(this, sqlassist.bb.users.seq);
 			this.name = builder$.buildColumn(this, sqlassist.bb.users.name);
 			this.description = builder$.buildColumn(this, sqlassist.bb.users.description);
-			this.role = builder$.buildColumn(this, sqlassist.bb.users.role);
+			this.privilege = builder$.buildColumn(this, sqlassist.bb.users.privilege);
 			this.revision = builder$.buildColumn(this, sqlassist.bb.users.revision);
 			this.props = builder$.buildColumn(this, sqlassist.bb.users.props);
 			this.tags = builder$.buildColumn(this, sqlassist.bb.users.tags);
