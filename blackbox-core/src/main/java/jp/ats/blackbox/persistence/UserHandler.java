@@ -44,7 +44,7 @@ public class UserHandler {
 		row.setId(id);
 		row.setName(request.name);
 		request.description.ifPresent(v -> row.setDescription(v));
-		row.setPrivilege(request.privilege.value());
+		row.setPrivilege(request.privilege.value);
 		row.setGroup_id(request.groupId);
 		row.setSeq(seq);
 		request.tags.ifPresent(v -> row.setTags(v));
