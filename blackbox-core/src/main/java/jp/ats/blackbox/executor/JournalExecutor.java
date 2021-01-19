@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -134,10 +135,10 @@ public class JournalExecutor {
 		return promise;
 	}
 
-	public OverwritePromise overwriteJournal(UUID userId, JournalOverwriteRequest request) {
+	public OverwritePromise overwriteJournal(UUID userId, JournalOverwriteRequest request, Consumer<JournalRegisterRequest> checker) {
 		var promise = new OverwritePromise();
 
-		var command = new OverwriteCommand(promise, Objects.requireNonNull(userId), Objects.requireNonNull(request));
+		var command = new OverwriteCommand(promise, Objects.requireNonNull(userId), Objects.requireNonNull(request), checker);
 
 		ringBuffer.publishEvent((event, sequence, buffer) -> event.set(userId, command, promise));
 
@@ -296,7 +297,7 @@ public class JournalExecutor {
 		var group = pausingGroups.get(groupId);
 		if (group == null) return;
 
-		if (group.willCloseAt.getTime() > willCloseAt.getTime()) new GroupPausingException(group);
+		if (group.willCloseAt.getTime() > willCloseAt.getTime()) throw new GroupPausingException(group);
 	}
 
 	private static void insertErrorLog(Event event, Throwable error) {
@@ -493,13 +494,16 @@ public class JournalExecutor {
 
 		private final JournalOverwriteRequest request;
 
+		private final Consumer<JournalRegisterRequest> checker;
+
 		private final List<UUID> deniedJournals = new LinkedList<>();
 
-		private OverwriteCommand(OverwritePromise promise, UUID userId, JournalOverwriteRequest request) {
+		private OverwriteCommand(OverwritePromise promise, UUID userId, JournalOverwriteRequest request, Consumer<JournalRegisterRequest> checker) {
 			this.promise = promise;
 			this.journalId = promise.getId();
 			this.userId = userId;
 			this.request = request;
+			this.checker = checker;
 		}
 
 		@Override
@@ -532,7 +536,10 @@ public class JournalExecutor {
 			denyRequest.deny_id = journalId;
 
 			try {
-				handler.deny(UUID.randomUUID(), userId, denyRequest, r -> checkPausing(r.group_id, r.fixed_at));
+				handler.deny(UUID.randomUUID(), userId, denyRequest, r -> {
+					checker.accept(r);//取り消すjournalに対して外部のチェック（権限検査を想定）を行う
+					checkPausing(r.group_id, r.fixed_at);
+				});
 			} catch (MinusTotalException e) {
 				//打消し自身はマイナスにはならないので、この例外が出ているということは未来のjournalで発生している
 				//その未来のjournalを打消し
