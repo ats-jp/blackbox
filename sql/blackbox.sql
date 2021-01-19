@@ -351,6 +351,18 @@ INSERT INTO bb.relationships (
 	'00000000-0000-0000-0000-000000000000',
 	0);
 
+--システム用
+INSERT INTO bb.relationships (
+	id,
+	parent_id,
+	child_id,
+	cascade_id
+) VALUES (
+	1,
+	'11111111-1111-1111-1111-111111111111',
+	'11111111-1111-1111-1111-111111111111',
+	0);
+
 ALTER TABLE bb.relationships ADD CONSTRAINT relationships_cascade_id_fkey FOREIGN KEY (cascade_id) REFERENCES bb.relationships ON DELETE CASCADE;
 
 ----------

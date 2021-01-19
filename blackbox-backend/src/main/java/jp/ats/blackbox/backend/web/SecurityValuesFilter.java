@@ -21,7 +21,7 @@ public class SecurityValuesFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		try {
-			SecurityValues.start(U.NULL_ID);
+			SecurityValues.start(U.PRIVILEGE_ID);
 			chain.doFilter(request, response);
 		} finally {
 			SecurityValues.end();

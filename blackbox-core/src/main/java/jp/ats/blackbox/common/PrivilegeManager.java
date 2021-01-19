@@ -31,9 +31,9 @@ public class PrivilegeManager {
 			.orElse(false);
 	}
 
-	public static boolean hasPrivilegeOfGroup(UUID userId, UUID groupId) {
+	public static boolean hasPrivilegeOfGroup(UUID userId, UUID groupId, Privilege privilege) {
 		//自身の属するグループ及びその下部グループに対象のグループがあるか
-		U.recorder.play(
+		return U.recorder.play(
 			() -> new users()
 				.SELECT(a -> a.privilege)
 				.LEFT_OUTER_JOIN(new relationships().SELECT(a -> a.id))
@@ -54,11 +54,9 @@ public class PrivilegeManager {
 					return myPrivilege <= Privilege.ORG.value;
 				}
 
-				//グループ権限以上を持っていれば操作可能
-				return myPrivilege <= Privilege.GROUP.value;
+				//指定された権限以上を持っていれば操作可能
+				return myPrivilege <= privilege.value;
 			});
-
-		return false;
 	}
 
 	public static boolean hasPrivilegeOfUser(UUID userId, UUID subjectUserId) {
@@ -69,7 +67,7 @@ public class PrivilegeManager {
 				.WHERE(a -> a.active.eq(true).AND.id.eq($UUID)),
 			subjectUserId).willUnique().map(r ->
 		//対象者のグループの操作権限を持つか
-		hasPrivilegeOfGroup(userId, r.getGroup_id()))
+		hasPrivilegeOfGroup(userId, r.getGroup_id(), Privilege.USER))
 			.orElse(false);//対象者がいない
 	}
 }

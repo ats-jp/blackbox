@@ -17,6 +17,7 @@ import jp.ats.blackbox.persistence.Requests.JournalDenyRequest;
 import jp.ats.blackbox.persistence.Requests.JournalOverwriteRequest;
 import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
 import jp.ats.blackbox.persistence.Requests.TransientMoveRequest;
+import jp.ats.blackbox.persistence.Privilege;
 import jp.ats.blackbox.persistence.SecurityValues;
 import sqlassist.bb.journals;
 import sqlassist.bb.transients;
@@ -25,14 +26,14 @@ public class JournalController {
 
 	public static JournalPromise register(JournalRegisterRequest request) throws PrivilegeException {
 		var userId = SecurityValues.currentUserId();
-		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id)) throw new PrivilegeException();
+		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id, Privilege.USER)) throw new PrivilegeException();
 
 		return JournalExecutorMap.get(request.group_id).registerJournal(userId, request);
 	}
 
 	public static JournalPromise registerLazily(JournalRegisterRequest request) throws PrivilegeException {
 		var userId = SecurityValues.currentUserId();
-		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id)) throw new PrivilegeException();
+		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id, Privilege.USER)) throw new PrivilegeException();
 
 		return JournalExecutorMap.get(request.group_id).registerJournalLazily(userId, request);
 	}
@@ -46,30 +47,30 @@ public class JournalController {
 			.getGroup_id();
 
 		var userId = SecurityValues.currentUserId();
-		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, groupId)) throw new PrivilegeException();
+		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, groupId, Privilege.USER)) throw new PrivilegeException();
 
 		return JournalExecutorMap.get(groupId).denyJournal(userId, request);
 	}
 
 	public static OverwritePromise overwrite(JournalOverwriteRequest request) throws PrivilegeException {
 		var userId = SecurityValues.currentUserId();
-		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id)) throw new PrivilegeException();
+		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id, Privilege.USER)) throw new PrivilegeException();
 
 		return JournalExecutorMap.get(request.group_id).overwriteJournal(userId, request, r -> {
-			if (!PrivilegeManager.hasPrivilegeOfGroup(userId, r.group_id)) throw new OverwriteDenyFailedException(r.denied_id.get());
+			if (!PrivilegeManager.hasPrivilegeOfGroup(userId, r.group_id, Privilege.USER)) throw new OverwriteDenyFailedException(r.denied_id.get());
 		});
 	}
 
 	public static PausingGroup[] pauseGroups(GroupPauseRequest request) throws CommandFailedException, PrivilegeException, InterruptedException {
 		var userId = SecurityValues.currentUserId();
-		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id)) throw new PrivilegeException();
+		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id, Privilege.USER)) throw new PrivilegeException();
 
 		return JournalExecutorMap.get(request.group_id).pauseGroups(userId, request);
 	}
 
 	public static PausingGroup[] resumeGroups(GroupProcessRequest request) throws CommandFailedException, PrivilegeException, InterruptedException {
 		var userId = SecurityValues.currentUserId();
-		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id)) throw new PrivilegeException();
+		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id, Privilege.USER)) throw new PrivilegeException();
 
 		return JournalExecutorMap.get(request.group_id).resumeGroups(userId, request);
 	}
@@ -80,7 +81,7 @@ public class JournalController {
 
 	public static JournalPromise close(ClosingRequest request) throws PrivilegeException {
 		var userId = SecurityValues.currentUserId();
-		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id)) throw new PrivilegeException();
+		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id, Privilege.USER)) throw new PrivilegeException();
 
 		return JournalExecutorMap.get(request.group_id).close(userId, request);
 	}
@@ -89,7 +90,7 @@ public class JournalController {
 		var groupId = U.recorder.play(() -> new transients().SELECT(a -> a.group_id)).fetch(request.transient_id).orElseThrow(() -> new JournalNotFoundException()).getGroup_id();
 
 		var userId = SecurityValues.currentUserId();
-		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, groupId)) throw new PrivilegeException();
+		if (!PrivilegeManager.hasPrivilegeOfGroup(userId, groupId, Privilege.USER)) throw new PrivilegeException();
 
 		return JournalExecutorMap.get(groupId).moveTransient(userId, request);
 	}

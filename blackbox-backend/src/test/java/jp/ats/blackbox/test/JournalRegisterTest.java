@@ -29,10 +29,10 @@ public class JournalRegisterTest {
 	public static void main(String[] args) throws Exception {
 		Common.startWithLog();
 
-		SecurityValues.start(U.NULL_ID);
+		SecurityValues.start(U.PRIVILEGE_ID);
 
 		var json = Blendee.executeAndGet(t -> {
-			return new Gson().toJson(createRequest(U.NULL_ID));
+			return new Gson().toJson(createRequest(U.PRIVILEGE_ID));
 		});
 
 		var c = HttpClient.newHttpClient();
@@ -55,7 +55,7 @@ public class JournalRegisterTest {
 		var out = new NodeRegisterRequest();
 		var in = new NodeRegisterRequest();
 
-		var unit = UnitHandler.register(U.NULL_ID);
+		var unit = UnitHandler.register(U.PRIVILEGE_ID);
 
 		out.in_out = InOut.OUT;
 		out.quantity = BigDecimal.ONE;
