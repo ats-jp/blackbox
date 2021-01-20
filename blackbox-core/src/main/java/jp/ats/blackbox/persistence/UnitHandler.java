@@ -34,8 +34,9 @@ public class UnitHandler {
 	 */
 	public static units.Row register(
 		UUID userId,
+		UUID groupId,
 		Supplier<units> supplier) {
-		UUID unitId = registerUnit(userId);
+		UUID unitId = registerUnit(userId, groupId);
 
 		registerCurrentUnit(unitId);
 
@@ -49,8 +50,8 @@ public class UnitHandler {
 	/**
 	 * unit登録処理
 	 */
-	public static UUID register(UUID userId) {
-		UUID unitId = registerUnit(userId);
+	public static UUID register(UUID userId, UUID groupId) {
+		UUID unitId = registerUnit(userId, groupId);
 
 		registerCurrentUnit(unitId);
 
@@ -60,7 +61,7 @@ public class UnitHandler {
 	/**
 	 * unit登録処理
 	 */
-	private static UUID registerUnit(UUID userId) {
+	private static UUID registerUnit(UUID userId, UUID groupId) {
 		UUID unitId = UUID.randomUUID();
 
 		U.recorder.play(
@@ -68,11 +69,14 @@ public class UnitHandler {
 				a -> a
 					.INSERT(
 						a.id,
+						a.group_id,
 						a.created_by)
 					.VALUES(
 						$UUID,
+						$UUID,
 						$UUID)),
 			unitId,
+			groupId,
 			userId)
 			.execute();
 

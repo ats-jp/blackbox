@@ -2,10 +2,12 @@ package jp.ats.blackbox.common;
 
 import static org.blendee.sql.Placeholder.$UUID;
 
+import java.util.Set;
 import java.util.UUID;
 
 import jp.ats.blackbox.persistence.Privilege;
 import sqlassist.bb.relationships;
+import sqlassist.bb.units;
 import sqlassist.bb.users;
 
 public class PrivilegeManager {
@@ -29,6 +31,40 @@ public class PrivilegeManager {
 					return myPrivilege <= Privilege.SYSTEM.value;
 				})
 			.orElse(false);
+	}
+
+	/**
+	 * groupIdがgrousIdsすべての親であることを検査
+	 */
+	public static boolean hasPrivilegeOfUnits(UUID groupId, Set<UUID> unitIds) {
+		//INの要素が可変のためRecorderは使用しない
+		return new units()
+			.SELECT(a -> a.COUNT())
+			.LEFT_OUTER_JOIN(new relationships().WHERE(a -> a.id.IS_NULL()))
+			.ON(
+				(l, r) -> r.child_id.eq(l.group_id).AND.parent_id.eq(groupId),
+				(l, r) -> l.id.IN(unitIds.toArray(new UUID[unitIds.size()])))
+			.WHERE(a -> a.OR.$groups().active.eq(false))
+			.executeAndGet(r -> {
+				r.next();
+				return r.getInt(1) == 0;
+			});
+	}
+
+	public static boolean hasPrivilegeOfUnit(UUID groupId, UUID unitId) {
+		return U.recorder.play(
+			() -> new units()
+				.SELECT(a -> a.COUNT())
+				.LEFT_OUTER_JOIN(new relationships().WHERE(a -> a.id.IS_NULL()))
+				.ON(
+					(l, r) -> r.child_id.eq(l.group_id).AND.parent_id.eq($UUID),
+					(l, r) -> l.id.eq($UUID))
+				.WHERE(a -> a.OR.$groups().active.eq(false)),
+			groupId,
+			unitId).executeAndGet(r -> {
+				r.next();
+				return r.getInt(1) == 0;
+			});
 	}
 
 	public static boolean hasPrivilegeOfGroup(UUID userId, UUID groupId, Privilege privilege) {

@@ -25,7 +25,7 @@ public class UnitHandlerTest {
 
 	static UUID register() {
 		return Blendee.executeAndGet(t -> {
-			return UnitHandler.register(U.NULL_ID, () -> new units().SELECT(a -> a.id)).getId();
+			return UnitHandler.register(U.NULL_ID, U.NULL_ID, () -> new units().SELECT(a -> a.id)).getId();
 		});
 	}
 }

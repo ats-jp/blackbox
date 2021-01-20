@@ -42,6 +42,7 @@ public class JournalRegisterTest {
 			.uri(URI.create("http://localhost:8080/api/journals/register"))
 			.build();
 
+		var start = System.currentTimeMillis();
 		IntStream.range(0, 100).forEach(i -> {
 			try {
 				System.out.println(i + "\t" + c.send(req, BodyHandlers.ofString()).body());
@@ -49,13 +50,15 @@ public class JournalRegisterTest {
 				throw new IllegalStateException(e);
 			}
 		});
+
+		System.out.println(System.currentTimeMillis() - start);
 	}
 
 	private static JournalRegisterRequest createRequest(UUID groupId) {
 		var out = new NodeRegisterRequest();
 		var in = new NodeRegisterRequest();
 
-		var unit = UnitHandler.register(U.PRIVILEGE_ID);
+		var unit = UnitHandler.register(U.PRIVILEGE_ID, U.PRIVILEGE_ID);
 
 		out.in_out = InOut.OUT;
 		out.quantity = BigDecimal.ONE;

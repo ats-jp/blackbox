@@ -17,7 +17,6 @@ import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
 import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
 import jp.ats.blackbox.persistence.SecurityValues;
 import jp.ats.blackbox.persistence.UnitHandler;
-import sqlassist.bb.units;
 import sqlassist.bb_account.group_accounts;
 import sqlassist.bb_account.subaccounts;
 
@@ -150,7 +149,7 @@ public class AccountingJournal {
 
 	private UUID register(UUID groupId, UUID subaccountId) {
 		var userId = SecurityValues.currentUserId();
-		var unitId = UnitHandler.register(userId, () -> new units().SELECT(a -> a.id)).getId();
+		var unitId = UnitHandler.register(userId, groupId);
 
 		recorder.play(
 			() -> new group_accounts().insertStatement(

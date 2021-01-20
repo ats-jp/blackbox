@@ -143,7 +143,7 @@ public class StockHandler {
 		Supplier<stocks> supplier,
 		UUID userId,
 		StockComponents components) {
-		UUID id = UnitHandler.register(userId);
+		UUID id = UnitHandler.register(userId, components.groupId());
 
 		U.recorder.play(
 			() -> new stocks().insertStatement(

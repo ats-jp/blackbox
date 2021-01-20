@@ -586,6 +586,7 @@ COMMENT ON COLUMN bb.last_closings.closed_at IS '締め時刻';
 --管理対象
 CREATE TABLE bb.units (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL);
 --log対象外
@@ -594,11 +595,12 @@ CREATE TABLE bb.units (
 COMMENT ON TABLE bb.units IS '管理対象
 Blackboxで数量管理する管理対象の最小単位';
 COMMENT ON COLUMN bb.units.id IS 'ID';
+COMMENT ON COLUMN bb.units.group_id IS 'グループID';
 COMMENT ON COLUMN bb.units.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.units.created_by IS '作成ユーザー';
 
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
-INSERT INTO bb.units (id, created_by) VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
+INSERT INTO bb.units (id, group_id, created_by) VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000');
 
 --===========================
 --journal tables

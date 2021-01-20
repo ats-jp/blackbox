@@ -34,7 +34,8 @@ public class Application {
 		context.setInitParameter("blendee-transaction-factory-class", "org.blendee.util.DriverManagerTransactionFactory");
 		context.setInitParameter("blendee-error-converter-class", "org.blendee.dialect.postgresql.PostgreSQLErrorConverter");
 		context.setInitParameter("blendee-use-lazy-transaction", "true");
-		context.setInitParameter("blendee-logger-class", "org.blendee.jdbc.VoidLogger");
+		context.setInitParameter("blendee-logger-class", config.getProperty("logger-class"));
+		context.setInitParameter("blendee-log-stacktrace-filter", "blackbox");
 		context.setInitParameter("blendee-table-facade-package", "sqlassist");
 
 		context.setInitParameter("blendee-jdbc-driver-class-name", "org.postgresql.Driver");

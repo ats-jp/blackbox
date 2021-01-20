@@ -26,6 +26,7 @@ public class Utils {
 	}
 
 	public static String handleError(Throwable t) {
+		t.printStackTrace();
 		logger.fatal(t);
 
 		var result = new IdResult();

@@ -20,7 +20,7 @@ public class JournalExecutorTest {
 
 	public static void main(String[] args) throws Exception {
 		JournalCommon.start();
-		//TransferCommon.startWithLog();
+		//JournalCommon.startWithLog();
 
 		SecurityValues.start(U.NULL_ID);
 		execute(GroupHandlerTest.register(), 100, 5);
