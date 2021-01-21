@@ -25,11 +25,11 @@ class JournalPreparer {
 		Timestamp createdAt,
 		Journal journal,
 		Recorder recorder) {
-		var group = recorder.play(() -> new groups().SELECT(a -> a.ls(a.props, a.$orgs().props)))
+		var group = recorder.play(() -> new groups().SELECT(a -> a.ls(a.props, a.$orgs().props, a.$orgs().revision, a.revision)))
 			.fetch(request.group_id)
 			.orElseThrow(() -> new DataNotFoundException(groups.$TABLE, request.group_id));
 
-		var user = recorder.play(() -> new users().SELECT(r -> r.props))
+		var user = recorder.play(() -> new users().SELECT(r -> r.ls(r.props, r.revision)))
 			.fetch(userId)
 			.orElseThrow(() -> new DataNotFoundException(users.$TABLE, userId));
 
@@ -54,6 +54,10 @@ class JournalPreparer {
 		journal.setGroup_props(group.getProps());
 		journal.setOrg_props(group.$orgs().getProps());
 		journal.setUser_props(user.getProps());
+
+		journal.setGroup_revision(group.getRevision());
+		journal.setOrg_revision(group.$orgs().getRevision());
+		journal.setUser_revision(user.getRevision());
 
 		request.tags.ifPresent(v -> journal.setTags(v));
 
@@ -121,6 +125,12 @@ class JournalPreparer {
 
 		void setUser_props(Object json);
 
+		void setGroup_revision(Long revision);
+
+		void setOrg_revision(Long revision);
+
+		void setUser_revision(Long revision);
+
 		void setTags(Object tags);
 
 		void setInstance_id(UUID id);
@@ -156,5 +166,7 @@ class JournalPreparer {
 		void setProps(Object json);
 
 		void setUnit_props(Object json);
+
+		void setUnit_group_revision(Long revision);
 	}
 }

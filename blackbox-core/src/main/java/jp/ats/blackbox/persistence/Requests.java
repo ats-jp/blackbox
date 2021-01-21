@@ -126,6 +126,11 @@ public class Requests {
 		 * DBから復元した追加情報JSON
 		 */
 		Optional<Object> restored_unit_props = Optional.empty();
+
+		/**
+		 * 登録時のunitのグループのリビジョン番号
+		 */
+		public Optional<Long> unit_group_revision = Optional.empty();
 	}
 
 	/**
@@ -164,7 +169,7 @@ public class Requests {
 		/**
 		 * 追加情報JSON
 		 */
-		public Optional<String> journalProps = Optional.empty();
+		public Optional<String> journal_props = Optional.empty();
 
 		/**
 		 * 検索用タグ
@@ -174,7 +179,7 @@ public class Requests {
 		/**
 		 * 追加情報JSON
 		 */
-		public Optional<String> detailProps = Optional.empty();
+		public Optional<String> detail_props = Optional.empty();
 
 		/**
 		 * unit
@@ -196,7 +201,7 @@ public class Requests {
 		/**
 		 * 追加情報JSON
 		 */
-		public Optional<String> nodeProps = Optional.empty();
+		public Optional<String> nodep_props = Optional.empty();
 	}
 
 	/**

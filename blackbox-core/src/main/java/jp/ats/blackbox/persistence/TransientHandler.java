@@ -123,6 +123,18 @@ public class TransientHandler {
 		}
 
 		@Override
+		public void setGroup_revision(Long revision) {
+		}
+
+		@Override
+		public void setOrg_revision(Long revision) {
+		}
+
+		@Override
+		public void setUser_revision(Long revision) {
+		}
+
+		@Override
 		public void setInstance_id(UUID id) {
 		}
 
@@ -272,6 +284,10 @@ public class TransientHandler {
 
 		@Override
 		public void setUnit_props(Object json) {
+		}
+
+		@Override
+		public void setUnit_group_revision(Long revision) {
 		}
 	}
 

@@ -261,12 +261,42 @@ public class journals
 	public static final String user_props = "user_props";
 
 	/**
+	 * name: org_revision<br>
+	 * remarks: 登録時の組織のリビジョン番号<br>
+	 * 登録当時の組織の状態を確認するために使用<br>
+	 * type: int8(19)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "org_revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録時の組織のリビジョン番号\n登録当時の組織の状態を確認するために使用", defaultValue = "null", ordinalPosition = 15, notNull = true)
+	public static final String org_revision = "org_revision";
+
+	/**
+	 * name: group_revision<br>
+	 * remarks: 登録時のグループのリビジョン番号<br>
+	 * 登録当時のグループの状態を確認するために使用<br>
+	 * type: int8(19)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "group_revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録時のグループのリビジョン番号\n登録当時のグループの状態を確認するために使用", defaultValue = "null", ordinalPosition = 16, notNull = true)
+	public static final String group_revision = "group_revision";
+
+	/**
+	 * name: user_revision<br>
+	 * remarks: 登録時の作成ユーザーのリビジョン番号<br>
+	 * 登録当時のユーザーの状態を確認するために使用<br>
+	 * type: int8(19)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "user_revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録時の作成ユーザーのリビジョン番号\n登録当時のユーザーの状態を確認するために使用", defaultValue = "null", ordinalPosition = 17, notNull = true)
+	public static final String user_revision = "user_revision";
+
+	/**
 	 * name: created_at<br>
 	 * remarks: 作成時刻<br>
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "null", ordinalPosition = 15, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "null", ordinalPosition = 18, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -275,7 +305,7 @@ public class journals
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 16, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 19, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -813,6 +843,102 @@ public class journals
 		public java.lang.Object getUser_props() {
 			Binder binder = data$.getValue("user_props");
 			return binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: org_revision<br>
+		 * remarks: 登録時の組織のリビジョン番号<br>
+		 * 登録当時の組織の状態を確認するために使用<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @param value java.lang.Long
+		 */
+		public void setOrg_revision(java.lang.Long value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("org_revision").getType());
+			data$.setValue("org_revision", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: org_revision<br>
+		 * remarks: 登録時の組織のリビジョン番号<br>
+		 * 登録当時の組織の状態を確認するために使用<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @return java.lang.Long
+		 */
+		public java.lang.Long getOrg_revision() {
+			Binder binder = data$.getValue("org_revision");
+			return (java.lang.Long) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: group_revision<br>
+		 * remarks: 登録時のグループのリビジョン番号<br>
+		 * 登録当時のグループの状態を確認するために使用<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @param value java.lang.Long
+		 */
+		public void setGroup_revision(java.lang.Long value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("group_revision").getType());
+			data$.setValue("group_revision", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: group_revision<br>
+		 * remarks: 登録時のグループのリビジョン番号<br>
+		 * 登録当時のグループの状態を確認するために使用<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @return java.lang.Long
+		 */
+		public java.lang.Long getGroup_revision() {
+			Binder binder = data$.getValue("group_revision");
+			return (java.lang.Long) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: user_revision<br>
+		 * remarks: 登録時の作成ユーザーのリビジョン番号<br>
+		 * 登録当時のユーザーの状態を確認するために使用<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @param value java.lang.Long
+		 */
+		public void setUser_revision(java.lang.Long value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("user_revision").getType());
+			data$.setValue("user_revision", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: user_revision<br>
+		 * remarks: 登録時の作成ユーザーのリビジョン番号<br>
+		 * 登録当時のユーザーの状態を確認するために使用<br>
+		 * type: int8(19)<br>
+		 * not null: true<br>
+		 * @return java.lang.Long
+		 */
+		public java.lang.Long getUser_revision() {
+			Binder binder = data$.getValue("user_revision");
+			return (java.lang.Long) binder.getValue();
 		}
 
 		/**
@@ -2055,6 +2181,21 @@ public class journals
 		public final T user_props;
 
 		/**
+		 * 項目名 org_revision
+		 */
+		public final T org_revision;
+
+		/**
+		 * 項目名 group_revision
+		 */
+		public final T group_revision;
+
+		/**
+		 * 項目名 user_revision
+		 */
+		public final T user_revision;
+
+		/**
 		 * 項目名 created_at
 		 */
 		public final T created_at;
@@ -2089,6 +2230,9 @@ public class journals
 			this.org_props = builder$.buildColumn(this, sqlassist.bb.journals.org_props);
 			this.group_props = builder$.buildColumn(this, sqlassist.bb.journals.group_props);
 			this.user_props = builder$.buildColumn(this, sqlassist.bb.journals.user_props);
+			this.org_revision = builder$.buildColumn(this, sqlassist.bb.journals.org_revision);
+			this.group_revision = builder$.buildColumn(this, sqlassist.bb.journals.group_revision);
+			this.user_revision = builder$.buildColumn(this, sqlassist.bb.journals.user_revision);
 			this.created_at = builder$.buildColumn(this, sqlassist.bb.journals.created_at);
 			this.created_by = builder$.buildColumn(this, sqlassist.bb.journals.created_by);
 		}

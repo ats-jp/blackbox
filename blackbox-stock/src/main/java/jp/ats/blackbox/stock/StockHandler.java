@@ -97,7 +97,8 @@ public class StockHandler {
 					a.$items().props,
 					a.$owners().props,
 					a.$locations().props,
-					a.$statuses().props)),
+					a.$statuses().props,
+					a.$groups().revision)),
 			userId,
 			components);
 
@@ -114,6 +115,8 @@ public class StockHandler {
 		props.status_props = gson.fromJson(U.fromPGObject(stock.$statuses().getProps()), Map.class);
 
 		request.unit_props = Optional.of(gson.toJson(props));
+
+		request.unit_group_revision = stock.$groups().getRevision();
 
 		return request;
 	}

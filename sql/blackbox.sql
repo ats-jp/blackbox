@@ -639,6 +639,9 @@ CREATE TABLE bb.journals (
 	org_props jsonb NOT NULL,
 	group_props jsonb NOT NULL,
 	user_props jsonb NOT NULL,
+	org_revision bigint NOT NULL,
+	group_revision bigint NOT NULL,
+	user_revision bigint NOT NULL,
 	created_at timestamptz NOT NULL, --Javaから指定するためDEFAULTなし
 	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, seq),
@@ -665,6 +668,12 @@ COMMENT ON COLUMN bb.journals.deny_reason IS '取消理由';
 COMMENT ON COLUMN bb.journals.org_props IS '組織のprops';
 COMMENT ON COLUMN bb.journals.group_props IS 'グループのprops';
 COMMENT ON COLUMN bb.journals.user_props IS '作成ユーザーのprops';
+COMMENT ON COLUMN bb.journals.org_revision IS '登録時の組織のリビジョン番号
+登録当時の組織の状態を確認するために使用';
+COMMENT ON COLUMN bb.journals.group_revision IS '登録時のグループのリビジョン番号
+登録当時のグループの状態を確認するために使用';
+COMMENT ON COLUMN bb.journals.user_revision IS '登録時の作成ユーザーのリビジョン番号
+登録当時のユーザーの状態を確認するために使用';
 COMMENT ON COLUMN bb.journals.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.journals.created_by IS '作成ユーザー';
 
@@ -678,6 +687,9 @@ INSERT INTO bb.journals (
 	org_props,
 	group_props,
 	user_props,
+	org_revision,
+	group_revision,
+	user_revision,
 	created_at,
 	created_by
 ) VALUES (
@@ -689,6 +701,9 @@ INSERT INTO bb.journals (
 	'{}',
 	'{}',
 	'{}',
+	0,
+	0,
+	0,
 	now(),
 	'00000000-0000-0000-0000-000000000000');
 
@@ -748,7 +763,8 @@ CREATE TABLE bb.nodes (
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
-	unit_props jsonb DEFAULT '{}' NOT NULL);
+	unit_props jsonb DEFAULT '{}' NOT NULL,
+	unit_group_revision bigint NOT NULL);
 --log対象外
 
 COMMENT ON TABLE bb.nodes IS '伝票明細ノード
@@ -765,6 +781,8 @@ COMMENT ON COLUMN bb.nodes.grants_unlimited IS '数量無制限の許可
 trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない';
 COMMENT ON COLUMN bb.nodes.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.nodes.unit_props IS '管理対象のprops';
+COMMENT ON COLUMN bb.nodes.unit_group_revision IS '管理対象のグループのリビジョン番号
+登録当時の管理対象の属するグループの状態を確認するために使用';
 
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.nodes (
@@ -773,12 +791,14 @@ INSERT INTO bb.nodes (
 	unit_id,
 	in_out,
 	seq,
-	quantity
+	quantity,
+	unit_group_revision
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	-1,
+	0,
 	0,
 	0);
 

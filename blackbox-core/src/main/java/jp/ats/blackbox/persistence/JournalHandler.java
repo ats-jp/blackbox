@@ -38,6 +38,7 @@ import sqlassist.bb.journals;
 import sqlassist.bb.journals_tags;
 import sqlassist.bb.nodes;
 import sqlassist.bb.snapshots;
+import sqlassist.bb.units;
 
 /**
  * journal操作クラス
@@ -264,6 +265,13 @@ public class JournalHandler {
 		var nodeSeq = ++this.nodeSeq;
 
 		JournalPreparer.prepareNode(detailId, nodeId, request, node, nodeSeq, recorder);
+
+		node.setUnit_group_revision(
+			request.unit_group_revision.orElseGet(
+				() -> recorder.play(
+					() -> new units().SELECT(a -> a.$groups().revision)
+						.WHERE(a -> a.id.eq($UUID)),
+					request.unit_id).willUnique().get().$groups().getRevision()));
 
 		node.insert();
 
@@ -517,7 +525,7 @@ public class JournalHandler {
 
 		var detailRequest = new DetailRegisterRequest();
 		detailRequest.nodes = new NodeRegisterRequest[] { out, in };
-		detailRequest.props = request.detailProps;
+		detailRequest.props = request.detail_props;
 
 		var journalRequest = new JournalRegisterRequest();
 		journalRequest.group_id = request.group_id;
@@ -525,7 +533,7 @@ public class JournalHandler {
 		journalRequest.description = request.description;
 		journalRequest.details = new DetailRegisterRequest[] { detailRequest };
 		journalRequest.tags = request.tags;
-		journalRequest.props = request.journalProps;
+		journalRequest.props = request.journal_props;
 
 		checker.accept(journalRequest);
 
