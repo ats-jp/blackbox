@@ -116,7 +116,7 @@ public class StockHandler {
 
 		request.unit_props = Optional.of(gson.toJson(props));
 
-		request.unit_group_revision = stock.$groups().getRevision();
+		request.unit_group_revision = Optional.of(stock.$groups().getRevision());
 
 		return request;
 	}
