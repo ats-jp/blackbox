@@ -1,4 +1,4 @@
-package jp.ats.blackbox.backend.controller;
+package jp.ats.blackbox.controller;
 
 import java.util.Arrays;
 import java.util.UUID;

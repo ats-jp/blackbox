@@ -11,8 +11,8 @@ import javax.ws.rs.core.MediaType;
 
 import jp.ats.blackbox.backend.api.Utils.IdResult;
 import jp.ats.blackbox.backend.api.Utils.JsonProcessingException;
-import jp.ats.blackbox.backend.controller.JournalController;
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.controller.JournalController;
 import jp.ats.blackbox.executor.CommandFailedException;
 import jp.ats.blackbox.persistence.Requests.ClosingRequest;
 

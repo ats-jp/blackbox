@@ -108,6 +108,8 @@ INSERT INTO bb.instances VALUES (
 
 ----------
 
+CREATE SEQUENCE bb.group_tree_revision_seq;
+
 --組織
 CREATE TABLE bb.orgs (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -116,6 +118,7 @@ CREATE TABLE bb.orgs (
 	name text NOT NULL,
 	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
+	group_tree_revision bigint NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
@@ -134,12 +137,27 @@ COMMENT ON COLUMN bb.orgs.seq IS 'インスタンス内連番';
 COMMENT ON COLUMN bb.orgs.name IS '名称';
 COMMENT ON COLUMN bb.orgs.description IS '補足事項';
 COMMENT ON COLUMN bb.orgs.revision IS 'リビジョン番号';
+COMMENT ON COLUMN bb.orgs.group_tree_revision IS 'グループ階層リビジョン番号
+この組織のグループ階層の現在のリビジョン番号';
 COMMENT ON COLUMN bb.orgs.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.orgs.active IS 'アクティブフラグ';
 COMMENT ON COLUMN bb.orgs.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.orgs.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.orgs.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.orgs.updated_by IS '更新ユーザー';
+
+CREATE FUNCTION bb.org_group_tree_revisionfunction() RETURNS TRIGGER AS $org_group_tree_revisiontrigger$
+	DECLARE
+		currval bigint;
+	BEGIN
+		SELECT last_value INTO currval FROM bb.group_tree_revision_seq;
+		NEW.group_tree_revision := currval;
+		RETURN NEW;
+	END
+$org_group_tree_revisiontrigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER org_group_tree_revisiontrigger BEFORE INSERT ON bb.orgs
+FOR EACH ROW EXECUTE PROCEDURE bb.org_group_tree_revisionfunction();
 
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.orgs (
@@ -196,6 +214,7 @@ CREATE TABLE bb.groups (
 	description text DEFAULT '' NOT NULL,
 	parent_id uuid REFERENCES bb.groups NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
+	tree_revision bigint DEFAULT nextval('bb.group_tree_revision_seq') UNIQUE NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
 	active boolean DEFAULT true NOT NULL,
@@ -219,6 +238,9 @@ COMMENT ON COLUMN bb.groups.name IS '名称';
 COMMENT ON COLUMN bb.groups.description IS '補足事項';
 COMMENT ON COLUMN bb.groups.parent_id IS '親グループID';
 COMMENT ON COLUMN bb.groups.revision IS 'リビジョン番号';
+COMMENT ON COLUMN bb.groups.tree_revision IS 'グループ階層リビジョン番号
+グループの階層構造が変更されるたびに増加するリビジョン番号
+実態は組織ごとの連番だが、シーケンスの最大値が大きいので簡略化のため全体に対する連番とする';
 COMMENT ON COLUMN bb.groups.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb.groups.tags IS 'log保存用タグ';
 COMMENT ON COLUMN bb.groups.active IS 'アクティブフラグ';
@@ -226,6 +248,19 @@ COMMENT ON COLUMN bb.groups.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.groups.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.groups.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.groups.updated_by IS '更新ユーザー';
+
+CREATE FUNCTION bb.group_tree_revisionfunction() RETURNS TRIGGER AS $group_tree_revisiontrigger$
+	BEGIN
+		IF (OLD.parent_id <> NEW.parent_id) THEN
+			NEW.tree_revision := nextval('bb.group_tree_revision_seq');
+			UPDATE bb.orgs SET group_tree_revision = NEW.tree_revision WHERE id = NEW.org_id;
+		END IF;
+		RETURN NEW;
+	END;
+$group_tree_revisiontrigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER group_tree_revisiontrigger BEFORE UPDATE ON bb.groups
+FOR EACH ROW EXECUTE PROCEDURE bb.group_tree_revisionfunction();
 
 --NULLの代用(id=0)
 INSERT INTO bb.groups (
@@ -642,6 +677,7 @@ CREATE TABLE bb.journals (
 	org_revision bigint NOT NULL,
 	group_revision bigint NOT NULL,
 	user_revision bigint NOT NULL,
+	group_tree_revision bigint NOT NULL,
 	created_at timestamptz NOT NULL, --Javaから指定するためDEFAULTなし
 	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, seq),
@@ -674,6 +710,8 @@ COMMENT ON COLUMN bb.journals.group_revision IS '登録時のグループのリ�
 登録当時のグループの状態を確認するために使用';
 COMMENT ON COLUMN bb.journals.user_revision IS '登録時の作成ユーザーのリビジョン番号
 登録当時のユーザーの状態を確認するために使用';
+COMMENT ON COLUMN bb.journals.group_tree_revision IS '登録時のグループ階層リビジョン番号
+登録当時のグループ階層状態を確認するために使用';
 COMMENT ON COLUMN bb.journals.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.journals.created_by IS '作成ユーザー';
 
@@ -690,6 +728,7 @@ INSERT INTO bb.journals (
 	org_revision,
 	group_revision,
 	user_revision,
+	group_tree_revision,
 	created_at,
 	created_by
 ) VALUES (
@@ -701,6 +740,7 @@ INSERT INTO bb.journals (
 	'{}',
 	'{}',
 	'{}',
+	0,
 	0,
 	0,
 	0,

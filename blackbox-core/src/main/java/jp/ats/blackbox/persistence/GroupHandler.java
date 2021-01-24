@@ -30,12 +30,6 @@ public class GroupHandler {
 		BlendeeManager.get().getCurrentTransaction().commit();
 	}
 
-	public static void lockChildren(UUID groupId, UUID userId) {
-		var children = new LinkedHashSet<UUID>();
-		collectChildren(groupId, children);
-		lock(groupId, children, userId);
-	}
-
 	private static void lockRelatingGroupsInternal(UUID groupId, UUID parentId, UUID userId) {
 		if (groupId.equals(parentId)) {
 			throw new CycleGroupException(groupId);

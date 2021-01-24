@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
@@ -59,7 +60,9 @@ public class JournalExecutor {
 
 	private final Map<UUID, PausingGroup> pausingGroups = new HashMap<>();
 
-	private AtomicBoolean started = new AtomicBoolean(false);
+	private final AtomicBoolean started = new AtomicBoolean(false);
+
+	private final ReentrantLock groupTreeLock = new ReentrantLock();
 
 	public JournalExecutor() {
 		this(256);
@@ -69,7 +72,12 @@ public class JournalExecutor {
 		disruptor = new Disruptor<>(Event::new, bufferSize, DaemonThreadFactory.INSTANCE);
 
 		disruptor.handleEventsWith((event, sequence, endOfBatch) -> {
-			execute(event);
+			lock();
+			try {
+				execute(event);
+			} finally {
+				unlock();
+			}
 		});
 
 		ringBuffer = disruptor.getRingBuffer();
@@ -92,6 +100,15 @@ public class JournalExecutor {
 		}
 
 		disruptor.shutdown();
+	}
+
+	//group登録更新時にロックを取得する
+	public void lock() {
+		groupTreeLock.lock();
+	}
+
+	public void unlock() {
+		groupTreeLock.unlock();
 	}
 
 	public boolean isEmpty() {
@@ -583,7 +600,7 @@ public class JournalExecutor {
 
 		@Override
 		public void execute() {
-			GroupHandler.lockChildren(origin.groupId, userId);
+			GroupHandler.lock(origin.groupId, userId);
 
 			synchronized (groups) {
 				pausingGroups.put(origin.groupId, origin);
@@ -705,18 +722,13 @@ public class JournalExecutor {
 
 		@Override
 		public void execute() {
-			try {
-				GroupHandler.lockChildren(request.group_id, userId);
-				ClosingHandler.close(closingId, userId, request);
+			ClosingHandler.close(closingId, userId, request);
 
-				pausingGroups.remove(request.group_id);
+			pausingGroups.remove(request.group_id);
 
-				GroupHandler.children(request.group_id).forEach(e -> {
-					pausingGroups.remove(e);
-				});
-			} finally {
-				GroupHandler.unlock(request.group_id);
-			}
+			GroupHandler.children(request.group_id).forEach(e -> {
+				pausingGroups.remove(e);
+			});
 		}
 
 		@Override

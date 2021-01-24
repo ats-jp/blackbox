@@ -196,12 +196,23 @@ public class groups
 	public static final String revision = "revision";
 
 	/**
+	 * name: tree_revision<br>
+	 * remarks: グループ階層リビジョン番号<br>
+	 * グループの階層構造が変更されるたびに増加するリビジョン番号<br>
+	 * 実態は組織ごとの連番だが、シーケンスの最大値が大きいので簡略化のため全体に対する連番とする<br>
+	 * type: bigserial(19)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "tree_revision", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループ階層リビジョン番号\nグループの階層構造が変更されるたびに増加するリビジョン番号\n実態は組織ごとの連番だが、シーケンスの最大値が大きいので簡略化のため全体に対する連番とする", defaultValue = "nextval('bb.group_tree_revision_seq'::regclass)", ordinalPosition = 8, notNull = true)
+	public static final String tree_revision = "tree_revision";
+
+	/**
 	 * name: props<br>
 	 * remarks: 外部アプリケーション情報JSON<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
 	public static final String props = "props";
 
 	/**
@@ -210,7 +221,7 @@ public class groups
 	 * type: _text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "log保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 9, notNull = true)
+	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "log保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 10, notNull = true)
 	public static final String tags = "tags";
 
 	/**
@@ -219,7 +230,7 @@ public class groups
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "active", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "アクティブフラグ", defaultValue = "true", ordinalPosition = 10, notNull = true)
+	@Column(name = "active", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "アクティブフラグ", defaultValue = "true", ordinalPosition = 11, notNull = true)
 	public static final String active = "active";
 
 	/**
@@ -228,7 +239,7 @@ public class groups
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 11, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 12, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -237,7 +248,7 @@ public class groups
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 12, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 13, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -246,7 +257,7 @@ public class groups
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 13, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 14, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -255,7 +266,7 @@ public class groups
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 14, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 15, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -568,6 +579,40 @@ public class groups
 		 */
 		public java.lang.Long getRevision() {
 			Binder binder = data$.getValue("revision");
+			return (java.lang.Long) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: tree_revision<br>
+		 * remarks: グループ階層リビジョン番号<br>
+		 * グループの階層構造が変更されるたびに増加するリビジョン番号<br>
+		 * 実態は組織ごとの連番だが、シーケンスの最大値が大きいので簡略化のため全体に対する連番とする<br>
+		 * type: bigserial(19)<br>
+		 * not null: true<br>
+		 * @param value java.lang.Long
+		 */
+		public void setTree_revision(java.lang.Long value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("tree_revision").getType());
+			data$.setValue("tree_revision", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: tree_revision<br>
+		 * remarks: グループ階層リビジョン番号<br>
+		 * グループの階層構造が変更されるたびに増加するリビジョン番号<br>
+		 * 実態は組織ごとの連番だが、シーケンスの最大値が大きいので簡略化のため全体に対する連番とする<br>
+		 * type: bigserial(19)<br>
+		 * not null: true<br>
+		 * @return java.lang.Long
+		 */
+		public java.lang.Long getTree_revision() {
+			Binder binder = data$.getValue("tree_revision");
 			return (java.lang.Long) binder.getValue();
 		}
 
@@ -1914,6 +1959,11 @@ public class groups
 		public final T revision;
 
 		/**
+		 * 項目名 tree_revision
+		 */
+		public final T tree_revision;
+
+		/**
 		 * 項目名 props
 		 */
 		public final T props;
@@ -1966,6 +2016,7 @@ public class groups
 			this.description = builder$.buildColumn(this, sqlassist.bb.groups.description);
 			this.parent_id = builder$.buildColumn(this, sqlassist.bb.groups.parent_id);
 			this.revision = builder$.buildColumn(this, sqlassist.bb.groups.revision);
+			this.tree_revision = builder$.buildColumn(this, sqlassist.bb.groups.tree_revision);
 			this.props = builder$.buildColumn(this, sqlassist.bb.groups.props);
 			this.tags = builder$.buildColumn(this, sqlassist.bb.groups.tags);
 			this.active = builder$.buildColumn(this, sqlassist.bb.groups.active);
