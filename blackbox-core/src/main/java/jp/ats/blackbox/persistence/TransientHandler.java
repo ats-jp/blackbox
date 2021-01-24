@@ -135,6 +135,10 @@ public class TransientHandler {
 		}
 
 		@Override
+		public void setGroup_tree_revision(Long revision) {
+		}
+
+		@Override
 		public void setInstance_id(UUID id) {
 		}
 

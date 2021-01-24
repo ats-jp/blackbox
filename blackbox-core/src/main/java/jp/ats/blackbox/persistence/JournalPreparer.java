@@ -25,7 +25,14 @@ class JournalPreparer {
 		Timestamp createdAt,
 		Journal journal,
 		Recorder recorder) {
-		var group = recorder.play(() -> new groups().SELECT(a -> a.ls(a.props, a.$orgs().props, a.$orgs().revision, a.revision)))
+		var group = recorder.play(
+			() -> new groups().SELECT(
+				a -> a.ls(
+					a.props,
+					a.$orgs().props,
+					a.$orgs().revision,
+					a.revision,
+					a.$orgs().group_tree_revision)))
 			.fetch(request.group_id)
 			.orElseThrow(() -> new DataNotFoundException(groups.$TABLE, request.group_id));
 
@@ -58,6 +65,8 @@ class JournalPreparer {
 		journal.setGroup_revision(group.getRevision());
 		journal.setOrg_revision(group.$orgs().getRevision());
 		journal.setUser_revision(user.getRevision());
+
+		journal.setGroup_tree_revision(group.$orgs().getGroup_tree_revision());
 
 		request.tags.ifPresent(v -> journal.setTags(v));
 
@@ -130,6 +139,8 @@ class JournalPreparer {
 		void setOrg_revision(Long revision);
 
 		void setUser_revision(Long revision);
+
+		void setGroup_tree_revision(Long revision);
 
 		void setTags(Object tags);
 
