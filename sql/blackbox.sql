@@ -398,6 +398,8 @@ INSERT INTO bb.relationships (
 	'11111111-1111-1111-1111-111111111111',
 	0);
 
+SELECT setval('bb.relationships_id_seq', 2);
+
 ALTER TABLE bb.relationships ADD CONSTRAINT relationships_cascade_id_fkey FOREIGN KEY (cascade_id) REFERENCES bb.relationships ON DELETE CASCADE;
 
 ----------
