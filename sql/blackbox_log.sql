@@ -46,6 +46,7 @@ CREATE TABLE bb_log.orgs (
 	name text,
 	description text,
 	revision bigint,
+	group_tree_revision bigint,
 	props jsonb,
 	active boolean,
 	created_at timestamptz,
@@ -87,6 +88,7 @@ CREATE TABLE bb_log.groups (
 	description text,
 	parent_id uuid,
 	revision bigint,
+	tree_revision bigint,
 	props jsonb,
 	tags text[],
 	active boolean,
@@ -127,7 +129,7 @@ CREATE TABLE bb_log.users (
 	seq bigint,
 	name text,
 	description text,
-	role smallint,
+	privilege smallint,
 	revision bigint,
 	props jsonb,
 	tags text[],
@@ -160,6 +162,78 @@ $users_logtrigger$ LANGUAGE plpgsql;
 
 CREATE TRIGGER users_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.users
 FOR EACH ROW EXECUTE PROCEDURE bb_log.users_logfunction();
+
+----------
+
+CREATE TABLE bb_log.executors (
+	id uuid,
+	org_id uuid,
+	seq bigint,
+	name text,
+	description text,
+	revision bigint,
+	props jsonb,
+	active boolean,
+	created_at timestamptz,
+	created_by uuid,
+	updated_at timestamptz,
+	updated_by uuid,
+	action "char",
+	log_id bigserial PRIMARY KEY,
+	txid bigint DEFAULT txid_current(),
+	logged_by name DEFAULT current_user,
+	logged_at timestamptz DEFAULT now());
+
+CREATE FUNCTION bb_log.executors_logfunction() RETURNS TRIGGER AS $executors_logtrigger$
+	BEGIN
+		IF (TG_OP = 'DELETE') THEN
+			INSERT INTO bb_log.executors SELECT OLD.*, 'D';
+			RETURN OLD;
+		ELSIF (TG_OP = 'UPDATE') THEN
+			INSERT INTO bb_log.executors SELECT NEW.*, 'U';
+			RETURN NEW;
+		ELSIF (TG_OP = 'INSERT') THEN
+			INSERT INTO bb_log.executors SELECT NEW.*, 'I';
+			RETURN NEW;
+		END IF;
+		RETURN NULL;
+	END;
+$executors_logtrigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER executors_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.executors
+FOR EACH ROW EXECUTE PROCEDURE bb_log.executors_logfunction();
+
+----------
+
+CREATE TABLE bb_log.executors_groups (
+	id uuid,
+	group_id uuid,
+	created_at timestamptz,
+	created_by uuid,
+	action "char",
+	log_id bigserial PRIMARY KEY,
+	txid bigint DEFAULT txid_current(),
+	logged_by name DEFAULT current_user,
+	logged_at timestamptz DEFAULT now());
+
+CREATE FUNCTION bb_log.executors_groups_logfunction() RETURNS TRIGGER AS $executors_groups_logtrigger$
+	BEGIN
+		IF (TG_OP = 'DELETE') THEN
+			INSERT INTO bb_log.executors_groups SELECT OLD.*, 'D';
+			RETURN OLD;
+		ELSIF (TG_OP = 'UPDATE') THEN
+			INSERT INTO bb_log.executors_groups SELECT NEW.*, 'U';
+			RETURN NEW;
+		ELSIF (TG_OP = 'INSERT') THEN
+			INSERT INTO bb_log.executors_groups SELECT NEW.*, 'I';
+			RETURN NEW;
+		END IF;
+		RETURN NULL;
+	END;
+$executors_groups_logtrigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER executors_groups_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb.executors_groups
+FOR EACH ROW EXECUTE PROCEDURE bb_log.executors_groups_logfunction();
 
 ----------
 
@@ -362,6 +436,8 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.transient_nodes_logfunction();
 ALTER TABLE bb_log.orgs SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.groups SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.users SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.executors SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
+ALTER TABLE bb_log.executors_groups SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.closings SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.transients SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);
 ALTER TABLE bb_log.transient_journals SET (autovacuum_enabled = false, toast.autovacuum_enabled = false);

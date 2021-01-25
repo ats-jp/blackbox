@@ -551,6 +551,8 @@ INSERT INTO bb.executors (
 CREATE TABLE bb.executors_groups (
 	id uuid REFERENCES bb.executors ON DELETE CASCADE NOT NULL,
 	group_id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
+	created_at timestamptz DEFAULT now() NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (id, group_id));
 
 ----------
@@ -1302,6 +1304,7 @@ GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb.groups,
 	bb.relationships,
 	bb.users,
+	bb.executors,
 	bb.transients,
 	bb.transient_journals,
 	bb.transient_details,
@@ -1322,6 +1325,7 @@ GRANT INSERT, DELETE ON TABLE
 	bb.locking_groups,
 	bb.groups_tags,
 	bb.users_tags,
+	bb.executors_groups,
 	bb.journals_tags,
 	bb.transient_journals_tags
 TO blackbox;
