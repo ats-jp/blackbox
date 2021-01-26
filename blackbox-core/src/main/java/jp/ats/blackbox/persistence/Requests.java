@@ -104,6 +104,7 @@ public class Requests {
 		/**
 		 * これ以降数量無制限を設定するか
 		 * 数量無制限の場合、通常はunit登録時からtrueにしておく
+		 * デフォルトはfalse
 		 */
 		public Optional<Boolean> grants_unlimited = Optional.empty();
 

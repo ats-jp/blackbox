@@ -1,9 +1,5 @@
 package jp.ats.blackbox.backend;
 
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.Properties;
 
@@ -17,24 +13,22 @@ import jp.ats.blackbox.backend.web.CORSFilter;
 import jp.ats.blackbox.backend.web.SecurityValuesFilter;
 import jp.ats.blackbox.web.BlendeeTransactionFilter;
 
-public class Application {
+public interface Application {
 
-	public static void main(String[] args) throws Exception {
-		var path = getApplicationPath();
-		var properties = path.resolve("blackbox.properties");
+	String blendeeSchemaNames();
 
-		var config = new Properties();
-		config.load(Files.newInputStream(properties));
+	String[] apiPackages();
 
+	default void start(Properties config) throws Exception {
 		var context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
 		context.setContextPath("/");
 
-		context.setInitParameter("blendee-schema-names", "bb");
+		context.setInitParameter("blendee-schema-names", blendeeSchemaNames());
 		context.setInitParameter("blendee-log-stacktrace-filter", ".");
 		context.setInitParameter("blendee-transaction-factory-class", "org.blendee.util.DriverManagerTransactionFactory");
 		context.setInitParameter("blendee-error-converter-class", "org.blendee.dialect.postgresql.PostgreSQLErrorConverter");
 		context.setInitParameter("blendee-use-lazy-transaction", "true");
-		context.setInitParameter("blendee-logger-class", config.getProperty("logger-class"));
+		context.setInitParameter("blendee-logger-class", config.getProperty("blendee-logger-class"));
 		context.setInitParameter("blendee-log-stacktrace-filter", "blackbox");
 		context.setInitParameter("blendee-table-facade-package", "sqlassist");
 
@@ -48,7 +42,7 @@ public class Application {
 		server.setHandler(context);
 
 		var servletHolder = context.addServlet(ServletContainer.class, "/api/*");
-		servletHolder.setInitParameter("jersey.config.server.provider.packages", "jp.ats.blackbox.backend.api.core");
+		servletHolder.setInitParameter("jersey.config.server.provider.packages", String.join(",", apiPackages()));
 		servletHolder.setInitParameter("jersey.config.server.provider.scanning.recursive", "false");
 
 		//CORSをOFF テスト用
@@ -63,14 +57,5 @@ public class Application {
 
 		server.start();
 		server.join();
-	}
-
-	public static Path getApplicationPath() {
-		try {
-			var uri = Application.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-			return Paths.get(uri).getParent();
-		} catch (URISyntaxException e) {
-			throw new IllegalStateException(e);
-		}
 	}
 }
