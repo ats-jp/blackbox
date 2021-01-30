@@ -11,21 +11,21 @@ public class GroupController {
 
 	public static UUID register(RegisterRequest request, UUID userId) {
 		var executor = JournalExecutorMap.get(request.parent_id);
-		executor.lock();
+		executor.writeLock();
 		try {
 			return GroupHandler.register(request, userId);
 		} finally {
-			executor.unlock();
+			executor.writeUnlock();
 		}
 	}
 
 	public static void update(UpdateRequest request, UUID userId) {
 		var executor = JournalExecutorMap.get(request.id);
-		executor.lock();
+		executor.writeLock();
 		try {
 			GroupHandler.update(request, userId);
 		} finally {
-			executor.unlock();
+			executor.writeUnlock();
 		}
 	}
 }

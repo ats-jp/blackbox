@@ -11,8 +11,6 @@ import org.blendee.sql.Recorder;
 import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
 import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
 import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
-import sqlassist.bb.groups;
-import sqlassist.bb.users;
 
 class JournalPreparer {
 
@@ -25,21 +23,6 @@ class JournalPreparer {
 		Timestamp createdAt,
 		Journal journal,
 		Recorder recorder) {
-		var group = recorder.play(
-			() -> new groups().SELECT(
-				a -> a.ls(
-					a.props,
-					a.$orgs().props,
-					a.$orgs().revision,
-					a.revision,
-					a.$orgs().group_tree_revision)))
-			.fetch(request.group_id)
-			.orElseThrow(() -> new DataNotFoundException(groups.$TABLE, request.group_id));
-
-		var user = recorder.play(() -> new users().SELECT(r -> r.ls(r.props, r.revision)))
-			.fetch(userId)
-			.orElseThrow(() -> new DataNotFoundException(users.$TABLE, userId));
-
 		journal.setId(journalId);
 		journal.setGroup_id(request.group_id);
 
@@ -58,15 +41,7 @@ class JournalPreparer {
 			v -> journal.setProps(v),
 			() -> request.props.ifPresent(v -> journal.setProps(toPGObject(v))));
 
-		journal.setGroup_props(group.getProps());
-		journal.setOrg_props(group.$orgs().getProps());
-		journal.setUser_props(user.getProps());
-
-		journal.setGroup_revision(group.getRevision());
-		journal.setOrg_revision(group.$orgs().getRevision());
-		journal.setUser_revision(user.getRevision());
-
-		journal.setGroup_tree_revision(group.$orgs().getGroup_tree_revision());
+		journal.setGroup_tree_revision(request.group_tree_revision.orElse(0L));
 
 		request.tags.ifPresent(v -> journal.setTags(v));
 
@@ -127,18 +102,6 @@ class JournalPreparer {
 		void setCreated_at(Timestamp createdAt);
 
 		void setProps(Object json);
-
-		void setGroup_props(Object json);
-
-		void setOrg_props(Object json);
-
-		void setUser_props(Object json);
-
-		void setGroup_revision(Long revision);
-
-		void setOrg_revision(Long revision);
-
-		void setUser_revision(Long revision);
 
 		void setGroup_tree_revision(Long revision);
 

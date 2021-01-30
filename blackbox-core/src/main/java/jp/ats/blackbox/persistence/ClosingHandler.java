@@ -45,6 +45,7 @@ public class ClosingHandler {
 		closing.setSeq(seq);
 		closing.setClosed_at(request.closed_at);
 		request.props.ifPresent(v -> closing.setProps(U.toPGObject(v)));
+		closing.setGroup_tree_revision(request.group_tree_revision.orElse(0L));
 		closing.setCreated_by(userId);
 
 		closing.insert();

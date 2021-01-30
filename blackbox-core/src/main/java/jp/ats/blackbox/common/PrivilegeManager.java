@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import jp.ats.blackbox.persistence.Privilege;
+import sqlassist.bb.orgs;
 import sqlassist.bb.relationships;
 import sqlassist.bb.units;
 import sqlassist.bb.users;
@@ -67,11 +68,20 @@ public class PrivilegeManager {
 			});
 	}
 
-	public static boolean hasPrivilegeOfGroup(UUID userId, UUID groupId, Privilege privilege) {
+	public static class PrivilegeResult {
+
+		public boolean success;
+
+		public long groupTreeRevision;
+	}
+
+	public static PrivilegeResult hasPrivilegeOfGroup(UUID userId, UUID groupId, Privilege privilege) {
+		var result = new PrivilegeResult();
+
 		//自身の属するグループ及びその下部グループに対象のグループがあるか
 		return U.recorder.play(
 			() -> new users()
-				.SELECT(a -> a.privilege)
+				.SELECT(a -> a.ls(a.privilege, a.$groups().$orgs().group_tree_revision))
 				.LEFT_OUTER_JOIN(new relationships().SELECT(a -> a.id))
 				.ON((l, r) -> r.parent_id.eq(l.group_id).AND.child_id.eq($UUID))
 				.WHERE(a -> a.active.eq(true).AND.id.eq($UUID)),
@@ -79,19 +89,23 @@ public class PrivilegeManager {
 			userId).executeAndGet(r -> {
 				if (!r.next()) {
 					//ユーザーが非アクティブまたはIDが一致しない
-					return false;
+					return result;
 				}
 
 				var myPrivilege = Privilege.of(r.getBigDecimal(users.privilege).intValue()).value;
 
+				result.groupTreeRevision = r.getLong(orgs.group_tree_revision);
+
 				r.getBigDecimal(relationships.id);
 				if (r.wasNull()) {//グループに関連づかないユーザー
 					//組織権限以上を持っていれば操作可能
-					return myPrivilege <= Privilege.ORG.value;
+					result.success = myPrivilege <= Privilege.ORG.value;
+					return result;
 				}
 
 				//指定された権限以上を持っていれば操作可能
-				return myPrivilege <= privilege.value;
+				result.success = myPrivilege <= privilege.value;
+				return result;
 			});
 	}
 
@@ -103,7 +117,7 @@ public class PrivilegeManager {
 				.WHERE(a -> a.active.eq(true).AND.id.eq($UUID)),
 			subjectUserId).willUnique().map(r ->
 		//対象者のグループの操作権限を持つか
-		hasPrivilegeOfGroup(userId, r.getGroup_id(), Privilege.USER))
+		hasPrivilegeOfGroup(userId, r.getGroup_id(), Privilege.GROUP).success)
 			.orElse(false);//対象者がいない
 	}
 }

@@ -10,7 +10,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
@@ -62,7 +63,7 @@ public class JournalExecutor {
 
 	private final AtomicBoolean started = new AtomicBoolean(false);
 
-	private final ReentrantLock groupTreeLock = new ReentrantLock();
+	private final ReadWriteLock groupTreeLock = new ReentrantReadWriteLock();
 
 	public JournalExecutor() {
 		this(256);
@@ -71,14 +72,7 @@ public class JournalExecutor {
 	public JournalExecutor(int bufferSize) {//bufferSize must be a power of 2
 		disruptor = new Disruptor<>(Event::new, bufferSize, DaemonThreadFactory.INSTANCE);
 
-		disruptor.handleEventsWith((event, sequence, endOfBatch) -> {
-			lock();
-			try {
-				execute(event);
-			} finally {
-				unlock();
-			}
-		});
+		disruptor.handleEventsWith((event, sequence, endOfBatch) -> execute(event));
 
 		ringBuffer = disruptor.getRingBuffer();
 	}
@@ -102,13 +96,20 @@ public class JournalExecutor {
 		disruptor.shutdown();
 	}
 
-	//group登録更新時にロックを取得する
-	public void lock() {
-		groupTreeLock.lock();
+	public void readLock() {
+		groupTreeLock.readLock().lock();
 	}
 
-	public void unlock() {
-		groupTreeLock.unlock();
+	public void readUnlock() {
+		groupTreeLock.readLock().unlock();
+	}
+
+	public void writeLock() {
+		groupTreeLock.writeLock().lock();
+	}
+
+	public void writeUnlock() {
+		groupTreeLock.writeLock().unlock();
 	}
 
 	public boolean isEmpty() {
@@ -525,7 +526,12 @@ public class JournalExecutor {
 
 		@Override
 		public void execute() {
-			overwrite();
+			readLock();
+			try {
+				overwrite();
+			} finally {
+				readUnlock();
+			}
 		}
 
 		private void overwrite() {
@@ -552,9 +558,11 @@ public class JournalExecutor {
 			var denyRequest = new JournalDenyRequest();
 			denyRequest.deny_id = journalId;
 
+			denyRequest.group_tree_revision = request.group_tree_revision;
+
 			try {
 				handler.deny(UUID.randomUUID(), userId, denyRequest, r -> {
-					checker.accept(r);//取り消すjournalに対して外部のチェック（権限検査を想定）を行う
+					checker.accept(r);//取り消す未来のjournalに対して外部のチェック（権限検査を想定）を行う
 					checkPausing(r.group_id, r.fixed_at);
 				});
 			} catch (MinusTotalException e) {

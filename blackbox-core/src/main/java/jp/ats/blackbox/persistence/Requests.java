@@ -52,6 +52,11 @@ public class Requests {
 		public Optional<String[]> tags = Optional.empty();
 
 		/**
+		 * 権限検査時のgroup_tree_revision
+		 */
+		public Optional<Long> group_tree_revision = Optional.empty();
+
+		/**
 		 * 配下のdetail
 		 * 必須
 		 */
@@ -143,6 +148,11 @@ public class Requests {
 		public UUID deny_id;
 
 		public Optional<String> deny_reason = Optional.empty();
+
+		/**
+		 * 権限検査時のgroup_tree_revision
+		 */
+		public Optional<Long> group_tree_revision = Optional.empty();
 	}
 
 	/**
@@ -203,6 +213,11 @@ public class Requests {
 		 * 追加情報JSON
 		 */
 		public Optional<String> nodep_props = Optional.empty();
+
+		/**
+		 * 権限検査時のgroup_tree_revision
+		 */
+		public Optional<Long> group_tree_revision = Optional.empty();
 	}
 
 	/**
@@ -240,6 +255,11 @@ public class Requests {
 		 * 追加情報JSON
 		 */
 		public Optional<String> props = Optional.empty();
+
+		/**
+		 * 権限検査時のgroup_tree_revision
+		 */
+		public Optional<Long> group_tree_revision = Optional.empty();
 	}
 
 	/**
@@ -250,5 +270,10 @@ public class Requests {
 		public UUID transient_id;
 
 		public boolean lazy = false;
+
+		/**
+		 * 権限検査時のgroup_tree_revision
+		 */
+		public Optional<Long> group_tree_revision = Optional.empty();
 	}
 }

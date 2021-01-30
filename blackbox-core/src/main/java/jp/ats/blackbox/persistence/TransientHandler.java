@@ -111,30 +111,6 @@ public class TransientHandler {
 		}
 
 		@Override
-		public void setGroup_props(Object json) {
-		}
-
-		@Override
-		public void setOrg_props(Object json) {
-		}
-
-		@Override
-		public void setUser_props(Object json) {
-		}
-
-		@Override
-		public void setGroup_revision(Long revision) {
-		}
-
-		@Override
-		public void setOrg_revision(Long revision) {
-		}
-
-		@Override
-		public void setUser_revision(Long revision) {
-		}
-
-		@Override
 		public void setGroup_tree_revision(Long revision) {
 		}
 
@@ -385,6 +361,8 @@ public class TransientHandler {
 		var requests = new LinkedList<JournalRegisterRequest>();
 		buildJournalRegisterRequests(request.transient_id, recorder).forEach(r -> {
 			checker.accept(r);
+
+			r.group_tree_revision = request.group_tree_revision;
 
 			var journalId = UUID.randomUUID();
 

@@ -589,6 +589,7 @@ CREATE TABLE bb.closings (
 	seq bigint NOT NULL,
 	closed_at timestamptz NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
+	group_tree_revision bigint NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
 	UNIQUE (group_id, seq));
@@ -601,6 +602,8 @@ COMMENT ON COLUMN bb.closings.description IS '補足事項';
 COMMENT ON COLUMN bb.closings.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb.closings.closed_at IS '締め時刻';
 COMMENT ON COLUMN bb.closings.props IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb.closings.group_tree_revision IS '登録時のグループ階層リビジョン番号
+登録前検査当時のグループ階層状態を確認するために使用';
 COMMENT ON COLUMN bb.closings.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.closings.created_by IS '作成ユーザー';
 
@@ -675,12 +678,6 @@ CREATE TABLE bb.journals (
 	instance_id uuid REFERENCES bb.instances NOT NULL,
 	denied_id uuid REFERENCES bb.journals DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,
 	deny_reason text DEFAULT '' NOT NULL,
-	org_props jsonb NOT NULL,
-	group_props jsonb NOT NULL,
-	user_props jsonb NOT NULL,
-	org_revision bigint NOT NULL,
-	group_revision bigint NOT NULL,
-	user_revision bigint NOT NULL,
 	group_tree_revision bigint NOT NULL,
 	created_at timestamptz NOT NULL, --Javaから指定するためDEFAULTなし
 	created_by uuid REFERENCES bb.users NOT NULL,
@@ -705,17 +702,8 @@ COMMENT ON COLUMN bb.journals.denied_id IS '取消元伝票ID
 訂正後の伝票が訂正前の伝票のIDを持つ
 ここに入っているIDが指す伝票は、取り消されたものとなる';
 COMMENT ON COLUMN bb.journals.deny_reason IS '取消理由';
-COMMENT ON COLUMN bb.journals.org_props IS '組織のprops';
-COMMENT ON COLUMN bb.journals.group_props IS 'グループのprops';
-COMMENT ON COLUMN bb.journals.user_props IS '作成ユーザーのprops';
-COMMENT ON COLUMN bb.journals.org_revision IS '登録時の組織のリビジョン番号
-登録当時の組織の状態を確認するために使用';
-COMMENT ON COLUMN bb.journals.group_revision IS '登録時のグループのリビジョン番号
-登録当時のグループの状態を確認するために使用';
-COMMENT ON COLUMN bb.journals.user_revision IS '登録時の作成ユーザーのリビジョン番号
-登録当時のユーザーの状態を確認するために使用';
 COMMENT ON COLUMN bb.journals.group_tree_revision IS '登録時のグループ階層リビジョン番号
-登録当時のグループ階層状態を確認するために使用';
+登録前検査当時のグループ階層状態を確認するために使用';
 COMMENT ON COLUMN bb.journals.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.journals.created_by IS '作成ユーザー';
 
@@ -726,12 +714,6 @@ INSERT INTO bb.journals (
 	journal_batch_id,
 	fixed_at,
 	instance_id,
-	org_props,
-	group_props,
-	user_props,
-	org_revision,
-	group_revision,
-	user_revision,
 	group_tree_revision,
 	created_at,
 	created_by
@@ -741,12 +723,6 @@ INSERT INTO bb.journals (
 	'00000000-0000-0000-0000-000000000000',
 	'1900-1-1'::timestamptz,
 	'00000000-0000-0000-0000-000000000000',
-	'{}',
-	'{}',
-	'{}',
-	0,
-	0,
-	0,
 	0,
 	now(),
 	'00000000-0000-0000-0000-000000000000');

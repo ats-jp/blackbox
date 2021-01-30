@@ -492,6 +492,8 @@ public class JournalHandler {
 
 		checker.accept(request);
 
+		request.group_tree_revision = denyRequest.group_tree_revision;
+
 		register(journalId, U.NULL_ID, userId, request);
 
 		return request.fixed_at;
