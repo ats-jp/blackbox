@@ -3,13 +3,10 @@ package jp.ats.blackbox.stock;
 import static org.blendee.sql.Placeholder.$UUID;
 
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
-
-import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.persistence.InOut;
@@ -104,39 +101,7 @@ public class StockHandler {
 
 		request.unit_id = stock.getId();
 
-		var gson = new Gson();
-
-		var props = new UnitProps();
-
-		props.group_props = gson.fromJson(U.fromPGObject(stock.$groups().getProps()), Map.class);
-		props.item_props = gson.fromJson(U.fromPGObject(stock.$items().getProps()), Map.class);
-		props.owner_props = gson.fromJson(U.fromPGObject(stock.$owners().getProps()), Map.class);
-		props.location_props = gson.fromJson(U.fromPGObject(stock.$locations().getProps()), Map.class);
-		props.status_props = gson.fromJson(U.fromPGObject(stock.$statuses().getProps()), Map.class);
-
-		request.unit_props = Optional.of(gson.toJson(props));
-
-		request.unit_group_revision = Optional.of(stock.$groups().getRevision());
-
 		return request;
-	}
-
-	private static class UnitProps {
-
-		@SuppressWarnings("unused")
-		private Object group_props;
-
-		@SuppressWarnings("unused")
-		private Object item_props;
-
-		@SuppressWarnings("unused")
-		private Object owner_props;
-
-		@SuppressWarnings("unused")
-		private Object location_props;
-
-		@SuppressWarnings("unused")
-		private Object status_props;
 	}
 
 	/**

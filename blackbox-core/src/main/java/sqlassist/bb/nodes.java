@@ -208,25 +208,6 @@ public class nodes
 	public static final String props = "props";
 
 	/**
-	 * name: unit_props<br>
-	 * remarks: 管理対象のprops<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "unit_props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象のprops", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
-	public static final String unit_props = "unit_props";
-
-	/**
-	 * name: unit_group_revision<br>
-	 * remarks: 管理対象のグループのリビジョン番号<br>
-	 * 登録当時の管理対象の属するグループの状態を確認するために使用<br>
-	 * type: int8(19)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "unit_group_revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "管理対象のグループのリビジョン番号\n登録当時の管理対象の属するグループの状態を確認するために使用", defaultValue = "null", ordinalPosition = 10, notNull = true)
-	public static final String unit_group_revision = "unit_group_revision";
-
-	/**
 	 * name: nodes_detail_id_fkey<br>
 	 * references: details<br>
 	 * columns: detail_id
@@ -557,68 +538,6 @@ public class nodes
 		public java.lang.Object getProps() {
 			Binder binder = data$.getValue("props");
 			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: unit_props<br>
-		 * remarks: 管理対象のprops<br>
-		 * type: jsonb(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.lang.Object
-		 */
-		public void setUnit_props(java.lang.Object value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("unit_props").getType());
-			data$.setValue("unit_props", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: unit_props<br>
-		 * remarks: 管理対象のprops<br>
-		 * type: jsonb(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.lang.Object
-		 */
-		public java.lang.Object getUnit_props() {
-			Binder binder = data$.getValue("unit_props");
-			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: unit_group_revision<br>
-		 * remarks: 管理対象のグループのリビジョン番号<br>
-		 * 登録当時の管理対象の属するグループの状態を確認するために使用<br>
-		 * type: int8(19)<br>
-		 * not null: true<br>
-		 * @param value java.lang.Long
-		 */
-		public void setUnit_group_revision(java.lang.Long value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("unit_group_revision").getType());
-			data$.setValue("unit_group_revision", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: unit_group_revision<br>
-		 * remarks: 管理対象のグループのリビジョン番号<br>
-		 * 登録当時の管理対象の属するグループの状態を確認するために使用<br>
-		 * type: int8(19)<br>
-		 * not null: true<br>
-		 * @return java.lang.Long
-		 */
-		public java.lang.Long getUnit_group_revision() {
-			Binder binder = data$.getValue("unit_group_revision");
-			return (java.lang.Long) binder.getValue();
 		}
 
 		/**
@@ -1734,16 +1653,6 @@ public class nodes
 		 */
 		public final T props;
 
-		/**
-		 * 項目名 unit_props
-		 */
-		public final T unit_props;
-
-		/**
-		 * 項目名 unit_group_revision
-		 */
-		public final T unit_group_revision;
-
 		private Assist(
 			nodes table$,
 			TableFacadeContext<T> builder$,
@@ -1763,8 +1672,6 @@ public class nodes
 			this.quantity = builder$.buildColumn(this, sqlassist.bb.nodes.quantity);
 			this.grants_unlimited = builder$.buildColumn(this, sqlassist.bb.nodes.grants_unlimited);
 			this.props = builder$.buildColumn(this, sqlassist.bb.nodes.props);
-			this.unit_props = builder$.buildColumn(this, sqlassist.bb.nodes.unit_props);
-			this.unit_group_revision = builder$.buildColumn(this, sqlassist.bb.nodes.unit_group_revision);
 		}
 
 		/**

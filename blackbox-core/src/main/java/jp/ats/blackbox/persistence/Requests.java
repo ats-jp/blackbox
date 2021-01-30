@@ -122,21 +122,6 @@ public class Requests {
 		 * DBから復元した追加情報JSON
 		 */
 		Optional<Object> restored_props = Optional.empty();
-
-		/**
-		 * unit追加情報JSON
-		 */
-		public Optional<String> unit_props = Optional.empty();
-
-		/**
-		 * DBから復元した追加情報JSON
-		 */
-		Optional<Object> restored_unit_props = Optional.empty();
-
-		/**
-		 * 登録時のunitのグループのリビジョン番号
-		 */
-		public Optional<Long> unit_group_revision = Optional.empty();
 	}
 
 	/**

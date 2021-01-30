@@ -782,9 +782,7 @@ CREATE TABLE bb.nodes (
 	seq integer CHECK (seq <= 999999) NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
-	props jsonb DEFAULT '{}' NOT NULL,
-	unit_props jsonb DEFAULT '{}' NOT NULL,
-	unit_group_revision bigint NOT NULL);
+	props jsonb DEFAULT '{}' NOT NULL);
 --log対象外
 
 COMMENT ON TABLE bb.nodes IS '伝票明細ノード
@@ -800,9 +798,6 @@ COMMENT ON COLUMN bb.nodes.quantity IS '数量';
 COMMENT ON COLUMN bb.nodes.grants_unlimited IS '数量無制限の許可
 trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない';
 COMMENT ON COLUMN bb.nodes.props IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb.nodes.unit_props IS '管理対象のprops';
-COMMENT ON COLUMN bb.nodes.unit_group_revision IS '管理対象のグループのリビジョン番号
-登録当時の管理対象の属するグループの状態を確認するために使用';
 
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.nodes (
@@ -811,14 +806,12 @@ INSERT INTO bb.nodes (
 	unit_id,
 	in_out,
 	seq,
-	quantity,
-	unit_group_revision
+	quantity
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	-1,
-	0,
 	0,
 	0);
 

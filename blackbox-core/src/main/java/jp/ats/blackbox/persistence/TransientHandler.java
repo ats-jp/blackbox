@@ -261,14 +261,6 @@ public class TransientHandler {
 		@Override
 		public void setSeq(Integer seq) {
 		}
-
-		@Override
-		public void setUnit_props(Object json) {
-		}
-
-		@Override
-		public void setUnit_group_revision(Long revision) {
-		}
 	}
 
 	public static UUID registerNode(long transientRevision, UUID detailId, NodeRegisterRequest request) {

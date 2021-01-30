@@ -79,8 +79,6 @@ class JournalPreparer {
 			.ifPresentOrElse(
 				v -> node.setProps(v),
 				() -> request.props.ifPresent(v -> node.setProps(toPGObject(v))));
-
-		request.unit_props.ifPresent(v -> node.setUnit_props(toPGObject(v)));
 	}
 
 	static interface Journal {
@@ -138,9 +136,5 @@ class JournalPreparer {
 		void setGrants_unlimited(Boolean value);
 
 		void setProps(Object json);
-
-		void setUnit_props(Object json);
-
-		void setUnit_group_revision(Long revision);
 	}
 }
