@@ -37,6 +37,12 @@ public class JournalController {
 		return result.groupTreeRevision;
 	}
 
+	@FunctionalInterface
+	public interface JournalRegisterRequestSupplier {
+
+		JournalRegisterRequest get() throws PrivilegeException;
+	}
+
 	public static JournalPromise register(JournalRegisterRequest request) throws PrivilegeException {
 		var executor = JournalExecutorMap.get(request.group_id);
 
@@ -52,11 +58,47 @@ public class JournalController {
 		}
 	}
 
+	public static JournalPromise register(UUID journalGroupId, JournalRegisterRequestSupplier supplier) throws PrivilegeException {
+		var executor = JournalExecutorMap.get(journalGroupId);
+
+		executor.readLock();
+		try {
+			//ロック中に実行することでSupplier内部でGroupの検査実施が可能
+			var request = supplier.get();
+
+			var userId = SecurityValues.currentUserId();
+
+			request.group_tree_revision = Optional.of(checkPrivilegeForRegister(userId, request));
+
+			return executor.registerJournal(userId, request);
+		} finally {
+			executor.readUnlock();
+		}
+	}
+
 	public static JournalPromise registerLazily(JournalRegisterRequest request) throws PrivilegeException {
 		var executor = JournalExecutorMap.get(request.group_id);
 
 		executor.readLock();
 		try {
+			var userId = SecurityValues.currentUserId();
+
+			request.group_tree_revision = Optional.of(checkPrivilegeForRegister(userId, request));
+
+			return executor.registerJournalLazily(userId, request);
+		} finally {
+			executor.readUnlock();
+		}
+	}
+
+	public static JournalPromise registerLazily(UUID journalGroupId, JournalRegisterRequestSupplier supplier) throws PrivilegeException {
+		var executor = JournalExecutorMap.get(journalGroupId);
+
+		executor.readLock();
+		try {
+			//ロック中に実行することでSupplier内部でGroupの検査実施が可能
+			var request = supplier.get();
+
 			var userId = SecurityValues.currentUserId();
 
 			request.group_tree_revision = Optional.of(checkPrivilegeForRegister(userId, request));

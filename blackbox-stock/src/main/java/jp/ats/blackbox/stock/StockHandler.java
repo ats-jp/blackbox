@@ -5,6 +5,7 @@ import static org.blendee.sql.Placeholder.$UUID;
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -78,7 +79,8 @@ public class StockHandler {
 		InOut inOut,
 		BigDecimal quantity,
 		Optional<Boolean> grantsUnlimited,
-		Optional<String> nodeProps) {
+		Optional<String> nodeProps,
+		Optional<Set<UUID>> allGroupIds) {
 		var request = new NodeRegisterRequest();
 
 		request.in_out = inOut;
@@ -90,16 +92,23 @@ public class StockHandler {
 			() -> new stocks().SELECT(
 				a -> a.ls(
 					a.id,
-					a.$groups().props,
-					a.$items().props,
-					a.$owners().props,
-					a.$locations().props,
-					a.$statuses().props,
-					a.$groups().revision)),
+					a.group_id,
+					a.$items().group_id,
+					a.$owners().group_id,
+					a.$locations().group_id,
+					a.$statuses().group_id)),
 			userId,
 			components);
 
 		request.unit_id = stock.getId();
+
+		allGroupIds.ifPresent(s -> {
+			s.add(stock.getGroup_id());
+			s.add(stock.$items().getGroup_id());
+			s.add(stock.$owners().getGroup_id());
+			s.add(stock.$locations().getGroup_id());
+			s.add(stock.$statuses().getGroup_id());
+		});
 
 		return request;
 	}

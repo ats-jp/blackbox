@@ -67,8 +67,8 @@ public class JournalHandlerTest {
 			}
 		};
 
-		var out = StockHandler.buildNodeRegisterRequest(U.NULL_ID, com, InOut.OUT, BigDecimal.valueOf(100), Optional.of(true), Optional.empty());
-		var in = StockHandler.buildNodeRegisterRequest(U.NULL_ID, com, InOut.IN, BigDecimal.valueOf(100), Optional.of(true), Optional.empty());
+		var out = StockHandler.buildNodeRegisterRequest(U.NULL_ID, com, InOut.OUT, BigDecimal.valueOf(100), Optional.of(true), Optional.empty(), Optional.empty());
+		var in = StockHandler.buildNodeRegisterRequest(U.NULL_ID, com, InOut.IN, BigDecimal.valueOf(100), Optional.of(true), Optional.empty(), Optional.empty());
 
 		var bundle = new DetailRegisterRequest();
 
