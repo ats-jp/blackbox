@@ -1,13 +1,13 @@
 package jp.ats.blackbox.account;
 
-import static jp.ats.blackbox.persistence.InOut.IN;
-import static jp.ats.blackbox.persistence.InOut.OUT;
+import static jp.ats.blackbox.core.persistence.InOut.IN;
+import static jp.ats.blackbox.core.persistence.InOut.OUT;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.function.Function;
 
-import jp.ats.blackbox.persistence.InOut;
+import jp.ats.blackbox.core.persistence.InOut;
 
 public enum AccountType {
 

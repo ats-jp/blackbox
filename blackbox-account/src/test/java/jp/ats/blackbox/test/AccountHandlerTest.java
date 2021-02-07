@@ -10,7 +10,7 @@ import jp.ats.blackbox.account.AccountHandler.AccountRegisterRequest;
 import jp.ats.blackbox.account.AccountHandler.SubaccountRegisterRequest;
 import jp.ats.blackbox.account.AccountType;
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.SecurityValues;
+import jp.ats.blackbox.core.persistence.SecurityValues;
 
 public class AccountHandlerTest {
 

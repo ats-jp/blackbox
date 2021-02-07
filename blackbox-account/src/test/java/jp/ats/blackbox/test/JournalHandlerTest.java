@@ -12,13 +12,13 @@ import jp.ats.blackbox.account.AccountType;
 import jp.ats.blackbox.account.AccountingJournal;
 import jp.ats.blackbox.account.DebitCredit;
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.GroupHandler;
-import jp.ats.blackbox.persistence.GroupHandler.RegisterRequest;
-import jp.ats.blackbox.persistence.JobHandler;
-import jp.ats.blackbox.persistence.JournalHandler;
-import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
-import jp.ats.blackbox.persistence.SecurityValues;
+import jp.ats.blackbox.core.persistence.GroupHandler;
+import jp.ats.blackbox.core.persistence.GroupHandler.RegisterRequest;
+import jp.ats.blackbox.core.persistence.JobHandler;
+import jp.ats.blackbox.core.persistence.JournalHandler;
+import jp.ats.blackbox.core.persistence.Requests.DetailRegisterRequest;
+import jp.ats.blackbox.core.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.core.persistence.SecurityValues;
 
 public class JournalHandlerTest {
 

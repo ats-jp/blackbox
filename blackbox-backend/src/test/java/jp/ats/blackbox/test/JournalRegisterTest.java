@@ -16,12 +16,12 @@ import org.blendee.util.Blendee;
 import com.google.gson.Gson;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.InOut;
-import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
-import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
-import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.UnitHandler;
+import jp.ats.blackbox.core.persistence.InOut;
+import jp.ats.blackbox.core.persistence.SecurityValues;
+import jp.ats.blackbox.core.persistence.UnitHandler;
+import jp.ats.blackbox.core.persistence.Requests.DetailRegisterRequest;
+import jp.ats.blackbox.core.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.core.persistence.Requests.NodeRegisterRequest;
 
 public class JournalRegisterTest {
 

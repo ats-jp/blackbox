@@ -5,9 +5,9 @@ import java.util.Optional;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.CycleGroupException;
-import jp.ats.blackbox.persistence.GroupHandler;
-import jp.ats.blackbox.persistence.SecurityValues;
+import jp.ats.blackbox.core.persistence.CycleGroupException;
+import jp.ats.blackbox.core.persistence.GroupHandler;
+import jp.ats.blackbox.core.persistence.SecurityValues;
 
 public class RelationshipTest {
 

@@ -7,9 +7,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.GroupHandler;
-import jp.ats.blackbox.persistence.GroupHandler.RegisterRequest;
-import jp.ats.blackbox.persistence.SecurityValues;
+import jp.ats.blackbox.core.persistence.GroupHandler;
+import jp.ats.blackbox.core.persistence.GroupHandler.RegisterRequest;
+import jp.ats.blackbox.core.persistence.SecurityValues;
 
 public class GroupHandlerTest {
 

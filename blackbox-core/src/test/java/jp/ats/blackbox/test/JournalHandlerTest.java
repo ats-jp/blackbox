@@ -10,12 +10,12 @@ import java.util.stream.IntStream;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.InOut;
-import jp.ats.blackbox.persistence.JobHandler;
-import jp.ats.blackbox.persistence.JournalHandler;
-import jp.ats.blackbox.persistence.Requests.DetailRegisterRequest;
-import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
-import jp.ats.blackbox.persistence.Requests.NodeRegisterRequest;
+import jp.ats.blackbox.core.persistence.InOut;
+import jp.ats.blackbox.core.persistence.JobHandler;
+import jp.ats.blackbox.core.persistence.JournalHandler;
+import jp.ats.blackbox.core.persistence.Requests.DetailRegisterRequest;
+import jp.ats.blackbox.core.persistence.Requests.JournalRegisterRequest;
+import jp.ats.blackbox.core.persistence.Requests.NodeRegisterRequest;
 
 public class JournalHandlerTest {
 

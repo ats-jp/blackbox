@@ -6,8 +6,8 @@ import java.util.stream.IntStream;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.UnitHandler;
+import jp.ats.blackbox.core.persistence.SecurityValues;
+import jp.ats.blackbox.core.persistence.UnitHandler;
 import sqlassist.bb.units;
 
 public class UnitHandlerTest {

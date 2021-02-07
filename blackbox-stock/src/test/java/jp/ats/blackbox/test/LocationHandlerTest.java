@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.stock.LocationHandler;
+import jp.ats.blackbox.core.persistence.SecurityValues;
+import jp.ats.blackbox.stock.persistence.LocationHandler;
 
 public class LocationHandlerTest {
 

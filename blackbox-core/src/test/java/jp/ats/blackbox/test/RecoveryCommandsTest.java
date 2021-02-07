@@ -3,9 +3,9 @@ package jp.ats.blackbox.test;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.executor.JobExecutor;
-import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.RecoveryCommands;
+import jp.ats.blackbox.core.executor.JobExecutor;
+import jp.ats.blackbox.core.persistence.RecoveryCommands;
+import jp.ats.blackbox.core.persistence.SecurityValues;
 
 public class RecoveryCommandsTest {
 

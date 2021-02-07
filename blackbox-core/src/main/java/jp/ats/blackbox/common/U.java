@@ -18,7 +18,7 @@ import org.postgresql.util.PGobject;
 
 import com.google.gson.Gson;
 
-import jp.ats.blackbox.persistence.IllegalJsonException;
+import jp.ats.blackbox.core.persistence.IllegalJsonException;
 
 public class U {
 

@@ -6,8 +6,8 @@ import javax.servlet.ServletContextListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import jp.ats.blackbox.executor.JobExecutor;
-import jp.ats.blackbox.executor.JournalExecutor;
+import jp.ats.blackbox.core.executor.JobExecutor;
+import jp.ats.blackbox.core.executor.JournalExecutor;
 
 public class JournalManager implements ServletContextListener {
 

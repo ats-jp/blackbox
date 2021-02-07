@@ -5,7 +5,7 @@ import static org.blendee.sql.Placeholder.$UUID;
 import java.util.Set;
 import java.util.UUID;
 
-import jp.ats.blackbox.persistence.Privilege;
+import jp.ats.blackbox.core.persistence.Privilege;
 import sqlassist.bb.orgs;
 import sqlassist.bb.relationships;
 import sqlassist.bb.units;
@@ -107,17 +107,5 @@ public class PrivilegeManager {
 				result.success = myPrivilege <= privilege.value;
 				return result;
 			});
-	}
-
-	public static boolean hasPrivilegeOfUser(UUID userId, UUID subjectUserId) {
-		//対象者のグループを取得
-		return U.recorder.play(
-			() -> new users()
-				.SELECT(a -> a.group_id)
-				.WHERE(a -> a.active.eq(true).AND.id.eq($UUID)),
-			subjectUserId).willUnique().map(r ->
-		//対象者のグループの操作権限を持つか
-		hasPrivilegeOfGroup(userId, r.getGroup_id(), Privilege.GROUP).success)
-			.orElse(false);//対象者がいない
 	}
 }

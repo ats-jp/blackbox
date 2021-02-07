@@ -8,8 +8,8 @@ import org.blendee.jdbc.Transaction;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.ClosingHandler;
-import jp.ats.blackbox.persistence.Requests.ClosingRequest;
+import jp.ats.blackbox.core.persistence.ClosingHandler;
+import jp.ats.blackbox.core.persistence.Requests.ClosingRequest;
 
 public class ClosingHandlerTest {
 

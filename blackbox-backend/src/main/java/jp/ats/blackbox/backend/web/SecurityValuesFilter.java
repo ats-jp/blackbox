@@ -10,7 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.SecurityValues;
+import jp.ats.blackbox.core.persistence.SecurityValues;
 
 public class SecurityValuesFilter implements Filter {
 

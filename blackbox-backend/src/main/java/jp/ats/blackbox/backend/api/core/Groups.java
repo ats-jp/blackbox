@@ -15,11 +15,11 @@ import javax.ws.rs.core.MediaType;
 
 import jp.ats.blackbox.backend.api.Utils.JsonProcessingException;
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.controller.JournalController;
-import jp.ats.blackbox.executor.CommandFailedException;
-import jp.ats.blackbox.executor.JournalExecutor.PausingGroup;
-import jp.ats.blackbox.persistence.Requests.GroupPauseRequest;
-import jp.ats.blackbox.persistence.Requests.GroupProcessRequest;
+import jp.ats.blackbox.core.controller.JournalController;
+import jp.ats.blackbox.core.executor.CommandFailedException;
+import jp.ats.blackbox.core.executor.JournalExecutor.PausingGroup;
+import jp.ats.blackbox.core.persistence.Requests.GroupPauseRequest;
+import jp.ats.blackbox.core.persistence.Requests.GroupProcessRequest;
 
 public class Groups {
 

@@ -9,11 +9,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.executor.JobExecutor;
-import jp.ats.blackbox.executor.JournalExecutor;
-import jp.ats.blackbox.persistence.Requests.ClosingRequest;
-import jp.ats.blackbox.persistence.Requests.JournalDenyRequest;
-import jp.ats.blackbox.persistence.SecurityValues;
+import jp.ats.blackbox.core.executor.JobExecutor;
+import jp.ats.blackbox.core.executor.JournalExecutor;
+import jp.ats.blackbox.core.persistence.Requests.ClosingRequest;
+import jp.ats.blackbox.core.persistence.Requests.JournalDenyRequest;
+import jp.ats.blackbox.core.persistence.SecurityValues;
 
 public class RegisterAndClosingTest {
 

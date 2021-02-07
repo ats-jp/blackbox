@@ -7,9 +7,9 @@ import org.blendee.assist.Vargs;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
-import jp.ats.blackbox.persistence.SecurityValues;
-import jp.ats.blackbox.persistence.TransientHandler;
-import jp.ats.blackbox.persistence.TransientUnitQuery;
+import jp.ats.blackbox.core.persistence.SecurityValues;
+import jp.ats.blackbox.core.persistence.TransientHandler;
+import jp.ats.blackbox.core.persistence.TransientUnitQuery;
 
 public class TransientUnitQueryTest {
 
