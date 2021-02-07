@@ -153,11 +153,20 @@ public class journals
 	/**
 	 * name: seq<br>
 	 * remarks: グループ内連番<br>
-	 * type: bigserial(19)<br>
+	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = -5, typeName = "bigserial", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループ内連番", defaultValue = "nextval('bb.journals_seq_seq'::regclass)", ordinalPosition = 3, notNull = true)
+	@Column(name = "seq", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループ内連番", defaultValue = "null", ordinalPosition = 3, notNull = true)
 	public static final String seq = "seq";
+
+	/**
+	 * name: code<br>
+	 * remarks: 外部システムコード<br>
+	 * type: text(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "code", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部システムコード", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	public static final String code = "code";
 
 	/**
 	 * name: journal_batch_id<br>
@@ -165,7 +174,7 @@ public class journals
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "journal_batch_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動伝票一括登録ID", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "journal_batch_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動伝票一括登録ID", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String journal_batch_id = "journal_batch_id";
 
 	/**
@@ -174,7 +183,7 @@ public class journals
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "fixed_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "確定時刻", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "fixed_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "確定時刻", defaultValue = "null", ordinalPosition = 6, notNull = true)
 	public static final String fixed_at = "fixed_at";
 
 	/**
@@ -183,7 +192,7 @@ public class journals
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "補足事項", defaultValue = "''::text", ordinalPosition = 6, notNull = true)
+	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "補足事項", defaultValue = "''::text", ordinalPosition = 7, notNull = true)
 	public static final String description = "description";
 
 	/**
@@ -192,7 +201,7 @@ public class journals
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 7, notNull = true)
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
 	public static final String props = "props";
 
 	/**
@@ -201,7 +210,7 @@ public class journals
 	 * type: _text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 8, notNull = true)
+	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 9, notNull = true)
 	public static final String tags = "tags";
 
 	/**
@@ -210,7 +219,7 @@ public class journals
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "instance_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "発生元インスタンスのID", defaultValue = "null", ordinalPosition = 9, notNull = true)
+	@Column(name = "instance_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "発生元インスタンスのID", defaultValue = "null", ordinalPosition = 10, notNull = true)
 	public static final String instance_id = "instance_id";
 
 	/**
@@ -221,7 +230,7 @@ public class journals
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "denied_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消元伝票ID\n訂正後の伝票が訂正前の伝票のIDを持つ\nここに入っているIDが指す伝票は、取り消されたものとなる", defaultValue = "'00000000-0000-0000-0000-000000000000'::uuid", ordinalPosition = 10, notNull = true)
+	@Column(name = "denied_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消元伝票ID\n訂正後の伝票が訂正前の伝票のIDを持つ\nここに入っているIDが指す伝票は、取り消されたものとなる", defaultValue = "'00000000-0000-0000-0000-000000000000'::uuid", ordinalPosition = 11, notNull = true)
 	public static final String denied_id = "denied_id";
 
 	/**
@@ -230,7 +239,7 @@ public class journals
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "deny_reason", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消理由", defaultValue = "''::text", ordinalPosition = 11, notNull = true)
+	@Column(name = "deny_reason", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "取消理由", defaultValue = "''::text", ordinalPosition = 12, notNull = true)
 	public static final String deny_reason = "deny_reason";
 
 	/**
@@ -240,7 +249,7 @@ public class journals
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_tree_revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録時のグループ階層リビジョン番号\n登録前検査当時のグループ階層状態を確認するために使用", defaultValue = "null", ordinalPosition = 12, notNull = true)
+	@Column(name = "group_tree_revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "登録時のグループ階層リビジョン番号\n登録前検査当時のグループ階層状態を確認するために使用", defaultValue = "null", ordinalPosition = 13, notNull = true)
 	public static final String group_tree_revision = "group_tree_revision";
 
 	/**
@@ -249,7 +258,7 @@ public class journals
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "null", ordinalPosition = 13, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "null", ordinalPosition = 14, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -258,7 +267,7 @@ public class journals
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 14, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 15, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -438,7 +447,7 @@ public class journals
 		 * setter
 		 * name: seq<br>
 		 * remarks: グループ内連番<br>
-		 * type: bigserial(19)<br>
+		 * type: int8(19)<br>
 		 * not null: true<br>
 		 * @param value java.lang.Long
 		 */
@@ -455,13 +464,43 @@ public class journals
 		 * getter
 		 * name: seq<br>
 		 * remarks: グループ内連番<br>
-		 * type: bigserial(19)<br>
+		 * type: int8(19)<br>
 		 * not null: true<br>
 		 * @return java.lang.Long
 		 */
 		public java.lang.Long getSeq() {
 			Binder binder = data$.getValue("seq");
 			return (java.lang.Long) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: code<br>
+		 * remarks: 外部システムコード<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
+		 * @param value java.lang.String
+		 */
+		public void setCode(java.lang.String value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("code").getType());
+			data$.setValue("code", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: code<br>
+		 * remarks: 外部システムコード<br>
+		 * type: text(2147483647)<br>
+		 * not null: true<br>
+		 * @return java.lang.String
+		 */
+		public java.lang.String getCode() {
+			Binder binder = data$.getValue("code");
+			return (java.lang.String) binder.getValue();
 		}
 
 		/**
@@ -1925,6 +1964,11 @@ public class journals
 		public final T seq;
 
 		/**
+		 * 項目名 code
+		 */
+		public final T code;
+
+		/**
 		 * 項目名 journal_batch_id
 		 */
 		public final T journal_batch_id;
@@ -1993,6 +2037,7 @@ public class journals
 			this.id = builder$.buildColumn(this, sqlassist.bb.journals.id);
 			this.group_id = builder$.buildColumn(this, sqlassist.bb.journals.group_id);
 			this.seq = builder$.buildColumn(this, sqlassist.bb.journals.seq);
+			this.code = builder$.buildColumn(this, sqlassist.bb.journals.code);
 			this.journal_batch_id = builder$.buildColumn(this, sqlassist.bb.journals.journal_batch_id);
 			this.fixed_at = builder$.buildColumn(this, sqlassist.bb.journals.fixed_at);
 			this.description = builder$.buildColumn(this, sqlassist.bb.journals.description);

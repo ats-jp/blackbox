@@ -97,21 +97,21 @@ import org.blendee.assist.annotation.Table;
 /**
  * 自動生成されたテーブル操作クラスです。
  * schema: bb_stock<br>
- * name: statuses<br>
+ * name: skus<br>
  * type: TABLE<br>
- * remarks: 状態<br>
- * Blackbox内でのアイテムの状態<br>
+ * remarks: SKU<br>
+ * 在庫管理する対象となるSKU、個品など<br>
  */
-@Table(name = "statuses", schema = "bb_stock", type = "TABLE", remarks = "状態\nBlackbox内でのアイテムの状態")
-@PrimaryKey(name = "statuses_pkey", columns = { "id" })
-public class statuses
+@Table(name = "skus", schema = "bb_stock", type = "TABLE", remarks = "SKU\n在庫管理する対象となるSKU、個品など")
+@PrimaryKey(name = "skus_pkey", columns = { "id" })
+public class skus
 	extends java.lang.Object
 	implements
 	TableFacade<Row>,
 	SelectStatement,
 	SQLDecorators,
-	Query<statuses.Iterator, statuses.Row>,
-	RightTable<statuses.OnRightAssist> {
+	Query<skus.Iterator, skus.Row>,
+	RightTable<skus.OnRightAssist> {
 
 	/**
 	 * この定数クラスのスキーマ名
@@ -121,7 +121,7 @@ public class statuses
 	/**
 	 * この定数クラスのテーブル名
 	 */
-	public static final String TABLE = "statuses";
+	public static final String TABLE = "skus";
 
 	/**
 	 * この定数クラスのテーブルを指す {@link TablePath}
@@ -142,22 +142,22 @@ public class statuses
 	public static final String id = "id";
 
 	/**
-	 * name: group_id<br>
-	 * remarks: グループID<br>
+	 * name: item_id<br>
+	 * remarks: アイテムID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID", defaultValue = "null", ordinalPosition = 2, notNull = true)
-	public static final String group_id = "group_id";
+	@Column(name = "item_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムID", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	public static final String item_id = "item_id";
 
 	/**
-	 * name: seq<br>
-	 * remarks: グループ内連番<br>
+	 * name: seq_in_item<br>
+	 * remarks: アイテム内連番<br>
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループ内連番", defaultValue = "null", ordinalPosition = 3, notNull = true)
-	public static final String seq = "seq";
+	@Column(name = "seq_in_item", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテム内連番", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String seq_in_item = "seq_in_item";
 
 	/**
 	 * name: name<br>
@@ -170,11 +170,11 @@ public class statuses
 
 	/**
 	 * name: code<br>
-	 * remarks: 外部システムコード<br>
+	 * remarks: <br>
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "code", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部システムコード", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "code", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 5, notNull = true)
 	public static final String code = "code";
 
 	/**
@@ -187,21 +187,12 @@ public class statuses
 	public static final String description = "description";
 
 	/**
-	 * name: owner_id<br>
-	 * remarks: 所有者ID<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "owner_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者ID", defaultValue = "null", ordinalPosition = 7, notNull = true)
-	public static final String owner_id = "owner_id";
-
-	/**
 	 * name: revision<br>
 	 * remarks: リビジョン番号<br>
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 8, notNull = true)
+	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 7, notNull = true)
 	public static final String revision = "revision";
 
 	/**
@@ -210,7 +201,7 @@ public class statuses
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
 	public static final String props = "props";
 
 	/**
@@ -219,7 +210,7 @@ public class statuses
 	 * type: _text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "log保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 10, notNull = true)
+	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "log保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 9, notNull = true)
 	public static final String tags = "tags";
 
 	/**
@@ -228,7 +219,7 @@ public class statuses
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "active", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "アクティブフラグ", defaultValue = "true", ordinalPosition = 11, notNull = true)
+	@Column(name = "active", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "アクティブフラグ", defaultValue = "true", ordinalPosition = 10, notNull = true)
 	public static final String active = "active";
 
 	/**
@@ -237,7 +228,7 @@ public class statuses
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 12, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 11, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -246,7 +237,7 @@ public class statuses
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 13, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 12, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -255,7 +246,7 @@ public class statuses
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 14, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 13, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -264,40 +255,32 @@ public class statuses
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 15, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 14, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
-	 * name: statuses_group_id_fkey<br>
-	 * references: groups<br>
-	 * columns: group_id
-	 */
-	@ForeignKey(name = "statuses_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
-	public static final String bb$groups$statuses_group_id_fkey = "statuses_group_id_fkey";
-
-	/**
-	 * name: statuses_created_by_fkey<br>
+	 * name: skus_created_by_fkey<br>
 	 * references: users<br>
 	 * columns: created_by
 	 */
-	@ForeignKey(name = "statuses_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String bb$users$statuses_created_by_fkey = "statuses_created_by_fkey";
+	@ForeignKey(name = "skus_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$skus_created_by_fkey = "skus_created_by_fkey";
 
 	/**
-	 * name: statuses_updated_by_fkey<br>
+	 * name: skus_updated_by_fkey<br>
 	 * references: users<br>
 	 * columns: updated_by
 	 */
-	@ForeignKey(name = "statuses_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String bb$users$statuses_updated_by_fkey = "statuses_updated_by_fkey";
+	@ForeignKey(name = "skus_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
+	public static final String bb$users$skus_updated_by_fkey = "skus_updated_by_fkey";
 
 	/**
-	 * name: statuses_owner_id_fkey<br>
-	 * references: owners<br>
-	 * columns: owner_id
+	 * name: skus_item_id_fkey<br>
+	 * references: items<br>
+	 * columns: item_id
 	 */
-	@ForeignKey(name = "statuses_owner_id_fkey", references = "bb_stock.owners", columns = { "owner_id" }, refColumns = { "id" })
-	public static final String bb_stock$owners$statuses_owner_id_fkey = "statuses_owner_id_fkey";
+	@ForeignKey(name = "skus_item_id_fkey", references = "bb_stock.items", columns = { "item_id" }, refColumns = { "id" })
+	public static final String bb_stock$items$skus_item_id_fkey = "skus_item_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -402,61 +385,61 @@ public class statuses
 
 		/**
 		 * setter
-		 * name: group_id<br>
-		 * remarks: グループID<br>
+		 * name: item_id<br>
+		 * remarks: アイテムID<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setGroup_id(java.util.UUID value) {
+		public void setItem_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("group_id").getType());
-			data$.setValue("group_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("item_id").getType());
+			data$.setValue("item_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: group_id<br>
-		 * remarks: グループID<br>
+		 * name: item_id<br>
+		 * remarks: アイテムID<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getGroup_id() {
-			Binder binder = data$.getValue("group_id");
+		public java.util.UUID getItem_id() {
+			Binder binder = data$.getValue("item_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * setter
-		 * name: seq<br>
-		 * remarks: グループ内連番<br>
+		 * name: seq_in_item<br>
+		 * remarks: アイテム内連番<br>
 		 * type: int8(19)<br>
 		 * not null: true<br>
 		 * @param value java.lang.Long
 		 */
-		public void setSeq(java.lang.Long value) {
+		public void setSeq_in_item(java.lang.Long value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("seq").getType());
-			data$.setValue("seq", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("seq_in_item").getType());
+			data$.setValue("seq_in_item", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: seq<br>
-		 * remarks: グループ内連番<br>
+		 * name: seq_in_item<br>
+		 * remarks: アイテム内連番<br>
 		 * type: int8(19)<br>
 		 * not null: true<br>
 		 * @return java.lang.Long
 		 */
-		public java.lang.Long getSeq() {
-			Binder binder = data$.getValue("seq");
+		public java.lang.Long getSeq_in_item() {
+			Binder binder = data$.getValue("seq_in_item");
 			return (java.lang.Long) binder.getValue();
 		}
 
@@ -493,7 +476,7 @@ public class statuses
 		/**
 		 * setter
 		 * name: code<br>
-		 * remarks: 外部システムコード<br>
+		 * remarks: <br>
 		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.lang.String
@@ -510,7 +493,7 @@ public class statuses
 		/**
 		 * getter
 		 * name: code<br>
-		 * remarks: 外部システムコード<br>
+		 * remarks: <br>
 		 * type: text(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.lang.String
@@ -548,36 +531,6 @@ public class statuses
 		public java.lang.String getDescription() {
 			Binder binder = data$.getValue("description");
 			return (java.lang.String) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: owner_id<br>
-		 * remarks: 所有者ID<br>
-		 * type: uuid(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setOwner_id(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("owner_id").getType());
-			data$.setValue("owner_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: owner_id<br>
-		 * remarks: 所有者ID<br>
-		 * type: uuid(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getOwner_id() {
-			Binder binder = data$.getValue("owner_id");
-			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -822,50 +775,38 @@ public class statuses
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 statuses_group_id_fkey<br>
-		 * 項目名 group_id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.groups.Row $groups() {
-			return sqlassist.bb.groups.row(
-				data$.getDataObject(bb$groups$statuses_group_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 users<br>
-		 * 外部キー名 statuses_created_by_fkey<br>
+		 * 外部キー名 skus_created_by_fkey<br>
 		 * 項目名 created_by
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.users.Row $users$statuses_created_by_fkey() {
+		public sqlassist.bb.users.Row $users$skus_created_by_fkey() {
 			return sqlassist.bb.users.row(
-				data$.getDataObject(bb$users$statuses_created_by_fkey));
+				data$.getDataObject(bb$users$skus_created_by_fkey));
 		}
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 users<br>
-		 * 外部キー名 statuses_updated_by_fkey<br>
+		 * 外部キー名 skus_updated_by_fkey<br>
 		 * 項目名 updated_by
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.users.Row $users$statuses_updated_by_fkey() {
+		public sqlassist.bb.users.Row $users$skus_updated_by_fkey() {
 			return sqlassist.bb.users.row(
-				data$.getDataObject(bb$users$statuses_updated_by_fkey));
+				data$.getDataObject(bb$users$skus_updated_by_fkey));
 		}
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 owners<br>
-		 * 外部キー名 statuses_owner_id_fkey<br>
-		 * 項目名 owner_id
+		 * 参照先テーブル名 items<br>
+		 * 外部キー名 skus_item_id_fkey<br>
+		 * 項目名 item_id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb_stock.owners.Row $owners() {
-			return sqlassist.bb_stock.owners.row(
-				data$.getDataObject(bb_stock$owners$statuses_owner_id_fkey));
+		public sqlassist.bb_stock.items.Row $items() {
+			return sqlassist.bb_stock.items.row(
+				data$.getDataObject(bb_stock$items$skus_item_id_fkey));
 		}
 	}
 
@@ -901,7 +842,7 @@ public class statuses
 		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final WhereAssist OR = new WhereAssist(
-			statuses.this,
+			skus.this,
 			whereContext$,
 			CriteriaContext.OR,
 			null);
@@ -910,7 +851,7 @@ public class statuses
 		 * WHERE 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final WhereAssist AND = new WhereAssist(
-			statuses.this,
+			skus.this,
 			whereContext$,
 			CriteriaContext.AND,
 			OR);
@@ -933,7 +874,7 @@ public class statuses
 		 * HAVING 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final HavingAssist OR = new HavingAssist(
-			statuses.this,
+			skus.this,
 			havingContext$,
 			CriteriaContext.OR,
 			null);
@@ -942,7 +883,7 @@ public class statuses
 		 * HAVING 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final HavingAssist AND = new HavingAssist(
-			statuses.this,
+			skus.this,
 			havingContext$,
 			CriteriaContext.AND,
 			OR);
@@ -965,7 +906,7 @@ public class statuses
 		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final OnLeftAssist OR = new OnLeftAssist(
-			statuses.this,
+			skus.this,
 			onLeftContext$,
 			CriteriaContext.OR,
 			null);
@@ -974,7 +915,7 @@ public class statuses
 		 * ON 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final OnLeftAssist AND = new OnLeftAssist(
-			statuses.this,
+			skus.this,
 			onLeftContext$,
 			CriteriaContext.AND,
 			OR);
@@ -997,7 +938,7 @@ public class statuses
 		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final OnRightAssist OR = new OnRightAssist(
-			statuses.this,
+			skus.this,
 			onRightContext$,
 			CriteriaContext.OR,
 			null);
@@ -1006,7 +947,7 @@ public class statuses
 		 * ON 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final OnRightAssist AND = new OnRightAssist(
-			statuses.this,
+			skus.this,
 			onRightContext$,
 			CriteriaContext.AND,
 			OR);
@@ -1029,7 +970,7 @@ public class statuses
 		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final DMSWhereAssist OR = new DMSWhereAssist(
-			statuses.this,
+			skus.this,
 			dmsWhereContext$,
 			CriteriaContext.OR,
 			null);
@@ -1038,7 +979,7 @@ public class statuses
 		 * WHERE 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final DMSWhereAssist AND = new DMSWhereAssist(
-			statuses.this,
+			skus.this,
 			dmsWhereContext$,
 			CriteriaContext.AND,
 			OR);
@@ -1067,48 +1008,48 @@ public class statuses
 	private class SelectBehavior extends SelectStatementBehavior<SelectAssist, ListSelectAssist, GroupByAssist, ListGroupByAssist, WhereAssist, HavingAssist, OrderByAssist, ListOrderByAssist, OnLeftAssist> {
 
 		private SelectBehavior() {
-			super($TABLE, getRuntimeId(), statuses.this);
+			super($TABLE, getRuntimeId(), skus.this);
 		}
 
 		@Override
 		protected SelectAssist newSelect() {
 			return new SelectAssist(
-				statuses.this,
+				skus.this,
 				selectContext$);
 		}
 
 		@Override
 		protected ListSelectAssist newListSelect() {
 			return new ListSelectAssist(
-				statuses.this,
+				skus.this,
 				selectContext$);
 		}
 
 		@Override
 		protected GroupByAssist newGroupBy() {
 			return new GroupByAssist(
-				statuses.this,
+				skus.this,
 				groupByContext$);
 		}
 
 		@Override
 		protected ListGroupByAssist newListGroupBy() {
 			return new ListGroupByAssist(
-				statuses.this,
+				skus.this,
 				groupByContext$);
 		}
 
 		@Override
 		protected OrderByAssist newOrderBy() {
 			return new OrderByAssist(
-				statuses.this,
+				skus.this,
 				orderByContext$);
 		}
 
 		@Override
 		protected ListOrderByAssist newListOrderBy() {
 			return new ListOrderByAssist(
-				statuses.this,
+				skus.this,
 				orderByContext$);
 		}
 
@@ -1140,35 +1081,35 @@ public class statuses
 			super(
 				$TABLE,
 				relationship$,
-				statuses.this.getRuntimeId(),
-				statuses.this);
+				skus.this.getRuntimeId(),
+				skus.this);
 		}
 
 		@Override
 		protected InsertAssist newInsert() {
 			return new InsertAssist(
-				statuses.this,
+				skus.this,
 				insertContext$);
 		}
 
 		@Override
 		protected ListInsertAssist newListInsert() {
 			return new ListInsertAssist(
-				statuses.this,
+				skus.this,
 				insertContext$);
 		}
 
 		@Override
 		protected UpdateAssist newUpdate() {
 			return new UpdateAssist(
-				statuses.this,
+				skus.this,
 				updateContext$);
 		}
 
 		@Override
 		protected ListUpdateAssist newListUpdate() {
 			return new ListUpdateAssist(
-				statuses.this,
+				skus.this,
 				updateContext$);
 		}
 
@@ -1181,7 +1122,7 @@ public class statuses
 	/**
 	 * 空のインスタンスを生成します。
 	 */
-	public statuses() {
+	public skus() {
 	}
 
 	/**
@@ -1189,7 +1130,7 @@ public class statuses
 	 * このコンストラクタで生成されたインスタンス の SELECT 句で使用されるカラムは、 パラメータの {@link SelectContext} に依存します。
 	 * @param context SELECT 句を決定する
 	 */
-	public statuses(SelectContext context) {
+	public skus(SelectContext context) {
 		selectBehavior().setSelectContext(Objects.requireNonNull(context));
 	}
 
@@ -1245,7 +1186,7 @@ public class statuses
 	 * @param consumer {@link Consumer}
 	 * @return this
 	 */
-	public statuses selectClause(Consumer<ListSelectAssist> consumer) {
+	public skus selectClause(Consumer<ListSelectAssist> consumer) {
 		selectBehavior().selectClause(consumer);
 		return this;
 	}
@@ -1255,7 +1196,7 @@ public class statuses
 	 * @param consumer {@link Consumer}
 	 * @return this
 	 */
-	public statuses groupByClause(Consumer<ListGroupByAssist> consumer) {
+	public skus groupByClause(Consumer<ListGroupByAssist> consumer) {
 		selectBehavior().groupByClause(consumer);
 		return this;
 	}
@@ -1265,7 +1206,7 @@ public class statuses
 	 * @param consumer {@link Consumer}
 	 * @return this
 	 */
-	public statuses orderByClause(Consumer<ListOrderByAssist> consumer) {
+	public skus orderByClause(Consumer<ListOrderByAssist> consumer) {
 		selectBehavior().orderByClause(consumer);
 		return this;
 	}
@@ -1275,7 +1216,7 @@ public class statuses
 	 * @param function
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses SELECT(
+	public skus SELECT(
 		SelectOfferFunction<SelectAssist> function) {
 		selectBehavior().SELECT(function);
 		return this;
@@ -1286,7 +1227,7 @@ public class statuses
 	 * @param function
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses SELECT_DISTINCT(
+	public skus SELECT_DISTINCT(
 		SelectOfferFunction<SelectAssist> function) {
 		selectBehavior().SELECT_DISTINCT(function);
 		return this;
@@ -1296,7 +1237,7 @@ public class statuses
 	 * COUNT(*) を使用した SELECT 句を記述します。
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses SELECT_COUNT() {
+	public skus SELECT_COUNT() {
 		selectBehavior().SELECT_COUNT();
 		return this;
 	}
@@ -1306,7 +1247,7 @@ public class statuses
 	 * @param function
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses GROUP_BY(
+	public skus GROUP_BY(
 		GroupByOfferFunction<GroupByAssist> function) {
 		selectBehavior().GROUP_BY(function);
 		return this;
@@ -1318,7 +1259,7 @@ public class statuses
 	 * @return この {@link SelectStatement}
 	 */
 	@SafeVarargs
-	public final statuses WHERE(
+	public final skus WHERE(
 		Consumer<WhereAssist>... consumers) {
 		selectBehavior().WHERE(consumers);
 		return this;
@@ -1340,7 +1281,7 @@ public class statuses
 	 * @return この {@link SelectStatement}
 	 */
 	@SafeVarargs
-	public final statuses HAVING(
+	public final skus HAVING(
 		Consumer<HavingAssist>... consumers) {
 		selectBehavior().HAVING(consumers);
 		return this;
@@ -1361,7 +1302,7 @@ public class statuses
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, statuses> INNER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, skus> INNER_JOIN(RightTable<R> right) {
 		return selectBehavior().INNER_JOIN(right, this);
 	}
 
@@ -1370,7 +1311,7 @@ public class statuses
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, statuses> LEFT_OUTER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, skus> LEFT_OUTER_JOIN(RightTable<R> right) {
 		return selectBehavior().LEFT_OUTER_JOIN(right, this);
 	}
 
@@ -1379,7 +1320,7 @@ public class statuses
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, statuses> RIGHT_OUTER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, skus> RIGHT_OUTER_JOIN(RightTable<R> right) {
 		return selectBehavior().RIGHT_OUTER_JOIN(right, this);
 	}
 
@@ -1388,7 +1329,7 @@ public class statuses
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, statuses> FULL_OUTER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, skus> FULL_OUTER_JOIN(RightTable<R> right) {
 		return selectBehavior().FULL_OUTER_JOIN(right, this);
 	}
 
@@ -1397,7 +1338,7 @@ public class statuses
 	 * @param right 別クエリ
 	 * @return この {@link SelectStatement}
 	 */
-	public <R extends OnRightClauseAssist<?>> statuses CROSS_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> skus CROSS_JOIN(RightTable<R> right) {
 		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
@@ -1408,7 +1349,7 @@ public class statuses
 	 * @param select UNION 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses UNION(SelectStatement select) {
+	public skus UNION(SelectStatement select) {
 		selectBehavior().UNION(select);
 		return this;
 	}
@@ -1419,7 +1360,7 @@ public class statuses
 	 * @param select UNION ALL 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses UNION_ALL(SelectStatement select) {
+	public skus UNION_ALL(SelectStatement select) {
 		selectBehavior().UNION_ALL(select);
 		return this;
 	}
@@ -1430,7 +1371,7 @@ public class statuses
 	 * @param select INTERSECT 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses INTERSECT(SelectStatement select) {
+	public skus INTERSECT(SelectStatement select) {
 		selectBehavior().INTERSECT(select);
 		return this;
 	}
@@ -1441,7 +1382,7 @@ public class statuses
 	 * @param select INTERSECT ALL 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses INTERSECT_ALL(SelectStatement select) {
+	public skus INTERSECT_ALL(SelectStatement select) {
 		selectBehavior().INTERSECT_ALL(select);
 		return this;
 	}
@@ -1452,7 +1393,7 @@ public class statuses
 	 * @param select EXCEPT 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses EXCEPT(SelectStatement select) {
+	public skus EXCEPT(SelectStatement select) {
 		selectBehavior().INTERSECT(select);
 		return this;
 	}
@@ -1463,7 +1404,7 @@ public class statuses
 	 * @param select EXCEPT ALL 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses EXCEPT_ALL(SelectStatement select) {
+	public skus EXCEPT_ALL(SelectStatement select) {
 		selectBehavior().EXCEPT_ALL(select);
 		return this;
 	}
@@ -1473,7 +1414,7 @@ public class statuses
 	 * @param function
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses ORDER_BY(
+	public skus ORDER_BY(
 		OrderByOfferFunction<OrderByAssist> function) {
 		selectBehavior().ORDER_BY(function);
 		return this;
@@ -1490,7 +1431,7 @@ public class statuses
 	 * @return {@link SelectStatement} 自身
 	 * @throws IllegalStateException 既に ORDER BY 句がセットされている場合
 	 */
-	public statuses setGroupByClause(GroupByClause clause) {
+	public skus setGroupByClause(GroupByClause clause) {
 		selectBehavior().setGroupByClause(clause);
 		return this;
 	}
@@ -1501,7 +1442,7 @@ public class statuses
 	 * @return {@link SelectStatement} 自身
 	 * @throws IllegalStateException 既に ORDER BY 句がセットされている場合
 	 */
-	public statuses setOrderByClause(OrderByClause clause) {
+	public skus setOrderByClause(OrderByClause clause) {
 		selectBehavior().setOrderByClause(clause);
 		return this;
 	}
@@ -1512,7 +1453,7 @@ public class statuses
 	 * @param criteria AND 結合する新条件
 	 * @return {@link SelectStatement} 自身
 	 */
-	public statuses and(Criteria criteria) {
+	public skus and(Criteria criteria) {
 		selectBehavior().and(criteria);
 		return this;
 	}
@@ -1523,7 +1464,7 @@ public class statuses
 	 * @param criteria OR 結合する新条件
 	 * @return {@link SelectStatement} 自身
 	 */
-	public statuses or(Criteria criteria) {
+	public skus or(Criteria criteria) {
 		selectBehavior().or(criteria);
 		return this;
 	}
@@ -1534,7 +1475,7 @@ public class statuses
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public statuses accept(SQLDecorator... decorators) {
+	public skus accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}
@@ -1684,7 +1625,7 @@ public class statuses
 	 * 現在保持している SELECT 文の WHERE 句をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetWhere() {
+	public skus resetWhere() {
 		selectBehavior().resetWhere();
 		return this;
 	}
@@ -1693,7 +1634,7 @@ public class statuses
 	 * 現在保持している HAVING 句をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetHaving() {
+	public skus resetHaving() {
 		selectBehavior().resetHaving();
 		return this;
 	}
@@ -1702,7 +1643,7 @@ public class statuses
 	 * 現在保持している SELECT 句をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetSelect() {
+	public skus resetSelect() {
 		selectBehavior().resetSelect();
 		return this;
 	}
@@ -1711,7 +1652,7 @@ public class statuses
 	 * 現在保持している GROUP BY 句をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetGroupBy() {
+	public skus resetGroupBy() {
 		selectBehavior().resetGroupBy();
 		return this;
 	}
@@ -1720,7 +1661,7 @@ public class statuses
 	 * 現在保持している ORDER BY 句をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetOrderBy() {
+	public skus resetOrderBy() {
 		selectBehavior().resetOrderBy();
 		return this;
 	}
@@ -1729,7 +1670,7 @@ public class statuses
 	 * 現在保持している UNION をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetUnions() {
+	public skus resetUnions() {
 		selectBehavior().resetUnions();
 		return this;
 	}
@@ -1738,7 +1679,7 @@ public class statuses
 	 * 現在保持している JOIN をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetJoins() {
+	public skus resetJoins() {
 		selectBehavior().resetJoins();
 		return this;
 	}
@@ -1747,7 +1688,7 @@ public class statuses
 	 * 現在保持している INSERT 文のカラムをリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetInsert() {
+	public skus resetInsert() {
 		dmsBehavior().resetInsert();
 		return this;
 	}
@@ -1756,7 +1697,7 @@ public class statuses
 	 * 現在保持している UPDATE 文の更新要素をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetUpdate() {
+	public skus resetUpdate() {
 		dmsBehavior().resetUpdate();
 		return this;
 	}
@@ -1765,7 +1706,7 @@ public class statuses
 	 * 現在保持している SET 文の更新要素をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetDelete() {
+	public skus resetDelete() {
 		dmsBehavior().resetDelete();
 		return this;
 	}
@@ -1774,7 +1715,7 @@ public class statuses
 	 * 現在保持している {@link SQLDecorator} をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetDecorators() {
+	public skus resetDecorators() {
 		decorators$.clear();
 		return this;
 	}
@@ -1783,7 +1724,7 @@ public class statuses
 	 * 現在保持している条件、並び順をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses reset() {
+	public skus reset() {
 		selectBehavior().reset();
 		dmsBehavior().reset();
 		resetDecorators();
@@ -1909,7 +1850,7 @@ public class statuses
 	 */
 	public static class Assist<T, M> implements TableFacadeAssist {
 
-		final statuses table$;
+		final skus table$;
 
 		private final CriteriaContext context$;
 
@@ -1923,14 +1864,14 @@ public class statuses
 		public final T id;
 
 		/**
-		 * 項目名 group_id
+		 * 項目名 item_id
 		 */
-		public final T group_id;
+		public final T item_id;
 
 		/**
-		 * 項目名 seq
+		 * 項目名 seq_in_item
 		 */
-		public final T seq;
+		public final T seq_in_item;
 
 		/**
 		 * 項目名 name
@@ -1946,11 +1887,6 @@ public class statuses
 		 * 項目名 description
 		 */
 		public final T description;
-
-		/**
-		 * 項目名 owner_id
-		 */
-		public final T owner_id;
 
 		/**
 		 * 項目名 revision
@@ -1993,7 +1929,7 @@ public class statuses
 		public final T updated_by;
 
 		private Assist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<T> builder$,
 			CriteriaContext context$,
 			TableFacadeAssist parent$,
@@ -2003,21 +1939,20 @@ public class statuses
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(this, sqlassist.bb_stock.statuses.id);
-			this.group_id = builder$.buildColumn(this, sqlassist.bb_stock.statuses.group_id);
-			this.seq = builder$.buildColumn(this, sqlassist.bb_stock.statuses.seq);
-			this.name = builder$.buildColumn(this, sqlassist.bb_stock.statuses.name);
-			this.code = builder$.buildColumn(this, sqlassist.bb_stock.statuses.code);
-			this.description = builder$.buildColumn(this, sqlassist.bb_stock.statuses.description);
-			this.owner_id = builder$.buildColumn(this, sqlassist.bb_stock.statuses.owner_id);
-			this.revision = builder$.buildColumn(this, sqlassist.bb_stock.statuses.revision);
-			this.props = builder$.buildColumn(this, sqlassist.bb_stock.statuses.props);
-			this.tags = builder$.buildColumn(this, sqlassist.bb_stock.statuses.tags);
-			this.active = builder$.buildColumn(this, sqlassist.bb_stock.statuses.active);
-			this.created_at = builder$.buildColumn(this, sqlassist.bb_stock.statuses.created_at);
-			this.created_by = builder$.buildColumn(this, sqlassist.bb_stock.statuses.created_by);
-			this.updated_at = builder$.buildColumn(this, sqlassist.bb_stock.statuses.updated_at);
-			this.updated_by = builder$.buildColumn(this, sqlassist.bb_stock.statuses.updated_by);
+			this.id = builder$.buildColumn(this, sqlassist.bb_stock.skus.id);
+			this.item_id = builder$.buildColumn(this, sqlassist.bb_stock.skus.item_id);
+			this.seq_in_item = builder$.buildColumn(this, sqlassist.bb_stock.skus.seq_in_item);
+			this.name = builder$.buildColumn(this, sqlassist.bb_stock.skus.name);
+			this.code = builder$.buildColumn(this, sqlassist.bb_stock.skus.code);
+			this.description = builder$.buildColumn(this, sqlassist.bb_stock.skus.description);
+			this.revision = builder$.buildColumn(this, sqlassist.bb_stock.skus.revision);
+			this.props = builder$.buildColumn(this, sqlassist.bb_stock.skus.props);
+			this.tags = builder$.buildColumn(this, sqlassist.bb_stock.skus.tags);
+			this.active = builder$.buildColumn(this, sqlassist.bb_stock.skus.active);
+			this.created_at = builder$.buildColumn(this, sqlassist.bb_stock.skus.created_at);
+			this.created_by = builder$.buildColumn(this, sqlassist.bb_stock.skus.created_by);
+			this.updated_at = builder$.buildColumn(this, sqlassist.bb_stock.skus.updated_at);
+			this.updated_by = builder$.buildColumn(this, sqlassist.bb_stock.skus.updated_by);
 		}
 
 		/**
@@ -2034,7 +1969,7 @@ public class statuses
 		}
 
 		private Assist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<T> builder$,
 			CriteriaContext context$) {
 			this(table$, builder$, context$, null, null);
@@ -2115,7 +2050,7 @@ public class statuses
 		}
 
 		private ExtAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<T> builder$,
 			CriteriaContext context$) {
 			super(table$, builder$, context$);
@@ -2135,55 +2070,42 @@ public class statuses
 		}
 
 		/**
-		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 statuses_group_id_fkey<br>
-		 * 項目名 group_id
-		 * @return groups relationship
-		 */
-		public sqlassist.bb.groups.ExtAssist<T, Many<sqlassist.bb_stock.statuses.Row, M>> $groups() {
-			return new sqlassist.bb.groups.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb_stock.statuses.bb$groups$statuses_group_id_fkey);
-		}
-
-		/**
 		 * 参照先テーブル名 users<br>
-		 * 外部キー名 statuses_created_by_fkey<br>
+		 * 外部キー名 skus_created_by_fkey<br>
 		 * 項目名 created_by
 		 * @return users relationship
 		 */
-		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb_stock.statuses.Row, M>> $users$statuses_created_by_fkey() {
+		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb_stock.skus.Row, M>> $users$skus_created_by_fkey() {
 			return new sqlassist.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb_stock.statuses.bb$users$statuses_created_by_fkey);
+				sqlassist.bb_stock.skus.bb$users$skus_created_by_fkey);
 		}
 
 		/**
 		 * 参照先テーブル名 users<br>
-		 * 外部キー名 statuses_updated_by_fkey<br>
+		 * 外部キー名 skus_updated_by_fkey<br>
 		 * 項目名 updated_by
 		 * @return users relationship
 		 */
-		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb_stock.statuses.Row, M>> $users$statuses_updated_by_fkey() {
+		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb_stock.skus.Row, M>> $users$skus_updated_by_fkey() {
 			return new sqlassist.bb.users.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb_stock.statuses.bb$users$statuses_updated_by_fkey);
+				sqlassist.bb_stock.skus.bb$users$skus_updated_by_fkey);
 		}
 
 		/**
-		 * 参照先テーブル名 owners<br>
-		 * 外部キー名 statuses_owner_id_fkey<br>
-		 * 項目名 owner_id
-		 * @return owners relationship
+		 * 参照先テーブル名 items<br>
+		 * 外部キー名 skus_item_id_fkey<br>
+		 * 項目名 item_id
+		 * @return items relationship
 		 */
-		public sqlassist.bb_stock.owners.ExtAssist<T, Many<sqlassist.bb_stock.statuses.Row, M>> $owners() {
-			return new sqlassist.bb_stock.owners.ExtAssist<>(
+		public sqlassist.bb_stock.items.ExtAssist<T, Many<sqlassist.bb_stock.skus.Row, M>> $items() {
+			return new sqlassist.bb_stock.items.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb_stock.statuses.bb_stock$owners$statuses_owner_id_fkey);
+				sqlassist.bb_stock.skus.bb_stock$items$skus_item_id_fkey);
 		}
 	}
 
@@ -2193,7 +2115,7 @@ public class statuses
 	public static class SelectAssist extends ExtAssist<SelectCol, Void> implements SelectClauseAssist {
 
 		private SelectAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<SelectCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
 		}
@@ -2205,7 +2127,7 @@ public class statuses
 	public static class ListSelectAssist extends SelectAssist implements ListSelectClauseAssist {
 
 		private ListSelectAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<SelectCol> builder$) {
 			super(table$, builder$);
 		}
@@ -2227,7 +2149,7 @@ public class statuses
 		public final WhereAssist OR;
 
 		private WhereAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<WhereColumn<WhereLogicalOperators>> builder$,
 			CriteriaContext context$,
 			WhereAssist or$) {
@@ -2318,7 +2240,7 @@ public class statuses
 	public static class GroupByAssist extends ExtAssist<GroupByCol, Void> implements GroupByClauseAssist {
 
 		private GroupByAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<GroupByCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
 		}
@@ -2335,7 +2257,7 @@ public class statuses
 	public static class ListGroupByAssist extends GroupByAssist implements ListGroupByClauseAssist {
 
 		private ListGroupByAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<GroupByCol> builder$) {
 			super(table$, builder$);
 		}
@@ -2357,7 +2279,7 @@ public class statuses
 		public final HavingAssist OR;
 
 		private HavingAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<HavingColumn<HavingLogicalOperators>> builder$,
 			CriteriaContext context$,
 			HavingAssist or$) {
@@ -2443,7 +2365,7 @@ public class statuses
 	public static class OrderByAssist extends ExtAssist<OrderByCol, Void> implements OrderByClauseAssist {
 
 		private OrderByAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<OrderByCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
 		}
@@ -2460,7 +2382,7 @@ public class statuses
 	public static class ListOrderByAssist extends OrderByAssist implements ListOrderByClauseAssist {
 
 		private ListOrderByAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<OrderByCol> builder$) {
 			super(table$, builder$);
 		}
@@ -2482,7 +2404,7 @@ public class statuses
 		public final OnLeftAssist OR;
 
 		private OnLeftAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<OnLeftColumn<OnLeftLogicalOperators>> builder$,
 			CriteriaContext context$,
 			OnLeftAssist or$) {
@@ -2573,7 +2495,7 @@ public class statuses
 		public final OnRightAssist OR;
 
 		private OnRightAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<OnRightColumn<OnRightLogicalOperators>> builder$,
 			CriteriaContext context$,
 			OnRightAssist or$) {
@@ -2659,7 +2581,7 @@ public class statuses
 	public static class InsertAssist extends Assist<InsertCol, Void> implements InsertClauseAssist {
 
 		private InsertAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<InsertCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
 		}
@@ -2671,7 +2593,7 @@ public class statuses
 	public static class ListInsertAssist extends InsertAssist implements ListInsertClauseAssist {
 
 		private ListInsertAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<InsertCol> builder$) {
 			super(table$, builder$);
 		}
@@ -2688,7 +2610,7 @@ public class statuses
 	public static class UpdateAssist extends Assist<UpdateCol, Void> implements UpdateClauseAssist {
 
 		private UpdateAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<UpdateCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
 		}
@@ -2700,7 +2622,7 @@ public class statuses
 	public static class ListUpdateAssist extends UpdateAssist implements ListUpdateClauseAssist<DMSWhereAssist> {
 
 		private ListUpdateAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<UpdateCol> builder$) {
 			super(table$, builder$);
 		}
@@ -2722,7 +2644,7 @@ public class statuses
 		public final DMSWhereAssist OR;
 
 		private DMSWhereAssist(
-			statuses table$,
+			skus table$,
 			TableFacadeContext<WhereColumn<DMSWhereLogicalOperators>> builder$,
 			CriteriaContext context$,
 			DMSWhereAssist or$) {

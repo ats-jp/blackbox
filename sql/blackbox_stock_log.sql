@@ -32,51 +32,6 @@ database
 SET default_tablespace = 'blackbox_log';
 */
 
-DROP TABLE IF EXISTS bb_log.items CASCADE;
-
-CREATE TABLE bb_log.items (
-	id uuid,
-	group_id uuid,
-	seq bigint,
-	name text,
-	description text,
-	revision bigint,
-	props jsonb,
-	tags text[],
-	active boolean,
-	created_at timestamptz,
-	created_by uuid,
-	updated_at timestamptz,
-	updated_by uuid,
-	action "char",
-	log_id bigserial PRIMARY KEY,
-	txid bigint DEFAULT txid_current(),
-	logged_by name DEFAULT current_user,
-	logged_at timestamptz DEFAULT now());
-
-DROP FUNCTION IF EXISTS bb_log.items_logfunction CASCADE;
-
-CREATE FUNCTION bb_log.items_logfunction() RETURNS TRIGGER AS $items_logtrigger$
-	BEGIN
-		IF (TG_OP = 'DELETE') THEN
-			INSERT INTO bb_log.items SELECT OLD.*, 'D';
-			RETURN OLD;
-		ELSIF (TG_OP = 'UPDATE') THEN
-			INSERT INTO bb_log.items SELECT NEW.*, 'U';
-			RETURN NEW;
-		ELSIF (TG_OP = 'INSERT') THEN
-			INSERT INTO bb_log.items SELECT NEW.*, 'I';
-			RETURN NEW;
-		END IF;
-		RETURN NULL;
-	END;
-$items_logtrigger$ LANGUAGE plpgsql;
-
-CREATE TRIGGER items_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb_stock.items
-FOR EACH ROW EXECUTE PROCEDURE bb_log.items_logfunction();
-
-----------
-
 DROP TABLE IF EXISTS bb_log.owners CASCADE;
 
 CREATE TABLE bb_log.owners (
@@ -84,6 +39,7 @@ CREATE TABLE bb_log.owners (
 	group_id uuid,
 	seq bigint,
 	name text,
+	code text,
 	description text,
 	revision bigint,
 	props jsonb,
@@ -122,6 +78,53 @@ FOR EACH ROW EXECUTE PROCEDURE bb_log.owners_logfunction();
 
 ----------
 
+DROP TABLE IF EXISTS bb_log.items CASCADE;
+
+CREATE TABLE bb_log.items (
+	id uuid,
+	group_id uuid,
+	seq bigint,
+	name text,
+	code text,
+	description text,
+	owner_id uuid,
+	revision bigint,
+	props jsonb,
+	tags text[],
+	active boolean,
+	created_at timestamptz,
+	created_by uuid,
+	updated_at timestamptz,
+	updated_by uuid,
+	action "char",
+	log_id bigserial PRIMARY KEY,
+	txid bigint DEFAULT txid_current(),
+	logged_by name DEFAULT current_user,
+	logged_at timestamptz DEFAULT now());
+
+DROP FUNCTION IF EXISTS bb_log.items_logfunction CASCADE;
+
+CREATE FUNCTION bb_log.items_logfunction() RETURNS TRIGGER AS $items_logtrigger$
+	BEGIN
+		IF (TG_OP = 'DELETE') THEN
+			INSERT INTO bb_log.items SELECT OLD.*, 'D';
+			RETURN OLD;
+		ELSIF (TG_OP = 'UPDATE') THEN
+			INSERT INTO bb_log.items SELECT NEW.*, 'U';
+			RETURN NEW;
+		ELSIF (TG_OP = 'INSERT') THEN
+			INSERT INTO bb_log.items SELECT NEW.*, 'I';
+			RETURN NEW;
+		END IF;
+		RETURN NULL;
+	END;
+$items_logtrigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER items_logtrigger AFTER INSERT OR UPDATE OR DELETE ON bb_stock.items
+FOR EACH ROW EXECUTE PROCEDURE bb_log.items_logfunction();
+
+----------
+
 DROP TABLE IF EXISTS bb_log.locations CASCADE;
 
 CREATE TABLE bb_log.locations (
@@ -129,7 +132,9 @@ CREATE TABLE bb_log.locations (
 	group_id uuid,
 	seq bigint,
 	name text,
+	code text,
 	description text,
+	owner_id uuid,
 	revision bigint,
 	props jsonb,
 	tags text[],
@@ -174,7 +179,9 @@ CREATE TABLE bb_log.statuses (
 	group_id uuid,
 	seq bigint,
 	name text,
+	code text,
 	description text,
+	owner_id uuid,
 	revision bigint,
 	props jsonb,
 	tags text[],
@@ -219,7 +226,9 @@ CREATE TABLE bb_log.formulas (
 	group_id uuid,
 	seq bigint,
 	name text,
+	code text,
 	description text,
+	owner_id uuid,
 	revision bigint,
 	props jsonb,
 	tags text[],

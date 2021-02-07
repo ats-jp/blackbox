@@ -101,6 +101,10 @@ public class TransientHandler {
 	private static class Journal extends transient_journals.Row implements JournalPreparer.Journal {
 
 		@Override
+		public void setCode(String code) {
+		}
+
+		@Override
 		public void setDenied_id(UUID id) {
 			throw new UnsupportedOperationException();
 		}
@@ -259,7 +263,7 @@ public class TransientHandler {
 		}
 
 		@Override
-		public void setSeq(Integer seq) {
+		public void setSeq_in_journal(Integer seq) {
 		}
 	}
 
@@ -592,7 +596,7 @@ public class TransientHandler {
 						"RANK() OVER (ORDER BY {0}, {1}, {2})",
 						a.$details().$journals().fixed_at,
 						a.$details().$journals().created_at,
-						a.seq).AS("seq")))
+						a.seq_in_journal).AS("seq")))
 			.WHERE(
 				a -> a.EXISTS(
 					new transient_nodes()

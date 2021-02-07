@@ -66,7 +66,7 @@ public class RecoveryCommands {
 		new nodes().SELECT(
 			a -> a.ls(
 				a.id,
-				a.seq,
+				a.seq_in_journal,
 				a.$details().$journals().group_id,
 				a.$details().$journals().fixed_at,
 				a.$details().$journals().created_at,
@@ -79,14 +79,14 @@ public class RecoveryCommands {
 				a -> a.ls(
 					a.$details().$journals().fixed_at,
 					a.$details().$journals().created_at,
-					a.seq))
+					a.seq_in_journal))
 			.forEach(node -> {
 				var journal = node.$details().$journals();
 
 				JournalHandler.storeSnapshot(
 					U.recorder,
 					node.getId(),
-					node.getSeq(),
+					node.getSeq_in_journal(),
 					SecurityValues.currentUserId(),
 					journal.getGroup_id(),
 					journal.getFixed_at(),

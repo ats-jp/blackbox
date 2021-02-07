@@ -152,12 +152,21 @@ public class details
 	public static final String journal_id = "journal_id";
 
 	/**
+	 * name: seq_in_journal<br>
+	 * remarks: 伝票内連番<br>
+	 * type: int4(10)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "seq_in_journal", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票内連番", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String seq_in_journal = "seq_in_journal";
+
+	/**
 	 * name: props<br>
 	 * remarks: 外部アプリケーション情報JSON<br>
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 3, notNull = true)
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 4, notNull = true)
 	public static final String props = "props";
 
 	/**
@@ -297,6 +306,36 @@ public class details
 		public java.util.UUID getJournal_id() {
 			Binder binder = data$.getValue("journal_id");
 			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: seq_in_journal<br>
+		 * remarks: 伝票内連番<br>
+		 * type: int4(10)<br>
+		 * not null: true<br>
+		 * @param value java.lang.Integer
+		 */
+		public void setSeq_in_journal(java.lang.Integer value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("seq_in_journal").getType());
+			data$.setValue("seq_in_journal", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: seq_in_journal<br>
+		 * remarks: 伝票内連番<br>
+		 * type: int4(10)<br>
+		 * not null: true<br>
+		 * @return java.lang.Integer
+		 */
+		public java.lang.Integer getSeq_in_journal() {
+			Binder binder = data$.getValue("seq_in_journal");
+			return (java.lang.Integer) binder.getValue();
 		}
 
 		/**
@@ -1401,6 +1440,11 @@ public class details
 		public final T journal_id;
 
 		/**
+		 * 項目名 seq_in_journal
+		 */
+		public final T seq_in_journal;
+
+		/**
 		 * 項目名 props
 		 */
 		public final T props;
@@ -1418,6 +1462,7 @@ public class details
 
 			this.id = builder$.buildColumn(this, sqlassist.bb.details.id);
 			this.journal_id = builder$.buildColumn(this, sqlassist.bb.details.journal_id);
+			this.seq_in_journal = builder$.buildColumn(this, sqlassist.bb.details.seq_in_journal);
 			this.props = builder$.buildColumn(this, sqlassist.bb.details.props);
 		}
 

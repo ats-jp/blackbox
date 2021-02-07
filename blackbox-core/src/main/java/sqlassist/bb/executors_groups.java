@@ -148,6 +148,24 @@ public class executors_groups
 	public static final String group_id = "group_id";
 
 	/**
+	 * name: created_at<br>
+	 * remarks: <br>
+	 * type: timestamptz(35)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = false, decimalDigits = 6, remarks = "", defaultValue = "now()", ordinalPosition = 3, notNull = true)
+	public static final String created_at = "created_at";
+
+	/**
+	 * name: created_by<br>
+	 * remarks: <br>
+	 * type: uuid(2147483647)<br>
+	 * not null: true<br>
+	 */
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	public static final String created_by = "created_by";
+
+	/**
 	 * name: executors_groups_id_fkey<br>
 	 * references: executors<br>
 	 * columns: id
@@ -162,6 +180,14 @@ public class executors_groups
 	 */
 	@ForeignKey(name = "executors_groups_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
 	public static final String bb$groups$executors_groups_group_id_fkey = "executors_groups_group_id_fkey";
+
+	/**
+	 * name: executors_groups_created_by_fkey<br>
+	 * references: users<br>
+	 * columns: created_by
+	 */
+	@ForeignKey(name = "executors_groups_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
+	public static final String bb$users$executors_groups_created_by_fkey = "executors_groups_created_by_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -295,6 +321,66 @@ public class executors_groups
 		}
 
 		/**
+		 * setter
+		 * name: created_at<br>
+		 * remarks: <br>
+		 * type: timestamptz(35)<br>
+		 * not null: true<br>
+		 * @param value java.sql.Timestamp
+		 */
+		public void setCreated_at(java.sql.Timestamp value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("created_at").getType());
+			data$.setValue("created_at", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: created_at<br>
+		 * remarks: <br>
+		 * type: timestamptz(35)<br>
+		 * not null: true<br>
+		 * @return java.sql.Timestamp
+		 */
+		public java.sql.Timestamp getCreated_at() {
+			Binder binder = data$.getValue("created_at");
+			return (java.sql.Timestamp) binder.getValue();
+		}
+
+		/**
+		 * setter
+		 * name: created_by<br>
+		 * remarks: <br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
+		 * @param value java.util.UUID
+		 */
+		public void setCreated_by(java.util.UUID value) {
+			Objects.requireNonNull(value);
+			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
+				.getValueExtractors()
+				.selectValueExtractor(
+					rowRel$.getColumn("created_by").getType());
+			data$.setValue("created_by", valueExtractor.extractAsBinder(value));
+		}
+
+		/**
+		 * getter
+		 * name: created_by<br>
+		 * remarks: <br>
+		 * type: uuid(2147483647)<br>
+		 * not null: true<br>
+		 * @return java.util.UUID
+		 */
+		public java.util.UUID getCreated_by() {
+			Binder binder = data$.getValue("created_by");
+			return (java.util.UUID) binder.getValue();
+		}
+
+		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 executors<br>
 		 * 外部キー名 executors_groups_id_fkey<br>
@@ -316,6 +402,18 @@ public class executors_groups
 		public sqlassist.bb.groups.Row $groups() {
 			return sqlassist.bb.groups.row(
 				data$.getDataObject(bb$groups$executors_groups_group_id_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 users<br>
+		 * 外部キー名 executors_groups_created_by_fkey<br>
+		 * 項目名 created_by
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb.users.Row $users() {
+			return sqlassist.bb.users.row(
+				data$.getDataObject(bb$users$executors_groups_created_by_fkey));
 		}
 	}
 
@@ -1377,6 +1475,16 @@ public class executors_groups
 		 */
 		public final T group_id;
 
+		/**
+		 * 項目名 created_at
+		 */
+		public final T created_at;
+
+		/**
+		 * 項目名 created_by
+		 */
+		public final T created_by;
+
 		private Assist(
 			executors_groups table$,
 			TableFacadeContext<T> builder$,
@@ -1390,6 +1498,8 @@ public class executors_groups
 
 			this.id = builder$.buildColumn(this, sqlassist.bb.executors_groups.id);
 			this.group_id = builder$.buildColumn(this, sqlassist.bb.executors_groups.group_id);
+			this.created_at = builder$.buildColumn(this, sqlassist.bb.executors_groups.created_at);
+			this.created_by = builder$.buildColumn(this, sqlassist.bb.executors_groups.created_by);
 		}
 
 		/**
@@ -1530,6 +1640,19 @@ public class executors_groups
 				builder$,
 				this,
 				sqlassist.bb.executors_groups.bb$groups$executors_groups_group_id_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 users<br>
+		 * 外部キー名 executors_groups_created_by_fkey<br>
+		 * 項目名 created_by
+		 * @return users relationship
+		 */
+		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb.executors_groups.Row, M>> $users() {
+			return new sqlassist.bb.users.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb.executors_groups.bb$users$executors_groups_created_by_fkey);
 		}
 	}
 

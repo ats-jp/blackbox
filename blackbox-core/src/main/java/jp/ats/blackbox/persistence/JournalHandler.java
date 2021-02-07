@@ -94,6 +94,8 @@ public class JournalHandler {
 		return instanceId;
 	}
 
+	private int detailSeq;
+
 	private int nodeSeq;
 
 	private boolean updateDifferentTotalCurrentUnits;
@@ -160,6 +162,7 @@ public class JournalHandler {
 
 	private void registerInternal(UUID journalId, UUID batchId, UUID userId, JournalRegisterRequest request, long seq) {
 		//初期化
+		detailSeq = 0;
 		nodeSeq = 0;
 		updateDifferentTotalCurrentUnits = false;
 
@@ -168,6 +171,11 @@ public class JournalHandler {
 		var createdAt = uniqueTime();
 
 		JournalPreparer.prepareJournal(journalId, instanceId(), batchId, userId, request, createdAt, journal, recorder);
+
+		journal.setSeq(seq);
+
+		journal.setCode(
+			request.code.orElseGet(() -> DefaultCodeGenerator.generate(recorder, request.group_id, seq)));
 
 		try {
 			journal.insert();
@@ -231,6 +239,8 @@ public class JournalHandler {
 		var detailId = UUID.randomUUID();
 
 		JournalPreparer.prepareDetail(journalId, detailId, request, detail);
+
+		detail.setSeq_in_journal(++detailSeq);
 
 		detail.insert();
 
@@ -345,7 +355,7 @@ public class JournalHandler {
 						a.unit_id,
 						a.journal_group_id,
 						a.fixed_at,
-						a.seq,
+						a.combined_seq,
 						a.updated_by)
 					.VALUES(
 						$UUID,
@@ -381,7 +391,7 @@ public class JournalHandler {
 								new snapshots()
 									.SELECT(sa -> sa.any(1))
 									//fixed_atが等しいものの最新は自分なので、それ以降のものに対して処理を行う
-									.WHERE(swa -> swa.id.eq(wa.id).AND.unit_id.eq($UUID).AND.seq.gt($STRING))))),
+									.WHERE(swa -> swa.id.eq(wa.id).AND.unit_id.eq($UUID).AND.combined_seq.gt($STRING))))),
 				unlimited,
 				inOut.normalize(quantity),
 				unitId,
@@ -401,7 +411,7 @@ public class JournalHandler {
 						a -> a.EXISTS(
 							new snapshots()
 								.SELECT(sa -> sa.any(1))
-								.WHERE(sa -> sa.id.eq(a.id).AND.unit_id.eq($UUID).AND.seq.gt($STRING).AND.expr("{0} + ? < 0", Vargs.of(sa.total), $BIGDECIMAL))))
+								.WHERE(sa -> sa.id.eq(a.id).AND.unit_id.eq($UUID).AND.combined_seq.gt($STRING).AND.expr("{0} + ? < 0", Vargs.of(sa.total), $BIGDECIMAL))))
 					.ORDER_BY(a -> a.fixed_at),
 				unitId,
 				seq,
@@ -440,10 +450,10 @@ public class JournalHandler {
 			() -> new snapshots()
 				.SELECT(a -> a.ls(a.total, a.unlimited))
 				.WHERE(
-					a -> a.unit_id.eq($UUID).AND.seq.eq(
+					a -> a.unit_id.eq($UUID).AND.combined_seq.eq(
 						new snapshots()
-							.SELECT(sa -> sa.MAX(sa.seq))
-							.WHERE(sa -> sa.unit_id.eq($UUID).AND.in_search_scope.eq(true).AND.seq.lt($STRING)))),
+							.SELECT(sa -> sa.MAX(sa.combined_seq))
+							.WHERE(sa -> sa.unit_id.eq($UUID).AND.in_search_scope.eq(true).AND.combined_seq.lt($STRING)))),
 			unitId,
 			unitId,
 			seq).executeAndGet(r -> {

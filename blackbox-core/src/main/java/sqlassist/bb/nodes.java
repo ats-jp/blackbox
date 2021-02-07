@@ -170,14 +170,14 @@ public class nodes
 	public static final String in_out = "in_out";
 
 	/**
-	 * name: seq<br>
+	 * name: seq_in_journal<br>
 	 * remarks: 伝票内連番<br>
 	 * 最大値999999<br>
 	 * type: int4(10)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票内連番\n最大値999999", defaultValue = "null", ordinalPosition = 5, notNull = true)
-	public static final String seq = "seq";
+	@Column(name = "seq_in_journal", type = 4, typeName = "int4", size = 10, hasDecimalDigits = true, decimalDigits = 0, remarks = "伝票内連番\n最大値999999", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	public static final String seq_in_journal = "seq_in_journal";
 
 	/**
 	 * name: quantity<br>
@@ -418,33 +418,33 @@ public class nodes
 
 		/**
 		 * setter
-		 * name: seq<br>
+		 * name: seq_in_journal<br>
 		 * remarks: 伝票内連番<br>
 		 * 最大値999999<br>
 		 * type: int4(10)<br>
 		 * not null: true<br>
 		 * @param value java.lang.Integer
 		 */
-		public void setSeq(java.lang.Integer value) {
+		public void setSeq_in_journal(java.lang.Integer value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("seq").getType());
-			data$.setValue("seq", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("seq_in_journal").getType());
+			data$.setValue("seq_in_journal", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: seq<br>
+		 * name: seq_in_journal<br>
 		 * remarks: 伝票内連番<br>
 		 * 最大値999999<br>
 		 * type: int4(10)<br>
 		 * not null: true<br>
 		 * @return java.lang.Integer
 		 */
-		public java.lang.Integer getSeq() {
-			Binder binder = data$.getValue("seq");
+		public java.lang.Integer getSeq_in_journal() {
+			Binder binder = data$.getValue("seq_in_journal");
 			return (java.lang.Integer) binder.getValue();
 		}
 
@@ -1634,9 +1634,9 @@ public class nodes
 		public final T in_out;
 
 		/**
-		 * 項目名 seq
+		 * 項目名 seq_in_journal
 		 */
-		public final T seq;
+		public final T seq_in_journal;
 
 		/**
 		 * 項目名 quantity
@@ -1668,7 +1668,7 @@ public class nodes
 			this.detail_id = builder$.buildColumn(this, sqlassist.bb.nodes.detail_id);
 			this.unit_id = builder$.buildColumn(this, sqlassist.bb.nodes.unit_id);
 			this.in_out = builder$.buildColumn(this, sqlassist.bb.nodes.in_out);
-			this.seq = builder$.buildColumn(this, sqlassist.bb.nodes.seq);
+			this.seq_in_journal = builder$.buildColumn(this, sqlassist.bb.nodes.seq_in_journal);
 			this.quantity = builder$.buildColumn(this, sqlassist.bb.nodes.quantity);
 			this.grants_unlimited = builder$.buildColumn(this, sqlassist.bb.nodes.grants_unlimited);
 			this.props = builder$.buildColumn(this, sqlassist.bb.nodes.props);

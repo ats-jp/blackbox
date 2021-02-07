@@ -153,13 +153,13 @@ public class stocks
 	public static final String group_id = "group_id";
 
 	/**
-	 * name: item_id<br>
-	 * remarks: アイテムID<br>
+	 * name: sku_id<br>
+	 * remarks: SKU ID<br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "item_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "アイテムID", defaultValue = "null", ordinalPosition = 3, notNull = true)
-	public static final String item_id = "item_id";
+	@Column(name = "sku_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "SKU ID", defaultValue = "null", ordinalPosition = 3, notNull = true)
+	public static final String sku_id = "sku_id";
 
 	/**
 	 * name: owner_id<br>
@@ -261,6 +261,14 @@ public class stocks
 	 */
 	@ForeignKey(name = "stocks_status_id_fkey", references = "bb_stock.statuses", columns = { "status_id" }, refColumns = { "id" })
 	public static final String bb_stock$statuses$stocks_status_id_fkey = "stocks_status_id_fkey";
+
+	/**
+	 * name: stocks_sku_id_fkey<br>
+	 * references: skus<br>
+	 * columns: sku_id
+	 */
+	@ForeignKey(name = "stocks_sku_id_fkey", references = "bb_stock.skus", columns = { "sku_id" }, refColumns = { "id" })
+	public static final String bb_stock$skus$stocks_sku_id_fkey = "stocks_sku_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -399,31 +407,31 @@ public class stocks
 
 		/**
 		 * setter
-		 * name: item_id<br>
-		 * remarks: アイテムID<br>
+		 * name: sku_id<br>
+		 * remarks: SKU ID<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setItem_id(java.util.UUID value) {
+		public void setSku_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("item_id").getType());
-			data$.setValue("item_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("sku_id").getType());
+			data$.setValue("sku_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: item_id<br>
-		 * remarks: アイテムID<br>
+		 * name: sku_id<br>
+		 * remarks: SKU ID<br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getItem_id() {
-			Binder binder = data$.getValue("item_id");
+		public java.util.UUID getSku_id() {
+			Binder binder = data$.getValue("sku_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
@@ -659,6 +667,18 @@ public class stocks
 		public sqlassist.bb_stock.statuses.Row $statuses() {
 			return sqlassist.bb_stock.statuses.row(
 				data$.getDataObject(bb_stock$statuses$stocks_status_id_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 skus<br>
+		 * 外部キー名 stocks_sku_id_fkey<br>
+		 * 項目名 sku_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb_stock.skus.Row $skus() {
+			return sqlassist.bb_stock.skus.row(
+				data$.getDataObject(bb_stock$skus$stocks_sku_id_fkey));
 		}
 	}
 
@@ -1721,9 +1741,9 @@ public class stocks
 		public final T group_id;
 
 		/**
-		 * 項目名 item_id
+		 * 項目名 sku_id
 		 */
-		public final T item_id;
+		public final T sku_id;
 
 		/**
 		 * 項目名 owner_id
@@ -1763,7 +1783,7 @@ public class stocks
 
 			this.id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.id);
 			this.group_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.group_id);
-			this.item_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.item_id);
+			this.sku_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.sku_id);
 			this.owner_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.owner_id);
 			this.location_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.location_id);
 			this.status_id = builder$.buildColumn(this, sqlassist.bb_stock.stocks.status_id);
@@ -1974,6 +1994,19 @@ public class stocks
 				builder$,
 				this,
 				sqlassist.bb_stock.stocks.bb_stock$statuses$stocks_status_id_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 skus<br>
+		 * 外部キー名 stocks_sku_id_fkey<br>
+		 * 項目名 sku_id
+		 * @return skus relationship
+		 */
+		public sqlassist.bb_stock.skus.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $skus() {
+			return new sqlassist.bb_stock.skus.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb_stock.stocks.bb_stock$skus$stocks_sku_id_fkey);
 		}
 	}
 

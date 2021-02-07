@@ -15,6 +15,8 @@ public class OrgHandler {
 
 		public String name;
 
+		public Optional<String> code = Optional.empty();
+
 		public Optional<String> description = Optional.empty();
 
 		public Optional<String> props = Optional.empty();
@@ -29,11 +31,11 @@ public class OrgHandler {
 
 		seqRequest.dependsId = instanceId;
 		return SeqHandler.getInstance().nextSeqAndGet(seqRequest, seq -> {
-			return registerInternal(seq, instanceId, request.name, request.description, request.props);
+			return registerInternal(seq, instanceId, request);
 		});
 	}
 
-	private static UUID registerInternal(long seq, UUID instanceId, String name, Optional<String> description, Optional<String> props) {
+	private static UUID registerInternal(long seq, UUID instanceId, RegisterRequest request) {
 		var row = orgs.row();
 
 		UUID id = UUID.randomUUID();
@@ -43,9 +45,11 @@ public class OrgHandler {
 		row.setId(id);
 		row.setInstance_id(instanceId);
 		row.setSeq(seq);
-		row.setName(name);
-		description.ifPresent(v -> row.setDescription(v));
-		props.ifPresent(v -> row.setProps(U.toPGObject(v)));
+		row.setName(request.name);
+		//デフォルトコードはID
+		row.setCode(request.code.orElse(id.toString()));
+		request.description.ifPresent(v -> row.setDescription(v));
+		request.props.ifPresent(v -> row.setProps(U.toPGObject(v)));
 		row.setCreated_by(userId);
 		row.setUpdated_by(userId);
 
@@ -62,6 +66,8 @@ public class OrgHandler {
 
 		public Optional<String> name = Optional.empty();
 
+		public Optional<String> code = Optional.empty();
+
 		public Optional<String> description = Optional.empty();
 
 		public Optional<String> props = Optional.empty();
@@ -73,6 +79,7 @@ public class OrgHandler {
 		int result = new orgs().UPDATE(a -> {
 			a.revision.set(request.revision + 1);
 			request.name.ifPresent(v -> a.name.set(v));
+			request.code.ifPresent(v -> a.code.set(v));
 			request.description.ifPresent(v -> a.description.set(v));
 			request.props.ifPresent(v -> a.props.set(v));
 			request.active.ifPresent(v -> a.active.set(v));

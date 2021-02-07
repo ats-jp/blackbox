@@ -18,6 +18,8 @@ public class Requests {
 		 */
 		public UUID group_id;
 
+		public Optional<String> code = Optional.empty();
+
 		/**
 		 * 移動時刻
 		 * 必須

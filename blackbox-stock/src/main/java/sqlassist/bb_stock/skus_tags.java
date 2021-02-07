@@ -49,7 +49,6 @@ import org.blendee.assist.InsertOfferFunction;
 import org.blendee.assist.InsertClauseAssist;
 import org.blendee.assist.InsertStatementIntermediate;
 import org.blendee.assist.InstantOneToManyQuery;
-import org.blendee.assist.annotation.PrimaryKey;
 import org.blendee.assist.annotation.ForeignKey;
 import org.blendee.assist.Many;
 import org.blendee.assist.LogicalOperators;
@@ -97,21 +96,19 @@ import org.blendee.assist.annotation.Table;
 /**
  * 自動生成されたテーブル操作クラスです。
  * schema: bb_stock<br>
- * name: statuses<br>
+ * name: skus_tags<br>
  * type: TABLE<br>
- * remarks: 状態<br>
- * Blackbox内でのアイテムの状態<br>
+ * remarks: <br>
  */
-@Table(name = "statuses", schema = "bb_stock", type = "TABLE", remarks = "状態\nBlackbox内でのアイテムの状態")
-@PrimaryKey(name = "statuses_pkey", columns = { "id" })
-public class statuses
+@Table(name = "skus_tags", schema = "bb_stock", type = "TABLE", remarks = "")
+public class skus_tags
 	extends java.lang.Object
 	implements
 	TableFacade<Row>,
 	SelectStatement,
 	SQLDecorators,
-	Query<statuses.Iterator, statuses.Row>,
-	RightTable<statuses.OnRightAssist> {
+	Query<skus_tags.Iterator, skus_tags.Row>,
+	RightTable<skus_tags.OnRightAssist> {
 
 	/**
 	 * この定数クラスのスキーマ名
@@ -121,7 +118,7 @@ public class statuses
 	/**
 	 * この定数クラスのテーブル名
 	 */
-	public static final String TABLE = "statuses";
+	public static final String TABLE = "skus_tags";
 
 	/**
 	 * この定数クラスのテーブルを指す {@link TablePath}
@@ -134,170 +131,37 @@ public class statuses
 
 	/**
 	 * name: id<br>
-	 * remarks: ID<br>
+	 * remarks: <br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "ID", defaultValue = "gen_random_uuid()", ordinalPosition = 1, notNull = true)
+	@Column(name = "id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 1, notNull = true)
 	public static final String id = "id";
 
 	/**
-	 * name: group_id<br>
-	 * remarks: グループID<br>
+	 * name: tag_id<br>
+	 * remarks: <br>
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "group_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループID", defaultValue = "null", ordinalPosition = 2, notNull = true)
-	public static final String group_id = "group_id";
+	@Column(name = "tag_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = false, decimalDigits = 0, remarks = "", defaultValue = "null", ordinalPosition = 2, notNull = true)
+	public static final String tag_id = "tag_id";
 
 	/**
-	 * name: seq<br>
-	 * remarks: グループ内連番<br>
-	 * type: int8(19)<br>
-	 * not null: true<br>
+	 * name: skus_tags_tag_id_fkey<br>
+	 * references: tags<br>
+	 * columns: tag_id
 	 */
-	@Column(name = "seq", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "グループ内連番", defaultValue = "null", ordinalPosition = 3, notNull = true)
-	public static final String seq = "seq";
+	@ForeignKey(name = "skus_tags_tag_id_fkey", references = "bb.tags", columns = { "tag_id" }, refColumns = { "id" })
+	public static final String bb$tags$skus_tags_tag_id_fkey = "skus_tags_tag_id_fkey";
 
 	/**
-	 * name: name<br>
-	 * remarks: 名称<br>
-	 * type: text(2147483647)<br>
-	 * not null: true<br>
+	 * name: skus_tags_id_fkey<br>
+	 * references: skus<br>
+	 * columns: id
 	 */
-	@Column(name = "name", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "名称", defaultValue = "null", ordinalPosition = 4, notNull = true)
-	public static final String name = "name";
-
-	/**
-	 * name: code<br>
-	 * remarks: 外部システムコード<br>
-	 * type: text(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "code", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部システムコード", defaultValue = "null", ordinalPosition = 5, notNull = true)
-	public static final String code = "code";
-
-	/**
-	 * name: description<br>
-	 * remarks: 補足事項<br>
-	 * type: text(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "description", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "補足事項", defaultValue = "''::text", ordinalPosition = 6, notNull = true)
-	public static final String description = "description";
-
-	/**
-	 * name: owner_id<br>
-	 * remarks: 所有者ID<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "owner_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者ID", defaultValue = "null", ordinalPosition = 7, notNull = true)
-	public static final String owner_id = "owner_id";
-
-	/**
-	 * name: revision<br>
-	 * remarks: リビジョン番号<br>
-	 * type: int8(19)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 8, notNull = true)
-	public static final String revision = "revision";
-
-	/**
-	 * name: props<br>
-	 * remarks: 外部アプリケーション情報JSON<br>
-	 * type: jsonb(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
-	public static final String props = "props";
-
-	/**
-	 * name: tags<br>
-	 * remarks: log保存用タグ<br>
-	 * type: _text(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "log保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 10, notNull = true)
-	public static final String tags = "tags";
-
-	/**
-	 * name: active<br>
-	 * remarks: アクティブフラグ<br>
-	 * type: bool(1)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "active", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "アクティブフラグ", defaultValue = "true", ordinalPosition = 11, notNull = true)
-	public static final String active = "active";
-
-	/**
-	 * name: created_at<br>
-	 * remarks: 作成時刻<br>
-	 * type: timestamptz(35, 6)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 12, notNull = true)
-	public static final String created_at = "created_at";
-
-	/**
-	 * name: created_by<br>
-	 * remarks: 作成ユーザー<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 13, notNull = true)
-	public static final String created_by = "created_by";
-
-	/**
-	 * name: updated_at<br>
-	 * remarks: 更新時刻<br>
-	 * type: timestamptz(35, 6)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 14, notNull = true)
-	public static final String updated_at = "updated_at";
-
-	/**
-	 * name: updated_by<br>
-	 * remarks: 更新ユーザー<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 15, notNull = true)
-	public static final String updated_by = "updated_by";
-
-	/**
-	 * name: statuses_group_id_fkey<br>
-	 * references: groups<br>
-	 * columns: group_id
-	 */
-	@ForeignKey(name = "statuses_group_id_fkey", references = "bb.groups", columns = { "group_id" }, refColumns = { "id" })
-	public static final String bb$groups$statuses_group_id_fkey = "statuses_group_id_fkey";
-
-	/**
-	 * name: statuses_created_by_fkey<br>
-	 * references: users<br>
-	 * columns: created_by
-	 */
-	@ForeignKey(name = "statuses_created_by_fkey", references = "bb.users", columns = { "created_by" }, refColumns = { "id" })
-	public static final String bb$users$statuses_created_by_fkey = "statuses_created_by_fkey";
-
-	/**
-	 * name: statuses_updated_by_fkey<br>
-	 * references: users<br>
-	 * columns: updated_by
-	 */
-	@ForeignKey(name = "statuses_updated_by_fkey", references = "bb.users", columns = { "updated_by" }, refColumns = { "id" })
-	public static final String bb$users$statuses_updated_by_fkey = "statuses_updated_by_fkey";
-
-	/**
-	 * name: statuses_owner_id_fkey<br>
-	 * references: owners<br>
-	 * columns: owner_id
-	 */
-	@ForeignKey(name = "statuses_owner_id_fkey", references = "bb_stock.owners", columns = { "owner_id" }, refColumns = { "id" })
-	public static final String bb_stock$owners$statuses_owner_id_fkey = "statuses_owner_id_fkey";
+	@ForeignKey(name = "skus_tags_id_fkey", references = "bb_stock.skus", columns = { "id" }, refColumns = { "id" })
+	public static final String bb_stock$skus$skus_tags_id_fkey = "skus_tags_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -373,7 +237,7 @@ public class statuses
 		/**
 		 * setter
 		 * name: id<br>
-		 * remarks: ID<br>
+		 * remarks: <br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.util.UUID
@@ -390,7 +254,7 @@ public class statuses
 		/**
 		 * getter
 		 * name: id<br>
-		 * remarks: ID<br>
+		 * remarks: <br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.util.UUID
@@ -402,470 +266,56 @@ public class statuses
 
 		/**
 		 * setter
-		 * name: group_id<br>
-		 * remarks: グループID<br>
+		 * name: tag_id<br>
+		 * remarks: <br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @param value java.util.UUID
 		 */
-		public void setGroup_id(java.util.UUID value) {
+		public void setTag_id(java.util.UUID value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("group_id").getType());
-			data$.setValue("group_id", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("tag_id").getType());
+			data$.setValue("tag_id", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: group_id<br>
-		 * remarks: グループID<br>
+		 * name: tag_id<br>
+		 * remarks: <br>
 		 * type: uuid(2147483647)<br>
 		 * not null: true<br>
 		 * @return java.util.UUID
 		 */
-		public java.util.UUID getGroup_id() {
-			Binder binder = data$.getValue("group_id");
-			return (java.util.UUID) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: seq<br>
-		 * remarks: グループ内連番<br>
-		 * type: int8(19)<br>
-		 * not null: true<br>
-		 * @param value java.lang.Long
-		 */
-		public void setSeq(java.lang.Long value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("seq").getType());
-			data$.setValue("seq", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: seq<br>
-		 * remarks: グループ内連番<br>
-		 * type: int8(19)<br>
-		 * not null: true<br>
-		 * @return java.lang.Long
-		 */
-		public java.lang.Long getSeq() {
-			Binder binder = data$.getValue("seq");
-			return (java.lang.Long) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: name<br>
-		 * remarks: 名称<br>
-		 * type: text(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.lang.String
-		 */
-		public void setName(java.lang.String value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("name").getType());
-			data$.setValue("name", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: name<br>
-		 * remarks: 名称<br>
-		 * type: text(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.lang.String
-		 */
-		public java.lang.String getName() {
-			Binder binder = data$.getValue("name");
-			return (java.lang.String) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: code<br>
-		 * remarks: 外部システムコード<br>
-		 * type: text(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.lang.String
-		 */
-		public void setCode(java.lang.String value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("code").getType());
-			data$.setValue("code", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: code<br>
-		 * remarks: 外部システムコード<br>
-		 * type: text(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.lang.String
-		 */
-		public java.lang.String getCode() {
-			Binder binder = data$.getValue("code");
-			return (java.lang.String) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: description<br>
-		 * remarks: 補足事項<br>
-		 * type: text(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.lang.String
-		 */
-		public void setDescription(java.lang.String value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("description").getType());
-			data$.setValue("description", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: description<br>
-		 * remarks: 補足事項<br>
-		 * type: text(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.lang.String
-		 */
-		public java.lang.String getDescription() {
-			Binder binder = data$.getValue("description");
-			return (java.lang.String) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: owner_id<br>
-		 * remarks: 所有者ID<br>
-		 * type: uuid(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setOwner_id(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("owner_id").getType());
-			data$.setValue("owner_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: owner_id<br>
-		 * remarks: 所有者ID<br>
-		 * type: uuid(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getOwner_id() {
-			Binder binder = data$.getValue("owner_id");
-			return (java.util.UUID) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: revision<br>
-		 * remarks: リビジョン番号<br>
-		 * type: int8(19)<br>
-		 * not null: true<br>
-		 * @param value java.lang.Long
-		 */
-		public void setRevision(java.lang.Long value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("revision").getType());
-			data$.setValue("revision", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: revision<br>
-		 * remarks: リビジョン番号<br>
-		 * type: int8(19)<br>
-		 * not null: true<br>
-		 * @return java.lang.Long
-		 */
-		public java.lang.Long getRevision() {
-			Binder binder = data$.getValue("revision");
-			return (java.lang.Long) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: props<br>
-		 * remarks: 外部アプリケーション情報JSON<br>
-		 * type: jsonb(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.lang.Object
-		 */
-		public void setProps(java.lang.Object value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("props").getType());
-			data$.setValue("props", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: props<br>
-		 * remarks: 外部アプリケーション情報JSON<br>
-		 * type: jsonb(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.lang.Object
-		 */
-		public java.lang.Object getProps() {
-			Binder binder = data$.getValue("props");
-			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: tags<br>
-		 * remarks: log保存用タグ<br>
-		 * type: _text(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.lang.Object
-		 */
-		public void setTags(java.lang.Object value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("tags").getType());
-			data$.setValue("tags", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: tags<br>
-		 * remarks: log保存用タグ<br>
-		 * type: _text(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.lang.Object
-		 */
-		public java.lang.Object getTags() {
-			Binder binder = data$.getValue("tags");
-			return binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: active<br>
-		 * remarks: アクティブフラグ<br>
-		 * type: bool(1)<br>
-		 * not null: true<br>
-		 * @param value java.lang.Boolean
-		 */
-		public void setActive(java.lang.Boolean value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("active").getType());
-			data$.setValue("active", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: active<br>
-		 * remarks: アクティブフラグ<br>
-		 * type: bool(1)<br>
-		 * not null: true<br>
-		 * @return java.lang.Boolean
-		 */
-		public java.lang.Boolean getActive() {
-			Binder binder = data$.getValue("active");
-			return (java.lang.Boolean) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: created_at<br>
-		 * remarks: 作成時刻<br>
-		 * type: timestamptz(35, 6)<br>
-		 * not null: true<br>
-		 * @param value java.sql.Timestamp
-		 */
-		public void setCreated_at(java.sql.Timestamp value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("created_at").getType());
-			data$.setValue("created_at", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: created_at<br>
-		 * remarks: 作成時刻<br>
-		 * type: timestamptz(35, 6)<br>
-		 * not null: true<br>
-		 * @return java.sql.Timestamp
-		 */
-		public java.sql.Timestamp getCreated_at() {
-			Binder binder = data$.getValue("created_at");
-			return (java.sql.Timestamp) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: created_by<br>
-		 * remarks: 作成ユーザー<br>
-		 * type: uuid(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setCreated_by(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("created_by").getType());
-			data$.setValue("created_by", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: created_by<br>
-		 * remarks: 作成ユーザー<br>
-		 * type: uuid(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getCreated_by() {
-			Binder binder = data$.getValue("created_by");
-			return (java.util.UUID) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: updated_at<br>
-		 * remarks: 更新時刻<br>
-		 * type: timestamptz(35, 6)<br>
-		 * not null: true<br>
-		 * @param value java.sql.Timestamp
-		 */
-		public void setUpdated_at(java.sql.Timestamp value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("updated_at").getType());
-			data$.setValue("updated_at", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: updated_at<br>
-		 * remarks: 更新時刻<br>
-		 * type: timestamptz(35, 6)<br>
-		 * not null: true<br>
-		 * @return java.sql.Timestamp
-		 */
-		public java.sql.Timestamp getUpdated_at() {
-			Binder binder = data$.getValue("updated_at");
-			return (java.sql.Timestamp) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: updated_by<br>
-		 * remarks: 更新ユーザー<br>
-		 * type: uuid(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setUpdated_by(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("updated_by").getType());
-			data$.setValue("updated_by", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: updated_by<br>
-		 * remarks: 更新ユーザー<br>
-		 * type: uuid(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getUpdated_by() {
-			Binder binder = data$.getValue("updated_by");
+		public java.util.UUID getTag_id() {
+			Binder binder = data$.getValue("tag_id");
 			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 statuses_group_id_fkey<br>
-		 * 項目名 group_id
+		 * 参照先テーブル名 tags<br>
+		 * 外部キー名 skus_tags_tag_id_fkey<br>
+		 * 項目名 tag_id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.groups.Row $groups() {
-			return sqlassist.bb.groups.row(
-				data$.getDataObject(bb$groups$statuses_group_id_fkey));
+		public sqlassist.bb.tags.Row $tags() {
+			return sqlassist.bb.tags.row(
+				data$.getDataObject(bb$tags$skus_tags_tag_id_fkey));
 		}
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 statuses_created_by_fkey<br>
-		 * 項目名 created_by
+		 * 参照先テーブル名 skus<br>
+		 * 外部キー名 skus_tags_id_fkey<br>
+		 * 項目名 id
 		 * @return 参照しているレコードの Row
 		 */
-		public sqlassist.bb.users.Row $users$statuses_created_by_fkey() {
-			return sqlassist.bb.users.row(
-				data$.getDataObject(bb$users$statuses_created_by_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 statuses_updated_by_fkey<br>
-		 * 項目名 updated_by
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb.users.Row $users$statuses_updated_by_fkey() {
-			return sqlassist.bb.users.row(
-				data$.getDataObject(bb$users$statuses_updated_by_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 owners<br>
-		 * 外部キー名 statuses_owner_id_fkey<br>
-		 * 項目名 owner_id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb_stock.owners.Row $owners() {
-			return sqlassist.bb_stock.owners.row(
-				data$.getDataObject(bb_stock$owners$statuses_owner_id_fkey));
+		public sqlassist.bb_stock.skus.Row $skus() {
+			return sqlassist.bb_stock.skus.row(
+				data$.getDataObject(bb_stock$skus$skus_tags_id_fkey));
 		}
 	}
 
@@ -901,7 +351,7 @@ public class statuses
 		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final WhereAssist OR = new WhereAssist(
-			statuses.this,
+			skus_tags.this,
 			whereContext$,
 			CriteriaContext.OR,
 			null);
@@ -910,7 +360,7 @@ public class statuses
 		 * WHERE 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final WhereAssist AND = new WhereAssist(
-			statuses.this,
+			skus_tags.this,
 			whereContext$,
 			CriteriaContext.AND,
 			OR);
@@ -933,7 +383,7 @@ public class statuses
 		 * HAVING 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final HavingAssist OR = new HavingAssist(
-			statuses.this,
+			skus_tags.this,
 			havingContext$,
 			CriteriaContext.OR,
 			null);
@@ -942,7 +392,7 @@ public class statuses
 		 * HAVING 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final HavingAssist AND = new HavingAssist(
-			statuses.this,
+			skus_tags.this,
 			havingContext$,
 			CriteriaContext.AND,
 			OR);
@@ -965,7 +415,7 @@ public class statuses
 		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final OnLeftAssist OR = new OnLeftAssist(
-			statuses.this,
+			skus_tags.this,
 			onLeftContext$,
 			CriteriaContext.OR,
 			null);
@@ -974,7 +424,7 @@ public class statuses
 		 * ON 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final OnLeftAssist AND = new OnLeftAssist(
-			statuses.this,
+			skus_tags.this,
 			onLeftContext$,
 			CriteriaContext.AND,
 			OR);
@@ -997,7 +447,7 @@ public class statuses
 		 * ON 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final OnRightAssist OR = new OnRightAssist(
-			statuses.this,
+			skus_tags.this,
 			onRightContext$,
 			CriteriaContext.OR,
 			null);
@@ -1006,7 +456,7 @@ public class statuses
 		 * ON 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final OnRightAssist AND = new OnRightAssist(
-			statuses.this,
+			skus_tags.this,
 			onRightContext$,
 			CriteriaContext.AND,
 			OR);
@@ -1029,7 +479,7 @@ public class statuses
 		 * WHERE 句に OR 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final DMSWhereAssist OR = new DMSWhereAssist(
-			statuses.this,
+			skus_tags.this,
 			dmsWhereContext$,
 			CriteriaContext.OR,
 			null);
@@ -1038,7 +488,7 @@ public class statuses
 		 * WHERE 句に AND 結合する条件用のカラムを選択するための {@link TableFacadeAssist} です。
 		 */
 		public final DMSWhereAssist AND = new DMSWhereAssist(
-			statuses.this,
+			skus_tags.this,
 			dmsWhereContext$,
 			CriteriaContext.AND,
 			OR);
@@ -1067,48 +517,48 @@ public class statuses
 	private class SelectBehavior extends SelectStatementBehavior<SelectAssist, ListSelectAssist, GroupByAssist, ListGroupByAssist, WhereAssist, HavingAssist, OrderByAssist, ListOrderByAssist, OnLeftAssist> {
 
 		private SelectBehavior() {
-			super($TABLE, getRuntimeId(), statuses.this);
+			super($TABLE, getRuntimeId(), skus_tags.this);
 		}
 
 		@Override
 		protected SelectAssist newSelect() {
 			return new SelectAssist(
-				statuses.this,
+				skus_tags.this,
 				selectContext$);
 		}
 
 		@Override
 		protected ListSelectAssist newListSelect() {
 			return new ListSelectAssist(
-				statuses.this,
+				skus_tags.this,
 				selectContext$);
 		}
 
 		@Override
 		protected GroupByAssist newGroupBy() {
 			return new GroupByAssist(
-				statuses.this,
+				skus_tags.this,
 				groupByContext$);
 		}
 
 		@Override
 		protected ListGroupByAssist newListGroupBy() {
 			return new ListGroupByAssist(
-				statuses.this,
+				skus_tags.this,
 				groupByContext$);
 		}
 
 		@Override
 		protected OrderByAssist newOrderBy() {
 			return new OrderByAssist(
-				statuses.this,
+				skus_tags.this,
 				orderByContext$);
 		}
 
 		@Override
 		protected ListOrderByAssist newListOrderBy() {
 			return new ListOrderByAssist(
-				statuses.this,
+				skus_tags.this,
 				orderByContext$);
 		}
 
@@ -1140,35 +590,35 @@ public class statuses
 			super(
 				$TABLE,
 				relationship$,
-				statuses.this.getRuntimeId(),
-				statuses.this);
+				skus_tags.this.getRuntimeId(),
+				skus_tags.this);
 		}
 
 		@Override
 		protected InsertAssist newInsert() {
 			return new InsertAssist(
-				statuses.this,
+				skus_tags.this,
 				insertContext$);
 		}
 
 		@Override
 		protected ListInsertAssist newListInsert() {
 			return new ListInsertAssist(
-				statuses.this,
+				skus_tags.this,
 				insertContext$);
 		}
 
 		@Override
 		protected UpdateAssist newUpdate() {
 			return new UpdateAssist(
-				statuses.this,
+				skus_tags.this,
 				updateContext$);
 		}
 
 		@Override
 		protected ListUpdateAssist newListUpdate() {
 			return new ListUpdateAssist(
-				statuses.this,
+				skus_tags.this,
 				updateContext$);
 		}
 
@@ -1181,7 +631,7 @@ public class statuses
 	/**
 	 * 空のインスタンスを生成します。
 	 */
-	public statuses() {
+	public skus_tags() {
 	}
 
 	/**
@@ -1189,7 +639,7 @@ public class statuses
 	 * このコンストラクタで生成されたインスタンス の SELECT 句で使用されるカラムは、 パラメータの {@link SelectContext} に依存します。
 	 * @param context SELECT 句を決定する
 	 */
-	public statuses(SelectContext context) {
+	public skus_tags(SelectContext context) {
 		selectBehavior().setSelectContext(Objects.requireNonNull(context));
 	}
 
@@ -1245,7 +695,7 @@ public class statuses
 	 * @param consumer {@link Consumer}
 	 * @return this
 	 */
-	public statuses selectClause(Consumer<ListSelectAssist> consumer) {
+	public skus_tags selectClause(Consumer<ListSelectAssist> consumer) {
 		selectBehavior().selectClause(consumer);
 		return this;
 	}
@@ -1255,7 +705,7 @@ public class statuses
 	 * @param consumer {@link Consumer}
 	 * @return this
 	 */
-	public statuses groupByClause(Consumer<ListGroupByAssist> consumer) {
+	public skus_tags groupByClause(Consumer<ListGroupByAssist> consumer) {
 		selectBehavior().groupByClause(consumer);
 		return this;
 	}
@@ -1265,7 +715,7 @@ public class statuses
 	 * @param consumer {@link Consumer}
 	 * @return this
 	 */
-	public statuses orderByClause(Consumer<ListOrderByAssist> consumer) {
+	public skus_tags orderByClause(Consumer<ListOrderByAssist> consumer) {
 		selectBehavior().orderByClause(consumer);
 		return this;
 	}
@@ -1275,7 +725,7 @@ public class statuses
 	 * @param function
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses SELECT(
+	public skus_tags SELECT(
 		SelectOfferFunction<SelectAssist> function) {
 		selectBehavior().SELECT(function);
 		return this;
@@ -1286,7 +736,7 @@ public class statuses
 	 * @param function
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses SELECT_DISTINCT(
+	public skus_tags SELECT_DISTINCT(
 		SelectOfferFunction<SelectAssist> function) {
 		selectBehavior().SELECT_DISTINCT(function);
 		return this;
@@ -1296,7 +746,7 @@ public class statuses
 	 * COUNT(*) を使用した SELECT 句を記述します。
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses SELECT_COUNT() {
+	public skus_tags SELECT_COUNT() {
 		selectBehavior().SELECT_COUNT();
 		return this;
 	}
@@ -1306,7 +756,7 @@ public class statuses
 	 * @param function
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses GROUP_BY(
+	public skus_tags GROUP_BY(
 		GroupByOfferFunction<GroupByAssist> function) {
 		selectBehavior().GROUP_BY(function);
 		return this;
@@ -1318,7 +768,7 @@ public class statuses
 	 * @return この {@link SelectStatement}
 	 */
 	@SafeVarargs
-	public final statuses WHERE(
+	public final skus_tags WHERE(
 		Consumer<WhereAssist>... consumers) {
 		selectBehavior().WHERE(consumers);
 		return this;
@@ -1340,7 +790,7 @@ public class statuses
 	 * @return この {@link SelectStatement}
 	 */
 	@SafeVarargs
-	public final statuses HAVING(
+	public final skus_tags HAVING(
 		Consumer<HavingAssist>... consumers) {
 		selectBehavior().HAVING(consumers);
 		return this;
@@ -1361,7 +811,7 @@ public class statuses
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, statuses> INNER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, skus_tags> INNER_JOIN(RightTable<R> right) {
 		return selectBehavior().INNER_JOIN(right, this);
 	}
 
@@ -1370,7 +820,7 @@ public class statuses
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, statuses> LEFT_OUTER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, skus_tags> LEFT_OUTER_JOIN(RightTable<R> right) {
 		return selectBehavior().LEFT_OUTER_JOIN(right, this);
 	}
 
@@ -1379,7 +829,7 @@ public class statuses
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, statuses> RIGHT_OUTER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, skus_tags> RIGHT_OUTER_JOIN(RightTable<R> right) {
 		return selectBehavior().RIGHT_OUTER_JOIN(right, this);
 	}
 
@@ -1388,7 +838,7 @@ public class statuses
 	 * @param right 別クエリ
 	 * @return ON
 	 */
-	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, statuses> FULL_OUTER_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> OnClause<OnLeftAssist, R, skus_tags> FULL_OUTER_JOIN(RightTable<R> right) {
 		return selectBehavior().FULL_OUTER_JOIN(right, this);
 	}
 
@@ -1397,7 +847,7 @@ public class statuses
 	 * @param right 別クエリ
 	 * @return この {@link SelectStatement}
 	 */
-	public <R extends OnRightClauseAssist<?>> statuses CROSS_JOIN(RightTable<R> right) {
+	public <R extends OnRightClauseAssist<?>> skus_tags CROSS_JOIN(RightTable<R> right) {
 		selectBehavior().CROSS_JOIN(right);
 		return this;
 	}
@@ -1408,7 +858,7 @@ public class statuses
 	 * @param select UNION 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses UNION(SelectStatement select) {
+	public skus_tags UNION(SelectStatement select) {
 		selectBehavior().UNION(select);
 		return this;
 	}
@@ -1419,7 +869,7 @@ public class statuses
 	 * @param select UNION ALL 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses UNION_ALL(SelectStatement select) {
+	public skus_tags UNION_ALL(SelectStatement select) {
 		selectBehavior().UNION_ALL(select);
 		return this;
 	}
@@ -1430,7 +880,7 @@ public class statuses
 	 * @param select INTERSECT 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses INTERSECT(SelectStatement select) {
+	public skus_tags INTERSECT(SelectStatement select) {
 		selectBehavior().INTERSECT(select);
 		return this;
 	}
@@ -1441,7 +891,7 @@ public class statuses
 	 * @param select INTERSECT ALL 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses INTERSECT_ALL(SelectStatement select) {
+	public skus_tags INTERSECT_ALL(SelectStatement select) {
 		selectBehavior().INTERSECT_ALL(select);
 		return this;
 	}
@@ -1452,7 +902,7 @@ public class statuses
 	 * @param select EXCEPT 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses EXCEPT(SelectStatement select) {
+	public skus_tags EXCEPT(SelectStatement select) {
 		selectBehavior().INTERSECT(select);
 		return this;
 	}
@@ -1463,7 +913,7 @@ public class statuses
 	 * @param select EXCEPT ALL 対象
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses EXCEPT_ALL(SelectStatement select) {
+	public skus_tags EXCEPT_ALL(SelectStatement select) {
 		selectBehavior().EXCEPT_ALL(select);
 		return this;
 	}
@@ -1473,7 +923,7 @@ public class statuses
 	 * @param function
 	 * @return この {@link SelectStatement}
 	 */
-	public statuses ORDER_BY(
+	public skus_tags ORDER_BY(
 		OrderByOfferFunction<OrderByAssist> function) {
 		selectBehavior().ORDER_BY(function);
 		return this;
@@ -1490,7 +940,7 @@ public class statuses
 	 * @return {@link SelectStatement} 自身
 	 * @throws IllegalStateException 既に ORDER BY 句がセットされている場合
 	 */
-	public statuses setGroupByClause(GroupByClause clause) {
+	public skus_tags setGroupByClause(GroupByClause clause) {
 		selectBehavior().setGroupByClause(clause);
 		return this;
 	}
@@ -1501,7 +951,7 @@ public class statuses
 	 * @return {@link SelectStatement} 自身
 	 * @throws IllegalStateException 既に ORDER BY 句がセットされている場合
 	 */
-	public statuses setOrderByClause(OrderByClause clause) {
+	public skus_tags setOrderByClause(OrderByClause clause) {
 		selectBehavior().setOrderByClause(clause);
 		return this;
 	}
@@ -1512,7 +962,7 @@ public class statuses
 	 * @param criteria AND 結合する新条件
 	 * @return {@link SelectStatement} 自身
 	 */
-	public statuses and(Criteria criteria) {
+	public skus_tags and(Criteria criteria) {
 		selectBehavior().and(criteria);
 		return this;
 	}
@@ -1523,7 +973,7 @@ public class statuses
 	 * @param criteria OR 結合する新条件
 	 * @return {@link SelectStatement} 自身
 	 */
-	public statuses or(Criteria criteria) {
+	public skus_tags or(Criteria criteria) {
 		selectBehavior().or(criteria);
 		return this;
 	}
@@ -1534,7 +984,7 @@ public class statuses
 	 * @return {@link SelectStatement} 自身
 	 */
 	@Override
-	public statuses accept(SQLDecorator... decorators) {
+	public skus_tags accept(SQLDecorator... decorators) {
 		for (SQLDecorator decorator : decorators) {
 			this.decorators$.add(decorator);
 		}
@@ -1684,7 +1134,7 @@ public class statuses
 	 * 現在保持している SELECT 文の WHERE 句をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetWhere() {
+	public skus_tags resetWhere() {
 		selectBehavior().resetWhere();
 		return this;
 	}
@@ -1693,7 +1143,7 @@ public class statuses
 	 * 現在保持している HAVING 句をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetHaving() {
+	public skus_tags resetHaving() {
 		selectBehavior().resetHaving();
 		return this;
 	}
@@ -1702,7 +1152,7 @@ public class statuses
 	 * 現在保持している SELECT 句をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetSelect() {
+	public skus_tags resetSelect() {
 		selectBehavior().resetSelect();
 		return this;
 	}
@@ -1711,7 +1161,7 @@ public class statuses
 	 * 現在保持している GROUP BY 句をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetGroupBy() {
+	public skus_tags resetGroupBy() {
 		selectBehavior().resetGroupBy();
 		return this;
 	}
@@ -1720,7 +1170,7 @@ public class statuses
 	 * 現在保持している ORDER BY 句をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetOrderBy() {
+	public skus_tags resetOrderBy() {
 		selectBehavior().resetOrderBy();
 		return this;
 	}
@@ -1729,7 +1179,7 @@ public class statuses
 	 * 現在保持している UNION をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetUnions() {
+	public skus_tags resetUnions() {
 		selectBehavior().resetUnions();
 		return this;
 	}
@@ -1738,7 +1188,7 @@ public class statuses
 	 * 現在保持している JOIN をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetJoins() {
+	public skus_tags resetJoins() {
 		selectBehavior().resetJoins();
 		return this;
 	}
@@ -1747,7 +1197,7 @@ public class statuses
 	 * 現在保持している INSERT 文のカラムをリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetInsert() {
+	public skus_tags resetInsert() {
 		dmsBehavior().resetInsert();
 		return this;
 	}
@@ -1756,7 +1206,7 @@ public class statuses
 	 * 現在保持している UPDATE 文の更新要素をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetUpdate() {
+	public skus_tags resetUpdate() {
 		dmsBehavior().resetUpdate();
 		return this;
 	}
@@ -1765,7 +1215,7 @@ public class statuses
 	 * 現在保持している SET 文の更新要素をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetDelete() {
+	public skus_tags resetDelete() {
 		dmsBehavior().resetDelete();
 		return this;
 	}
@@ -1774,7 +1224,7 @@ public class statuses
 	 * 現在保持している {@link SQLDecorator} をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses resetDecorators() {
+	public skus_tags resetDecorators() {
 		decorators$.clear();
 		return this;
 	}
@@ -1783,7 +1233,7 @@ public class statuses
 	 * 現在保持している条件、並び順をリセットします。
 	 * @return このインスタンス
 	 */
-	public statuses reset() {
+	public skus_tags reset() {
 		selectBehavior().reset();
 		dmsBehavior().reset();
 		resetDecorators();
@@ -1909,7 +1359,7 @@ public class statuses
 	 */
 	public static class Assist<T, M> implements TableFacadeAssist {
 
-		final statuses table$;
+		final skus_tags table$;
 
 		private final CriteriaContext context$;
 
@@ -1923,77 +1373,12 @@ public class statuses
 		public final T id;
 
 		/**
-		 * 項目名 group_id
+		 * 項目名 tag_id
 		 */
-		public final T group_id;
-
-		/**
-		 * 項目名 seq
-		 */
-		public final T seq;
-
-		/**
-		 * 項目名 name
-		 */
-		public final T name;
-
-		/**
-		 * 項目名 code
-		 */
-		public final T code;
-
-		/**
-		 * 項目名 description
-		 */
-		public final T description;
-
-		/**
-		 * 項目名 owner_id
-		 */
-		public final T owner_id;
-
-		/**
-		 * 項目名 revision
-		 */
-		public final T revision;
-
-		/**
-		 * 項目名 props
-		 */
-		public final T props;
-
-		/**
-		 * 項目名 tags
-		 */
-		public final T tags;
-
-		/**
-		 * 項目名 active
-		 */
-		public final T active;
-
-		/**
-		 * 項目名 created_at
-		 */
-		public final T created_at;
-
-		/**
-		 * 項目名 created_by
-		 */
-		public final T created_by;
-
-		/**
-		 * 項目名 updated_at
-		 */
-		public final T updated_at;
-
-		/**
-		 * 項目名 updated_by
-		 */
-		public final T updated_by;
+		public final T tag_id;
 
 		private Assist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<T> builder$,
 			CriteriaContext context$,
 			TableFacadeAssist parent$,
@@ -2003,21 +1388,8 @@ public class statuses
 			this.parent$ = parent$;
 			this.fkName$ = fkName$;
 
-			this.id = builder$.buildColumn(this, sqlassist.bb_stock.statuses.id);
-			this.group_id = builder$.buildColumn(this, sqlassist.bb_stock.statuses.group_id);
-			this.seq = builder$.buildColumn(this, sqlassist.bb_stock.statuses.seq);
-			this.name = builder$.buildColumn(this, sqlassist.bb_stock.statuses.name);
-			this.code = builder$.buildColumn(this, sqlassist.bb_stock.statuses.code);
-			this.description = builder$.buildColumn(this, sqlassist.bb_stock.statuses.description);
-			this.owner_id = builder$.buildColumn(this, sqlassist.bb_stock.statuses.owner_id);
-			this.revision = builder$.buildColumn(this, sqlassist.bb_stock.statuses.revision);
-			this.props = builder$.buildColumn(this, sqlassist.bb_stock.statuses.props);
-			this.tags = builder$.buildColumn(this, sqlassist.bb_stock.statuses.tags);
-			this.active = builder$.buildColumn(this, sqlassist.bb_stock.statuses.active);
-			this.created_at = builder$.buildColumn(this, sqlassist.bb_stock.statuses.created_at);
-			this.created_by = builder$.buildColumn(this, sqlassist.bb_stock.statuses.created_by);
-			this.updated_at = builder$.buildColumn(this, sqlassist.bb_stock.statuses.updated_at);
-			this.updated_by = builder$.buildColumn(this, sqlassist.bb_stock.statuses.updated_by);
+			this.id = builder$.buildColumn(this, sqlassist.bb_stock.skus_tags.id);
+			this.tag_id = builder$.buildColumn(this, sqlassist.bb_stock.skus_tags.tag_id);
 		}
 
 		/**
@@ -2034,7 +1406,7 @@ public class statuses
 		}
 
 		private Assist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<T> builder$,
 			CriteriaContext context$) {
 			this(table$, builder$, context$, null, null);
@@ -2115,7 +1487,7 @@ public class statuses
 		}
 
 		private ExtAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<T> builder$,
 			CriteriaContext context$) {
 			super(table$, builder$, context$);
@@ -2135,55 +1507,29 @@ public class statuses
 		}
 
 		/**
-		 * 参照先テーブル名 groups<br>
-		 * 外部キー名 statuses_group_id_fkey<br>
-		 * 項目名 group_id
-		 * @return groups relationship
+		 * 参照先テーブル名 tags<br>
+		 * 外部キー名 skus_tags_tag_id_fkey<br>
+		 * 項目名 tag_id
+		 * @return tags relationship
 		 */
-		public sqlassist.bb.groups.ExtAssist<T, Many<sqlassist.bb_stock.statuses.Row, M>> $groups() {
-			return new sqlassist.bb.groups.ExtAssist<>(
+		public sqlassist.bb.tags.ExtAssist<T, Many<sqlassist.bb_stock.skus_tags.Row, M>> $tags() {
+			return new sqlassist.bb.tags.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb_stock.statuses.bb$groups$statuses_group_id_fkey);
+				sqlassist.bb_stock.skus_tags.bb$tags$skus_tags_tag_id_fkey);
 		}
 
 		/**
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 statuses_created_by_fkey<br>
-		 * 項目名 created_by
-		 * @return users relationship
+		 * 参照先テーブル名 skus<br>
+		 * 外部キー名 skus_tags_id_fkey<br>
+		 * 項目名 id
+		 * @return skus relationship
 		 */
-		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb_stock.statuses.Row, M>> $users$statuses_created_by_fkey() {
-			return new sqlassist.bb.users.ExtAssist<>(
+		public sqlassist.bb_stock.skus.ExtAssist<T, Many<sqlassist.bb_stock.skus_tags.Row, M>> $skus() {
+			return new sqlassist.bb_stock.skus.ExtAssist<>(
 				builder$,
 				this,
-				sqlassist.bb_stock.statuses.bb$users$statuses_created_by_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 users<br>
-		 * 外部キー名 statuses_updated_by_fkey<br>
-		 * 項目名 updated_by
-		 * @return users relationship
-		 */
-		public sqlassist.bb.users.ExtAssist<T, Many<sqlassist.bb_stock.statuses.Row, M>> $users$statuses_updated_by_fkey() {
-			return new sqlassist.bb.users.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb_stock.statuses.bb$users$statuses_updated_by_fkey);
-		}
-
-		/**
-		 * 参照先テーブル名 owners<br>
-		 * 外部キー名 statuses_owner_id_fkey<br>
-		 * 項目名 owner_id
-		 * @return owners relationship
-		 */
-		public sqlassist.bb_stock.owners.ExtAssist<T, Many<sqlassist.bb_stock.statuses.Row, M>> $owners() {
-			return new sqlassist.bb_stock.owners.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb_stock.statuses.bb_stock$owners$statuses_owner_id_fkey);
+				sqlassist.bb_stock.skus_tags.bb_stock$skus$skus_tags_id_fkey);
 		}
 	}
 
@@ -2193,7 +1539,7 @@ public class statuses
 	public static class SelectAssist extends ExtAssist<SelectCol, Void> implements SelectClauseAssist {
 
 		private SelectAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<SelectCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
 		}
@@ -2205,7 +1551,7 @@ public class statuses
 	public static class ListSelectAssist extends SelectAssist implements ListSelectClauseAssist {
 
 		private ListSelectAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<SelectCol> builder$) {
 			super(table$, builder$);
 		}
@@ -2227,7 +1573,7 @@ public class statuses
 		public final WhereAssist OR;
 
 		private WhereAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<WhereColumn<WhereLogicalOperators>> builder$,
 			CriteriaContext context$,
 			WhereAssist or$) {
@@ -2318,7 +1664,7 @@ public class statuses
 	public static class GroupByAssist extends ExtAssist<GroupByCol, Void> implements GroupByClauseAssist {
 
 		private GroupByAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<GroupByCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
 		}
@@ -2335,7 +1681,7 @@ public class statuses
 	public static class ListGroupByAssist extends GroupByAssist implements ListGroupByClauseAssist {
 
 		private ListGroupByAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<GroupByCol> builder$) {
 			super(table$, builder$);
 		}
@@ -2357,7 +1703,7 @@ public class statuses
 		public final HavingAssist OR;
 
 		private HavingAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<HavingColumn<HavingLogicalOperators>> builder$,
 			CriteriaContext context$,
 			HavingAssist or$) {
@@ -2443,7 +1789,7 @@ public class statuses
 	public static class OrderByAssist extends ExtAssist<OrderByCol, Void> implements OrderByClauseAssist {
 
 		private OrderByAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<OrderByCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
 		}
@@ -2460,7 +1806,7 @@ public class statuses
 	public static class ListOrderByAssist extends OrderByAssist implements ListOrderByClauseAssist {
 
 		private ListOrderByAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<OrderByCol> builder$) {
 			super(table$, builder$);
 		}
@@ -2482,7 +1828,7 @@ public class statuses
 		public final OnLeftAssist OR;
 
 		private OnLeftAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<OnLeftColumn<OnLeftLogicalOperators>> builder$,
 			CriteriaContext context$,
 			OnLeftAssist or$) {
@@ -2573,7 +1919,7 @@ public class statuses
 		public final OnRightAssist OR;
 
 		private OnRightAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<OnRightColumn<OnRightLogicalOperators>> builder$,
 			CriteriaContext context$,
 			OnRightAssist or$) {
@@ -2659,7 +2005,7 @@ public class statuses
 	public static class InsertAssist extends Assist<InsertCol, Void> implements InsertClauseAssist {
 
 		private InsertAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<InsertCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
 		}
@@ -2671,7 +2017,7 @@ public class statuses
 	public static class ListInsertAssist extends InsertAssist implements ListInsertClauseAssist {
 
 		private ListInsertAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<InsertCol> builder$) {
 			super(table$, builder$);
 		}
@@ -2688,7 +2034,7 @@ public class statuses
 	public static class UpdateAssist extends Assist<UpdateCol, Void> implements UpdateClauseAssist {
 
 		private UpdateAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<UpdateCol> builder$) {
 			super(table$, builder$, CriteriaContext.NULL);
 		}
@@ -2700,7 +2046,7 @@ public class statuses
 	public static class ListUpdateAssist extends UpdateAssist implements ListUpdateClauseAssist<DMSWhereAssist> {
 
 		private ListUpdateAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<UpdateCol> builder$) {
 			super(table$, builder$);
 		}
@@ -2722,7 +2068,7 @@ public class statuses
 		public final DMSWhereAssist OR;
 
 		private DMSWhereAssist(
-			statuses table$,
+			skus_tags table$,
 			TableFacadeContext<WhereColumn<DMSWhereLogicalOperators>> builder$,
 			CriteriaContext context$,
 			DMSWhereAssist or$) {

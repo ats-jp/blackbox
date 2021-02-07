@@ -200,7 +200,7 @@ public class ClosingHandler {
 		var query = new snapshots()
 			.SELECT(
 				a -> a.ls(
-					a.any("RANK() OVER (ORDER BY {0} DESC)", a.seq).AS("rank")))
+					a.any("RANK() OVER (ORDER BY {0} DESC)", a.combined_seq).AS("rank")))
 			.WHERE(a -> a.journal_group_id.eq($UUID).AND.fixed_at.le($TIMESTAMP));
 
 		applyer.accept(query);

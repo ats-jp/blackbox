@@ -47,7 +47,7 @@ public class JournalHandlerTest {
 			}
 
 			@Override
-			public UUID itemId() {
+			public UUID skuId() {
 				return U.NULL_ID;
 			}
 

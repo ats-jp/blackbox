@@ -116,6 +116,7 @@ CREATE TABLE bb.orgs (
 	instance_id uuid REFERENCES bb.instances NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	code text UNIQUE NOT NULL,
 	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	group_tree_revision bigint NOT NULL,
@@ -135,6 +136,8 @@ COMMENT ON COLUMN bb.orgs.id IS 'ID';
 COMMENT ON COLUMN bb.orgs.instance_id IS '発生元インスタンスのID';
 COMMENT ON COLUMN bb.orgs.seq IS 'インスタンス内連番';
 COMMENT ON COLUMN bb.orgs.name IS '名称';
+COMMENT ON COLUMN bb.orgs.code IS '外部システムコード
+インスタンスを合併した場合でもユニークである必要あり';
 COMMENT ON COLUMN bb.orgs.description IS '補足事項';
 COMMENT ON COLUMN bb.orgs.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.orgs.group_tree_revision IS 'グループ階層リビジョン番号
@@ -159,12 +162,17 @@ $org_group_tree_revisiontrigger$ LANGUAGE plpgsql;
 CREATE TRIGGER org_group_tree_revisiontrigger BEFORE INSERT ON bb.orgs
 FOR EACH ROW EXECUTE PROCEDURE bb.org_group_tree_revisionfunction();
 
+CREATE INDEX ON bb.orgs (active);
+CREATE INDEX ON bb.orgs (seq);
+CREATE INDEX ON bb.orgs (code);
+
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.orgs (
 	id,
 	instance_id,
 	seq,
 	name,
+	code,
 	revision,
 	created_by,
 	updated_by
@@ -172,6 +180,7 @@ INSERT INTO bb.orgs (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	0,
+	'NULL',
 	'NULL',
 	0,
 	'00000000-0000-0000-0000-000000000000',
@@ -183,6 +192,7 @@ INSERT INTO bb.orgs (
 	instance_id,
 	seq,
 	name,
+	code,
 	description,
 	revision,
 	created_by,
@@ -192,6 +202,7 @@ INSERT INTO bb.orgs (
 	'00000000-0000-0000-0000-000000000000',
 	1,
 	'Blackbox',
+	'blackbox',
 	'Blackboxシステム管理',
 	0,
 	'11111111-1111-1111-1111-111111111111',
@@ -211,6 +222,7 @@ CREATE TABLE bb.groups (
 	org_id uuid REFERENCES bb.orgs NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	code text NOT NULL,
 	description text DEFAULT '' NOT NULL,
 	parent_id uuid REFERENCES bb.groups NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
@@ -235,6 +247,7 @@ COMMENT ON COLUMN bb.groups.id IS 'ID';
 COMMENT ON COLUMN bb.groups.org_id IS '組織ID';
 COMMENT ON COLUMN bb.groups.seq IS '組織内連番';
 COMMENT ON COLUMN bb.groups.name IS '名称';
+COMMENT ON COLUMN bb.groups.code IS '外部システムコード';
 COMMENT ON COLUMN bb.groups.description IS '補足事項';
 COMMENT ON COLUMN bb.groups.parent_id IS '親グループID';
 COMMENT ON COLUMN bb.groups.revision IS 'リビジョン番号';
@@ -262,12 +275,19 @@ $group_tree_revisiontrigger$ LANGUAGE plpgsql;
 CREATE TRIGGER group_tree_revisiontrigger BEFORE UPDATE ON bb.groups
 FOR EACH ROW EXECUTE PROCEDURE bb.group_tree_revisionfunction();
 
+CREATE INDEX ON bb.groups (org_id);
+CREATE INDEX ON bb.groups (seq);
+CREATE INDEX ON bb.groups (code);
+CREATE INDEX ON bb.groups (active);
+--parent_idで検索することはないのでindex不要
+
 --NULLの代用(id=0)
 INSERT INTO bb.groups (
 	id,
 	org_id,
 	seq,
 	name,
+	code,
 	parent_id,
 	revision,
 	created_by,
@@ -276,6 +296,7 @@ INSERT INTO bb.groups (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	0,
+	'NULL',
 	'NULL',
 	'00000000-0000-0000-0000-000000000000',
 	0,
@@ -288,6 +309,7 @@ INSERT INTO bb.groups (
 	org_id,
 	seq,
 	name,
+	code,
 	description,
 	parent_id,
 	revision,
@@ -298,6 +320,7 @@ INSERT INTO bb.groups (
 	'11111111-1111-1111-1111-111111111111',
 	0,
 	'Superusers',
+	'superusers',
 	'Blackboxシステム管理者グループ',
 	'00000000-0000-0000-0000-000000000000',
 	0,
@@ -308,6 +331,8 @@ CREATE TABLE bb.groups_tags (
 	id uuid REFERENCES bb.groups ON DELETE CASCADE NOT NULL,
 	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
+
+CREATE INDEX ON bb.groups_tags (tag_id);
 
 ----------
 
@@ -374,6 +399,9 @@ COMMENT ON COLUMN bb.relationships.child_id IS '子グループID
 COMMENT ON COLUMN bb.relationships.cascade_id IS 'カスケード削除用ID
 自身が依存する親のIDを持っておき、親が削除されたときに連鎖的にすべて削除するための項目';
 
+CREATE INDEX ON bb.relationships (parent_id);
+CREATE INDEX ON bb.relationships (child_id);
+
 --NULLの代用(id=0)
 INSERT INTO bb.relationships (
 	id,
@@ -410,6 +438,7 @@ CREATE TABLE bb.users (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	code text NOT NULL,
 	description text DEFAULT '' NOT NULL,
 	privilege smallint CHECK (privilege IN (0, 1, 2, 3, 9)) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
@@ -429,6 +458,7 @@ COMMENT ON COLUMN bb.users.id IS 'ID';
 COMMENT ON COLUMN bb.users.group_id IS 'グループID';
 COMMENT ON COLUMN bb.users.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb.users.name IS '名称';
+COMMENT ON COLUMN bb.users.code IS '外部システムコード';
 COMMENT ON COLUMN bb.users.description IS '補足事項';
 COMMENT ON COLUMN bb.users.privilege IS '権限
 値の小さいほうが強い権限となる
@@ -442,12 +472,19 @@ COMMENT ON COLUMN bb.users.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.users.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.users.updated_by IS '更新ユーザー';
 
+CREATE INDEX ON bb.users (group_id);
+CREATE INDEX ON bb.users (seq);
+CREATE INDEX ON bb.users (code);
+CREATE INDEX ON bb.users (privilege);
+CREATE INDEX ON bb.users (active);
+
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.users (
 	id,
 	group_id,
 	seq,
 	name,
+	code,
 	privilege,
 	revision,
 	created_by,
@@ -456,6 +493,7 @@ INSERT INTO bb.users (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	0,
+	'NULL',
 	'NULL',
 	9,
 	0,
@@ -468,6 +506,7 @@ INSERT INTO bb.users (
 	group_id,
 	seq,
 	name,
+	code,
 	description,
 	privilege,
 	revision,
@@ -477,6 +516,7 @@ INSERT INTO bb.users (
 	'11111111-1111-1111-1111-111111111111',
 	'11111111-1111-1111-1111-111111111111',
 	0,
+	'Superuser',
 	'superuser',
 	'Blackbox管理者',
 	0,
@@ -495,6 +535,8 @@ CREATE TABLE bb.users_tags (
 	id uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
 	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
+
+CREATE INDEX ON bb.users_tags (tag_id);
 
 ----------
 
@@ -607,6 +649,9 @@ COMMENT ON COLUMN bb.closings.group_tree_revision IS '登録時のグループ�
 COMMENT ON COLUMN bb.closings.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.closings.created_by IS '作成ユーザー';
 
+CREATE INDEX ON bb.closings (group_id);
+CREATE INDEX ON bb.closings (closed_at);
+
 --締め済グループ
 CREATE UNLOGGED TABLE bb.last_closings (
 	id uuid PRIMARY KEY REFERENCES bb.groups ON DELETE CASCADE,
@@ -669,7 +714,8 @@ INSERT INTO bb.journal_batches (id, created_by) VALUES ('00000000-0000-0000-0000
 CREATE TABLE bb.journals (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
-	seq bigserial NOT NULL,
+	seq bigint NOT NULL,
+	code text NOT NULL,
 	journal_batch_id uuid REFERENCES bb.journal_batches NOT NULL,
 	fixed_at timestamptz NOT NULL,
 	description text DEFAULT '' NOT NULL,
@@ -692,6 +738,7 @@ COMMENT ON COLUMN bb.journals.id IS 'ID';
 COMMENT ON COLUMN bb.journals.group_id IS 'グループID
 この伝票の属するグループ';
 COMMENT ON COLUMN bb.journals.seq IS 'グループ内連番';
+COMMENT ON COLUMN bb.journals.code IS '外部システムコード';
 COMMENT ON COLUMN bb.journals.journal_batch_id IS '移動伝票一括登録ID';
 COMMENT ON COLUMN bb.journals.fixed_at IS '確定時刻';
 COMMENT ON COLUMN bb.journals.description IS '補足事項';
@@ -707,10 +754,19 @@ COMMENT ON COLUMN bb.journals.group_tree_revision IS '登録時のグループ�
 COMMENT ON COLUMN bb.journals.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.journals.created_by IS '作成ユーザー';
 
+--journals
+CREATE INDEX ON bb.journals (group_id);
+CREATE INDEX ON bb.journals (seq);
+CREATE INDEX ON bb.journals (code);
+CREATE INDEX ON bb.journals (fixed_at);
+CREATE INDEX ON bb.journals (created_at);
+
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.journals (
 	id,
 	group_id,
+	seq,
+	code,
 	journal_batch_id,
 	fixed_at,
 	instance_id,
@@ -720,6 +776,8 @@ INSERT INTO bb.journals (
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
+	0,
+	'NULL',
 	'00000000-0000-0000-0000-000000000000',
 	'1900-1-1'::timestamptz,
 	'00000000-0000-0000-0000-000000000000',
@@ -747,12 +805,15 @@ CREATE TABLE bb.journals_tags (
 	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
+CREATE INDEX ON bb.journals_tags (tag_id);
+
 ----------
 
 --伝票明細
 CREATE TABLE bb.details (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	journal_id uuid REFERENCES bb.journals NOT NULL,
+	seq_in_journal integer NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL);
 --log対象外
 
@@ -761,15 +822,20 @@ COMMENT ON TABLE bb.details IS '伝票明細
 出ノードと入ノードを束ねる';
 COMMENT ON COLUMN bb.details.id IS 'ID';
 COMMENT ON COLUMN bb.details.journal_id IS '伝票ID';
+COMMENT ON COLUMN bb.details.seq_in_journal IS '伝票内連番';
 COMMENT ON COLUMN bb.details.props IS '外部アプリケーション情報JSON';
+
+CREATE INDEX ON bb.details (journal_id);
 
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.details (
 	id,
-	journal_id
+	journal_id,
+	seq_in_journal
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000');
+	'00000000-0000-0000-0000-000000000000',
+	0);
 
 ----------
 
@@ -779,7 +845,7 @@ CREATE TABLE bb.nodes (
 	detail_id uuid REFERENCES bb.details NOT NULL,
 	unit_id uuid REFERENCES bb.units NOT NULL,
 	in_out smallint CHECK (in_out IN (1, -1)) NOT NULL, --そのまま計算に使用できるように
-	seq integer CHECK (seq <= 999999) NOT NULL,
+	seq_in_journal integer CHECK (seq_in_journal <= 999999) NOT NULL,
 	quantity numeric CHECK (quantity >= 0) NOT NULL,
 	grants_unlimited boolean DEFAULT false NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL);
@@ -792,12 +858,15 @@ COMMENT ON COLUMN bb.nodes.detail_id IS '明細ID';
 COMMENT ON COLUMN bb.nodes.unit_id IS '管理対象ID';
 COMMENT ON COLUMN bb.nodes.in_out IS '入出区分
 IN=1, OUT=-1';
-COMMENT ON COLUMN bb.nodes.seq IS '伝票内連番
+COMMENT ON COLUMN bb.nodes.seq_in_journal IS '伝票内連番
 最大値999999';
 COMMENT ON COLUMN bb.nodes.quantity IS '数量';
 COMMENT ON COLUMN bb.nodes.grants_unlimited IS '数量無制限の許可
 trueの場合、以降のsnapshotは数量がマイナスになってもエラーにならない';
 COMMENT ON COLUMN bb.nodes.props IS '外部アプリケーション情報JSON';
+
+CREATE INDEX ON bb.nodes (detail_id);
+CREATE INDEX ON bb.nodes (unit_id);
 
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.nodes (
@@ -805,7 +874,7 @@ INSERT INTO bb.nodes (
 	detail_id,
 	unit_id,
 	in_out,
-	seq,
+	seq_in_journal,
 	quantity
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
@@ -835,10 +904,10 @@ CREATE UNLOGGED TABLE bb.snapshots (
 	journal_group_id uuid REFERENCES bb.groups NOT NULL,
 	unit_id uuid REFERENCES bb.units NOT NULL,
 	fixed_at timestamptz NOT NULL,
-	seq char(36) NOT NULL,
+	combined_seq char(36) NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 	updated_by uuid REFERENCES bb.users ON DELETE CASCADE NOT NULL,
-	UNIQUE (journal_group_id, seq));
+	UNIQUE (journal_group_id, combined_seq));
 --log対象外
 --WAL対象外のため、クラッシュ時journalから復元する必要あり
 --頻繁に参照、更新されることが予想されるので締め済のデータは削除も可
@@ -859,11 +928,18 @@ COMMENT ON COLUMN bb.snapshots.unit_id IS '管理対象ID
 検索高速化のためnodes.unit_idをここに持つ';
 COMMENT ON COLUMN bb.snapshots.fixed_at IS '確定時刻
 検索高速化のためjournals.fixed_atをここに持つ';
-COMMENT ON COLUMN bb.snapshots.seq IS '移動ノード状態の登録順
-検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ
+COMMENT ON COLUMN bb.snapshots.combined_seq IS '移動ノード状態の登録順
+検索高速化のためfixedAt, created_at, nodes.seq_in_journalを連結しここに持つ
 グループ内で一意であり順序として使用できる';
 COMMENT ON COLUMN bb.snapshots.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.snapshots.updated_by IS '更新ユーザー';
+
+CREATE INDEX ON bb.snapshots (in_search_scope);
+CREATE INDEX ON bb.snapshots (total);
+CREATE INDEX ON bb.snapshots (journal_group_id);
+CREATE INDEX ON bb.snapshots (unit_id);
+CREATE INDEX ON bb.snapshots (fixed_at);
+CREATE INDEX ON bb.snapshots (combined_seq);
 
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.snapshots (
@@ -874,7 +950,7 @@ INSERT INTO bb.snapshots (
 	journal_group_id,
 	unit_id,
 	fixed_at,
-	seq,
+	combined_seq,
 	updated_by
 ) VALUES (
 	'00000000-0000-0000-0000-000000000000',
@@ -910,6 +986,8 @@ COMMENT ON COLUMN bb.current_units.total IS '現時点の総数';
 COMMENT ON COLUMN bb.current_units.snapshot_id IS 'スナップショットID
 現時点の数量を変更した伝票';
 COMMENT ON COLUMN bb.current_units.updated_at IS '更新時刻';
+
+CREATE INDEX ON bb.current_units (snapshot_id);
 
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.current_units (
@@ -963,6 +1041,9 @@ COMMENT ON COLUMN bb.closed_journals.id IS 'ID
 journals.idに従属';
 COMMENT ON COLUMN bb.closed_journals.closing_id IS '締めID';
 
+--closed_journals
+CREATE INDEX ON bb.closed_journals (closing_id);
+
 ----------
 
 --現在在庫数量反映ジョブ
@@ -980,6 +1061,9 @@ COMMENT ON COLUMN bb.jobs.id IS 'ID
 journals.journal_idに従属';
 COMMENT ON COLUMN bb.jobs.completed IS '実施済フラグ';
 COMMENT ON COLUMN bb.jobs.updated_at IS '更新時刻';
+
+CREATE INDEX ON bb.jobs (completed);
+--worker_idで検索することはないのでindex不要
 
 ----------
 
@@ -1057,6 +1141,11 @@ COMMENT ON COLUMN bb.transients.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transients.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transients.updated_by IS '更新ユーザー';
 
+CREATE INDEX ON bb.transients (group_id);
+CREATE INDEX ON bb.transients (seq_in_group);
+CREATE INDEX ON bb.transients (user_id);
+CREATE INDEX ON bb.transients (seq_in_user);
+
 ----------
 
 --一時作業移動伝票
@@ -1092,6 +1181,13 @@ COMMENT ON COLUMN bb.transient_journals.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transient_journals.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transient_journals.updated_by IS '更新ユーザー';
 
+CREATE INDEX ON bb.transient_journals (transient_id);
+CREATE INDEX ON bb.transient_journals (seq_in_transient);
+CREATE INDEX ON bb.transient_journals (group_id);
+CREATE INDEX ON bb.transient_journals (fixed_at);
+CREATE INDEX ON bb.transient_journals (seq_in_db);
+CREATE INDEX ON bb.transient_journals (created_at);
+
 --締め済グループチェック
 CREATE FUNCTION bb.transient_closed_check() RETURNS TRIGGER AS $$
 	DECLARE closed_at_local timestamptz;
@@ -1111,6 +1207,8 @@ CREATE TABLE bb.transient_journals_tags (
 	id uuid REFERENCES bb.transient_journals ON DELETE CASCADE NOT NULL,
 	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
+
+CREATE INDEX ON bb.transient_journals_tags (tag_id);
 
 ----------
 
@@ -1135,6 +1233,8 @@ COMMENT ON COLUMN bb.transient_details.created_at IS '作成時刻';
 COMMENT ON COLUMN bb.transient_details.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transient_details.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transient_details.updated_by IS '更新ユーザー';
+
+CREATE INDEX ON bb.transient_details (transient_journal_id);
 
 ----------
 
@@ -1168,92 +1268,17 @@ COMMENT ON COLUMN bb.transient_nodes.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb.transient_nodes.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb.transient_nodes.updated_by IS '更新ユーザー';
 
+CREATE INDEX ON bb.transient_nodes (transient_detail_id);
+CREATE INDEX ON bb.transient_nodes (unit_id);
+
 --===========================
---indexes
+--tablespace
 --===========================
 
 /*
 --開発環境、クラウド環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
 SET default_tablespace = 'blackbox_index';
 */
-
---orgs
-CREATE INDEX ON bb.orgs (active);
-CREATE INDEX ON bb.orgs (seq);
-
---groups
-CREATE INDEX ON bb.groups (org_id);
-CREATE INDEX ON bb.groups (seq);
-CREATE INDEX ON bb.groups (active);
---parent_idで検索することはないのでindex不要
-
---relationships
-CREATE INDEX ON bb.relationships (parent_id);
-CREATE INDEX ON bb.relationships (child_id);
-
---users
-CREATE INDEX ON bb.users (group_id);
-CREATE INDEX ON bb.users (seq);
-CREATE INDEX ON bb.users (privilege);
-CREATE INDEX ON bb.users (active);
-
---journals
-CREATE INDEX ON bb.journals (group_id);
-CREATE INDEX ON bb.journals (seq);
-CREATE INDEX ON bb.journals (fixed_at);
-CREATE INDEX ON bb.journals (created_at);
-
---details
-CREATE INDEX ON bb.details (journal_id);
-
---nodes
-CREATE INDEX ON bb.nodes (detail_id);
-CREATE INDEX ON bb.nodes (unit_id);
-
---snapshots
-CREATE INDEX ON bb.snapshots (in_search_scope);
-CREATE INDEX ON bb.snapshots (total);
-CREATE INDEX ON bb.snapshots (journal_group_id);
-CREATE INDEX ON bb.snapshots (unit_id);
-CREATE INDEX ON bb.snapshots (fixed_at);
-CREATE INDEX ON bb.snapshots (seq);
-
---current_units
-CREATE INDEX ON bb.current_units (snapshot_id);
-
---closed_journals
-CREATE INDEX ON bb.closed_journals (closing_id);
-
---jobs
-CREATE INDEX ON bb.jobs (completed);
---worker_idで検索することはないのでindex不要
-
---transients
-CREATE INDEX ON bb.transients (group_id);
-CREATE INDEX ON bb.transients (seq_in_group);
-CREATE INDEX ON bb.transients (user_id);
-CREATE INDEX ON bb.transients (seq_in_user);
-
---transient_journals
-CREATE INDEX ON bb.transient_journals (transient_id);
-CREATE INDEX ON bb.transient_journals (seq_in_transient);
-CREATE INDEX ON bb.transient_journals (group_id);
-CREATE INDEX ON bb.transient_journals (fixed_at);
-CREATE INDEX ON bb.transient_journals (seq_in_db);
-CREATE INDEX ON bb.transient_journals (created_at);
-
---transient_details
-CREATE INDEX ON bb.transient_details (transient_journal_id);
-
---transient_nodes
-CREATE INDEX ON bb.transient_nodes (transient_detail_id);
-CREATE INDEX ON bb.transient_nodes (unit_id);
-
---tags
-CREATE INDEX ON bb.groups_tags (tag_id);
-CREATE INDEX ON bb.users_tags (tag_id);
-CREATE INDEX ON bb.journals_tags (tag_id);
-CREATE INDEX ON bb.transient_journals_tags (tag_id);
 
 --===========================
 --privileges

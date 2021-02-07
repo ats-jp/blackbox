@@ -49,66 +49,6 @@ SET default_tablespace = 'blackbox';
 --stock tables
 --===========================
 
---アイテム
---SKU、個品
-CREATE TABLE bb_stock.items (
-	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-	group_id uuid REFERENCES bb.groups NOT NULL,
-	seq bigint NOT NULL,
-	name text NOT NULL,
-	description text DEFAULT '' NOT NULL,
-	revision bigint DEFAULT 0 NOT NULL,
-	props jsonb DEFAULT '{}' NOT NULL,
-	tags text[] DEFAULT '{}' NOT NULL,
-	active boolean DEFAULT true NOT NULL,
-	created_at timestamptz DEFAULT now() NOT NULL,
-	created_by uuid REFERENCES bb.users NOT NULL,
-	updated_at timestamptz DEFAULT now() NOT NULL,
-	updated_by uuid REFERENCES bb.users NOT NULL,
-	UNIQUE (group_id, seq));
---log対象
-
-COMMENT ON TABLE bb_stock.items IS 'アイテム
-在庫管理する対象となる「もの」、SKU、個品など';
-COMMENT ON COLUMN bb_stock.items.id IS 'ID';
-COMMENT ON COLUMN bb_stock.items.group_id IS 'グループID';
-COMMENT ON COLUMN bb_stock.items.seq IS 'グループ内連番';
-COMMENT ON COLUMN bb_stock.items.name IS '名称';
-COMMENT ON COLUMN bb_stock.items.description IS '補足事項';
-COMMENT ON COLUMN bb_stock.items.revision IS 'リビジョン番号';
-COMMENT ON COLUMN bb_stock.items.props IS '外部アプリケーション情報JSON';
-COMMENT ON COLUMN bb_stock.items.tags IS 'log保存用タグ';
-COMMENT ON COLUMN bb_stock.items.active IS 'アクティブフラグ';
-COMMENT ON COLUMN bb_stock.items.created_at IS '作成時刻';
-COMMENT ON COLUMN bb_stock.items.created_by IS '作成ユーザー';
-COMMENT ON COLUMN bb_stock.items.updated_at IS '更新時刻';
-COMMENT ON COLUMN bb_stock.items.updated_by IS '更新ユーザー';
-
---NULLの代用(id=00000000-0000-0000-0000-000000000000)
-INSERT INTO bb_stock.items (
-	id,
-	group_id,
-	seq,
-	name,
-	revision,
-	created_by,
-	updated_by
-) VALUES (
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000',
-	0,
-	'NULL',
-	0,
-	'00000000-0000-0000-0000-000000000000',
-	'00000000-0000-0000-0000-000000000000');
-
-CREATE TABLE bb_stock.items_tags (
-	id uuid REFERENCES bb_stock.items ON DELETE CASCADE NOT NULL,
-	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
-	UNIQUE (id, tag_id));
-
-----------
-
 --所有者
 --顧客、委託者
 CREATE TABLE bb_stock.owners (
@@ -116,6 +56,7 @@ CREATE TABLE bb_stock.owners (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	code text NOT NULL,
 	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -134,6 +75,7 @@ COMMENT ON COLUMN bb_stock.owners.id IS 'ID';
 COMMENT ON COLUMN bb_stock.owners.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.owners.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.owners.name IS '名称';
+COMMENT ON COLUMN bb_stock.owners.code IS '外部システムコード';
 COMMENT ON COLUMN bb_stock.owners.description IS '補足事項';
 COMMENT ON COLUMN bb_stock.owners.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.owners.props IS '外部アプリケーション情報JSON';
@@ -144,12 +86,18 @@ COMMENT ON COLUMN bb_stock.owners.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb_stock.owners.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb_stock.owners.updated_by IS '更新ユーザー';
 
+CREATE INDEX ON bb_stock.owners (group_id);
+CREATE INDEX ON bb_stock.owners (seq);
+CREATE INDEX ON bb_stock.owners (code);
+CREATE INDEX ON bb_stock.owners (active);
+
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb_stock.owners (
 	id,
 	group_id,
 	seq,
 	name,
+	code,
 	revision,
 	created_by,
 	updated_by
@@ -157,6 +105,7 @@ INSERT INTO bb_stock.owners (
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000',
 	0,
+	'NULL',
 	'NULL',
 	0,
 	'00000000-0000-0000-0000-000000000000',
@@ -167,6 +116,151 @@ CREATE TABLE bb_stock.owners_tags (
 	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
+CREATE INDEX ON bb_stock.owners_tags (tag_id);
+
+----------
+
+--アイテム、商品、管理品
+CREATE TABLE bb_stock.items (
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	group_id uuid REFERENCES bb.groups NOT NULL,
+	seq bigint NOT NULL,
+	name text NOT NULL,
+	code text NOT NULL,
+	description text DEFAULT '' NOT NULL,
+	owner_id uuid REFERENCES bb_stock.owners NOT NULL,
+	revision bigint DEFAULT 0 NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
+	active boolean DEFAULT true NOT NULL,
+	created_at timestamptz DEFAULT now() NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
+	updated_at timestamptz DEFAULT now() NOT NULL,
+	updated_by uuid REFERENCES bb.users NOT NULL,
+	UNIQUE (group_id, seq));
+--log対象
+
+COMMENT ON TABLE bb_stock.items IS 'アイテム
+在庫管理する対象となる「もの」';
+COMMENT ON COLUMN bb_stock.items.id IS 'ID';
+COMMENT ON COLUMN bb_stock.items.group_id IS 'グループID';
+COMMENT ON COLUMN bb_stock.items.seq IS 'グループ内連番';
+COMMENT ON COLUMN bb_stock.items.name IS '名称';
+COMMENT ON COLUMN bb_stock.items.code IS '外部システムコード';
+COMMENT ON COLUMN bb_stock.items.description IS '補足事項';
+COMMENT ON COLUMN bb_stock.items.owner_id IS '所有者ID';
+COMMENT ON COLUMN bb_stock.items.revision IS 'リビジョン番号';
+COMMENT ON COLUMN bb_stock.items.props IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb_stock.items.tags IS 'log保存用タグ';
+COMMENT ON COLUMN bb_stock.items.active IS 'アクティブフラグ';
+COMMENT ON COLUMN bb_stock.items.created_at IS '作成時刻';
+COMMENT ON COLUMN bb_stock.items.created_by IS '作成ユーザー';
+COMMENT ON COLUMN bb_stock.items.updated_at IS '更新時刻';
+COMMENT ON COLUMN bb_stock.items.updated_by IS '更新ユーザー';
+
+CREATE INDEX ON bb_stock.items (group_id);
+CREATE INDEX ON bb_stock.items (seq);
+CREATE INDEX ON bb_stock.items (code);
+CREATE INDEX ON bb_stock.items (active);
+
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
+INSERT INTO bb_stock.items (
+	id,
+	group_id,
+	seq,
+	name,
+	code,
+	owner_id,
+	revision,
+	created_by,
+	updated_by
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	0,
+	'NULL',
+	'NULL',
+	'00000000-0000-0000-0000-000000000000',
+	0,
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
+
+CREATE TABLE bb_stock.items_tags (
+	id uuid REFERENCES bb_stock.items ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
+
+CREATE INDEX ON bb_stock.items_tags (tag_id);
+
+----------
+
+--SKU、個品
+CREATE TABLE bb_stock.skus (
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+	item_id uuid REFERENCES bb_stock.items NOT NULL,
+	seq_in_item bigint NOT NULL,
+	name text NOT NULL,
+	code text NOT NULL,
+	description text DEFAULT '' NOT NULL,
+	revision bigint DEFAULT 0 NOT NULL,
+	props jsonb DEFAULT '{}' NOT NULL,
+	tags text[] DEFAULT '{}' NOT NULL,
+	active boolean DEFAULT true NOT NULL,
+	created_at timestamptz DEFAULT now() NOT NULL,
+	created_by uuid REFERENCES bb.users NOT NULL,
+	updated_at timestamptz DEFAULT now() NOT NULL,
+	updated_by uuid REFERENCES bb.users NOT NULL,
+	UNIQUE (item_id, seq_in_item));
+--log対象
+
+CREATE INDEX ON bb_stock.skus (item_id);
+CREATE INDEX ON bb_stock.skus (seq_in_item);
+CREATE INDEX ON bb_stock.skus (code);
+CREATE INDEX ON bb_stock.skus (active);
+
+COMMENT ON TABLE bb_stock.skus IS 'SKU
+在庫管理する対象となるSKU、個品など';
+COMMENT ON COLUMN bb_stock.skus.id IS 'ID';
+COMMENT ON COLUMN bb_stock.skus.item_id IS 'アイテムID';
+COMMENT ON COLUMN bb_stock.skus.seq_in_item IS 'アイテム内連番';
+COMMENT ON COLUMN bb_stock.skus.name IS '名称';
+COMMENT ON COLUMN bb_stock.skus.description IS '補足事項';
+COMMENT ON COLUMN bb_stock.skus.revision IS 'リビジョン番号';
+COMMENT ON COLUMN bb_stock.skus.props IS '外部アプリケーション情報JSON';
+COMMENT ON COLUMN bb_stock.skus.tags IS 'log保存用タグ';
+COMMENT ON COLUMN bb_stock.skus.active IS 'アクティブフラグ';
+COMMENT ON COLUMN bb_stock.skus.created_at IS '作成時刻';
+COMMENT ON COLUMN bb_stock.skus.created_by IS '作成ユーザー';
+COMMENT ON COLUMN bb_stock.skus.updated_at IS '更新時刻';
+COMMENT ON COLUMN bb_stock.skus.updated_by IS '更新ユーザー';
+
+--NULLの代用(id=00000000-0000-0000-0000-000000000000)
+INSERT INTO bb_stock.skus (
+	id,
+	item_id,
+	seq_in_item,
+	name,
+	code,
+	revision,
+	created_by,
+	updated_by
+) VALUES (
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000',
+	0,
+	'NULL',
+	'NULL',
+	0,
+	'00000000-0000-0000-0000-000000000000',
+	'00000000-0000-0000-0000-000000000000');
+
+CREATE TABLE bb_stock.skus_tags (
+	id uuid REFERENCES bb_stock.skus ON DELETE CASCADE NOT NULL,
+	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
+	UNIQUE (id, tag_id));
+
+CREATE INDEX ON bb_stock.skus_tags (tag_id);
+
 ----------
 
 --置き場
@@ -176,7 +270,9 @@ CREATE TABLE bb_stock.locations (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	code text NOT NULL,
 	description text DEFAULT '' NOT NULL,
+	owner_id uuid REFERENCES bb_stock.owners NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -194,7 +290,9 @@ COMMENT ON COLUMN bb_stock.locations.id IS 'ID';
 COMMENT ON COLUMN bb_stock.locations.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.locations.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.locations.name IS '名称';
+COMMENT ON COLUMN bb_stock.locations.code IS '外部システムコード';
 COMMENT ON COLUMN bb_stock.locations.description IS '補足事項';
+COMMENT ON COLUMN bb_stock.locations.owner_id IS '所有者ID';
 COMMENT ON COLUMN bb_stock.locations.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.locations.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.locations.tags IS 'log保存用タグ';
@@ -204,12 +302,20 @@ COMMENT ON COLUMN bb_stock.locations.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb_stock.locations.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb_stock.locations.updated_by IS '更新ユーザー';
 
+CREATE INDEX ON bb_stock.locations (group_id);
+CREATE INDEX ON bb_stock.locations (seq);
+CREATE INDEX ON bb_stock.locations (code);
+CREATE INDEX ON bb_stock.locations (owner_id);
+CREATE INDEX ON bb_stock.locations (active);
+
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb_stock.locations (
 	id,
 	group_id,
 	seq,
 	name,
+	code,
+	owner_id,
 	revision,
 	created_by,
 	updated_by
@@ -218,6 +324,8 @@ INSERT INTO bb_stock.locations (
 	'00000000-0000-0000-0000-000000000000',
 	0,
 	'NULL',
+	'NULL',
+	'00000000-0000-0000-0000-000000000000',
 	0,
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
@@ -227,6 +335,8 @@ CREATE TABLE bb_stock.locations_tags (
 	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
+CREATE INDEX ON bb_stock.locations_tags (tag_id);
+
 ----------
 
 --状態
@@ -235,7 +345,9 @@ CREATE TABLE bb_stock.statuses (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	code text NOT NULL,
 	description text DEFAULT '' NOT NULL,
+	owner_id uuid REFERENCES bb_stock.owners NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -253,7 +365,9 @@ COMMENT ON COLUMN bb_stock.statuses.id IS 'ID';
 COMMENT ON COLUMN bb_stock.statuses.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.statuses.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.statuses.name IS '名称';
+COMMENT ON COLUMN bb_stock.statuses.code IS '外部システムコード';
 COMMENT ON COLUMN bb_stock.statuses.description IS '補足事項';
+COMMENT ON COLUMN bb_stock.statuses.owner_id IS '所有者ID';
 COMMENT ON COLUMN bb_stock.statuses.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.statuses.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.statuses.tags IS 'log保存用タグ';
@@ -263,12 +377,19 @@ COMMENT ON COLUMN bb_stock.statuses.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb_stock.statuses.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb_stock.statuses.updated_by IS '更新ユーザー';
 
+CREATE INDEX ON bb_stock.statuses (group_id);
+CREATE INDEX ON bb_stock.statuses (seq);
+CREATE INDEX ON bb_stock.statuses (code);
+CREATE INDEX ON bb_stock.statuses (active);
+
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb_stock.statuses (
 	id,
 	group_id,
 	seq,
 	name,
+	code,
+	owner_id,
 	revision,
 	created_by,
 	updated_by
@@ -277,6 +398,8 @@ INSERT INTO bb_stock.statuses (
 	'00000000-0000-0000-0000-000000000000',
 	0,
 	'NULL',
+	'NULL',
+	'00000000-0000-0000-0000-000000000000',
 	0,
 	'00000000-0000-0000-0000-000000000000',
 	'00000000-0000-0000-0000-000000000000');
@@ -286,19 +409,21 @@ CREATE TABLE bb_stock.statuses_tags (
 	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
 
+CREATE INDEX ON bb_stock.statuses_tags (tag_id);
+
 ----------
 
 --在庫
 CREATE TABLE bb_stock.stocks (
 	id uuid REFERENCES bb.units PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
-	item_id uuid REFERENCES bb_stock.items NOT NULL,
+	sku_id uuid REFERENCES bb_stock.skus NOT NULL,
 	owner_id uuid REFERENCES bb_stock.owners NOT NULL,
 	location_id uuid REFERENCES bb_stock.locations NOT NULL,
 	status_id uuid REFERENCES bb_stock.statuses NOT NULL,
 	created_at timestamptz DEFAULT now() NOT NULL,
 	created_by uuid REFERENCES bb.users NOT NULL,
-	UNIQUE (group_id, item_id, owner_id, location_id, status_id));
+	UNIQUE (group_id, sku_id, owner_id, location_id, status_id));
 --log対象外
 --一度登録されたら変更されない
 
@@ -308,18 +433,24 @@ COMMENT ON COLUMN bb_stock.stocks.id IS 'ID
 管理対象IDに従属';
 COMMENT ON COLUMN bb_stock.stocks.group_id IS '管理対象に持つグループID
 この在庫の属するグループ';
-COMMENT ON COLUMN bb_stock.stocks.item_id IS 'アイテムID';
+COMMENT ON COLUMN bb_stock.stocks.sku_id IS 'SKU ID';
 COMMENT ON COLUMN bb_stock.stocks.owner_id IS '所有者ID';
 COMMENT ON COLUMN bb_stock.stocks.location_id IS '置き場ID';
 COMMENT ON COLUMN bb_stock.stocks.status_id IS '状態ID';
 COMMENT ON COLUMN bb_stock.stocks.created_at IS '作成時刻';
 COMMENT ON COLUMN bb_stock.stocks.created_by IS '作成ユーザー';
 
+CREATE INDEX ON bb_stock.stocks (group_id);
+CREATE INDEX ON bb_stock.stocks (sku_id);
+CREATE INDEX ON bb_stock.stocks (owner_id);
+CREATE INDEX ON bb_stock.stocks (location_id);
+CREATE INDEX ON bb_stock.stocks (status_id);
+
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb_stock.stocks (
 	id,
 	group_id,
-	item_id,
+	sku_id,
 	owner_id,
 	location_id,
 	status_id,
@@ -341,7 +472,9 @@ CREATE TABLE bb_stock.formulas (
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
 	name text NOT NULL,
+	code text NOT NULL,
 	description text DEFAULT '' NOT NULL,
+	owner_id uuid REFERENCES bb_stock.owners NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
 	tags text[] DEFAULT '{}' NOT NULL,
@@ -357,7 +490,9 @@ COMMENT ON COLUMN bb_stock.formulas.id IS 'ID';
 COMMENT ON COLUMN bb_stock.formulas.group_id IS 'グループID';
 COMMENT ON COLUMN bb_stock.formulas.seq IS 'グループ内連番';
 COMMENT ON COLUMN bb_stock.formulas.name IS '名称';
+COMMENT ON COLUMN bb_stock.formulas.code IS '外部システムコード';
 COMMENT ON COLUMN bb_stock.formulas.description IS '補足事項';
+COMMENT ON COLUMN bb_stock.formulas.owner_id IS '所有者ID';
 COMMENT ON COLUMN bb_stock.formulas.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb_stock.formulas.props IS '外部アプリケーション情報JSON';
 COMMENT ON COLUMN bb_stock.formulas.tags IS 'log保存用タグ';
@@ -366,10 +501,16 @@ COMMENT ON COLUMN bb_stock.formulas.created_by IS '作成ユーザー';
 COMMENT ON COLUMN bb_stock.formulas.updated_at IS '更新時刻';
 COMMENT ON COLUMN bb_stock.formulas.updated_by IS '更新ユーザー';
 
+CREATE INDEX ON bb_stock.formulas (group_id);
+CREATE INDEX ON bb_stock.formulas (seq);
+CREATE INDEX ON bb_stock.formulas (code);
+
 CREATE TABLE bb_stock.formulas_tags (
 	id uuid REFERENCES bb_stock.formulas ON DELETE CASCADE NOT NULL,
 	tag_id uuid REFERENCES bb.tags ON DELETE CASCADE NOT NULL,
 	UNIQUE (id, tag_id));
+
+CREATE INDEX ON bb_stock.formulas_tags (tag_id);
 
 ----------
 
@@ -399,53 +540,17 @@ COMMENT ON COLUMN bb_stock.formula_details.seq_in_formula IS '変換式内連番
 COMMENT ON COLUMN bb_stock.formula_details.quantity IS '数量';
 COMMENT ON COLUMN bb_stock.formula_details.props IS '外部アプリケーション情報JSON';
 
+CREATE INDEX ON bb_stock.formula_details (formula_id);
+CREATE INDEX ON bb_stock.formula_details (stock_id);
+
 --===========================
---indexes
+--tablespace
 --===========================
 
 /*
 --開発環境、クラウド環境等デフォルトtablespaceのままCREATEする場合、この行をコメントアウト
 SET default_tablespace = 'blackbox_index';
 */
-
---items
-CREATE INDEX ON bb_stock.items (group_id);
-CREATE INDEX ON bb_stock.items (seq);
-CREATE INDEX ON bb_stock.items (active);
-
---owners
-CREATE INDEX ON bb_stock.owners (group_id);
-CREATE INDEX ON bb_stock.owners (seq);
-CREATE INDEX ON bb_stock.owners (active);
-
---locations
-CREATE INDEX ON bb_stock.locations (group_id);
-CREATE INDEX ON bb_stock.locations (seq);
-CREATE INDEX ON bb_stock.locations (active);
-
---statuses
-CREATE INDEX ON bb_stock.statuses (group_id);
-CREATE INDEX ON bb_stock.statuses (seq);
-CREATE INDEX ON bb_stock.statuses (active);
-
---stocks
-CREATE INDEX ON bb_stock.stocks (group_id);
-CREATE INDEX ON bb_stock.stocks (item_id);
-CREATE INDEX ON bb_stock.stocks (owner_id);
-CREATE INDEX ON bb_stock.stocks (location_id);
-CREATE INDEX ON bb_stock.stocks (status_id);
-
---fomulas
-CREATE INDEX ON bb_stock.formulas (group_id);
-CREATE INDEX ON bb_stock.formula_details (formula_id);
-CREATE INDEX ON bb_stock.formula_details (stock_id);
-
---tags
-CREATE INDEX ON bb_stock.items_tags (tag_id);
-CREATE INDEX ON bb_stock.owners_tags (tag_id);
-CREATE INDEX ON bb_stock.locations_tags (tag_id);
-CREATE INDEX ON bb_stock.statuses_tags (tag_id);
-CREATE INDEX ON bb_stock.formulas_tags (tag_id);
 
 --===========================
 --privileges
@@ -462,6 +567,7 @@ GRANT SELECT ON ALL TABLES IN SCHEMA bb_stock TO blackbox;
 
 GRANT INSERT, UPDATE, DELETE ON TABLE
 	bb_stock.items,
+	bb_stock.skus,
 	bb_stock.owners,
 	bb_stock.locations,
 	bb_stock.statuses,
@@ -472,6 +578,7 @@ TO blackbox;
 --tag関連はINSERT, DELETEのみ
 GRANT INSERT, DELETE ON TABLE
 	bb_stock.items_tags,
+	bb_stock.skus_tags,
 	bb_stock.owners_tags,
 	bb_stock.locations_tags,
 	bb_stock.statuses_tags

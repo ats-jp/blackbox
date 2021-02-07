@@ -15,6 +15,7 @@ import org.blendee.assist.NotUniqueException;
 import jp.ats.blackbox.common.BlackboxException;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.executor.TagExecutor;
+import jp.ats.blackbox.persistence.DefaultCodeGenerator;
 import jp.ats.blackbox.persistence.InOut;
 import jp.ats.blackbox.persistence.Requests;
 import jp.ats.blackbox.persistence.Requests.JournalRegisterRequest;
@@ -35,6 +36,8 @@ public class FormulaHandler {
 		public UUID group_id;
 
 		public String name;
+
+		public Optional<String> code = Optional.empty();
 
 		public Optional<String> props = Optional.empty();
 
@@ -111,6 +114,7 @@ public class FormulaHandler {
 		formula.setGroup_id(request.group_id);
 		formula.setSeq(seq);
 		formula.setName(request.name);
+		formula.setCode(request.code.orElseGet(() -> DefaultCodeGenerator.generate(U.recorder, request.group_id, seq)));
 		request.props.ifPresent(v -> formula.setProps(U.toPGObject(v)));
 		request.tags.ifPresent(v -> formula.setTags(v));
 		formula.setCreated_by(userId);
@@ -236,7 +240,7 @@ public class FormulaHandler {
 
 		Optional<UUID> group_id = Optional.empty();
 
-		Optional<UUID> item_id = Optional.empty();
+		Optional<UUID> sku_id = Optional.empty();
 
 		Optional<UUID> owner_id = Optional.empty();
 
@@ -307,7 +311,7 @@ public class FormulaHandler {
 				try {
 					var unitId = new stocks().SELECT(a -> a.id).WHERE(a -> {
 						a.group_id.eq(request.group_id.orElseGet(() -> stock.getGroup_id()));
-						a.item_id.eq(request.item_id.orElseGet(() -> stock.getItem_id()));
+						a.sku_id.eq(request.sku_id.orElseGet(() -> stock.getSku_id()));
 						a.owner_id.eq(request.owner_id.orElseGet(() -> stock.getOwner_id()));
 						a.location_id.eq(request.location_id.orElseGet(() -> stock.getLocation_id()));
 						a.status_id.eq(request.status_id.orElseGet(() -> stock.getStatus_id()));

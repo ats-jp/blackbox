@@ -70,7 +70,7 @@ class JournalPreparer {
 		node.setDetail_id(detailId);
 		node.setUnit_id(request.unit_id);
 		node.setIn_out(request.in_out.intValue);
-		node.setSeq(nodeSeq);
+		node.setSeq_in_journal(nodeSeq);
 		node.setQuantity(request.quantity);
 
 		request.grants_unlimited.ifPresent(v -> node.setGrants_unlimited(v));
@@ -87,6 +87,8 @@ class JournalPreparer {
 
 		void setGroup_id(UUID id);
 
+		void setCode(String code);
+		
 		void setJournal_batch_id(UUID id);
 
 		void setDenied_id(UUID id);
@@ -129,7 +131,7 @@ class JournalPreparer {
 
 		void setIn_out(Integer value);
 
-		void setSeq(Integer seq);
+		void setSeq_in_journal(Integer seq);
 
 		void setQuantity(BigDecimal quantity);
 

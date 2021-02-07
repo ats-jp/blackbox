@@ -203,15 +203,15 @@ public class snapshots
 	public static final String fixed_at = "fixed_at";
 
 	/**
-	 * name: seq<br>
+	 * name: combined_seq<br>
 	 * remarks: 移動ノード状態の登録順<br>
-	 * 検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ<br>
+	 * 検索高速化のためfixedAt, created_at, nodes.seq_in_journalを連結しここに持つ<br>
 	 * グループ内で一意であり順序として使用できる<br>
 	 * type: bpchar(36)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "seq", type = 1, typeName = "bpchar", size = 36, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ノード状態の登録順\n検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ\nグループ内で一意であり順序として使用できる", defaultValue = "null", ordinalPosition = 8, notNull = true)
-	public static final String seq = "seq";
+	@Column(name = "combined_seq", type = 1, typeName = "bpchar", size = 36, hasDecimalDigits = true, decimalDigits = 0, remarks = "移動ノード状態の登録順\n検索高速化のためfixedAt, created_at, nodes.seq_in_journalを連結しここに持つ\nグループ内で一意であり順序として使用できる", defaultValue = "null", ordinalPosition = 8, notNull = true)
+	public static final String combined_seq = "combined_seq";
 
 	/**
 	 * name: updated_at<br>
@@ -560,35 +560,35 @@ public class snapshots
 
 		/**
 		 * setter
-		 * name: seq<br>
+		 * name: combined_seq<br>
 		 * remarks: 移動ノード状態の登録順<br>
-		 * 検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ<br>
+		 * 検索高速化のためfixedAt, created_at, nodes.seq_in_journalを連結しここに持つ<br>
 		 * グループ内で一意であり順序として使用できる<br>
 		 * type: bpchar(36)<br>
 		 * not null: true<br>
 		 * @param value java.lang.String
 		 */
-		public void setSeq(java.lang.String value) {
+		public void setCombined_seq(java.lang.String value) {
 			Objects.requireNonNull(value);
 			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
 				.getValueExtractors()
 				.selectValueExtractor(
-					rowRel$.getColumn("seq").getType());
-			data$.setValue("seq", valueExtractor.extractAsBinder(value));
+					rowRel$.getColumn("combined_seq").getType());
+			data$.setValue("combined_seq", valueExtractor.extractAsBinder(value));
 		}
 
 		/**
 		 * getter
-		 * name: seq<br>
+		 * name: combined_seq<br>
 		 * remarks: 移動ノード状態の登録順<br>
-		 * 検索高速化のためfixedAt, created_at, nodes.seqを連結しここに持つ<br>
+		 * 検索高速化のためfixedAt, created_at, nodes.seq_in_journalを連結しここに持つ<br>
 		 * グループ内で一意であり順序として使用できる<br>
 		 * type: bpchar(36)<br>
 		 * not null: true<br>
 		 * @return java.lang.String
 		 */
-		public java.lang.String getSeq() {
-			Binder binder = data$.getValue("seq");
+		public java.lang.String getCombined_seq() {
+			Binder binder = data$.getValue("combined_seq");
 			return (java.lang.String) binder.getValue();
 		}
 
@@ -1785,9 +1785,9 @@ public class snapshots
 		public final T fixed_at;
 
 		/**
-		 * 項目名 seq
+		 * 項目名 combined_seq
 		 */
-		public final T seq;
+		public final T combined_seq;
 
 		/**
 		 * 項目名 updated_at
@@ -1817,7 +1817,7 @@ public class snapshots
 			this.journal_group_id = builder$.buildColumn(this, sqlassist.bb.snapshots.journal_group_id);
 			this.unit_id = builder$.buildColumn(this, sqlassist.bb.snapshots.unit_id);
 			this.fixed_at = builder$.buildColumn(this, sqlassist.bb.snapshots.fixed_at);
-			this.seq = builder$.buildColumn(this, sqlassist.bb.snapshots.seq);
+			this.combined_seq = builder$.buildColumn(this, sqlassist.bb.snapshots.combined_seq);
 			this.updated_at = builder$.buildColumn(this, sqlassist.bb.snapshots.updated_at);
 			this.updated_by = builder$.buildColumn(this, sqlassist.bb.snapshots.updated_by);
 		}

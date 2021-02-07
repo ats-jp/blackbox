@@ -42,7 +42,7 @@ public class JobHandler {
 					() -> new snapshots()
 						.SELECT(a -> a.ls(a.id, a.unlimited, a.total, a.$nodes().unit_id))
 						.WHERE(a -> a.$nodes().$details().journal_id.eq($UUID))
-						.ORDER_BY(a -> a.seq),
+						.ORDER_BY(a -> a.combined_seq),
 					row.getId())
 					.execute(result -> {
 						while (result.next()) {

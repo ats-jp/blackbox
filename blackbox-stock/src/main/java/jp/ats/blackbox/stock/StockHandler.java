@@ -21,7 +21,7 @@ public class StockHandler {
 
 		UUID groupId();
 
-		UUID itemId();
+		UUID skuId();
 
 		UUID ownerId();
 
@@ -63,9 +63,9 @@ public class StockHandler {
 		return U.recorder.play(
 			() -> new RecorderCacheKey(supplier.getClass(), 0),
 			() -> supplier.get()
-				.WHERE(a -> a.group_id.eq($UUID).AND.item_id.eq($UUID).AND.owner_id.eq($UUID).AND.location_id.eq($UUID).AND.status_id.eq($UUID)),
+				.WHERE(a -> a.group_id.eq($UUID).AND.sku_id.eq($UUID).AND.owner_id.eq($UUID).AND.location_id.eq($UUID).AND.status_id.eq($UUID)),
 			components.groupId(),
-			components.itemId(),
+			components.skuId(),
 			components.ownerId(),
 			components.locationId(),
 			components.statusId())
@@ -128,7 +128,7 @@ public class StockHandler {
 					.INSERT(
 						a.id,
 						a.group_id,
-						a.item_id,
+						a.sku_id,
 						a.owner_id,
 						a.location_id,
 						a.status_id,
@@ -143,7 +143,7 @@ public class StockHandler {
 						$UUID)),
 			id,
 			components.groupId(),
-			components.itemId(),
+			components.skuId(),
 			components.ownerId(),
 			components.locationId(),
 			components.statusId(),

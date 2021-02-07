@@ -13,39 +13,40 @@ public class UserHandler {
 
 		public String name;
 
+		public Optional<String> code = Optional.empty();
+
 		public Optional<String> description = Optional.empty();
 
 		public Privilege privilege;
 
-		public UUID groupId;
+		public UUID group_id;
 
 		public Optional<String> props = Optional.empty();
 
 		public Optional<String[]> tags = Optional.empty();
 	}
 
-	public static UUID register(RegisterRequest request) {
+	public static UUID register(RegisterRequest request, UUID userId) {
 		var seqRequest = new SeqHandler.Request();
 		seqRequest.table = users.$TABLE;
 		seqRequest.dependsColumn = users.group_id;
-		seqRequest.dependsId = request.groupId;
+		seqRequest.dependsId = request.group_id;
 		return SeqHandler.getInstance().nextSeqAndGet(seqRequest, seq -> {
-			return registerInternal(request, seq);
+			return registerInternal(request, seq, userId);
 		});
 	}
 
-	private static UUID registerInternal(RegisterRequest request, long seq) {
+	private static UUID registerInternal(RegisterRequest request, long seq, UUID userId) {
 		var row = users.row();
 
 		UUID id = UUID.randomUUID();
 
-		UUID userId = SecurityValues.currentUserId();
-
 		row.setId(id);
 		row.setName(request.name);
+		row.setCode(request.code.orElseGet(() -> DefaultCodeGenerator.generate(U.recorder, request.group_id, seq)));
 		request.description.ifPresent(v -> row.setDescription(v));
 		row.setPrivilege(request.privilege.value);
-		row.setGroup_id(request.groupId);
+		row.setGroup_id(request.group_id);
 		row.setSeq(seq);
 		request.tags.ifPresent(v -> row.setTags(v));
 		request.props.ifPresent(v -> row.setProps(U.toPGObject(v)));
@@ -67,7 +68,13 @@ public class UserHandler {
 
 		public Optional<String> name = Optional.empty();
 
+		public Optional<String> code = Optional.empty();
+
 		public Optional<String> description = Optional.empty();
+
+		public Optional<Privilege> privilege = Optional.empty();
+
+		public Optional<UUID> group_id = Optional.empty();
 
 		public Optional<String> props = Optional.empty();
 
@@ -76,15 +83,18 @@ public class UserHandler {
 		public Optional<Boolean> active = Optional.empty();
 	}
 
-	public static void update(UpdateRequest request) {
+	public static void update(UpdateRequest request, UUID userId) {
 		int result = new users().UPDATE(a -> {
 			a.revision.set(request.revision + 1);
 			request.name.ifPresent(v -> a.name.set(v));
+			request.code.ifPresent(v -> a.code.set(v));
 			request.description.ifPresent(v -> a.name.set(v));
+			request.privilege.ifPresent(v -> a.privilege.set(v.value));
+			request.group_id.ifPresent(v -> a.group_id.set(v));
 			request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 			request.tags.ifPresent(v -> a.tags.set((Object) v));
 			request.active.ifPresent(v -> a.active.set(v));
-			a.updated_by.set(SecurityValues.currentUserId());
+			a.updated_by.set(userId);
 			a.updated_at.setAny("now()");
 		}).WHERE(a -> a.id.eq(request.id).AND.revision.eq(request.revision)).execute();
 
