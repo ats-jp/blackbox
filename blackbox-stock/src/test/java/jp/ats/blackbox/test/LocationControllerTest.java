@@ -6,32 +6,38 @@ import java.util.UUID;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.core.executor.JournalExecutorMap;
 import jp.ats.blackbox.core.persistence.SecurityValues;
+import jp.ats.blackbox.stock.controller.LocationController;
 import jp.ats.blackbox.stock.persistence.LocationHandler;
 
-public class LocationHandlerTest {
+public class LocationControllerTest {
 
 	public static void main(String[] args) {
 		Common.startWithLog();
 
-		SecurityValues.start(U.NULL_ID);
+		SecurityValues.start(U.PRIVILEGE_ID);
 
-		Blendee.execute(t -> {
-			execute();
-		});
+		try {
+			Blendee.execute(t -> {
+				execute();
+			});
+		} finally {
+			JournalExecutorMap.shutdown();
+		}
 
 		SecurityValues.end();
 	}
 
-	private static void execute() {
+	private static void execute() throws Exception {
 		var req = new LocationHandler.RegisterRequest();
-		req.group_id = U.NULL_ID;
+		req.group_id = U.PRIVILEGE_ID;
 		req.name = "test";
 		req.owner_id = U.NULL_ID;
 		req.props = Optional.of("{}");
 		req.tags = Optional.of(new String[] { "tag1", "tag2" });
 
-		UUID registered = LocationHandler.register(req, U.NULL_ID);
+		UUID registered = LocationController.register(req);
 
 		System.out.print("registered id: " + registered);
 
@@ -42,6 +48,6 @@ public class LocationHandlerTest {
 		updateReq.tags = Optional.of(new String[] { "tag1", "tag2" });
 		updateReq.revision = 0;
 
-		LocationHandler.update(updateReq, U.NULL_ID);
+		LocationController.update(updateReq);
 	}
 }

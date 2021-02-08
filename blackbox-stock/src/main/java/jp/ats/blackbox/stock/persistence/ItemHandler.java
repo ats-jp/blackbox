@@ -35,14 +35,14 @@ public class ItemHandler {
 		public Optional<UUID> item_id = Optional.empty();
 	}
 
-	public static UUID registerItem(ItemRegisterRequest request, UUID userId) {
+	public static UUID register(ItemRegisterRequest request, UUID userId) {
 		return StockComponentHandler.register(items.$TABLE, request, new GroupInfo(request.group_id), userId, r -> {
 			r.setUUID(items.group_id, request.group_id);
 			r.setUUID(items.owner_id, request.owner_id);
 		});
 	}
 
-	public static void updateItem(ItemUpdateRequest request, UUID userId) {
+	public static void update(ItemUpdateRequest request, UUID userId) {
 		StockComponentHandler.update(items.$TABLE, request, userId, a -> {
 			request.group_id.ifPresent(i -> a.col(items.group_id).set(i));
 			request.owner_id.ifPresent(i -> a.col(items.owner_id).set(i));
@@ -53,7 +53,7 @@ public class ItemHandler {
 		StockComponentHandler.delete(items.$TABLE, id, revision);
 	}
 
-	public static UUID registerSku(SkuRegisterRequest request, UUID userId) {
+	public static UUID register(SkuRegisterRequest request, UUID userId) {
 		return StockComponentHandler.register(skus.$TABLE, request, new RegisterInfo() {
 
 			@Override
@@ -80,7 +80,7 @@ public class ItemHandler {
 		});
 	}
 
-	public static void updateSku(SkuUpdateRequest request, UUID userId) {
+	public static void update(SkuUpdateRequest request, UUID userId) {
 		StockComponentHandler.update(skus.$TABLE, request, userId, a -> {
 			request.item_id.ifPresent(i -> a.col(skus.item_id).set(i));
 		});

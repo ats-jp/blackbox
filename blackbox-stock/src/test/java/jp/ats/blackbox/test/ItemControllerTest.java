@@ -6,24 +6,30 @@ import java.util.UUID;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.core.executor.JournalExecutorMap;
 import jp.ats.blackbox.core.persistence.SecurityValues;
+import jp.ats.blackbox.stock.controller.ItemController;
 import jp.ats.blackbox.stock.persistence.ItemHandler;
 
-public class ItemHandlerTest {
+public class ItemControllerTest {
 
 	public static void main(String[] args) {
 		Common.startWithLog();
 
-		SecurityValues.start(U.NULL_ID);
+		SecurityValues.start(U.PRIVILEGE_ID);
 
-		Blendee.execute(t -> {
-			execute(execute());
-		});
+		try {
+			Blendee.execute(t -> {
+				execute(execute());
+			});
+		} finally {
+			JournalExecutorMap.shutdown();
+		}
 
 		SecurityValues.end();
 	}
 
-	private static UUID execute() {
+	private static UUID execute() throws Exception {
 		var req = new ItemHandler.ItemRegisterRequest();
 		req.group_id = U.NULL_ID;
 		req.name = "test";
@@ -31,7 +37,7 @@ public class ItemHandlerTest {
 		req.props = Optional.of("{}");
 		req.tags = Optional.of(new String[] { "tag1", "tag2" });
 
-		UUID registered = ItemHandler.registerItem(req, U.NULL_ID);
+		UUID registered = ItemController.register(req);
 
 		System.out.print("registered id: " + registered);
 
@@ -42,19 +48,19 @@ public class ItemHandlerTest {
 		updateReq.tags = Optional.of(new String[] { "tag1", "tag2" });
 		updateReq.revision = 0;
 
-		ItemHandler.updateItem(updateReq, U.NULL_ID);
+		ItemController.update(updateReq);
 
 		return registered;
 	}
 
-	private static void execute(UUID itemId) {
+	private static void execute(UUID itemId) throws Exception {
 		var req = new ItemHandler.SkuRegisterRequest();
 		req.item_id = itemId;
 		req.name = "test";
 		req.props = Optional.of("{}");
 		req.tags = Optional.of(new String[] { "tag1", "tag2" });
 
-		UUID registered = ItemHandler.registerSku(req, U.NULL_ID);
+		UUID registered = ItemController.register(req);
 
 		System.out.print("registered id: " + registered);
 
@@ -65,6 +71,6 @@ public class ItemHandlerTest {
 		updateReq.tags = Optional.of(new String[] { "tag1", "tag2" });
 		updateReq.revision = 0;
 
-		ItemHandler.updateSku(updateReq, U.NULL_ID);
+		ItemController.update(updateReq);
 	}
 }

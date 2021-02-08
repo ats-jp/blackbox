@@ -18,9 +18,13 @@ public class OwnerControllerTest {
 
 		SecurityValues.start(U.PRIVILEGE_ID);
 
-		Blendee.execute(t -> {
-			execute();
-		});
+		try {
+			Blendee.execute(t -> {
+				execute();
+			});
+		} finally {
+			JournalExecutorMap.shutdown();
+		}
 
 		SecurityValues.end();
 	}
@@ -44,7 +48,5 @@ public class OwnerControllerTest {
 		updateReq.revision = 0;
 
 		OwnerController.update(updateReq);
-
-		JournalExecutorMap.shutdown();
 	}
 }
