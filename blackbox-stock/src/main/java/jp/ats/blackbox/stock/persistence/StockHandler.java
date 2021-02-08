@@ -93,7 +93,7 @@ public class StockHandler {
 				a -> a.ls(
 					a.id,
 					a.group_id,
-					a.$items().group_id,
+					a.$skus().$items().group_id,
 					a.$owners().group_id,
 					a.$locations().group_id,
 					a.$statuses().group_id)),
@@ -104,7 +104,7 @@ public class StockHandler {
 
 		allGroupIds.ifPresent(s -> {
 			s.add(stock.getGroup_id());
-			s.add(stock.$items().getGroup_id());
+			s.add(stock.$skus().$items().getGroup_id());
 			s.add(stock.$owners().getGroup_id());
 			s.add(stock.$locations().getGroup_id());
 			s.add(stock.$statuses().getGroup_id());

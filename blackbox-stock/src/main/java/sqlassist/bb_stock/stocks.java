@@ -1,74 +1,12 @@
 package sqlassist.bb_stock;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.List;
+import java.util.LinkedList;
 
-import org.blendee.assist.AssistColumn;
-import org.blendee.assist.CriteriaAnyColumn;
-import org.blendee.assist.CriteriaAssistColumn;
-import org.blendee.assist.CriteriaContext;
-import org.blendee.assist.DataManipulationStatement;
-import org.blendee.assist.DataManipulationStatementBehavior;
-import org.blendee.assist.DataManipulator;
-import org.blendee.assist.DeleteStatementIntermediate;
-import org.blendee.assist.GroupByClauseAssist;
-import org.blendee.assist.GroupByColumn;
-import org.blendee.assist.GroupByOfferFunction;
-import org.blendee.assist.HavingClauseAssist;
-import org.blendee.assist.HavingColumn;
-import org.blendee.assist.Helper;
-import org.blendee.assist.InsertClauseAssist;
-import org.blendee.assist.InsertColumn;
-import org.blendee.assist.InsertOfferFunction;
-import org.blendee.assist.InsertStatementIntermediate;
-import org.blendee.assist.InstantOneToManyQuery;
-import org.blendee.assist.ListGroupByClauseAssist;
-import org.blendee.assist.ListInsertClauseAssist;
-import org.blendee.assist.ListOrderByClauseAssist;
-import org.blendee.assist.ListSelectClauseAssist;
-import org.blendee.assist.ListUpdateClauseAssist;
-import org.blendee.assist.LogicalOperators;
-import org.blendee.assist.Many;
-import org.blendee.assist.OnClause;
-import org.blendee.assist.OnLeftClauseAssist;
-import org.blendee.assist.OnLeftColumn;
-import org.blendee.assist.OnRightClauseAssist;
-import org.blendee.assist.OnRightColumn;
-import org.blendee.assist.OneToManyBehavior;
-import org.blendee.assist.OneToManyQuery;
-import org.blendee.assist.OrderByClauseAssist;
-import org.blendee.assist.OrderByColumn;
-import org.blendee.assist.OrderByOfferFunction;
-import org.blendee.assist.Query;
-import org.blendee.assist.RightTable;
-import org.blendee.assist.Row;
-import org.blendee.assist.RowIterator;
-import org.blendee.assist.SQLDecorators;
-import org.blendee.assist.SelectClauseAssist;
-import org.blendee.assist.SelectColumn;
-import org.blendee.assist.SelectOfferFunction;
-import org.blendee.assist.SelectStatement;
-import org.blendee.assist.SelectStatementBehavior;
-import org.blendee.assist.SelectStatementBehavior.PlaybackQuery;
-import org.blendee.assist.Statement;
-import org.blendee.assist.TableFacade;
-import org.blendee.assist.TableFacadeAssist;
-import org.blendee.assist.TableFacadeColumn;
-import org.blendee.assist.TableFacadeContext;
-import org.blendee.assist.UpdateClauseAssist;
-import org.blendee.assist.UpdateColumn;
-import org.blendee.assist.UpdateStatementIntermediate;
-import org.blendee.assist.Vargs;
-import org.blendee.assist.WhereClauseAssist;
-import org.blendee.assist.WhereColumn;
-import org.blendee.assist.annotation.Column;
-import org.blendee.assist.annotation.ForeignKey;
-import org.blendee.assist.annotation.PrimaryKey;
-import org.blendee.assist.annotation.Table;
 import org.blendee.jdbc.BPreparedStatement;
 import org.blendee.jdbc.ComposedSQL;
 import org.blendee.jdbc.ContextManager;
@@ -87,12 +25,74 @@ import org.blendee.sql.MultiColumn;
 import org.blendee.sql.OrderByClause;
 import org.blendee.sql.Relationship;
 import org.blendee.sql.RelationshipFactory;
-import org.blendee.sql.RuntimeId;
-import org.blendee.sql.RuntimeIdFactory;
 import org.blendee.sql.SQLDecorator;
 import org.blendee.sql.SQLQueryBuilder;
 import org.blendee.sql.ValueExtractor;
 import org.blendee.sql.ValueExtractorsConfigure;
+import org.blendee.sql.RuntimeId;
+import org.blendee.sql.RuntimeIdFactory;
+import org.blendee.assist.CriteriaAnyColumn;
+import org.blendee.assist.AssistColumn;
+import org.blendee.assist.CriteriaAssistColumn;
+import org.blendee.assist.CriteriaContext;
+import org.blendee.assist.DataManipulationStatement;
+import org.blendee.assist.DataManipulationStatementBehavior;
+import org.blendee.assist.DataManipulator;
+import org.blendee.assist.DeleteStatementIntermediate;
+import org.blendee.assist.GroupByColumn;
+import org.blendee.assist.GroupByOfferFunction;
+import org.blendee.assist.GroupByClauseAssist;
+import org.blendee.assist.HavingColumn;
+import org.blendee.assist.HavingClauseAssist;
+import org.blendee.assist.InsertColumn;
+import org.blendee.assist.InsertOfferFunction;
+import org.blendee.assist.InsertClauseAssist;
+import org.blendee.assist.InsertStatementIntermediate;
+import org.blendee.assist.InstantOneToManyQuery;
+import org.blendee.assist.annotation.PrimaryKey;
+import org.blendee.assist.annotation.ForeignKey;
+import org.blendee.assist.Many;
+import org.blendee.assist.LogicalOperators;
+import org.blendee.assist.OnClause;
+import org.blendee.assist.OnLeftColumn;
+import org.blendee.assist.OnLeftClauseAssist;
+import org.blendee.assist.OnRightColumn;
+import org.blendee.assist.OnRightClauseAssist;
+import org.blendee.assist.OneToManyQuery;
+import org.blendee.assist.OneToManyBehavior;
+import org.blendee.assist.OrderByColumn;
+import org.blendee.assist.OrderByOfferFunction;
+import org.blendee.assist.OrderByClauseAssist;
+import org.blendee.assist.Query;
+import org.blendee.assist.RightTable;
+import org.blendee.assist.Row;
+import org.blendee.assist.RowIterator;
+import org.blendee.assist.SelectColumn;
+import org.blendee.assist.SelectOfferFunction;
+import org.blendee.assist.SelectClauseAssist;
+import org.blendee.assist.Statement;
+import org.blendee.assist.SelectStatement;
+import org.blendee.assist.SelectStatementBehavior;
+import org.blendee.assist.SelectStatementBehavior.PlaybackQuery;
+import org.blendee.assist.TableFacade;
+import org.blendee.assist.TableFacadeColumn;
+import org.blendee.assist.TableFacadeContext;
+import org.blendee.assist.TableFacadeAssist;
+import org.blendee.assist.UpdateColumn;
+import org.blendee.assist.UpdateClauseAssist;
+import org.blendee.assist.UpdateStatementIntermediate;
+import org.blendee.assist.WhereColumn;
+import org.blendee.assist.WhereClauseAssist;
+import org.blendee.assist.SQLDecorators;
+import org.blendee.assist.ListSelectClauseAssist;
+import org.blendee.assist.ListGroupByClauseAssist;
+import org.blendee.assist.ListOrderByClauseAssist;
+import org.blendee.assist.ListInsertClauseAssist;
+import org.blendee.assist.ListUpdateClauseAssist;
+import org.blendee.assist.annotation.Column;
+import org.blendee.assist.Helper;
+import org.blendee.assist.Vargs;
+import org.blendee.assist.annotation.Table;
 
 /**
  * 自動生成されたテーブル操作クラスです。
@@ -231,14 +231,6 @@ public class stocks
 	public static final String bb$users$stocks_created_by_fkey = "stocks_created_by_fkey";
 
 	/**
-	 * name: stocks_item_id_fkey<br>
-	 * references: items<br>
-	 * columns: item_id
-	 */
-	@ForeignKey(name = "stocks_item_id_fkey", references = "bb_stock.items", columns = { "item_id" }, refColumns = { "id" })
-	public static final String bb_stock$items$stocks_item_id_fkey = "stocks_item_id_fkey";
-
-	/**
 	 * name: stocks_location_id_fkey<br>
 	 * references: locations<br>
 	 * columns: location_id
@@ -255,20 +247,20 @@ public class stocks
 	public static final String bb_stock$owners$stocks_owner_id_fkey = "stocks_owner_id_fkey";
 
 	/**
-	 * name: stocks_status_id_fkey<br>
-	 * references: statuses<br>
-	 * columns: status_id
-	 */
-	@ForeignKey(name = "stocks_status_id_fkey", references = "bb_stock.statuses", columns = { "status_id" }, refColumns = { "id" })
-	public static final String bb_stock$statuses$stocks_status_id_fkey = "stocks_status_id_fkey";
-
-	/**
 	 * name: stocks_sku_id_fkey<br>
 	 * references: skus<br>
 	 * columns: sku_id
 	 */
 	@ForeignKey(name = "stocks_sku_id_fkey", references = "bb_stock.skus", columns = { "sku_id" }, refColumns = { "id" })
 	public static final String bb_stock$skus$stocks_sku_id_fkey = "stocks_sku_id_fkey";
+
+	/**
+	 * name: stocks_status_id_fkey<br>
+	 * references: statuses<br>
+	 * columns: status_id
+	 */
+	@ForeignKey(name = "stocks_status_id_fkey", references = "bb_stock.statuses", columns = { "status_id" }, refColumns = { "id" })
+	public static final String bb_stock$statuses$stocks_status_id_fkey = "stocks_status_id_fkey";
 
 	/**
 	 * 登録用コンストラクタです。
@@ -623,18 +615,6 @@ public class stocks
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 items<br>
-		 * 外部キー名 stocks_item_id_fkey<br>
-		 * 項目名 item_id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb_stock.items.Row $items() {
-			return sqlassist.bb_stock.items.row(
-				data$.getDataObject(bb_stock$items$stocks_item_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 locations<br>
 		 * 外部キー名 stocks_location_id_fkey<br>
 		 * 項目名 location_id
@@ -659,18 +639,6 @@ public class stocks
 
 		/**
 		 * このレコードが参照しているレコードの Row を返します。<br>
-		 * 参照先テーブル名 statuses<br>
-		 * 外部キー名 stocks_status_id_fkey<br>
-		 * 項目名 status_id
-		 * @return 参照しているレコードの Row
-		 */
-		public sqlassist.bb_stock.statuses.Row $statuses() {
-			return sqlassist.bb_stock.statuses.row(
-				data$.getDataObject(bb_stock$statuses$stocks_status_id_fkey));
-		}
-
-		/**
-		 * このレコードが参照しているレコードの Row を返します。<br>
 		 * 参照先テーブル名 skus<br>
 		 * 外部キー名 stocks_sku_id_fkey<br>
 		 * 項目名 sku_id
@@ -679,6 +647,18 @@ public class stocks
 		public sqlassist.bb_stock.skus.Row $skus() {
 			return sqlassist.bb_stock.skus.row(
 				data$.getDataObject(bb_stock$skus$stocks_sku_id_fkey));
+		}
+
+		/**
+		 * このレコードが参照しているレコードの Row を返します。<br>
+		 * 参照先テーブル名 statuses<br>
+		 * 外部キー名 stocks_status_id_fkey<br>
+		 * 項目名 status_id
+		 * @return 参照しているレコードの Row
+		 */
+		public sqlassist.bb_stock.statuses.Row $statuses() {
+			return sqlassist.bb_stock.statuses.row(
+				data$.getDataObject(bb_stock$statuses$stocks_status_id_fkey));
 		}
 	}
 
@@ -1945,19 +1925,6 @@ public class stocks
 		}
 
 		/**
-		 * 参照先テーブル名 items<br>
-		 * 外部キー名 stocks_item_id_fkey<br>
-		 * 項目名 item_id
-		 * @return items relationship
-		 */
-		public sqlassist.bb_stock.items.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $items() {
-			return new sqlassist.bb_stock.items.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb_stock.stocks.bb_stock$items$stocks_item_id_fkey);
-		}
-
-		/**
 		 * 参照先テーブル名 locations<br>
 		 * 外部キー名 stocks_location_id_fkey<br>
 		 * 項目名 location_id
@@ -1984,19 +1951,6 @@ public class stocks
 		}
 
 		/**
-		 * 参照先テーブル名 statuses<br>
-		 * 外部キー名 stocks_status_id_fkey<br>
-		 * 項目名 status_id
-		 * @return statuses relationship
-		 */
-		public sqlassist.bb_stock.statuses.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $statuses() {
-			return new sqlassist.bb_stock.statuses.ExtAssist<>(
-				builder$,
-				this,
-				sqlassist.bb_stock.stocks.bb_stock$statuses$stocks_status_id_fkey);
-		}
-
-		/**
 		 * 参照先テーブル名 skus<br>
 		 * 外部キー名 stocks_sku_id_fkey<br>
 		 * 項目名 sku_id
@@ -2007,6 +1961,19 @@ public class stocks
 				builder$,
 				this,
 				sqlassist.bb_stock.stocks.bb_stock$skus$stocks_sku_id_fkey);
+		}
+
+		/**
+		 * 参照先テーブル名 statuses<br>
+		 * 外部キー名 stocks_status_id_fkey<br>
+		 * 項目名 status_id
+		 * @return statuses relationship
+		 */
+		public sqlassist.bb_stock.statuses.ExtAssist<T, Many<sqlassist.bb_stock.stocks.Row, M>> $statuses() {
+			return new sqlassist.bb_stock.statuses.ExtAssist<>(
+				builder$,
+				this,
+				sqlassist.bb_stock.stocks.bb_stock$statuses$stocks_status_id_fkey);
 		}
 	}
 

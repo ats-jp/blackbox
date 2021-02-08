@@ -17,9 +17,8 @@ public class PrivilegeManager {
 		//自身を検索
 		return U.recorder.play(
 			() -> new users().SELECT(a -> a.ls(a.$groups().org_id, a.privilege))
-				.WHERE(a -> a.active.eq(true).AND.id.eq($UUID)),
-			userId)
-			.willUnique()
+				.WHERE(a -> a.active.eq(true)))
+			.fetch(userId)
 			.map(
 				r -> {
 					var myOrgId = r.$groups().getOrg_id();

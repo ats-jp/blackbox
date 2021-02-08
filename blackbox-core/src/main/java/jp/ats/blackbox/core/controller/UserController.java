@@ -1,7 +1,5 @@
 package jp.ats.blackbox.core.controller;
 
-import static org.blendee.sql.Placeholder.$UUID;
-
 import java.util.UUID;
 
 import jp.ats.blackbox.common.PrivilegeManager;
@@ -36,8 +34,10 @@ public class UserController {
 			() -> U.recorder.play(
 				() -> new users()
 					.SELECT(a -> a.group_id)
-					.WHERE(a -> a.active.eq(true).AND.id.eq($UUID)),
-				request.id).willUnique().get().getGroup_id());
+					.WHERE(a -> a.active.eq(true)))
+				.fetch(request.id)
+				.get()
+				.getGroup_id());
 
 		var executor = JournalExecutorMap.get(groupId);
 		executor.readLock();
