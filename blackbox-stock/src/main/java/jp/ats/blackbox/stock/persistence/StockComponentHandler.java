@@ -191,13 +191,4 @@ class StockComponentHandler {
 
 		request.tags.ifPresent(tags -> TagExecutor.stickTagsAgain(tags, request.id, table));
 	}
-
-	static void delete(TablePath table, UUID id, long revision) {
-		int result = new GenericTable(table)
-			.DELETE()
-			.WHERE(a -> a.col(StockComponentHandler.id).eq(id).AND.col(StockComponentHandler.revision).eq(revision))
-			.execute();
-
-		if (result != 1) throw Utils.decisionException(table, id);
-	}
 }

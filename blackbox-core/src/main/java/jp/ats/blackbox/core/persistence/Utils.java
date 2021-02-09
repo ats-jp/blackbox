@@ -24,7 +24,7 @@ public class Utils {
 		return (String[]) pgArray.getArray();
 	}
 
-	public static void delete(TablePath table, UUID id, long revision) {
+	public static void delete(TablePath table, UUID id, long revision) throws AlreadyUsedException {
 		try {
 			if (new GenericTable(table).DELETE().WHERE(a -> a.col("id").eq(id).AND.col("revision").eq(revision)).execute() != 1)
 				throw Utils.decisionException(table, id);

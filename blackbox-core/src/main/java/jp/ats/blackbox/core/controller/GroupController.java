@@ -5,6 +5,7 @@ import java.util.UUID;
 import jp.ats.blackbox.common.PrivilegeManager;
 import jp.ats.blackbox.core.controller.JournalController.PrivilegeException;
 import jp.ats.blackbox.core.executor.JournalExecutorMap;
+import jp.ats.blackbox.core.persistence.AlreadyUsedException;
 import jp.ats.blackbox.core.persistence.GroupHandler;
 import jp.ats.blackbox.core.persistence.GroupHandler.RegisterRequest;
 import jp.ats.blackbox.core.persistence.GroupHandler.UpdateRequest;
@@ -36,6 +37,20 @@ public class GroupController {
 			if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.id, Privilege.GROUP).success) throw new PrivilegeException();
 
 			GroupHandler.update(request, userId);
+		} finally {
+			executor.writeUnlock();
+		}
+	}
+
+	public static void delete(UUID groupId, long revision) throws PrivilegeException, AlreadyUsedException {
+		var executor = JournalExecutorMap.get(groupId);
+		executor.writeLock();
+		try {
+			var userId = SecurityValues.currentUserId();
+
+			if (!PrivilegeManager.hasPrivilegeOfGroup(userId, groupId, Privilege.GROUP).success) throw new PrivilegeException();
+
+			GroupHandler.delete(groupId, revision);
 		} finally {
 			executor.writeUnlock();
 		}

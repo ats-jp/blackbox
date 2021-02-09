@@ -4,6 +4,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.core.persistence.AlreadyUsedException;
+import jp.ats.blackbox.core.persistence.Utils;
 import jp.ats.blackbox.stock.persistence.StockComponentHandler.GroupInfo;
 import jp.ats.blackbox.stock.persistence.StockComponentHandler.RegisterInfo;
 import sqlassist.bb_stock.items;
@@ -49,8 +51,8 @@ public class ItemHandler {
 		});
 	}
 
-	public static void deleteItem(UUID id, long revision) {
-		StockComponentHandler.delete(items.$TABLE, id, revision);
+	public static void deleteItem(UUID id, long revision) throws AlreadyUsedException {
+		Utils.delete(items.$TABLE, id, revision);
 	}
 
 	public static UUID register(SkuRegisterRequest request, UUID userId) {
@@ -86,7 +88,7 @@ public class ItemHandler {
 		});
 	}
 
-	public static void deleteSku(UUID id, long revision) {
-		StockComponentHandler.delete(skus.$TABLE, id, revision);
+	public static void deleteSku(UUID id, long revision) throws AlreadyUsedException {
+		Utils.delete(skus.$TABLE, id, revision);
 	}
 }

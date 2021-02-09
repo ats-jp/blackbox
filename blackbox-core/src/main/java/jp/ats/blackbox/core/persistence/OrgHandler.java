@@ -90,7 +90,7 @@ public class OrgHandler {
 		if (result != 1) throw Utils.decisionException(orgs.$TABLE, request.id);
 	}
 
-	public static void delete(UUID orgId, long revision) {
+	public static void delete(UUID orgId, long revision) throws AlreadyUsedException {
 		Utils.delete(orgs.$TABLE, orgId, revision);
 	}
 

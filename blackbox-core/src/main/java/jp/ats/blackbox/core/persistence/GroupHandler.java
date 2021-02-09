@@ -253,7 +253,7 @@ public class GroupHandler {
 			});
 	}
 
-	public void delete(UUID groupId, long revision) {
+	public static void delete(UUID groupId, long revision) throws AlreadyUsedException {
 		Utils.delete(groups.$TABLE, groupId, revision);
 	}
 

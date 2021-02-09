@@ -2,12 +2,9 @@ package jp.ats.blackbox.stock.controller;
 
 import java.util.UUID;
 
-import jp.ats.blackbox.common.PrivilegeManager;
-import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.core.controller.ControllerUtils;
 import jp.ats.blackbox.core.controller.JournalController.PrivilegeException;
-import jp.ats.blackbox.core.executor.JournalExecutorMap;
-import jp.ats.blackbox.core.persistence.Privilege;
-import jp.ats.blackbox.core.persistence.SecurityValues;
+import jp.ats.blackbox.core.persistence.AlreadyUsedException;
 import jp.ats.blackbox.stock.persistence.StatusHandler;
 import jp.ats.blackbox.stock.persistence.StatusHandler.RegisterRequest;
 import jp.ats.blackbox.stock.persistence.StatusHandler.UpdateRequest;
@@ -16,39 +13,14 @@ import sqlassist.bb_stock.statuses;
 public class StatusController {
 
 	public static UUID register(RegisterRequest request) throws PrivilegeException {
-		var executor = JournalExecutorMap.get(request.group_id);
-		executor.readLock();
-		try {
-			var userId = SecurityValues.currentUserId();
-
-			if (!PrivilegeManager.hasPrivilegeOfGroup(userId, request.group_id, Privilege.GROUP).success) throw new PrivilegeException();
-
-			return StatusHandler.register(request, userId);
-		} finally {
-			executor.readUnlock();
-		}
+		return ControllerUtils.register(request.group_id, userId -> StatusHandler.register(request, userId));
 	}
 
 	public static void update(UpdateRequest request) throws PrivilegeException {
-		var groupId = request.group_id.orElseGet(
-			() -> U.recorder.play(
-				() -> new statuses()
-					.SELECT(a -> a.group_id)
-					.WHERE(a -> a.active.eq(true)))
-				.fetch(request.id)
-				.get()
-				.getGroup_id());
+		ControllerUtils.update(request.group_id, statuses.$TABLE, request.id, userId -> StatusHandler.update(request, userId));
+	}
 
-		var executor = JournalExecutorMap.get(groupId);
-		executor.readLock();
-		try {
-			var userId = SecurityValues.currentUserId();
-
-			if (!PrivilegeManager.hasPrivilegeOfGroup(userId, groupId, Privilege.GROUP).success) throw new PrivilegeException();
-
-			StatusHandler.update(request, userId);
-		} finally {
-			executor.readUnlock();
-		}
+	public static void delete(UUID ownerId, long revision) throws PrivilegeException, AlreadyUsedException {
+		ControllerUtils.delete(statuses.$TABLE, ownerId, () -> StatusHandler.delete(ownerId, revision));
 	}
 }

@@ -103,7 +103,7 @@ public class UserHandler {
 		request.tags.ifPresent(v -> TagExecutor.stickTagsAgain(v, request.id, users.$TABLE));
 	}
 
-	public static void delete(UUID userId, long revision) {
+	public static void delete(UUID userId, long revision) throws AlreadyUsedException {
 		Utils.delete(users.$TABLE, userId, revision);
 	}
 

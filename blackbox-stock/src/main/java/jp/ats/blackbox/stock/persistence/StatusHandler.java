@@ -3,6 +3,8 @@ package jp.ats.blackbox.stock.persistence;
 import java.util.Optional;
 import java.util.UUID;
 
+import jp.ats.blackbox.core.persistence.AlreadyUsedException;
+import jp.ats.blackbox.core.persistence.Utils;
 import jp.ats.blackbox.stock.persistence.StockComponentHandler.GroupInfo;
 import sqlassist.bb_stock.statuses;
 
@@ -36,7 +38,7 @@ public class StatusHandler {
 		});
 	}
 
-	public static void delete(UUID id, long revision) {
-		StockComponentHandler.delete(statuses.$TABLE, id, revision);
+	public static void delete(UUID id, long revision) throws AlreadyUsedException {
+		Utils.delete(statuses.$TABLE, id, revision);
 	}
 }

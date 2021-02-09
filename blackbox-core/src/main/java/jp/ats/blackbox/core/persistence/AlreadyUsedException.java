@@ -5,10 +5,8 @@ import java.util.UUID;
 import org.blendee.jdbc.TablePath;
 import org.blendee.jdbc.exception.ForeignKeyConstraintViolationException;
 
-import jp.ats.blackbox.common.BlackboxException;
-
 @SuppressWarnings("serial")
-public class AlreadyUsedException extends BlackboxException {
+public class AlreadyUsedException extends Exception {
 
 	private final TablePath table;
 

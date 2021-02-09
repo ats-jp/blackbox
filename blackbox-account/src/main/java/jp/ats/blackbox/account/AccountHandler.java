@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.core.executor.TagExecutor;
+import jp.ats.blackbox.core.persistence.AlreadyUsedException;
 import jp.ats.blackbox.core.persistence.SecurityValues;
 import jp.ats.blackbox.core.persistence.SeqHandler;
 import jp.ats.blackbox.core.persistence.Utils;
@@ -106,7 +107,7 @@ public class AccountHandler {
 		request.tags.ifPresent(v -> TagExecutor.stickTagsAgain(v, request.id, accounts.$TABLE));
 	}
 
-	public static void deleteAccount(UUID accountId, long revision) {
+	public static void deleteAccount(UUID accountId, long revision) throws AlreadyUsedException {
 		Utils.delete(accounts.$TABLE, accountId, revision);
 	}
 
@@ -198,7 +199,7 @@ public class AccountHandler {
 		request.tags.ifPresent(v -> TagExecutor.stickTagsAgain(v, request.id, subaccounts.$TABLE));
 	}
 
-	public static void deleteSubaccount(UUID accountId, long revision) {
+	public static void deleteSubaccount(UUID accountId, long revision) throws AlreadyUsedException {
 		Utils.delete(subaccounts.$TABLE, accountId, revision);
 	}
 }

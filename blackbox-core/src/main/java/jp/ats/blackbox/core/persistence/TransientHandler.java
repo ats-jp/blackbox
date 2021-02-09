@@ -94,7 +94,7 @@ public class TransientHandler {
 		if (result != 1) throw Utils.decisionException(transients.$TABLE, transientId);
 	}
 
-	public static void delete(UUID transientId, long revision) {
+	public static void delete(UUID transientId, long revision) throws AlreadyUsedException {
 		Utils.delete(transients.$TABLE, transientId, revision);
 	}
 

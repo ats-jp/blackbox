@@ -15,6 +15,7 @@ import org.blendee.assist.NotUniqueException;
 import jp.ats.blackbox.common.BlackboxException;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.core.executor.TagExecutor;
+import jp.ats.blackbox.core.persistence.AlreadyUsedException;
 import jp.ats.blackbox.core.persistence.DefaultCodeGenerator;
 import jp.ats.blackbox.core.persistence.InOut;
 import jp.ats.blackbox.core.persistence.Requests;
@@ -219,7 +220,7 @@ public class FormulaHandler {
 		if (result != 1) throw Utils.decisionException(formula_details.$TABLE, request.id);
 	}
 
-	public static void delete(long formulaRevision, UUID formulaId) {
+	public static void delete(long formulaRevision, UUID formulaId) throws AlreadyUsedException {
 		Utils.delete(transients.$TABLE, formulaId, formulaRevision);
 	}
 
