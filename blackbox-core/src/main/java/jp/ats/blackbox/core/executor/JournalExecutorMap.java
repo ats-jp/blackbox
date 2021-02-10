@@ -43,7 +43,11 @@ public class JournalExecutorMap {
 			return service.submit(() -> {
 				initializeIfUninitialized();
 
-				return executors.get(groupId);
+				var executor = executors.get(groupId);
+
+				if (executor == null) throw new IllegalStateException("group : " + groupId + " not found.");
+
+				return executor;
 			}).get();
 		} catch (InterruptedException e) {
 			logger.warn(e.getMessage());
@@ -61,6 +65,16 @@ public class JournalExecutorMap {
 
 			Blendee.execute(t -> {
 				reloadOrgInternal(orgId);
+			});
+		});
+	}
+
+	public static void removeOrg(UUID orgId) {
+		service.submit(() -> {
+			initializeIfUninitialized();
+
+			Blendee.execute(t -> {
+				orgGroups.remove(orgId).stream().forEach(groupId -> executors.remove(groupId).stop());
 			});
 		});
 	}

@@ -54,6 +54,6 @@ public class ItemController {
 	}
 
 	public static void deleteSku(UUID itemId, long revision) throws AlreadyUsedException {
-		ItemHandler.deleteItem(itemId, revision);
+		ItemHandler.deleteSku(itemId, revision);
 	}
 }

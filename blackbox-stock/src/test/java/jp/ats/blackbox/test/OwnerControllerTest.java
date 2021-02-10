@@ -1,7 +1,6 @@
 package jp.ats.blackbox.test;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.blendee.util.Blendee;
 
@@ -36,7 +35,7 @@ public class OwnerControllerTest {
 		req.props = Optional.of("{}");
 		req.tags = Optional.of(new String[] { "tag1", "tag2" });
 
-		UUID registered = OwnerController.register(req);
+		var registered = OwnerController.register(req);
 
 		System.out.print("registered id: " + registered);
 
@@ -48,5 +47,7 @@ public class OwnerControllerTest {
 		updateReq.revision = 0;
 
 		OwnerController.update(updateReq);
+
+		OwnerController.delete(registered, 1);
 	}
 }

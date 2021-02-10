@@ -108,7 +108,11 @@ INSERT INTO bb.instances VALUES (
 
 ----------
 
+--全グループの更新状態リビジョン
 CREATE SEQUENCE bb.group_tree_revision_seq;
+--instanceを移設した際、instance間で最大の番号を持つものに更新すること
+--移設してきた新instanceのほうが値が大きい場合、その値に更新
+--移設してきた新instanceのほうが値が小さい場合、なにもしない
 
 --組織
 CREATE TABLE bb.orgs (
@@ -1288,7 +1292,7 @@ SET default_tablespace = 'blackbox_index';
 GRANT USAGE ON SCHEMA bb TO blackbox;
 
 --シーケンス使用権を付与
-GRANT USAGE ON ALL SEQUENCES IN SCHEMA bb TO blackbox;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA bb TO blackbox;
 
 --全テーブルSELECT可能
 GRANT SELECT ON ALL TABLES IN SCHEMA bb TO blackbox;

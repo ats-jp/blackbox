@@ -6,32 +6,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import jp.ats.blackbox.core.persistence.Privilege;
+import sqlassist.bb.groups;
 import sqlassist.bb.orgs;
 import sqlassist.bb.relationships;
 import sqlassist.bb.units;
 import sqlassist.bb.users;
 
 public class PrivilegeManager {
-
-	public static boolean hasPrivilegeOfOrg(UUID userId, UUID orgId) {
-		//自身を検索
-		return U.recorder.play(
-			() -> new users().SELECT(a -> a.ls(a.$groups().org_id, a.privilege))
-				.WHERE(a -> a.active.eq(true)))
-			.fetch(userId)
-			.map(
-				r -> {
-					var myOrgId = r.$groups().getOrg_id();
-					var myPrivilege = r.getPrivilege().intValue();
-
-					//自身の組織の場合、自身の権限がORG以上か
-					if (myOrgId.equals(orgId)) return myPrivilege < Privilege.ORG.value;
-
-					//自身の組織ではない場合、自身の権限がSYSTEMか
-					return myPrivilege <= Privilege.SYSTEM.value;
-				})
-			.orElse(false);
-	}
 
 	/**
 	 * groupIdがgrousIdsすべての親であることを検査
@@ -71,6 +52,8 @@ public class PrivilegeManager {
 
 		public boolean success;
 
+		public UUID orgId;
+
 		public long groupTreeRevision;
 	}
 
@@ -80,7 +63,11 @@ public class PrivilegeManager {
 		//自身の属するグループ及びその下部グループに対象のグループがあるか
 		return U.recorder.play(
 			() -> new users()
-				.SELECT(a -> a.ls(a.privilege, a.$groups().$orgs().group_tree_revision))
+				.SELECT(
+					a -> a.ls(
+						a.privilege,
+						a.$groups().org_id,
+						a.$groups().$orgs().group_tree_revision))
 				.LEFT_OUTER_JOIN(new relationships().SELECT(a -> a.id))
 				.ON((l, r) -> r.parent_id.eq(l.group_id).AND.child_id.eq($UUID))
 				.WHERE(a -> a.active.eq(true).AND.id.eq($UUID)),
@@ -92,6 +79,8 @@ public class PrivilegeManager {
 				}
 
 				var myPrivilege = Privilege.of(r.getBigDecimal(users.privilege).intValue()).value;
+
+				result.orgId = (UUID) r.getObject(groups.org_id);
 
 				result.groupTreeRevision = r.getLong(orgs.group_tree_revision);
 

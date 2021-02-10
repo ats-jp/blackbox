@@ -37,7 +37,7 @@ public class ItemControllerTest {
 		req.props = Optional.of("{}");
 		req.tags = Optional.of(new String[] { "tag1", "tag2" });
 
-		UUID registered = ItemController.register(req);
+		var registered = ItemController.register(req);
 
 		System.out.print("registered id: " + registered);
 
@@ -60,7 +60,7 @@ public class ItemControllerTest {
 		req.props = Optional.of("{}");
 		req.tags = Optional.of(new String[] { "tag1", "tag2" });
 
-		UUID registered = ItemController.register(req);
+		var registered = ItemController.register(req);
 
 		System.out.print("registered id: " + registered);
 
@@ -72,5 +72,9 @@ public class ItemControllerTest {
 		updateReq.revision = 0;
 
 		ItemController.update(updateReq);
+
+		ItemController.deleteSku(registered, 1);
+
+		ItemController.deleteItem(itemId, 1);
 	}
 }

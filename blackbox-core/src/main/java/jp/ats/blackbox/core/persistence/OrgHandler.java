@@ -22,7 +22,7 @@ public class OrgHandler {
 		public Optional<String> props = Optional.empty();
 	}
 
-	public static UUID register(RegisterRequest request) {
+	public static UUID register(RegisterRequest request, UUID userId) {
 		var seqRequest = new SeqHandler.Request();
 		seqRequest.table = orgs.$TABLE;
 		seqRequest.dependsColumn = orgs.instance_id;
@@ -31,16 +31,14 @@ public class OrgHandler {
 
 		seqRequest.dependsId = instanceId;
 		return SeqHandler.getInstance().nextSeqAndGet(seqRequest, seq -> {
-			return registerInternal(seq, instanceId, request);
+			return registerInternal(seq, instanceId, request, userId);
 		});
 	}
 
-	private static UUID registerInternal(long seq, UUID instanceId, RegisterRequest request) {
+	private static UUID registerInternal(long seq, UUID instanceId, RegisterRequest request, UUID userId) {
 		var row = orgs.row();
 
 		UUID id = UUID.randomUUID();
-
-		UUID userId = SecurityValues.currentUserId();
 
 		row.setId(id);
 		row.setInstance_id(instanceId);
@@ -75,15 +73,15 @@ public class OrgHandler {
 		public Optional<Boolean> active = Optional.empty();
 	}
 
-	public static void update(UpdateRequest request) {
+	public static void update(UpdateRequest request, UUID userId) {
 		int result = new orgs().UPDATE(a -> {
 			a.revision.set(request.revision + 1);
 			request.name.ifPresent(v -> a.name.set(v));
 			request.code.ifPresent(v -> a.code.set(v));
 			request.description.ifPresent(v -> a.description.set(v));
-			request.props.ifPresent(v -> a.props.set(v));
+			request.props.ifPresent(v -> a.props.set(U.toPGObject(v)));
 			request.active.ifPresent(v -> a.active.set(v));
-			a.updated_by.set(SecurityValues.currentUserId());
+			a.updated_by.set(userId);
 			a.updated_at.setAny("now()");
 		}).WHERE(a -> a.id.eq(request.id).AND.revision.eq(request.revision)).execute();
 

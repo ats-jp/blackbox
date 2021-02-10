@@ -5,12 +5,12 @@ import java.util.Optional;
 import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
+import jp.ats.blackbox.core.controller.GroupController;
 import jp.ats.blackbox.core.executor.JournalExecutorMap;
+import jp.ats.blackbox.core.persistence.GroupHandler;
 import jp.ats.blackbox.core.persistence.SecurityValues;
-import jp.ats.blackbox.stock.controller.StatusController;
-import jp.ats.blackbox.stock.persistence.StatusHandler;
 
-public class StatusHandlerTest {
+public class GroupControllerTest {
 
 	public static void main(String[] args) {
 		Common.startWithLog();
@@ -29,26 +29,26 @@ public class StatusHandlerTest {
 	}
 
 	private static void execute() throws Exception {
-		var req = new StatusHandler.RegisterRequest();
-		req.group_id = U.PRIVILEGE_ID;
+		var req = new GroupHandler.RegisterRequest();
+		req.org_id = U.PRIVILEGE_ID;
+		req.parent_id = U.NULL_ID;
 		req.name = "test";
-		req.owner_id = U.NULL_ID;
 		req.props = Optional.of("{}");
 		req.tags = Optional.of(new String[] { "tag1", "tag2" });
 
-		var registered = StatusController.register(req);
+		var registered = GroupController.register(req);
 
-		System.out.print("registered id: " + registered);
+		System.out.println("registered id: " + registered);
 
-		var updateReq = new StatusHandler.UpdateRequest();
+		var updateReq = new GroupHandler.UpdateRequest();
 		updateReq.id = registered;
 		updateReq.name = Optional.of("test");
 		updateReq.props = Optional.of("{}");
 		updateReq.tags = Optional.of(new String[] { "tag1", "tag2" });
 		updateReq.revision = 0;
 
-		StatusController.update(updateReq);
+		GroupController.update(updateReq);
 
-		StatusController.delete(registered, 1);
+		GroupController.delete(registered, 1);
 	}
 }

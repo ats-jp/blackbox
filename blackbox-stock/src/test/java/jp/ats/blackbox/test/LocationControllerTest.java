@@ -1,7 +1,6 @@
 package jp.ats.blackbox.test;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.blendee.util.Blendee;
 
@@ -37,7 +36,7 @@ public class LocationControllerTest {
 		req.props = Optional.of("{}");
 		req.tags = Optional.of(new String[] { "tag1", "tag2" });
 
-		UUID registered = LocationController.register(req);
+		var registered = LocationController.register(req);
 
 		System.out.print("registered id: " + registered);
 
@@ -49,5 +48,7 @@ public class LocationControllerTest {
 		updateReq.revision = 0;
 
 		LocationController.update(updateReq);
+
+		LocationController.delete(registered, 1);
 	}
 }
