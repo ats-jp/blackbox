@@ -13,13 +13,14 @@ import javax.ws.rs.core.MediaType;
 
 import jp.ats.blackbox.backend.api.Utils.IdResult;
 import jp.ats.blackbox.backend.api.Utils.JsonProcessingException;
+import jp.ats.blackbox.backend.api.request.SimpleJournalRegisterRequest;
+import jp.ats.blackbox.backend.api.request.SimpleJournalRegisterRequestConverter;
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.core.controller.JournalController;
 import jp.ats.blackbox.core.controller.JournalController.JournalNotFoundException;
 import jp.ats.blackbox.core.executor.CommandFailedException;
 import jp.ats.blackbox.core.persistence.Requests.JournalDenyRequest;
 import jp.ats.blackbox.core.persistence.Requests.JournalOverwriteRequest;
-import jp.ats.blackbox.core.persistence.Requests.JournalRegisterRequest;
 
 @Path("journals")
 public class Journals {
@@ -30,7 +31,8 @@ public class Journals {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String register(String json) {
 		try {
-			var promise = JournalController.register(parse(json, JournalRegisterRequest.class));
+			var promise = JournalController.register(
+				SimpleJournalRegisterRequestConverter.convert(parse(json, SimpleJournalRegisterRequest.class)));
 
 			promise.waitUntilFinished();
 
@@ -53,7 +55,8 @@ public class Journals {
 	public String registerNowait(String json) {
 		try {
 			var result = new IdResult();
-			result.id = JournalController.register(parse(json, JournalRegisterRequest.class)).getId();
+			result.id = JournalController.register(
+				SimpleJournalRegisterRequestConverter.convert(parse(json, SimpleJournalRegisterRequest.class))).getId();
 			result.success = true;
 
 			return U.toJson(result);
@@ -70,7 +73,8 @@ public class Journals {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String registerLazily(String json) {
 		try {
-			var promise = JournalController.registerLazily(parse(json, JournalRegisterRequest.class));
+			var promise = JournalController.register(
+				SimpleJournalRegisterRequestConverter.convert(parse(json, SimpleJournalRegisterRequest.class)));
 
 			promise.waitUntilFinished();
 
@@ -93,7 +97,8 @@ public class Journals {
 	public String registerLazilyNowait(String json) {
 		try {
 			var result = new IdResult();
-			result.id = JournalController.registerLazily(parse(json, JournalRegisterRequest.class)).getId();
+			result.id = JournalController.register(
+				SimpleJournalRegisterRequestConverter.convert(parse(json, SimpleJournalRegisterRequest.class))).getId();
 			result.success = true;
 
 			return U.toJson(result);

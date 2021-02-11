@@ -6,6 +6,7 @@ import org.blendee.util.Blendee;
 
 import jp.ats.blackbox.common.U;
 import jp.ats.blackbox.core.controller.OrgController;
+import jp.ats.blackbox.core.executor.JournalExecutorMap;
 import jp.ats.blackbox.core.persistence.OrgHandler;
 import jp.ats.blackbox.core.persistence.SecurityValues;
 
@@ -16,9 +17,13 @@ public class OrgControllerTest {
 
 		SecurityValues.start(U.PRIVILEGE_ID);
 
-		Blendee.execute(t -> {
-			execute();
-		});
+		try {
+			Blendee.execute(t -> {
+				execute();
+			});
+		} finally {
+			JournalExecutorMap.shutdown();
+		}
 
 		SecurityValues.end();
 	}
