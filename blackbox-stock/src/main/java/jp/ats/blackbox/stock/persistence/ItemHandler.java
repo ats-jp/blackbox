@@ -16,8 +16,6 @@ public class ItemHandler {
 	public static class ItemRegisterRequest extends StockComponentHandler.RegisterRequest {
 
 		public UUID group_id;
-
-		public UUID owner_id;
 	}
 
 	public static class ItemUpdateRequest extends StockComponentHandler.UpdateRequest {
@@ -40,14 +38,12 @@ public class ItemHandler {
 	public static UUID register(ItemRegisterRequest request, UUID userId) {
 		return StockComponentHandler.register(items.$TABLE, request, new GroupInfo(request.group_id), userId, r -> {
 			r.setUUID(items.group_id, request.group_id);
-			r.setUUID(items.owner_id, request.owner_id);
 		});
 	}
 
 	public static void update(ItemUpdateRequest request, UUID userId) {
 		StockComponentHandler.update(items.$TABLE, request, userId, a -> {
 			request.group_id.ifPresent(i -> a.col(items.group_id).set(i));
-			request.owner_id.ifPresent(i -> a.col(items.owner_id).set(i));
 		});
 	}
 

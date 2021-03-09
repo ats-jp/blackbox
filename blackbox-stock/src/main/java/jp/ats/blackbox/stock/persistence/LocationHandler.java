@@ -13,8 +13,6 @@ public class LocationHandler {
 	public static class RegisterRequest extends StockComponentHandler.RegisterRequest {
 
 		public UUID group_id;
-
-		public UUID owner_id;
 	}
 
 	public static class UpdateRequest extends StockComponentHandler.UpdateRequest {
@@ -27,14 +25,12 @@ public class LocationHandler {
 	public static UUID register(RegisterRequest request, UUID userId) {
 		return StockComponentHandler.register(locations.$TABLE, request, new GroupInfo(request.group_id), userId, r -> {
 			r.setUUID(locations.group_id, request.group_id);
-			r.setUUID(locations.owner_id, request.owner_id);
 		});
 	}
 
 	public static void update(UpdateRequest request, UUID userId) {
 		StockComponentHandler.update(locations.$TABLE, request, userId, a -> {
 			request.group_id.ifPresent(i -> a.col(locations.group_id).set(i));
-			request.owner_id.ifPresent(i -> a.col(locations.owner_id).set(i));
 		});
 	}
 

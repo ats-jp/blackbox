@@ -33,7 +33,6 @@ public class ItemControllerTest {
 		var req = new ItemHandler.ItemRegisterRequest();
 		req.group_id = U.NULL_ID;
 		req.name = "test";
-		req.owner_id = U.NULL_ID;
 		req.props = Optional.of("{}");
 		req.tags = Optional.of(new String[] { "tag1", "tag2" });
 

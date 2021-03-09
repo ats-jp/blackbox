@@ -165,7 +165,7 @@ public class items
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "name", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "名称", defaultValue = "null", ordinalPosition = 4, notNull = true)
+	@Column(name = "name", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "名称", defaultValue = "''::text", ordinalPosition = 4, notNull = true)
 	public static final String name = "name";
 
 	/**
@@ -174,7 +174,7 @@ public class items
 	 * type: text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "code", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部システムコード", defaultValue = "null", ordinalPosition = 5, notNull = true)
+	@Column(name = "code", type = 12, typeName = "text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部システムコード", defaultValue = "''::text", ordinalPosition = 5, notNull = true)
 	public static final String code = "code";
 
 	/**
@@ -187,21 +187,12 @@ public class items
 	public static final String description = "description";
 
 	/**
-	 * name: owner_id<br>
-	 * remarks: 所有者ID<br>
-	 * type: uuid(2147483647)<br>
-	 * not null: true<br>
-	 */
-	@Column(name = "owner_id", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "所有者ID", defaultValue = "null", ordinalPosition = 7, notNull = true)
-	public static final String owner_id = "owner_id";
-
-	/**
 	 * name: revision<br>
 	 * remarks: リビジョン番号<br>
 	 * type: int8(19)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 8, notNull = true)
+	@Column(name = "revision", type = -5, typeName = "int8", size = 19, hasDecimalDigits = true, decimalDigits = 0, remarks = "リビジョン番号", defaultValue = "0", ordinalPosition = 7, notNull = true)
 	public static final String revision = "revision";
 
 	/**
@@ -210,7 +201,7 @@ public class items
 	 * type: jsonb(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 9, notNull = true)
+	@Column(name = "props", type = 1111, typeName = "jsonb", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "外部アプリケーション情報JSON", defaultValue = "'{}'::jsonb", ordinalPosition = 8, notNull = true)
 	public static final String props = "props";
 
 	/**
@@ -219,7 +210,7 @@ public class items
 	 * type: _text(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "log保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 10, notNull = true)
+	@Column(name = "tags", type = 2003, typeName = "_text", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "log保存用タグ", defaultValue = "'{}'::text[]", ordinalPosition = 9, notNull = true)
 	public static final String tags = "tags";
 
 	/**
@@ -228,7 +219,7 @@ public class items
 	 * type: bool(1)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "active", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "アクティブフラグ", defaultValue = "true", ordinalPosition = 11, notNull = true)
+	@Column(name = "active", type = -7, typeName = "bool", size = 1, hasDecimalDigits = true, decimalDigits = 0, remarks = "アクティブフラグ", defaultValue = "true", ordinalPosition = 10, notNull = true)
 	public static final String active = "active";
 
 	/**
@@ -237,7 +228,7 @@ public class items
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 12, notNull = true)
+	@Column(name = "created_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "作成時刻", defaultValue = "now()", ordinalPosition = 11, notNull = true)
 	public static final String created_at = "created_at";
 
 	/**
@@ -246,7 +237,7 @@ public class items
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 13, notNull = true)
+	@Column(name = "created_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "作成ユーザー", defaultValue = "null", ordinalPosition = 12, notNull = true)
 	public static final String created_by = "created_by";
 
 	/**
@@ -255,7 +246,7 @@ public class items
 	 * type: timestamptz(35, 6)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 14, notNull = true)
+	@Column(name = "updated_at", type = 93, typeName = "timestamptz", size = 35, hasDecimalDigits = true, decimalDigits = 6, remarks = "更新時刻", defaultValue = "now()", ordinalPosition = 13, notNull = true)
 	public static final String updated_at = "updated_at";
 
 	/**
@@ -264,7 +255,7 @@ public class items
 	 * type: uuid(2147483647)<br>
 	 * not null: true<br>
 	 */
-	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 15, notNull = true)
+	@Column(name = "updated_by", type = 1111, typeName = "uuid", size = 2147483647, hasDecimalDigits = true, decimalDigits = 0, remarks = "更新ユーザー", defaultValue = "null", ordinalPosition = 14, notNull = true)
 	public static final String updated_by = "updated_by";
 
 	/**
@@ -548,36 +539,6 @@ public class items
 		public java.lang.String getDescription() {
 			Binder binder = data$.getValue("description");
 			return (java.lang.String) binder.getValue();
-		}
-
-		/**
-		 * setter
-		 * name: owner_id<br>
-		 * remarks: 所有者ID<br>
-		 * type: uuid(2147483647)<br>
-		 * not null: true<br>
-		 * @param value java.util.UUID
-		 */
-		public void setOwner_id(java.util.UUID value) {
-			Objects.requireNonNull(value);
-			ValueExtractor valueExtractor = ContextManager.get(ValueExtractorsConfigure.class)
-				.getValueExtractors()
-				.selectValueExtractor(
-					rowRel$.getColumn("owner_id").getType());
-			data$.setValue("owner_id", valueExtractor.extractAsBinder(value));
-		}
-
-		/**
-		 * getter
-		 * name: owner_id<br>
-		 * remarks: 所有者ID<br>
-		 * type: uuid(2147483647)<br>
-		 * not null: true<br>
-		 * @return java.util.UUID
-		 */
-		public java.util.UUID getOwner_id() {
-			Binder binder = data$.getValue("owner_id");
-			return (java.util.UUID) binder.getValue();
 		}
 
 		/**
@@ -1948,11 +1909,6 @@ public class items
 		public final T description;
 
 		/**
-		 * 項目名 owner_id
-		 */
-		public final T owner_id;
-
-		/**
 		 * 項目名 revision
 		 */
 		public final T revision;
@@ -2009,7 +1965,6 @@ public class items
 			this.name = builder$.buildColumn(this, sqlassist.bb_stock.items.name);
 			this.code = builder$.buildColumn(this, sqlassist.bb_stock.items.code);
 			this.description = builder$.buildColumn(this, sqlassist.bb_stock.items.description);
-			this.owner_id = builder$.buildColumn(this, sqlassist.bb_stock.items.owner_id);
 			this.revision = builder$.buildColumn(this, sqlassist.bb_stock.items.revision);
 			this.props = builder$.buildColumn(this, sqlassist.bb_stock.items.props);
 			this.tags = builder$.buildColumn(this, sqlassist.bb_stock.items.tags);

@@ -32,7 +32,6 @@ public class StatusHandlerTest {
 		var req = new StatusHandler.RegisterRequest();
 		req.group_id = U.PRIVILEGE_ID;
 		req.name = "test";
-		req.owner_id = U.NULL_ID;
 		req.props = Optional.of("{}");
 		req.tags = Optional.of(new String[] { "tag1", "tag2" });
 

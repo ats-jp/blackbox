@@ -49,7 +49,13 @@ id
 	org単位でデータベース間の移行が可能なようにUUIDを使用
 name
 	各オブジェクトの名称
-	システム的には特別な意味を持たない
+	Blackbox的には単なる文字列であり特別な意味を持たない
+	障害時の調査等に使用することを想定している
+code
+	各オブジェクトを識別するためのコード
+	Blackbox的には単なる文字列であり特別な意味を持たない
+	発番や制約は外部アプリケーションが実装するものとする
+	障害時の調査等に使用することを想定している
 revision
 	楽観的排他制御のためのリビジョン番号
 	更新時にデータ参照時のリビジョン番号で更新し、失敗したら既に他で更新されていると判断する
@@ -87,7 +93,7 @@ SET default_tablespace = 'blackbox';
 --Blackboxインスタンス
 CREATE TABLE bb.instances (
 	id uuid PRIMARY KEY,
-	name text NOT NULL,
+	name text DEFAULT '' NOT NULL,
 	description text DEFAULT '' NOT NULL,
 	principal boolean NOT NULL);
 
@@ -119,8 +125,8 @@ CREATE TABLE bb.orgs (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	instance_id uuid REFERENCES bb.instances NOT NULL,
 	seq bigint NOT NULL,
-	name text NOT NULL,
-	code text UNIQUE NOT NULL,
+	name text DEFAULT '' NOT NULL,
+	code text DEFAULT '' NOT NULL,
 	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	group_tree_revision bigint NOT NULL,
@@ -140,8 +146,7 @@ COMMENT ON COLUMN bb.orgs.id IS 'ID';
 COMMENT ON COLUMN bb.orgs.instance_id IS '発生元インスタンスのID';
 COMMENT ON COLUMN bb.orgs.seq IS 'インスタンス内連番';
 COMMENT ON COLUMN bb.orgs.name IS '名称';
-COMMENT ON COLUMN bb.orgs.code IS '外部システムコード
-インスタンスを合併した場合でもユニークである必要あり';
+COMMENT ON COLUMN bb.orgs.code IS '外部システムコード';
 COMMENT ON COLUMN bb.orgs.description IS '補足事項';
 COMMENT ON COLUMN bb.orgs.revision IS 'リビジョン番号';
 COMMENT ON COLUMN bb.orgs.group_tree_revision IS 'グループ階層リビジョン番号
@@ -168,7 +173,6 @@ FOR EACH ROW EXECUTE PROCEDURE bb.org_group_tree_revisionfunction();
 
 CREATE INDEX ON bb.orgs (active);
 CREATE INDEX ON bb.orgs (seq);
-CREATE INDEX ON bb.orgs (code);
 
 --NULLの代用(id=00000000-0000-0000-0000-000000000000)
 INSERT INTO bb.orgs (
@@ -225,8 +229,8 @@ CREATE TABLE bb.groups (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	org_id uuid REFERENCES bb.orgs NOT NULL,
 	seq bigint NOT NULL,
-	name text NOT NULL,
-	code text NOT NULL,
+	name text DEFAULT '' NOT NULL,
+	code text DEFAULT '' NOT NULL,
 	description text DEFAULT '' NOT NULL,
 	parent_id uuid REFERENCES bb.groups NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
@@ -281,7 +285,6 @@ FOR EACH ROW EXECUTE PROCEDURE bb.group_tree_revisionfunction();
 
 CREATE INDEX ON bb.groups (org_id);
 CREATE INDEX ON bb.groups (seq);
-CREATE INDEX ON bb.groups (code);
 CREATE INDEX ON bb.groups (active);
 --parent_idで検索することはないのでindex不要
 
@@ -441,8 +444,8 @@ CREATE TABLE bb.users (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
-	name text NOT NULL,
-	code text NOT NULL,
+	name text DEFAULT '' NOT NULL,
+	code text DEFAULT '' NOT NULL,
 	description text DEFAULT '' NOT NULL,
 	privilege smallint CHECK (privilege IN (0, 1, 2, 3, 9)) NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
@@ -478,7 +481,6 @@ COMMENT ON COLUMN bb.users.updated_by IS '更新ユーザー';
 
 CREATE INDEX ON bb.users (group_id);
 CREATE INDEX ON bb.users (seq);
-CREATE INDEX ON bb.users (code);
 CREATE INDEX ON bb.users (privilege);
 CREATE INDEX ON bb.users (active);
 
@@ -549,7 +551,7 @@ CREATE TABLE bb.executors (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	org_id uuid REFERENCES bb.orgs NOT NULL,
 	seq bigint NOT NULL,
-	name text NOT NULL,
+	name text DEFAULT '' NOT NULL,
 	description text DEFAULT '' NOT NULL,
 	revision bigint DEFAULT 0 NOT NULL,
 	props jsonb DEFAULT '{}' NOT NULL,
@@ -719,7 +721,7 @@ CREATE TABLE bb.journals (
 	id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
 	group_id uuid REFERENCES bb.groups NOT NULL,
 	seq bigint NOT NULL,
-	code text NOT NULL,
+	code text DEFAULT '' NOT NULL,
 	journal_batch_id uuid REFERENCES bb.journal_batches NOT NULL,
 	fixed_at timestamptz NOT NULL,
 	description text DEFAULT '' NOT NULL,
@@ -761,7 +763,6 @@ COMMENT ON COLUMN bb.journals.created_by IS '作成ユーザー';
 --journals
 CREATE INDEX ON bb.journals (group_id);
 CREATE INDEX ON bb.journals (seq);
-CREATE INDEX ON bb.journals (code);
 CREATE INDEX ON bb.journals (fixed_at);
 CREATE INDEX ON bb.journals (created_at);
 
