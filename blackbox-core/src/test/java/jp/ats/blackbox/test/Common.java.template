@@ -32,6 +32,7 @@ public class Common {
 		param.put(BlendeeConstants.JDBC_USER, "[user]");
 		param.put(BlendeeConstants.JDBC_PASSWORD, "[password]");
 		param.put(BlendeeConstants.AUTO_CLOSE_INTERVAL_MILLIS, 300);
+		param.put(BlendeeConstants.SQL_EXTRACTOR_CLASS, ToStringSQLExtractor.class);
 
 		return param;
 	}

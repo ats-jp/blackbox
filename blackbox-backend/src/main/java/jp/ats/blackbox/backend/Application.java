@@ -5,6 +5,9 @@ import java.util.Properties;
 
 import javax.servlet.DispatcherType;
 
+import org.blendee.dialect.ToStringSQLExtractor;
+import org.blendee.dialect.postgresql.PostgreSQLErrorConverter;
+import org.blendee.util.DriverManagerTransactionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -25,11 +28,12 @@ public interface Application {
 
 		context.setInitParameter("blendee-schema-names", blendeeSchemaNames());
 		context.setInitParameter("blendee-log-stacktrace-filter", ".");
-		context.setInitParameter("blendee-transaction-factory-class", "org.blendee.util.DriverManagerTransactionFactory");
-		context.setInitParameter("blendee-error-converter-class", "org.blendee.dialect.postgresql.PostgreSQLErrorConverter");
+		context.setInitParameter("blendee-transaction-factory-class", DriverManagerTransactionFactory.class.getName());
+		context.setInitParameter("blendee-error-converter-class", PostgreSQLErrorConverter.class.getName());
 		context.setInitParameter("blendee-use-lazy-transaction", "true");
 		context.setInitParameter("blendee-logger-class", config.getProperty("blendee-logger-class"));
 		context.setInitParameter("blendee-log-stacktrace-filter", "blackbox");
+		context.setInitParameter("blendee-sql-extractor-class", ToStringSQLExtractor.class.getName());
 		context.setInitParameter("blendee-table-facade-package", "sqlassist");
 
 		context.setInitParameter("blendee-jdbc-driver-class-name", "org.postgresql.Driver");
