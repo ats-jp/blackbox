@@ -21,7 +21,7 @@ public class Common {
 		var param = param();
 		param.put(BlendeeConstants.LOGGER_CLASS, SystemOutLogger.class);
 
-		BlendeeStarter.start(param);
+		Blendee.start(param);
 	}
 
 	static Map<OptionKey<?>, Object> param() {
